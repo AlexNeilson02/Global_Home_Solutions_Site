@@ -57,6 +57,7 @@ export default function Login() {
     defaultValues: {
       username: "",
       password: "",
+      role: "salesperson", // Default to salesperson role
     },
   });
 
@@ -201,6 +202,26 @@ export default function Login() {
                         <FormControl>
                           <Input type="password" placeholder="Enter your password" {...field} />
                         </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={loginForm.control}
+                    name="role"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Login As</FormLabel>
+                        <select
+                          className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                          {...field}
+                        >
+                          <option value="salesperson">Salesperson</option>
+                          <option value="contractor">Contractor</option>
+                          <option value="admin">Admin</option>
+                          <option value="homeowner">Homeowner</option>
+                        </select>
                         <FormMessage />
                       </FormItem>
                     )}
