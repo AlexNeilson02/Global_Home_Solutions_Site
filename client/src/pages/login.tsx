@@ -79,7 +79,20 @@ export default function Login() {
     
     try {
       await login(data);
-      navigate("/");
+      // Redirect based on user role
+      switch (data.role) {
+        case "salesperson":
+          navigate("/sales-dashboard");
+          break;
+        case "contractor":
+          navigate("/contractor-dashboard");
+          break;
+        case "admin":
+          navigate("/admin-dashboard");
+          break;
+        default:
+          navigate("/");
+      }
     } catch (err: any) {
       setError(err.message || "Login failed. Please check your credentials.");
     } finally {

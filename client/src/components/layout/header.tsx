@@ -6,13 +6,11 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { getInitials } from "@/lib/utils";
 import { useTheme } from "@/components/ui/theme-provider";
-import { PortalSwitcher } from "./portal-switcher";
 import { 
   Menu, 
   User, 
@@ -39,17 +37,15 @@ export function Header() {
               <span>ContractConnect</span>
             </Link>
           </div>
-          
+
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-6">
-            <PortalSwitcher />
-            
             <Link href="/">
               <Button variant="default">
                 Request a Quote
               </Button>
             </Link>
-            
+
             {user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -85,7 +81,7 @@ export function Header() {
               </Link>
             )}
           </div>
-          
+
           {/* Mobile Menu Button */}
           <Button 
             variant="ghost" 
@@ -96,7 +92,7 @@ export function Header() {
             <Menu className="h-6 w-6" />
           </Button>
         </div>
-        
+
         {/* Mobile Navigation */}
         {isMenuOpen && (
           <div className="md:hidden py-4 border-t">
@@ -109,7 +105,7 @@ export function Header() {
                   Home
                 </Button>
               </Link>
-              
+
               {user ? (
                 <>
                   <Link href={
@@ -124,7 +120,7 @@ export function Header() {
                       Dashboard
                     </Button>
                   </Link>
-                  
+
                   <Button 
                     variant="ghost" 
                     className="w-full justify-start"
@@ -133,7 +129,7 @@ export function Header() {
                     {theme === "light" ? <Moon className="mr-2 h-4 w-4" /> : <Sun className="mr-2 h-4 w-4" />}
                     {theme === "light" ? "Dark Mode" : "Light Mode"}
                   </Button>
-                  
+
                   <Button 
                     variant="ghost" 
                     className="w-full justify-start"
