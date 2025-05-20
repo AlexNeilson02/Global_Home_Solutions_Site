@@ -23,6 +23,7 @@ export const users = pgTable("users", {
   role: text("role").notNull().default("homeowner"), // homeowner, contractor, salesperson, admin
   createdAt: timestamp("created_at").defaultNow(),
   avatarUrl: text("avatar_url"),
+  lastLogin: timestamp("last_login"),
 });
 
 // Contractors table
@@ -55,6 +56,8 @@ export const salespersons = pgTable("salespersons", {
   conversionRate: real("conversion_rate").default(0),
   commissions: real("commissions").default(0),
   activeProjects: integer("active_projects").default(0),
+  totalVisits: integer("total_visits").default(0),
+  successfulConversions: integer("successful_conversions").default(0),
 });
 
 // Projects/Leads table
@@ -100,6 +103,21 @@ export const bidRequests = pgTable("bid_requests", {
   additionalInformation: text("additional_information"),
   status: text("status").notNull().default("pending"), // pending, sent, contacted, completed, declined
   emailSent: boolean("email_sent").default(false),
+  lastUpdated: timestamp("last_updated"),
+  notes: text("notes"),
+});
+
+// Page visit tracking table
+export const pageVisits = pgTable("page_visits", {
+  id: serial("id").primaryKey(),
+  salespersonId: integer("salesperson_id").references(() => salespersons.id),
+  visitorIp: text("visitor_ip"),
+  userAgent: text("user_agent"),
+  referrer: text("referrer"),
+  path: text("path").notNull(),
+  timestamp: timestamp("timestamp").defaultNow(),
+  convertedToBidRequest: boolean("converted_to_bid_request").default(false),
+  bidRequestId: integer("bid_request_id").references(() => bidRequests.id),
 });
 
 // Insert schemas
@@ -110,6 +128,7 @@ export const insertServiceCategorySchema = createInsertSchema(serviceCategories)
 export const insertUserSchema = createInsertSchema(users).omit({
   id: true,
   createdAt: true,
+  lastLogin: true,
 });
 
 export const insertContractorSchema = createInsertSchema(contractors).omit({
@@ -123,6 +142,8 @@ export const insertSalespersonSchema = createInsertSchema(salespersons).omit({
   conversionRate: true,
   commissions: true,
   activeProjects: true,
+  totalVisits: true,
+  successfulConversions: true,
 });
 
 export const insertProjectSchema = createInsertSchema(projects).omit({
@@ -141,6 +162,15 @@ export const insertBidRequestSchema = createInsertSchema(bidRequests).omit({
   createdAt: true,
   status: true,
   emailSent: true,
+  lastUpdated: true,
+  notes: true,
+});
+
+export const insertPageVisitSchema = createInsertSchema(pageVisits).omit({
+  id: true,
+  timestamp: true,
+  convertedToBidRequest: true,
+  bidRequestId: true,
 });
 
 // Relations - these are required for Drizzle ORM
@@ -157,6 +187,7 @@ export const contractorsRelations = relations(contractors, ({ one, many }) => ({
     references: [users.id],
   }),
   projects: many(projects),
+  bidRequests: many(bidRequests),
 }));
 
 export const serviceCategoriesRelations = relations(serviceCategories, ({ many }) => ({
@@ -169,6 +200,31 @@ export const salespersonsRelations = relations(salespersons, ({ one, many }) => 
     references: [users.id],
   }),
   projects: many(projects),
+  bidRequests: many(bidRequests),
+  pageVisits: many(pageVisits),
+}));
+
+export const bidRequestsRelations = relations(bidRequests, ({ one, many }) => ({
+  contractor: one(contractors, {
+    fields: [bidRequests.contractorId],
+    references: [contractors.id],
+  }),
+  salesperson: one(salespersons, {
+    fields: [bidRequests.salespersonId],
+    references: [salespersons.id],
+  }),
+  pageVisits: many(pageVisits),
+}));
+
+export const pageVisitsRelations = relations(pageVisits, ({ one }) => ({
+  salesperson: one(salespersons, {
+    fields: [pageVisits.salespersonId],
+    references: [salespersons.id],
+  }),
+  bidRequest: one(bidRequests, {
+    fields: [pageVisits.bidRequestId],
+    references: [bidRequests.id],
+  }),
 }));
 
 export const projectsRelations = relations(projects, ({ one, many }) => ({
@@ -220,6 +276,9 @@ export type InsertServiceCategory = z.infer<typeof insertServiceCategorySchema>;
 
 export type BidRequest = typeof bidRequests.$inferSelect;
 export type InsertBidRequest = z.infer<typeof insertBidRequestSchema>;
+
+export type PageVisit = typeof pageVisits.$inferSelect;
+export type InsertPageVisit = z.infer<typeof insertPageVisitSchema>;
 
 // Extended schemas for login
 export const loginSchema = z.object({

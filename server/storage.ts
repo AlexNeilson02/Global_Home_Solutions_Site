@@ -17,6 +17,8 @@ export interface IStorage {
   createUser(user: InsertUser): Promise<User>;
   updateUser(id: number, user: Partial<User>): Promise<User | undefined>;
   getAllUsers(): Promise<User[]>;
+  updateUserLastLogin(id: number): Promise<User | undefined>;
+  getUsersByRole(role: string): Promise<User[]>;
 
   // Contractor methods
   getContractor(id: number): Promise<Contractor | undefined>;
@@ -34,6 +36,9 @@ export interface IStorage {
   createSalesperson(salesperson: InsertSalesperson): Promise<Salesperson>;
   updateSalesperson(id: number, salesperson: Partial<Salesperson>): Promise<Salesperson | undefined>;
   getAllSalespersons(): Promise<Salesperson[]>;
+  incrementSalespersonStats(id: number, field: 'totalVisits' | 'successfulConversions'): Promise<Salesperson | undefined>;
+  getSalespersonAnalytics(id: number): Promise<{ totalVisits: number, conversions: number, conversionRate: number }>;
+  getTopSalespersons(limit: number, metric: 'totalLeads' | 'conversionRate' | 'commissions'): Promise<Salesperson[]>;
   
   // Service Category methods
   getServiceCategory(id: number): Promise<ServiceCategory | undefined>;
@@ -62,8 +67,21 @@ export interface IStorage {
   createBidRequest(bidRequest: InsertBidRequest): Promise<BidRequest>;
   getBidRequest(id: number): Promise<BidRequest | undefined>;
   getBidRequestsByContractorId(contractorId: number): Promise<BidRequest[]>;
+  getBidRequestsBySalespersonId(salespersonId: number): Promise<BidRequest[]>;
+  getRecentBidRequests(limit: number): Promise<BidRequest[]>;
   updateBidRequestStatus(id: number, status: string): Promise<BidRequest | undefined>;
   updateBidRequestEmailSent(id: number, emailSent: boolean): Promise<BidRequest | undefined>;
+  updateBidRequestNotes(id: number, notes: string): Promise<BidRequest | undefined>;
+  
+  // Page Visit methods
+  createPageVisit(pageVisit: InsertPageVisit): Promise<PageVisit>;
+  getPageVisitsBySalespersonId(salespersonId: number): Promise<PageVisit[]>;
+  updatePageVisitConversion(id: number, bidRequestId: number): Promise<PageVisit | undefined>;
+  getPageVisitStats(salespersonId: number, startDate?: Date, endDate?: Date): Promise<{ 
+    totalVisits: number, 
+    uniqueVisitors: number, 
+    conversionRate: number 
+  }>;
 }
 
 // In-memory implementation of the storage interface

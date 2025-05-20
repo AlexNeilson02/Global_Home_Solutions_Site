@@ -50,6 +50,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ message: "Invalid credentials" });
       }
       
+      // Update last login timestamp
+      await storage.updateUserLastLogin(user.id);
+      
       const sessionId = Math.random().toString(36).substring(2, 15);
       sessions[sessionId] = { userId: user.id, role: user.role };
       
@@ -132,6 +135,55 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       res.json({ user: userWithoutPassword, roleData });
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
+  // Get user by ID - admin only
+  apiRouter.get("/users/:id", authenticate, checkRole(["admin"]), async (req: Request, res: Response) => {
+    try {
+      const userId = parseInt(req.params.id);
+      if (isNaN(userId)) {
+        return res.status(400).json({ message: "Invalid user ID" });
+      }
+      
+      const user = await storage.getUser(userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const { password, ...userWithoutPassword } = user;
+      
+      // Get role-specific data
+      let roleData = null;
+      if (user.role === "contractor") {
+        roleData = await storage.getContractorByUserId(user.id);
+      } else if (user.role === "salesperson") {
+        roleData = await storage.getSalespersonByUserId(user.id);
+      }
+      
+      res.json({ user: userWithoutPassword, roleData });
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
+  // Get all users by role - admin only
+  apiRouter.get("/users/role/:role", authenticate, checkRole(["admin"]), async (req: Request, res: Response) => {
+    try {
+      const role = req.params.role;
+      if (!["homeowner", "contractor", "salesperson", "admin"].includes(role)) {
+        return res.status(400).json({ message: "Invalid role" });
+      }
+      
+      const users = await storage.getUsersByRole(role);
+      const usersWithoutPasswords = users.map(user => {
+        const { password, ...userWithoutPassword } = user;
+        return userWithoutPassword;
+      });
+      
+      res.json({ users: usersWithoutPasswords });
     } catch (error) {
       res.status(500).json({ message: "Internal server error" });
     }
@@ -285,6 +337,173 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Salesperson analytics endpoints
+  apiRouter.get("/salespersons/:id/analytics", authenticate, async (req: Request, res: Response) => {
+    try {
+      const id = Number(req.params.id);
+      const salesperson = await storage.getSalesperson(id);
+      
+      if (!salesperson) {
+        return res.status(404).json({ message: "Salesperson not found" });
+      }
+      
+      // Only allow admins or the salesperson themselves to access their analytics
+      if (req.user.role !== "admin" && req.user.userId !== salesperson.userId) {
+        return res.status(403).json({ message: "Forbidden" });
+      }
+      
+      // Get analytics data
+      const analytics = await storage.getSalespersonAnalytics(id);
+      
+      // Get recent bid requests
+      const bidRequests = await storage.getBidRequestsBySalespersonId(id);
+      
+      // Get conversion metrics over time (last 30 days by default)
+      const startDate = new Date();
+      startDate.setDate(startDate.getDate() - 30);
+      const visitStats = await storage.getPageVisitStats(id, startDate);
+      
+      res.json({ 
+        analytics,
+        recentBidRequests: bidRequests.slice(0, 5), // Just get the 5 most recent
+        visitStats
+      });
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
+  // Top performing salespersons - admin only
+  apiRouter.get("/salespersons/top/:metric", authenticate, checkRole(["admin"]), async (req: Request, res: Response) => {
+    try {
+      const metric = req.params.metric as 'totalLeads' | 'conversionRate' | 'commissions';
+      const limit = parseInt(req.query.limit as string) || 5;
+      
+      if (!['totalLeads', 'conversionRate', 'commissions'].includes(metric)) {
+        return res.status(400).json({ message: "Invalid metric" });
+      }
+      
+      const topSalespersons = await storage.getTopSalespersons(limit, metric);
+      
+      // Fetch user data for each salesperson
+      const enrichedData = await Promise.all(
+        topSalespersons.map(async (salesperson) => {
+          const user = await storage.getUser(salesperson.userId);
+          return {
+            ...salesperson,
+            fullName: user?.fullName,
+            email: user?.email,
+            avatarUrl: user?.avatarUrl
+          };
+        })
+      );
+      
+      res.json({ salespersons: enrichedData });
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
+  // Bid requests for a salesperson
+  apiRouter.get("/salespersons/:id/bid-requests", authenticate, async (req: Request, res: Response) => {
+    try {
+      const id = Number(req.params.id);
+      const salesperson = await storage.getSalesperson(id);
+      
+      if (!salesperson) {
+        return res.status(404).json({ message: "Salesperson not found" });
+      }
+      
+      // Only allow admins or the salesperson themselves to access their bid requests
+      if (req.user.role !== "admin" && req.user.userId !== salesperson.userId) {
+        return res.status(403).json({ message: "Forbidden" });
+      }
+      
+      const bidRequests = await storage.getBidRequestsBySalespersonId(id);
+      
+      // Enrich bid requests with contractor data
+      const enrichedRequests = await Promise.all(
+        bidRequests.map(async (request) => {
+          const contractor = await storage.getContractor(request.contractorId);
+          return {
+            ...request,
+            contractorName: contractor?.companyName || "Unknown"
+          };
+        })
+      );
+      
+      res.json({ bidRequests: enrichedRequests });
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
+  // Update bid request status - only available to the salesperson who created it or admin
+  apiRouter.patch("/bid-requests/:id/status", authenticate, async (req: Request, res: Response) => {
+    try {
+      const id = Number(req.params.id);
+      const { status } = req.body;
+      
+      if (!status || !['pending', 'sent', 'contacted', 'completed', 'declined'].includes(status)) {
+        return res.status(400).json({ message: "Invalid status" });
+      }
+      
+      const bidRequest = await storage.getBidRequest(id);
+      if (!bidRequest) {
+        return res.status(404).json({ message: "Bid request not found" });
+      }
+      
+      // Verify authorization (only admin or the salesperson who created it)
+      const salesperson = bidRequest.salespersonId ? 
+        await storage.getSalesperson(bidRequest.salespersonId) : null;
+      
+      if (
+        req.user.role !== "admin" && 
+        (!salesperson || req.user.userId !== salesperson.userId)
+      ) {
+        return res.status(403).json({ message: "Forbidden" });
+      }
+      
+      const updatedRequest = await storage.updateBidRequestStatus(id, status);
+      res.json({ bidRequest: updatedRequest });
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
+  // Add notes to bid request
+  apiRouter.patch("/bid-requests/:id/notes", authenticate, async (req: Request, res: Response) => {
+    try {
+      const id = Number(req.params.id);
+      const { notes } = req.body;
+      
+      if (!notes) {
+        return res.status(400).json({ message: "Notes are required" });
+      }
+      
+      const bidRequest = await storage.getBidRequest(id);
+      if (!bidRequest) {
+        return res.status(404).json({ message: "Bid request not found" });
+      }
+      
+      // Verify authorization (only admin or the salesperson who created it)
+      const salesperson = bidRequest.salespersonId ? 
+        await storage.getSalesperson(bidRequest.salespersonId) : null;
+      
+      if (
+        req.user.role !== "admin" && 
+        (!salesperson || req.user.userId !== salesperson.userId)
+      ) {
+        return res.status(403).json({ message: "Forbidden" });
+      }
+      
+      const updatedRequest = await storage.updateBidRequestNotes(id, notes);
+      res.json({ bidRequest: updatedRequest });
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
   // NFC profile route - publicly accessible
   apiRouter.get("/nfc/:profileUrl", async (req: Request, res: Response) => {
     try {

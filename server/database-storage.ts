@@ -1,13 +1,15 @@
-import { eq, and, desc, sql } from "drizzle-orm";
+import { eq, and, desc, sql, asc, count, avg, max, lt, gt, between } from "drizzle-orm";
 import { db } from "./db";
 import { 
-  users, contractors, salespersons, projects, testimonials, serviceCategories,
+  users, contractors, salespersons, projects, testimonials, serviceCategories, bidRequests, pageVisits,
   type User, type InsertUser,
   type Contractor, type InsertContractor,
   type Salesperson, type InsertSalesperson,
   type Project, type InsertProject,
   type Testimonial, type InsertTestimonial,
-  type ServiceCategory, type InsertServiceCategory
+  type ServiceCategory, type InsertServiceCategory,
+  type BidRequest, type InsertBidRequest,
+  type PageVisit, type InsertPageVisit
 } from "@shared/schema";
 import { IStorage } from "./storage";
 
@@ -44,6 +46,19 @@ export class DatabaseStorage implements IStorage {
 
   async getAllUsers(): Promise<User[]> {
     return db.select().from(users);
+  }
+  
+  async updateUserLastLogin(id: number): Promise<User | undefined> {
+    const [user] = await db
+      .update(users)
+      .set({ lastLogin: new Date() })
+      .where(eq(users.id, id))
+      .returning();
+    return user;
+  }
+  
+  async getUsersByRole(role: string): Promise<User[]> {
+    return db.select().from(users).where(eq(users.role, role));
   }
 
   // Contractor methods
@@ -121,6 +136,83 @@ export class DatabaseStorage implements IStorage {
 
   async getAllSalespersons(): Promise<Salesperson[]> {
     return db.select().from(salespersons);
+  }
+  
+  async incrementSalespersonStats(id: number, field: 'totalVisits' | 'successfulConversions'): Promise<Salesperson | undefined> {
+    // Get current value
+    const [salesperson] = await db.select().from(salespersons).where(eq(salespersons.id, id));
+    if (!salesperson) return undefined;
+    
+    // Increment the specified field
+    const updateData: Partial<Salesperson> = {};
+    if (field === 'totalVisits') {
+      updateData.totalVisits = (salesperson.totalVisits || 0) + 1;
+    } else if (field === 'successfulConversions') {
+      updateData.successfulConversions = (salesperson.successfulConversions || 0) + 1;
+      
+      // Also recalculate conversion rate
+      const totalVisits = salesperson.totalVisits || 0;
+      const successfulConversions = (salesperson.successfulConversions || 0) + 1;
+      if (totalVisits > 0) {
+        updateData.conversionRate = successfulConversions / totalVisits;
+      }
+    }
+    
+    // Update salesperson record
+    const [updated] = await db
+      .update(salespersons)
+      .set(updateData)
+      .where(eq(salespersons.id, id))
+      .returning();
+    
+    return updated;
+  }
+  
+  async getSalespersonAnalytics(id: number): Promise<{ totalVisits: number, conversions: number, conversionRate: number }> {
+    // Get salesperson
+    const [salesperson] = await db.select().from(salespersons).where(eq(salespersons.id, id));
+    if (!salesperson) {
+      return { totalVisits: 0, conversions: 0, conversionRate: 0 };
+    }
+    
+    // Count bid requests
+    const bidRequestsCount = await db
+      .select({ count: count() })
+      .from(bidRequests)
+      .where(eq(bidRequests.salespersonId, id));
+    
+    const conversions = bidRequestsCount[0]?.count || 0;
+    const totalVisits = salesperson.totalVisits || 0;
+    const conversionRate = totalVisits > 0 ? conversions / totalVisits : 0;
+    
+    return {
+      totalVisits,
+      conversions,
+      conversionRate
+    };
+  }
+  
+  async getTopSalespersons(limit: number, metric: 'totalLeads' | 'conversionRate' | 'commissions'): Promise<Salesperson[]> {
+    switch (metric) {
+      case 'totalLeads':
+        return db
+          .select()
+          .from(salespersons)
+          .orderBy(desc(salespersons.totalLeads))
+          .limit(limit);
+      case 'conversionRate':
+        return db
+          .select()
+          .from(salespersons)
+          .orderBy(desc(salespersons.conversionRate))
+          .limit(limit);
+      case 'commissions':
+        return db
+          .select()
+          .from(salespersons)
+          .orderBy(desc(salespersons.commissions))
+          .limit(limit);
+    }
   }
 
   // Project methods
@@ -216,5 +308,145 @@ export class DatabaseStorage implements IStorage {
 
   async getAllServiceCategories(): Promise<ServiceCategory[]> {
     return db.select().from(serviceCategories).where(eq(serviceCategories.isActive, true));
+  }
+  
+  // Bid Request methods
+  async createBidRequest(bidRequest: InsertBidRequest): Promise<BidRequest> {
+    const [request] = await db.insert(bidRequests).values(bidRequest).returning();
+    return request;
+  }
+  
+  async getBidRequest(id: number): Promise<BidRequest | undefined> {
+    const [request] = await db.select().from(bidRequests).where(eq(bidRequests.id, id));
+    return request;
+  }
+  
+  async getBidRequestsByContractorId(contractorId: number): Promise<BidRequest[]> {
+    return db.select().from(bidRequests).where(eq(bidRequests.contractorId, contractorId));
+  }
+  
+  async getBidRequestsBySalespersonId(salespersonId: number): Promise<BidRequest[]> {
+    return db.select().from(bidRequests).where(eq(bidRequests.salespersonId, salespersonId));
+  }
+  
+  async getRecentBidRequests(limit: number): Promise<BidRequest[]> {
+    return db
+      .select()
+      .from(bidRequests)
+      .orderBy(desc(bidRequests.createdAt))
+      .limit(limit);
+  }
+  
+  async updateBidRequestStatus(id: number, status: string): Promise<BidRequest | undefined> {
+    const [request] = await db
+      .update(bidRequests)
+      .set({ 
+        status,
+        lastUpdated: new Date()
+      })
+      .where(eq(bidRequests.id, id))
+      .returning();
+    return request;
+  }
+  
+  async updateBidRequestEmailSent(id: number, emailSent: boolean): Promise<BidRequest | undefined> {
+    const [request] = await db
+      .update(bidRequests)
+      .set({ emailSent })
+      .where(eq(bidRequests.id, id))
+      .returning();
+    return request;
+  }
+  
+  async updateBidRequestNotes(id: number, notes: string): Promise<BidRequest | undefined> {
+    const [request] = await db
+      .update(bidRequests)
+      .set({ 
+        notes,
+        lastUpdated: new Date()
+      })
+      .where(eq(bidRequests.id, id))
+      .returning();
+    return request;
+  }
+  
+  // Page Visit methods
+  async createPageVisit(pageVisit: InsertPageVisit): Promise<PageVisit> {
+    const [visit] = await db.insert(pageVisits).values(pageVisit).returning();
+    
+    // Update salesperson stats
+    if (visit.salespersonId) {
+      await this.incrementSalespersonStats(visit.salespersonId, 'totalVisits');
+    }
+    
+    return visit;
+  }
+  
+  async getPageVisitsBySalespersonId(salespersonId: number): Promise<PageVisit[]> {
+    return db.select().from(pageVisits).where(eq(pageVisits.salespersonId, salespersonId));
+  }
+  
+  async updatePageVisitConversion(id: number, bidRequestId: number): Promise<PageVisit | undefined> {
+    const [visit] = await db
+      .update(pageVisits)
+      .set({ 
+        convertedToBidRequest: true,
+        bidRequestId
+      })
+      .where(eq(pageVisits.id, id))
+      .returning();
+      
+    // Update salesperson conversion stats
+    if (visit.salespersonId) {
+      await this.incrementSalespersonStats(visit.salespersonId, 'successfulConversions');
+    }
+    
+    return visit;
+  }
+  
+  async getPageVisitStats(salespersonId: number, startDate?: Date, endDate?: Date): Promise<{ 
+    totalVisits: number, 
+    uniqueVisitors: number, 
+    conversionRate: number 
+  }> {
+    // Get total visits with date filtering if needed
+    let totalVisitsQuery = db
+      .select()
+      .from(pageVisits)
+      .where(eq(pageVisits.salespersonId, salespersonId));
+      
+    // Apply date filters if provided
+    if (startDate && endDate) {
+      totalVisitsQuery = totalVisitsQuery.where(
+        and(
+          gt(pageVisits.timestamp, startDate),
+          lt(pageVisits.timestamp, endDate)
+        )
+      );
+    } else if (startDate) {
+      totalVisitsQuery = totalVisitsQuery.where(gt(pageVisits.timestamp, startDate));
+    } else if (endDate) {
+      totalVisitsQuery = totalVisitsQuery.where(lt(pageVisits.timestamp, endDate));
+    }
+    
+    // Execute queries
+    const totalVisitsResult = await totalVisitsQuery;
+    const totalVisits = totalVisitsResult.length;
+    
+    // Get unique visitors by counting distinct IPs
+    const visitorIps = new Set(totalVisitsResult.map(visit => visit.visitorIp).filter(Boolean));
+    const uniqueVisitors = visitorIps.size;
+    
+    // Count conversions
+    const conversions = totalVisitsResult.filter(visit => visit.convertedToBidRequest).length;
+    
+    // Calculate conversion rate
+    const conversionRate = totalVisits > 0 ? conversions / totalVisits : 0;
+    
+    return {
+      totalVisits,
+      uniqueVisitors,
+      conversionRate
+    };
   }
 }
