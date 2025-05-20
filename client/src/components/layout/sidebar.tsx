@@ -12,6 +12,7 @@ import {
   Settings, 
   Home
 } from "lucide-react";
+import globalLogoPath from "@/assets/global-home-solutions-logo.png";
 
 interface SidebarProps {
   className?: string;
@@ -61,8 +62,8 @@ export function Sidebar({ className }: SidebarProps) {
   return (
     <div className={cn("hidden md:block w-64 bg-white dark:bg-card shadow-sm p-6 space-y-8", className)}>
       <div className="flex items-center space-x-3 mb-8">
-        <span className="text-2xl text-primary">🏠</span>
-        <Link href="/" className="text-xl font-bold text-foreground">ContractConnect</Link>
+        <img src={globalLogoPath} alt="Global Home Solutions" className="h-8" />
+        <Link href="/" className="text-xl font-bold text-foreground">Global Home Solutions</Link>
       </div>
       
       <div className="space-y-1">

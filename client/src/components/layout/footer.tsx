@@ -1,4 +1,5 @@
 import { Link } from "wouter";
+import globalLogoPath from "@/assets/global-home-solutions-logo.png";
 
 export function Footer() {
   return (
@@ -7,8 +8,8 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div>
             <div className="flex items-center space-x-2 mb-6">
-              <span className="text-2xl">🏠</span>
-              <span className="text-xl font-bold">ContractConnect</span>
+              <img src={globalLogoPath} alt="Global Home Solutions" className="h-10" />
+              <span className="text-xl font-bold">Global Home Solutions</span>
             </div>
             <p className="text-sm text-gray-300 mb-6">
               Connecting homeowners with trusted contractors through verified door-to-door representatives and secure NFC technology.
@@ -80,7 +81,7 @@ export function Footer() {
         </div>
         
         <div className="border-t border-gray-700 mt-12 pt-8 text-center text-sm text-gray-400">
-          <p>&copy; {new Date().getFullYear()} ContractConnect. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} Global Home Solutions. All rights reserved.</p>
         </div>
       </div>
     </footer>
