@@ -74,11 +74,7 @@ export function Header() {
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              <Link href="/login">
-                <Button variant="ghost" size="icon">
-                  <User className="h-5 w-5" />
-                </Button>
-              </Link>
+              </>
             )}
           </div>
 
@@ -140,15 +136,7 @@ export function Header() {
                   </Button>
                 </>
               ) : (
-                <Link href="/login">
-                  <Button 
-                    variant="ghost"
-                    className="w-full justify-start"
-                  >
-                    <User className="mr-2 h-4 w-4" />
-                    <span>Log in</span>
-                  </Button>
-                </Link>
+                </>
               )}
             </div>
           </div>
