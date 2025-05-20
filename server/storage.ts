@@ -3,7 +3,9 @@ import {
   Contractor, InsertContractor, 
   Salesperson, InsertSalesperson, 
   Project, InsertProject, 
-  Testimonial, InsertTestimonial 
+  Testimonial, InsertTestimonial,
+  ServiceCategory, InsertServiceCategory,
+  BidRequest, InsertBidRequest
 } from "@shared/schema";
 
 // Extend this interface with all required storage methods
@@ -310,6 +312,64 @@ export class MemStorage implements IStorage {
     return Array.from(this.testimonials.values())
       .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
       .slice(0, limit);
+  }
+  
+  // Bid Request methods
+  async createBidRequest(bidRequest: InsertBidRequest): Promise<BidRequest> {
+    const id = this.bidRequestId++;
+    const now = new Date();
+    
+    const newBidRequest: BidRequest = {
+      ...bidRequest,
+      id,
+      createdAt: now,
+      status: "pending",
+      emailSent: false
+    };
+    
+    this.bidRequests.set(id, newBidRequest);
+    return newBidRequest;
+  }
+  
+  async getBidRequest(id: number): Promise<BidRequest | undefined> {
+    return this.bidRequests.get(id);
+  }
+  
+  async getBidRequestsByContractorId(contractorId: number): Promise<BidRequest[]> {
+    return Array.from(this.bidRequests.values())
+      .filter(bidRequest => bidRequest.contractorId === contractorId);
+  }
+  
+  async updateBidRequestStatus(id: number, status: string): Promise<BidRequest | undefined> {
+    const bidRequest = this.bidRequests.get(id);
+    
+    if (!bidRequest) {
+      return undefined;
+    }
+    
+    const updatedBidRequest = {
+      ...bidRequest,
+      status
+    };
+    
+    this.bidRequests.set(id, updatedBidRequest);
+    return updatedBidRequest;
+  }
+  
+  async updateBidRequestEmailSent(id: number, emailSent: boolean): Promise<BidRequest | undefined> {
+    const bidRequest = this.bidRequests.get(id);
+    
+    if (!bidRequest) {
+      return undefined;
+    }
+    
+    const updatedBidRequest = {
+      ...bidRequest,
+      emailSent
+    };
+    
+    this.bidRequests.set(id, updatedBidRequest);
+    return updatedBidRequest;
   }
 
   // Seed some initial data
