@@ -3,6 +3,15 @@ import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 import { relations } from "drizzle-orm";
 
+// Service Categories table
+export const serviceCategories = pgTable("service_categories", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull().unique(),
+  description: text("description"),
+  icon: text("icon"),
+  isActive: boolean("is_active").default(true),
+});
+
 // Base user table for authentication
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
@@ -23,10 +32,12 @@ export const contractors = pgTable("contractors", {
   companyName: text("company_name").notNull(),
   description: text("description").notNull(),
   specialties: text("specialties").array(),
+  serviceCategoryIds: integer("service_category_ids").array(),
   rating: real("rating"),
   reviewCount: integer("review_count").default(0),
   hourlyRate: real("hourly_rate"),
   logoUrl: text("logo_url"),
+  videoUrl: text("video_url"),
   isVerified: boolean("is_verified").default(false),
   isActive: boolean("is_active").default(true),
   subscriptionTier: text("subscription_tier").default("basic"), // basic, premium, pro
@@ -73,6 +84,10 @@ export const testimonials = pgTable("testimonials", {
 });
 
 // Insert schemas
+export const insertServiceCategorySchema = createInsertSchema(serviceCategories).omit({
+  id: true,
+});
+
 export const insertUserSchema = createInsertSchema(users).omit({
   id: true,
   createdAt: true,
@@ -115,6 +130,10 @@ export const contractorsRelations = relations(contractors, ({ one, many }) => ({
     fields: [contractors.userId],
     references: [users.id],
   }),
+  projects: many(projects),
+}));
+
+export const serviceCategoriesRelations = relations(serviceCategories, ({ many }) => ({
   projects: many(projects),
 }));
 
@@ -169,6 +188,9 @@ export type InsertProject = z.infer<typeof insertProjectSchema>;
 
 export type Testimonial = typeof testimonials.$inferSelect;
 export type InsertTestimonial = z.infer<typeof insertTestimonialSchema>;
+
+export type ServiceCategory = typeof serviceCategories.$inferSelect;
+export type InsertServiceCategory = z.infer<typeof insertServiceCategorySchema>;
 
 // Extended schemas for login
 export const loginSchema = z.object({
