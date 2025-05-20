@@ -60,12 +60,7 @@ export function Sidebar({ className }: SidebarProps) {
   const navItems = getNavItems();
 
   return (
-    <div className={cn("hidden md:block w-64 bg-white dark:bg-card shadow-sm p-6 space-y-8", className)}>
-      <div className="flex items-center space-x-3 mb-8">
-        <img src={globalLogoPath} alt="Global Home Solutions" className="h-8" />
-        <Link href="/" className="text-xl font-bold text-foreground">Global Home Solutions</Link>
-      </div>
-      
+    <div className={cn("hidden md:block w-64 bg-white dark:bg-card shadow-sm p-6 space-y-8", className)}>      
       <div className="space-y-1">
         {navItems.map((item) => (
           <Link key={item.href} href={item.href}>
