@@ -135,7 +135,7 @@ export async function seedDatabase() {
       budget: 25000,
       createdAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000), // 30 days ago
       completedAt: null,
-      imageUrl: null
+      imageUrl: "https://images.unsplash.com/photo-1589939705384-5185137a7f0f?auto=format&fit=crop&q=80"
     }).returning();
 
     const project2 = await db.insert(projects).values({
@@ -149,7 +149,7 @@ export async function seedDatabase() {
       budget: 12000,
       createdAt: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000), // 60 days ago
       completedAt: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000), // 15 days ago
-      imageUrl: null
+      imageUrl: "https://images.unsplash.com/photo-1589939705384-5185137a7f0f?auto=format&fit=crop&q=80"
     }).returning();
 
     const project3 = await db.insert(projects).values({
@@ -161,9 +161,9 @@ export async function seedDatabase() {
       serviceType: 'Bathroom Renovations',
       status: 'pending',
       budget: 18000,
+      imageUrl: "https://images.unsplash.com/photo-1507089947368-19c1da9775ae?auto=format&fit=crop&q=80",
       createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000), // 7 days ago
       completedAt: null,
-      imageUrl: null
     }).returning();
 
     // Create testimonials

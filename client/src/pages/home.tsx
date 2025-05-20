@@ -78,12 +78,11 @@ export default function Home() {
             </div>
             
             <div className="md:w-1/2 md:pl-12">
-              {/* Placeholder for contractor image */}
-              <div className="rounded-lg shadow-lg w-full h-80 md:h-96 bg-primary-500 flex items-center justify-center">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-24 w-24 text-white opacity-30" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                </svg>
-              </div>
+              <img 
+                src="https://images.unsplash.com/photo-1581578731548-c64695cc6952?auto=format&fit=crop&q=80" 
+                alt="Professional contractor at work" 
+                className="rounded-lg shadow-lg w-full h-80 md:h-96 object-cover"
+              />
             </div>
           </div>
         </div>
