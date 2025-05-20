@@ -67,15 +67,6 @@ export function Sidebar({ className }: SidebarProps) {
       </div>
       
       <div className="space-y-1">
-        <Link href="/">
-          <div className={cn(
-            "flex items-center space-x-3 text-muted-foreground hover:text-primary hover:bg-primary-50 dark:hover:bg-primary/10 rounded-md px-3 py-2 cursor-pointer transition-colors",
-          )}>
-            <Home className="w-5 h-5" />
-            <span>Public Website</span>
-          </div>
-        </Link>
-        
         {navItems.map((item) => (
           <Link key={item.href} href={item.href}>
             <div className={cn(

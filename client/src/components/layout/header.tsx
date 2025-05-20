@@ -118,15 +118,6 @@ export function Header() {
             <div className="flex flex-col space-y-4">
               {!isSalespersonPage && (
                 <>
-                  <Link href="/">
-                    <Button 
-                      variant={location === "/" ? "default" : "ghost"} 
-                      className="w-full justify-start"
-                    >
-                      Home
-                    </Button>
-                  </Link>
-    
                   {user ? (
                     <>
                       <Link href={
