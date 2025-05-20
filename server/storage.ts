@@ -55,6 +55,13 @@ export interface IStorage {
   getAllTestimonials(): Promise<Testimonial[]>;
   getTestimonialsByUserId(userId: number): Promise<Testimonial[]>;
   getRecentTestimonials(limit: number): Promise<Testimonial[]>;
+  
+  // Bid Request methods
+  createBidRequest(bidRequest: InsertBidRequest): Promise<BidRequest>;
+  getBidRequest(id: number): Promise<BidRequest | undefined>;
+  getBidRequestsByContractorId(contractorId: number): Promise<BidRequest[]>;
+  updateBidRequestStatus(id: number, status: string): Promise<BidRequest | undefined>;
+  updateBidRequestEmailSent(id: number, emailSent: boolean): Promise<BidRequest | undefined>;
 }
 
 // In-memory implementation of the storage interface
@@ -64,12 +71,16 @@ export class MemStorage implements IStorage {
   private salespersons: Map<number, Salesperson>;
   private projects: Map<number, Project>;
   private testimonials: Map<number, Testimonial>;
+  private serviceCategories: Map<number, ServiceCategory>;
+  private bidRequests: Map<number, BidRequest>;
   
   private userId: number;
   private contractorId: number;
   private salespersonId: number;
   private projectId: number;
   private testimonialId: number;
+  private serviceCategoryId: number;
+  private bidRequestId: number;
 
   constructor() {
     this.users = new Map();
@@ -77,12 +88,16 @@ export class MemStorage implements IStorage {
     this.salespersons = new Map();
     this.projects = new Map();
     this.testimonials = new Map();
+    this.serviceCategories = new Map();
+    this.bidRequests = new Map();
     
     this.userId = 1;
     this.contractorId = 1;
     this.salespersonId = 1;
     this.projectId = 1;
     this.testimonialId = 1;
+    this.serviceCategoryId = 1;
+    this.bidRequestId = 1;
     
     // Initialize with some seed data
     this.seedData();

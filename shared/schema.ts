@@ -83,6 +83,25 @@ export const testimonials = pgTable("testimonials", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// Bid requests table
+export const bidRequests = pgTable("bid_requests", {
+  id: serial("id").primaryKey(),
+  createdAt: timestamp("created_at").defaultNow(),
+  contractorId: integer("contractor_id").notNull().references(() => contractors.id),
+  salespersonId: integer("salesperson_id").references(() => salespersons.id),
+  fullName: text("full_name").notNull(),
+  email: text("email").notNull(),
+  phone: text("phone").notNull(),
+  address: text("address").notNull(),
+  description: text("description").notNull(),
+  timeline: text("timeline").notNull(),
+  budget: text("budget"),
+  preferredContactMethod: text("preferred_contact_method").notNull(),
+  additionalInformation: text("additional_information"),
+  status: text("status").notNull().default("pending"), // pending, sent, contacted, completed, declined
+  emailSent: boolean("email_sent").default(false),
+});
+
 // Insert schemas
 export const insertServiceCategorySchema = createInsertSchema(serviceCategories).omit({
   id: true,
@@ -115,6 +134,13 @@ export const insertProjectSchema = createInsertSchema(projects).omit({
 export const insertTestimonialSchema = createInsertSchema(testimonials).omit({
   id: true,
   createdAt: true,
+});
+
+export const insertBidRequestSchema = createInsertSchema(bidRequests).omit({
+  id: true,
+  createdAt: true,
+  status: true,
+  emailSent: true,
 });
 
 // Relations - these are required for Drizzle ORM
@@ -191,6 +217,9 @@ export type InsertTestimonial = z.infer<typeof insertTestimonialSchema>;
 
 export type ServiceCategory = typeof serviceCategories.$inferSelect;
 export type InsertServiceCategory = z.infer<typeof insertServiceCategorySchema>;
+
+export type BidRequest = typeof bidRequests.$inferSelect;
+export type InsertBidRequest = z.infer<typeof insertBidRequestSchema>;
 
 // Extended schemas for login
 export const loginSchema = z.object({
