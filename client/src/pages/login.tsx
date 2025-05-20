@@ -41,7 +41,12 @@ const registerSchema = insertUserSchema.extend({
   }
 });
 
-type LoginFormData = z.infer<typeof loginSchema>;
+// Create a modified login schema with role
+const loginFormSchema = loginSchema.extend({
+  role: z.string().optional(),
+});
+
+type LoginFormData = z.infer<typeof loginFormSchema>;
 type RegisterFormData = z.infer<typeof registerSchema>;
 
 export default function Login() {
@@ -54,7 +59,7 @@ export default function Login() {
 
   // Login form
   const loginForm = useForm<LoginFormData>({
-    resolver: zodResolver(loginSchema),
+    resolver: zodResolver(loginFormSchema),
     defaultValues: {
       username: "",
       password: "",
@@ -80,26 +85,39 @@ export default function Login() {
     setError(null);
     
     try {
-      await login(data);
+      // The login function now uses the real API
+      await login({
+        username: data.username,
+        password: data.password
+      });
       
-      // Force a small delay to ensure authentication state is updated
-      setTimeout(() => {
-        // Redirect based on role selection from the form
-        switch (data.role) {
-          case "salesperson":
-            navigate("/sales-dashboard");
-            break;
-          case "contractor":
-            navigate("/contractor-dashboard");
-            break;
-          case "admin":
-            navigate("/admin-dashboard");
-            break;
-          default:
-            navigate("/");
-        }
+      // Get the stored user to determine their role
+      const userJson = localStorage.getItem('user');
+      if (userJson) {
+        const userData = JSON.parse(userJson);
+        
+        // Redirect based on the actual user role from the database
+        setTimeout(() => {
+          switch (userData.role) {
+            case "salesperson":
+              navigate("/sales-dashboard");
+              break;
+            case "contractor":
+              navigate("/contractor-dashboard");
+              break;
+            case "admin":
+              navigate("/admin-dashboard");
+              break;
+            default:
+              navigate("/");
+          }
+          setIsLoading(false);
+        }, 500);
+      } else {
+        // Fallback if user data isn't found
+        navigate("/");
         setIsLoading(false);
-      }, 500);
+      }
     } catch (err: any) {
       setError(err.message || "Login failed. Please check your credentials.");
       setIsLoading(false);
