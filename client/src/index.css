@@ -1,0 +1,139 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap');
+
+:root {
+  /* Base colors */
+  --background: 0 0% 100%;
+  --foreground:
+    220 14.3% 30.1%; /* #172B4D */
+  
+  /* ContractConnect theme */
+  --primary: 220 65% 47%; /* #2B59C3 */
+  --primary-foreground: 0 0% 100%;
+  
+  --secondary: 153 52% 46%; /* #36B37E */
+  --secondary-foreground: 0 0% 100%;
+  
+  --accent: 10 100% 60%; /* #FF5630 */
+  --accent-foreground: 0 0% 100%;
+  
+  /* UI elements */
+  --card: 0 0% 100%;
+  --card-foreground: 220 14.3% 30.1%;
+
+  --popover: 0 0% 100%;
+  --popover-foreground: 220 14.3% 30.1%;
+
+  --muted: 220 10% 96%;
+  --muted-foreground: 220 5% 65%;
+
+  --border: 220 13% 91%; /* #E4E7EB */
+  --input: 220 13% 91%;
+  --ring: 220 65% 47%;
+
+  --destructive: 10 100% 60%;
+  --destructive-foreground: 0 0% 100%;
+  
+  /* Visual indicators */
+  --success: 153 52% 46%;
+  --warning: 40 100% 50%;
+  --info: 250 50% 55%;
+  --error: 10 100% 60%;
+  
+  /* Chart colors */
+  --chart-1: 220 65% 47%;
+  --chart-2: 153 52% 46%;
+  --chart-3: 10 100% 60%;
+  --chart-4: 250 50% 55%;
+  --chart-5: 40 100% 50%;
+  
+  /* Other settings */
+  --radius: 0.5rem;
+  --content-width: 1120px;
+}
+
+.dark {
+  --background: 220 43% 15%;
+  --foreground: 210 20% 90%;
+  
+  --primary: 220 65% 55%;
+  --primary-foreground: 0 0% 100%;
+  
+  --secondary: 153 52% 46%;
+  --secondary-foreground: 0 0% 100%;
+  
+  --accent: 10 100% 60%;
+  --accent-foreground: 0 0% 100%;
+  
+  --card: 220 43% 18%;
+  --card-foreground: 210 20% 90%;
+  
+  --popover: 220 43% 18%;
+  --popover-foreground: 210 20% 90%;
+  
+  --muted: 220 43% 25%;
+  --muted-foreground: 210 20% 70%;
+  
+  --border: 220 43% 25%;
+  --input: 220 43% 25%;
+  --ring: 220 65% 55%;
+  
+  --destructive: 10 100% 60%;
+  --destructive-foreground: 0 0% 100%;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-sans;
+  }
+  
+  .font-mono {
+    font-family: 'Roboto Mono', monospace;
+  }
+}
+
+@layer components {
+  .container-custom {
+    @apply max-w-[var(--content-width)] mx-auto px-4 md:px-6;
+  }
+  
+  /* NFC animation */
+  @keyframes nfc-pulse {
+    0% { box-shadow: 0 0 0 0 hsl(var(--primary) / 0.4); }
+    70% { box-shadow: 0 0 0 10px hsl(var(--primary) / 0); }
+    100% { box-shadow: 0 0 0 0 hsl(var(--primary) / 0); }
+  }
+  
+  .nfc-pulse {
+    animation: nfc-pulse 1.5s infinite;
+  }
+  
+  /* Card layouts */
+  .card-grid {
+    @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6;
+  }
+  
+  /* Feature boxes */
+  .feature-box {
+    @apply flex flex-col items-center text-center p-6;
+  }
+  
+  .feature-icon {
+    @apply bg-blue-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-primary;
+  }
+  
+  /* Stats cards */
+  .stats-grid {
+    @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6;
+  }
+}

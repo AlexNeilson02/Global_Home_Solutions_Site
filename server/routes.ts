@@ -1,0 +1,469 @@
+import express, { type Express, Request, Response } from "express";
+import { createServer, type Server } from "http";
+import { storage } from "./storage";
+import { z } from "zod";
+import { 
+  loginSchema, 
+  insertUserSchema, 
+  insertContractorSchema, 
+  insertSalespersonSchema, 
+  insertProjectSchema, 
+  insertTestimonialSchema 
+} from "@shared/schema";
+
+export async function registerRoutes(app: Express): Promise<Server> {
+  // API routes prefix
+  const apiRouter = express.Router();
+  app.use("/api", apiRouter);
+
+  // Session management - for simplicity using in-memory sessions
+  const sessions: Record<string, { userId: number, role: string }> = {};
+
+  // Middleware to check authentication
+  const authenticate = (req: Request, res: Response, next: Function) => {
+    const sessionId = req.headers.authorization?.split(" ")[1];
+    if (!sessionId || !sessions[sessionId]) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+    req.user = sessions[sessionId];
+    next();
+  };
+
+  // Middleware to check role
+  const checkRole = (allowedRoles: string[]) => {
+    return (req: Request, res: Response, next: Function) => {
+      if (!req.user || !allowedRoles.includes(req.user.role)) {
+        return res.status(403).json({ message: "Forbidden" });
+      }
+      next();
+    };
+  };
+
+  // Auth endpoints
+  apiRouter.post("/auth/login", async (req: Request, res: Response) => {
+    try {
+      const data = loginSchema.parse(req.body);
+      const user = await storage.getUserByUsername(data.username);
+      
+      if (!user || user.password !== data.password) {
+        return res.status(401).json({ message: "Invalid credentials" });
+      }
+      
+      const sessionId = Math.random().toString(36).substring(2, 15);
+      sessions[sessionId] = { userId: user.id, role: user.role };
+      
+      res.json({ 
+        token: sessionId, 
+        user: { 
+          id: user.id, 
+          username: user.username, 
+          fullName: user.fullName, 
+          email: user.email,
+          role: user.role,
+          avatarUrl: user.avatarUrl
+        } 
+      });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: error.errors });
+      }
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
+  apiRouter.post("/auth/logout", authenticate, (req: Request, res: Response) => {
+    const sessionId = req.headers.authorization?.split(" ")[1];
+    if (sessionId) {
+      delete sessions[sessionId];
+    }
+    res.json({ message: "Logged out successfully" });
+  });
+
+  apiRouter.post("/auth/register", async (req: Request, res: Response) => {
+    try {
+      const data = insertUserSchema.parse(req.body);
+      
+      // Check if username or email already exists
+      const existingUser = await storage.getUserByUsername(data.username);
+      if (existingUser) {
+        return res.status(400).json({ message: "Username already exists" });
+      }
+      
+      const existingEmail = await storage.getUserByEmail(data.email);
+      if (existingEmail) {
+        return res.status(400).json({ message: "Email already exists" });
+      }
+      
+      const user = await storage.createUser(data);
+      res.status(201).json({ 
+        user: { 
+          id: user.id, 
+          username: user.username, 
+          fullName: user.fullName, 
+          email: user.email,
+          role: user.role
+        } 
+      });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: error.errors });
+      }
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // User endpoints
+  apiRouter.get("/users/me", authenticate, async (req: Request, res: Response) => {
+    try {
+      const user = await storage.getUser(req.user.userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const { password, ...userWithoutPassword } = user;
+      
+      // Get role-specific data
+      let roleData = null;
+      if (user.role === "contractor") {
+        roleData = await storage.getContractorByUserId(user.id);
+      } else if (user.role === "salesperson") {
+        roleData = await storage.getSalespersonByUserId(user.id);
+      }
+      
+      res.json({ user: userWithoutPassword, roleData });
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Contractor endpoints
+  apiRouter.get("/contractors", async (req: Request, res: Response) => {
+    try {
+      const contractors = await storage.getAllContractors();
+      
+      // Fetch user data for each contractor
+      const contractorsWithUserData = await Promise.all(
+        contractors.map(async (contractor) => {
+          const user = await storage.getUser(contractor.userId);
+          return {
+            ...contractor,
+            fullName: user?.fullName,
+            email: user?.email,
+            phone: user?.phone,
+            avatarUrl: user?.avatarUrl
+          };
+        })
+      );
+      
+      res.json({ contractors: contractorsWithUserData });
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  apiRouter.get("/contractors/featured", async (req: Request, res: Response) => {
+    try {
+      const limit = Number(req.query.limit) || 3;
+      const contractors = await storage.getFeaturedContractors(limit);
+      
+      // Fetch user data for each contractor
+      const contractorsWithUserData = await Promise.all(
+        contractors.map(async (contractor) => {
+          const user = await storage.getUser(contractor.userId);
+          return {
+            ...contractor,
+            fullName: user?.fullName,
+            email: user?.email,
+            phone: user?.phone,
+            avatarUrl: user?.avatarUrl
+          };
+        })
+      );
+      
+      res.json({ contractors: contractorsWithUserData });
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  apiRouter.get("/contractors/:id", async (req: Request, res: Response) => {
+    try {
+      const id = Number(req.params.id);
+      const contractor = await storage.getContractor(id);
+      
+      if (!contractor) {
+        return res.status(404).json({ message: "Contractor not found" });
+      }
+      
+      const user = await storage.getUser(contractor.userId);
+      
+      res.json({ 
+        contractor: {
+          ...contractor,
+          fullName: user?.fullName,
+          email: user?.email,
+          phone: user?.phone,
+          avatarUrl: user?.avatarUrl
+        } 
+      });
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  apiRouter.post("/contractors", authenticate, async (req: Request, res: Response) => {
+    try {
+      // Only allow admins to create contractors
+      if (req.user.role !== "admin") {
+        return res.status(403).json({ message: "Forbidden" });
+      }
+      
+      const data = insertContractorSchema.parse(req.body);
+      const contractor = await storage.createContractor(data);
+      res.status(201).json({ contractor });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: error.errors });
+      }
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Salesperson endpoints
+  apiRouter.get("/salespersons", authenticate, checkRole(["admin"]), async (req: Request, res: Response) => {
+    try {
+      const salespersons = await storage.getAllSalespersons();
+      
+      // Fetch user data for each salesperson
+      const salespersonsWithUserData = await Promise.all(
+        salespersons.map(async (salesperson) => {
+          const user = await storage.getUser(salesperson.userId);
+          return {
+            ...salesperson,
+            fullName: user?.fullName,
+            email: user?.email,
+            phone: user?.phone,
+            avatarUrl: user?.avatarUrl
+          };
+        })
+      );
+      
+      res.json({ salespersons: salespersonsWithUserData });
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  apiRouter.get("/salespersons/:id", authenticate, async (req: Request, res: Response) => {
+    try {
+      const id = Number(req.params.id);
+      const salesperson = await storage.getSalesperson(id);
+      
+      if (!salesperson) {
+        return res.status(404).json({ message: "Salesperson not found" });
+      }
+      
+      // Only allow admins or the salesperson themselves to access their data
+      if (req.user.role !== "admin" && req.user.userId !== salesperson.userId) {
+        return res.status(403).json({ message: "Forbidden" });
+      }
+      
+      const user = await storage.getUser(salesperson.userId);
+      
+      res.json({ 
+        salesperson: {
+          ...salesperson,
+          fullName: user?.fullName,
+          email: user?.email,
+          phone: user?.phone,
+          avatarUrl: user?.avatarUrl
+        } 
+      });
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // NFC profile route - publicly accessible
+  apiRouter.get("/nfc/:profileUrl", async (req: Request, res: Response) => {
+    try {
+      const profileUrl = req.params.profileUrl;
+      const salesperson = await storage.getSalespersonByProfileUrl(profileUrl);
+      
+      if (!salesperson) {
+        return res.status(404).json({ message: "Salesperson not found" });
+      }
+      
+      // Update last scanned time
+      await storage.updateSalesperson(salesperson.id, {
+        lastScanned: new Date()
+      });
+      
+      const user = await storage.getUser(salesperson.userId);
+      
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Get their contractors
+      const contractors = await storage.getAllContractors();
+      
+      res.json({ 
+        salesperson: {
+          id: salesperson.id,
+          fullName: user.fullName,
+          profileUrl: salesperson.profileUrl,
+          nfcId: salesperson.nfcId,
+          avatarUrl: user.avatarUrl,
+          phone: user.phone,
+          email: user.email
+        },
+        contractors
+      });
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Project endpoints
+  apiRouter.get("/projects", authenticate, async (req: Request, res: Response) => {
+    try {
+      let projects = [];
+      
+      // Filter projects based on role
+      if (req.user.role === "admin") {
+        projects = await storage.getAllProjects();
+      } else if (req.user.role === "contractor") {
+        const contractor = await storage.getContractorByUserId(req.user.userId);
+        if (contractor) {
+          projects = await storage.getProjectsByContractorId(contractor.id);
+        }
+      } else if (req.user.role === "salesperson") {
+        const salesperson = await storage.getSalespersonByUserId(req.user.userId);
+        if (salesperson) {
+          projects = await storage.getProjectsBySalespersonId(salesperson.id);
+        }
+      } else {
+        projects = await storage.getProjectsByHomeownerId(req.user.userId);
+      }
+      
+      res.json({ projects });
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
+  apiRouter.get("/projects/recent", async (req: Request, res: Response) => {
+    try {
+      const limit = Number(req.query.limit) || 3;
+      const projects = await storage.getRecentProjects(limit);
+      
+      // Fetch contractor data for each project
+      const projectsWithContractorData = await Promise.all(
+        projects.map(async (project) => {
+          let contractorName = "Unknown";
+          
+          if (project.contractorId) {
+            const contractor = await storage.getContractor(project.contractorId);
+            if (contractor) {
+              contractorName = contractor.companyName;
+            }
+          }
+          
+          return {
+            ...project,
+            contractorName
+          };
+        })
+      );
+      
+      res.json({ projects: projectsWithContractorData });
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  apiRouter.post("/projects", authenticate, async (req: Request, res: Response) => {
+    try {
+      const data = insertProjectSchema.parse(req.body);
+      
+      // Set homeownerId to the logged in user if they're a homeowner
+      if (req.user.role === "homeowner") {
+        data.homeownerId = req.user.userId;
+      }
+      
+      const project = await storage.createProject(data);
+      
+      // If project has a salespersonId, update their stats
+      if (project.salespersonId) {
+        const salesperson = await storage.getSalesperson(project.salespersonId);
+        if (salesperson) {
+          await storage.updateSalesperson(salesperson.id, {
+            totalLeads: (salesperson.totalLeads || 0) + 1,
+            activeProjects: (salesperson.activeProjects || 0) + 1
+          });
+        }
+      }
+      
+      res.status(201).json({ project });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: error.errors });
+      }
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Testimonial endpoints
+  apiRouter.get("/testimonials/recent", async (req: Request, res: Response) => {
+    try {
+      const limit = Number(req.query.limit) || 3;
+      const testimonials = await storage.getRecentTestimonials(limit);
+      
+      // Fetch user data for each testimonial
+      const testimonialsWithUserData = await Promise.all(
+        testimonials.map(async (testimonial) => {
+          const user = await storage.getUser(testimonial.userId);
+          return {
+            ...testimonial,
+            fullName: user?.fullName,
+            avatarUrl: user?.avatarUrl
+          };
+        })
+      );
+      
+      res.json({ testimonials: testimonialsWithUserData });
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  apiRouter.post("/testimonials", authenticate, async (req: Request, res: Response) => {
+    try {
+      const data = insertTestimonialSchema.parse(req.body);
+      
+      // Set userId to the logged in user
+      data.userId = req.user.userId;
+      
+      // Verify that the project exists and belongs to the user
+      if (data.projectId) {
+        const project = await storage.getProject(data.projectId);
+        if (!project || project.homeownerId !== req.user.userId) {
+          return res.status(403).json({ message: "You can only leave testimonials for your own projects" });
+        }
+      }
+      
+      const testimonial = await storage.createTestimonial(data);
+      res.status(201).json({ testimonial });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: error.errors });
+      }
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Create HTTP server
+  const httpServer = createServer(app);
+  return httpServer;
+}
