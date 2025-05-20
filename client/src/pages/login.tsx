@@ -80,23 +80,27 @@ export default function Login() {
     
     try {
       await login(data);
-      // Redirect based on user role
-      switch (data.role) {
-        case "salesperson":
-          navigate("/sales-dashboard");
-          break;
-        case "contractor":
-          navigate("/contractor-dashboard");
-          break;
-        case "admin":
-          navigate("/admin-dashboard");
-          break;
-        default:
-          navigate("/");
-      }
+      
+      // Force a small delay to ensure authentication state is updated
+      setTimeout(() => {
+        // Redirect based on role selection from the form
+        switch (data.role) {
+          case "salesperson":
+            navigate("/sales-dashboard");
+            break;
+          case "contractor":
+            navigate("/contractor-dashboard");
+            break;
+          case "admin":
+            navigate("/admin-dashboard");
+            break;
+          default:
+            navigate("/");
+        }
+        setIsLoading(false);
+      }, 500);
     } catch (err: any) {
       setError(err.message || "Login failed. Please check your credentials.");
-    } finally {
       setIsLoading(false);
     }
   }
