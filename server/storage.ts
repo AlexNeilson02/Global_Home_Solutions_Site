@@ -396,7 +396,7 @@ export class MemStorage implements IStorage {
     const admin = await this.createUser({
       username: "admin",
       password: "admin123",
-      email: "admin@contractconnect.com",
+      email: "admin@globalhomesolutions.com",
       fullName: "Admin User",
       role: "admin",
       phone: "555-123-4567",
@@ -406,7 +406,7 @@ export class MemStorage implements IStorage {
     const salesperson = await this.createUser({
       username: "jameswilson",
       password: "password123",
-      email: "james@contractconnect.com",
+      email: "james@globalhomesolutions.com",
       fullName: "James Wilson",
       role: "salesperson",
       phone: "555-234-5678",

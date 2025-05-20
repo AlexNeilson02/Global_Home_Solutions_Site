@@ -15,6 +15,7 @@ import {
   Building,
   Star
 } from "lucide-react";
+import globalLogoPath from "@/assets/global-home-solutions-logo.png";
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState("homeowners");
@@ -91,7 +92,7 @@ export default function Home() {
       {/* How It Works Section */}
       <div className="bg-white dark:bg-card py-16">
         <div className="container-custom">
-          <h2 className="text-2xl md:text-3xl font-semibold text-center mb-12">How ContractConnect Works</h2>
+          <h2 className="text-2xl md:text-3xl font-semibold text-center mb-12">How Global Home Solutions Works</h2>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="feature-box">

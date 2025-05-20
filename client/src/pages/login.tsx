@@ -4,6 +4,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useAuth } from "@/lib/auth";
+import globalLogoPath from "@/assets/global-home-solutions-logo.png";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -148,8 +149,8 @@ export default function Login() {
         <CardHeader className="space-y-1">
           <div className="flex justify-center mb-4">
             <div className="text-primary text-3xl font-bold flex items-center">
-              <span className="mr-2 text-3xl">🏠</span>
-              <span>ContractConnect</span>
+              <img src={globalLogoPath} alt="Global Home Solutions" className="h-10 mr-2" />
+              <span>Global Home Solutions</span>
             </div>
           </div>
           <CardTitle className="text-2xl font-bold text-center">
