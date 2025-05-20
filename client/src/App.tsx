@@ -14,7 +14,7 @@ import AdminDashboard from "@/pages/admin-dashboard";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { DashboardNav } from "@/components/layout/dashboard-nav";
-import { useAuth } from "@/lib/auth";
+import { useAuth, AuthProvider } from "@/lib/auth";
 
 function Router() {
   const [location] = useLocation();
@@ -109,10 +109,12 @@ function Router() {
 
 function App() {
   return (
-    <TooltipProvider>
-      <Toaster />
-      <Router />
-    </TooltipProvider>
+    <AuthProvider>
+      <TooltipProvider>
+        <Toaster />
+        <Router />
+      </TooltipProvider>
+    </AuthProvider>
   );
 }
 
