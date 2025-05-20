@@ -30,7 +30,7 @@ const categoryIcons: Record<string, React.ElementType> = {
   pipe: Pipette,
   zap: Zap,
   home: Home,
-  palmtree: PalmTree,
+  palmtree: Palmtree,
   thermometer: Thermometer,
   paintbrush: MessageSquare, // Using a substitute as paintbrush isn't in lucide
   layers: Layers,

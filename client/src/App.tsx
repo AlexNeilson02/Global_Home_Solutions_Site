@@ -5,6 +5,7 @@ import NotFound from "@/pages/not-found";
 import Home from "@/pages/home";
 import NfcLanding from "@/pages/nfc-landing";
 import SalespersonProfile from "@/pages/salesperson-profile";
+import SalespersonProfileV2 from "@/pages/salesperson-profile-v2";
 import Login from "@/pages/login";
 import SalesDashboard from "@/pages/sales-dashboard";
 import ContractorDashboard from "@/pages/contractor-dashboard";
@@ -63,7 +64,7 @@ function Router() {
           <Route path="/" component={Home} />
           <Route path="/login" component={Login} />
           <Route path="/rep/:profileUrl" component={NfcLanding} />
-          <Route path="/s/:id" component={SalespersonProfile} />
+          <Route path="/s/:id" component={SalespersonProfileV2} />
           
           {/* Protected routes */}
           <Route path="/sales-dashboard">
