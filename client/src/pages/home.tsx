@@ -37,18 +37,18 @@ export default function Home() {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <div className="bg-primary-600 text-white">
+      <div className="bg-primary text-white">
         <div className="container-custom py-12 md:py-24">
           <div className="flex flex-col md:flex-row items-center">
             <div className="md:w-1/2 mb-8 md:mb-0">
               <h1 className="text-3xl md:text-4xl font-semibold mb-6">Connect with trusted contractors in your area</h1>
-              <p className="text-lg md:text-xl mb-8 text-primary-100">Find verified professionals for your home improvement projects through our network of certified door-to-door representatives.</p>
+              <p className="text-lg md:text-xl mb-8 opacity-90">Find verified professionals for your home improvement projects through our network of certified door-to-door representatives.</p>
               
               <div className="flex flex-col sm:flex-row gap-4">
-                <Button className="bg-white text-primary-600 hover:bg-primary-50">
+                <Button className="bg-white text-primary hover:bg-gray-100">
                   Find Contractors
                 </Button>
-                <Button variant="outline" className="border-white text-white hover:bg-primary-500">
+                <Button variant="outline" className="border-white text-white hover:bg-primary/80">
                   Become a Contractor
                 </Button>
               </div>
@@ -138,14 +138,14 @@ export default function Home() {
                         <h4 className="font-semibold">James Wilson</h4>
                         <p className="text-sm text-muted-foreground">Verified Sales Representative</p>
                         <div className="flex items-center mt-1">
-                          <span className="text-xs bg-success text-white px-2 py-0.5 rounded-full">Verified</span>
+                          <span className="text-xs bg-green-600 text-white px-2 py-0.5 rounded-full">Verified</span>
                           <span className="text-xs text-muted-foreground ml-2">ID: #38291</span>
                         </div>
                       </div>
                     </div>
                   </CardContent>
                 </Card>
-                <Button className="w-full">
+                <Button className="w-full bg-primary text-white hover:bg-primary/90">
                   Learn More About NFC Verification
                 </Button>
               </div>
@@ -283,16 +283,16 @@ export default function Home() {
       </div>
       
       {/* CTA Section */}
-      <div className="py-16 bg-primary-600 text-white">
+      <div className="py-16 bg-primary text-white">
         <div className="container-custom text-center">
           <h2 className="text-2xl md:text-3xl font-semibold mb-4">Ready to start your home improvement project?</h2>
-          <p className="text-lg mb-8 text-primary-100 max-w-3xl mx-auto">Connect with trusted contractors in your area today and transform your home with confidence.</p>
+          <p className="text-lg mb-8 opacity-90 max-w-3xl mx-auto">Connect with trusted contractors in your area today and transform your home with confidence.</p>
           
           <div className="flex flex-col sm:flex-row justify-center gap-4">
-            <Button className="bg-white text-primary-600 hover:bg-primary-50">
+            <Button className="bg-white text-primary hover:bg-gray-100">
               Find Contractors
             </Button>
-            <Button variant="outline" className="border-white text-white hover:bg-primary-500">
+            <Button variant="outline" className="border-white text-white hover:bg-primary/80">
               Learn More
             </Button>
           </div>
