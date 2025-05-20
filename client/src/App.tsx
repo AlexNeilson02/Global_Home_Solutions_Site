@@ -7,6 +7,7 @@ import NfcLanding from "@/pages/nfc-landing";
 import SalespersonProfile from "@/pages/salesperson-profile";
 import SalespersonProfileV2 from "@/pages/salesperson-profile-v2";
 import Login from "@/pages/login";
+import DashboardLogin from "@/pages/dashboard-login";
 import SalesDashboard from "@/pages/sales-dashboard";
 import ContractorDashboard from "@/pages/contractor-dashboard";
 import AdminDashboard from "@/pages/admin-dashboard";
@@ -63,6 +64,7 @@ function Router() {
           {/* Public routes */}
           <Route path="/" component={Home} />
           <Route path="/login" component={Login} />
+          <Route path="/dashboard-login" component={DashboardLogin} />
           <Route path="/rep/:profileUrl" component={NfcLanding} />
           <Route path="/s/:id" component={SalespersonProfileV2} />
           
