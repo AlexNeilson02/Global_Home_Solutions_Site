@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState, useEffect } from "react";
 import { LoginData } from "@shared/schema";
 
 type User = {
@@ -7,12 +7,12 @@ type User = {
   fullName: string;
   email: string;
   role: string;
-  avatarUrl?: string;
+  avatarUrl?: string | null;
 };
 
 type AuthContextType = {
   user: User | null;
-  login: (data: LoginData) => Promise<void>;
+  login: (data: LoginData) => Promise<User>;
   logout: () => void;
   isLoading: boolean;
   error: Error | null;
@@ -20,7 +20,7 @@ type AuthContextType = {
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
-  login: async () => {},
+  login: async () => { throw new Error("AuthContext not initialized"); },
   logout: () => {},
   isLoading: false,
   error: null
@@ -38,8 +38,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     
     if (storedToken && storedUser) {
       try {
-        setUser(JSON.parse(storedUser));
+        const parsedUser = JSON.parse(storedUser);
+        console.log("Loaded stored user:", parsedUser);
+        setUser(parsedUser);
       } catch (err) {
+        console.error("Error parsing stored user:", err);
         // Invalid stored user data
         localStorage.removeItem('authToken');
         localStorage.removeItem('user');
@@ -48,11 +51,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   // Real API login implementation
-  const login = async (loginData: LoginData) => {
+  const login = async (loginData: LoginData): Promise<User> => {
     setIsLoading(true);
     setError(null);
     
     try {
+      console.log("Sending login request to API...");
+      
       // Call the real API endpoint
       const response = await fetch('/api/auth/login', {
         method: 'POST',
@@ -62,12 +67,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         body: JSON.stringify(loginData),
       });
       
+      console.log("Login response status:", response.status);
+      
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || 'Login failed');
       }
       
       const data = await response.json();
+      console.log("Login response data:", data);
+      
+      if (!data.user) {
+        throw new Error("Server didn't return user data");
+      }
       
       // Store token and user in localStorage for persistence
       localStorage.setItem('authToken', data.token);
@@ -75,7 +87,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       
       // Update state with user info
       setUser(data.user);
+      return data.user;
     } catch (err) {
+      console.error("Login error:", err);
       setError(err as Error);
       throw err;
     } finally {

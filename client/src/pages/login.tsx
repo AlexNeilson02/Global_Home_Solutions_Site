@@ -87,46 +87,34 @@ export default function Login() {
     try {
       console.log("Attempting login with:", data.username);
       
-      // The login function now uses the real API
-      await login({
+      // The login function now returns the user directly
+      const userData = await login({
         username: data.username,
         password: data.password
       });
       
-      console.log("Login successful, checking user data");
+      console.log("Login successful, user data:", userData);
       
-      // Get the stored user to determine their role
-      const userJson = localStorage.getItem('user');
-      if (userJson) {
-        const userData = JSON.parse(userJson);
-        console.log("User role:", userData.role);
-        
-        // Redirect based on the actual user role from the database
-        switch (userData.role) {
-          case "salesperson":
-            navigate("/sales-dashboard");
-            break;
-          case "contractor":
-            navigate("/contractor-dashboard");
-            break;
-          case "admin":
-            navigate("/admin-dashboard");
-            break;
-          case "homeowner":
-            // Homeowners shouldn't be accessing dashboards, redirect to home
-            setError("Homeowner accounts don't have dashboard access");
-            localStorage.removeItem('authToken');
-            localStorage.removeItem('user');
-            navigate("/");
-            break;
-          default:
-            navigate("/");
-        }
-      } else {
-        // Fallback if user data isn't found
-        console.error("No user data found after successful login");
-        setError("Login successful but user data not found. Please try again.");
-        navigate("/");
+      // Redirect based on the actual user role from the database
+      switch (userData.role) {
+        case "salesperson":
+          navigate("/sales-dashboard");
+          break;
+        case "contractor":
+          navigate("/contractor-dashboard");
+          break;
+        case "admin":
+          navigate("/admin-dashboard");
+          break;
+        case "homeowner":
+          // Homeowners shouldn't be accessing dashboards, redirect to home
+          setError("Homeowner accounts don't have dashboard access");
+          localStorage.removeItem('authToken');
+          localStorage.removeItem('user');
+          navigate("/");
+          break;
+        default:
+          navigate("/");
       }
     } catch (err: any) {
       console.error("Login error:", err);
