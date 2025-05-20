@@ -316,11 +316,60 @@ export async function registerRoutes(app: Express): Promise<Server> {
           nfcId: salesperson.nfcId,
           avatarUrl: user.avatarUrl,
           phone: user.phone,
-          email: user.email
+          email: user.email,
+          lastScanned: salesperson.lastScanned
         },
         contractors
       });
     } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
+  // Salesperson profile route by ID - publicly accessible
+  apiRouter.get("/salesperson/:id", async (req: Request, res: Response) => {
+    try {
+      const id = parseInt(req.params.id);
+      
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid salesperson ID" });
+      }
+      
+      const salesperson = await storage.getSalesperson(id);
+      
+      if (!salesperson) {
+        return res.status(404).json({ message: "Salesperson not found" });
+      }
+      
+      // Update last scanned time
+      await storage.updateSalesperson(salesperson.id, {
+        lastScanned: new Date()
+      });
+      
+      const user = await storage.getUser(salesperson.userId);
+      
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Get their contractors
+      const contractors = await storage.getAllContractors();
+      
+      res.json({ 
+        salesperson: {
+          id: salesperson.id,
+          fullName: user.fullName,
+          profileUrl: salesperson.profileUrl,
+          nfcId: salesperson.nfcId,
+          avatarUrl: user.avatarUrl,
+          phone: user.phone,
+          email: user.email,
+          lastScanned: salesperson.lastScanned
+        },
+        contractors
+      });
+    } catch (error) {
+      console.error("Error fetching salesperson by ID:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   });
