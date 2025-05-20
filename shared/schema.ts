@@ -1,6 +1,7 @@
 import { pgTable, text, serial, integer, boolean, timestamp, real, json } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
+import { relations } from "drizzle-orm";
 
 // Base user table for authentication
 export const users = pgTable("users", {
@@ -100,6 +101,58 @@ export const insertTestimonialSchema = createInsertSchema(testimonials).omit({
   id: true,
   createdAt: true,
 });
+
+// Relations - these are required for Drizzle ORM
+export const usersRelations = relations(users, ({ many }) => ({
+  contractors: many(contractors),
+  salespersons: many(salespersons),
+  testimonials: many(testimonials),
+  projects: many(projects, { relationName: 'homeowner' }),
+}));
+
+export const contractorsRelations = relations(contractors, ({ one, many }) => ({
+  user: one(users, {
+    fields: [contractors.userId],
+    references: [users.id],
+  }),
+  projects: many(projects),
+}));
+
+export const salespersonsRelations = relations(salespersons, ({ one, many }) => ({
+  user: one(users, {
+    fields: [salespersons.userId],
+    references: [users.id],
+  }),
+  projects: many(projects),
+}));
+
+export const projectsRelations = relations(projects, ({ one, many }) => ({
+  homeowner: one(users, {
+    fields: [projects.homeownerId],
+    references: [users.id],
+    relationName: 'homeowner',
+  }),
+  contractor: one(contractors, {
+    fields: [projects.contractorId],
+    references: [contractors.id],
+  }),
+  salesperson: one(salespersons, {
+    fields: [projects.salespersonId],
+    references: [salespersons.id],
+  }),
+  testimonials: many(testimonials),
+}));
+
+export const testimonialsRelations = relations(testimonials, ({ one }) => ({
+  user: one(users, {
+    fields: [testimonials.userId],
+    references: [users.id],
+  }),
+  project: one(projects, {
+    fields: [testimonials.projectId],
+    references: [projects.id],
+  }),
+}));
 
 // Export types
 export type User = typeof users.$inferSelect;
