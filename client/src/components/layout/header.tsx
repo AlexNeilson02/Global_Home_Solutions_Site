@@ -19,6 +19,7 @@ import {
   Sun, 
   Moon
 } from "lucide-react";
+import globalLogoPath from "@/assets/global-home-solutions-logo.png";
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -37,8 +38,8 @@ export function Header() {
         <div className="flex justify-between items-center py-4">
           <div className="flex items-center space-x-2">
             <Link href="/" className="text-primary text-xl font-bold flex items-center">
-              <span className="mr-2 text-2xl">🏠</span>
-              <span>ContractConnect</span>
+              <img src={globalLogoPath} alt="Global Home Solutions" className="h-10 mr-2" />
+              <span>Global Home Solutions</span>
             </Link>
           </div>
 
