@@ -45,10 +45,13 @@ export default function Home() {
               <p className="text-lg md:text-xl mb-8 opacity-90">Find verified professionals for your home improvement projects through our network of certified door-to-door representatives.</p>
               
               <div className="flex flex-col sm:flex-row gap-4">
-                <Button className="bg-white text-primary hover:bg-gray-100">
+                <Button className="bg-white text-primary hover:bg-primary hover:text-white hover:border-white">
                   Find Contractors
                 </Button>
-                <Button variant="outline" className="border-white text-white hover:bg-primary/80">
+                <Button 
+                  variant="outline" 
+                  className="text-primary border-primary hover:bg-primary hover:text-white hover:border-white"
+                >
                   Become a Contractor
                 </Button>
               </div>
