@@ -373,6 +373,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Internal server error" });
     }
   });
+  
+  // Service categories endpoint
+  apiRouter.get("/service-categories", async (req: Request, res: Response) => {
+    try {
+      const categories = await storage.getAllServiceCategories();
+      res.json({ categories });
+    } catch (error) {
+      console.error("Error fetching service categories:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
 
   // Project endpoints
   apiRouter.get("/projects", authenticate, async (req: Request, res: Response) => {

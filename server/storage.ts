@@ -33,6 +33,12 @@ export interface IStorage {
   updateSalesperson(id: number, salesperson: Partial<Salesperson>): Promise<Salesperson | undefined>;
   getAllSalespersons(): Promise<Salesperson[]>;
   
+  // Service Category methods
+  getServiceCategory(id: number): Promise<ServiceCategory | undefined>;
+  createServiceCategory(serviceCategory: InsertServiceCategory): Promise<ServiceCategory>;
+  updateServiceCategory(id: number, serviceCategory: Partial<ServiceCategory>): Promise<ServiceCategory | undefined>;
+  getAllServiceCategories(): Promise<ServiceCategory[]>;
+  
   // Project methods
   getProject(id: number): Promise<Project | undefined>;
   createProject(project: InsertProject): Promise<Project>;

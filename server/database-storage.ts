@@ -1,12 +1,13 @@
 import { eq, and, desc, sql } from "drizzle-orm";
 import { db } from "./db";
 import { 
-  users, contractors, salespersons, projects, testimonials,
+  users, contractors, salespersons, projects, testimonials, serviceCategories,
   type User, type InsertUser,
   type Contractor, type InsertContractor,
   type Salesperson, type InsertSalesperson,
   type Project, type InsertProject,
-  type Testimonial, type InsertTestimonial
+  type Testimonial, type InsertTestimonial,
+  type ServiceCategory, type InsertServiceCategory
 } from "@shared/schema";
 import { IStorage } from "./storage";
 
@@ -191,5 +192,29 @@ export class DatabaseStorage implements IStorage {
       .from(testimonials)
       .orderBy(desc(testimonials.createdAt))
       .limit(limit);
+  }
+  
+  // Service Category methods
+  async getServiceCategory(id: number): Promise<ServiceCategory | undefined> {
+    const [category] = await db.select().from(serviceCategories).where(eq(serviceCategories.id, id));
+    return category;
+  }
+
+  async createServiceCategory(insertServiceCategory: InsertServiceCategory): Promise<ServiceCategory> {
+    const [category] = await db.insert(serviceCategories).values(insertServiceCategory).returning();
+    return category;
+  }
+
+  async updateServiceCategory(id: number, serviceCategoryData: Partial<ServiceCategory>): Promise<ServiceCategory | undefined> {
+    const [category] = await db
+      .update(serviceCategories)
+      .set(serviceCategoryData)
+      .where(eq(serviceCategories.id, id))
+      .returning();
+    return category;
+  }
+
+  async getAllServiceCategories(): Promise<ServiceCategory[]> {
+    return db.select().from(serviceCategories).where(eq(serviceCategories.isActive, true));
   }
 }
