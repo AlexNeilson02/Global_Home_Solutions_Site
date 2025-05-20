@@ -108,6 +108,13 @@ export default function Login() {
             case "admin":
               navigate("/admin-dashboard");
               break;
+            case "homeowner":
+              // Homeowners shouldn't be accessing dashboards, redirect to home
+              setError("Homeowner accounts don't have dashboard access");
+              localStorage.removeItem('authToken');
+              localStorage.removeItem('user');
+              navigate("/");
+              break;
             default:
               navigate("/");
           }
