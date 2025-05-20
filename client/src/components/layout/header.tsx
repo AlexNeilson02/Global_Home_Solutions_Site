@@ -7,6 +7,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
+  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { getInitials } from "@/lib/utils";
@@ -74,6 +75,13 @@ export function Header() {
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
+              <>
+                <Link href="/login">
+                  <Button variant="ghost">Log in</Button>
+                </Link>
+                <Link href="/register">
+                  <Button variant="default">Sign up</Button>
+                </Link>
               </>
             )}
           </div>
@@ -136,6 +144,17 @@ export function Header() {
                   </Button>
                 </>
               ) : (
+                <>
+                  <Link href="/login">
+                    <Button variant="ghost" className="w-full justify-start">
+                      Log in
+                    </Button>
+                  </Link>
+                  <Link href="/register">
+                    <Button variant="ghost" className="w-full justify-start">
+                      Sign up
+                    </Button>
+                  </Link>
                 </>
               )}
             </div>
