@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ContractorCard } from "@/components/contractor-card";
 import { NfcBadge } from "@/components/nfc-badge";
+import { BidRequestModal } from "@/components/bid-request-modal";
 import { getInitials } from "@/lib/utils";
 import { 
   Phone, 
@@ -62,11 +63,19 @@ interface ContractorWithVideo extends Contractor {
   showVideo: boolean;
 }
 
+interface SelectedContractor {
+  id: number;
+  name: string;
+  serviceCategory?: string;
+}
+
 export default function SalespersonProfileV2() {
   const { id } = useParams();
   const { toast } = useToast();
   const [contractorsWithVideo, setContractorsWithVideo] = useState<ContractorWithVideo[]>([]);
   const [filteredCategoryId, setFilteredCategoryId] = useState<number | null>(null);
+  const [bidModalOpen, setBidModalOpen] = useState(false);
+  const [selectedContractor, setSelectedContractor] = useState<SelectedContractor | null>(null);
   
   // Get salesperson data by ID
   const { data, isLoading: isLoadingSalesperson } = useQuery<{
@@ -114,14 +123,30 @@ export default function SalespersonProfileV2() {
     );
   };
   
+  // Find the service category name based on categoryId
+  const getServiceCategoryName = (categoryId: number) => {
+    return categoriesData?.categories.find(c => c.id === categoryId)?.name || '';
+  };
+  
+  // Helper to find primary service category for a contractor
+  const getContractorPrimaryCategory = (contractor: Contractor) => {
+    if (!contractor.serviceCategoryIds || contractor.serviceCategoryIds.length === 0) {
+      return '';
+    }
+    return getServiceCategoryName(contractor.serviceCategoryIds[0]);
+  };
+  
   const requestBid = (contractorId: number) => {
-    toast({
-      title: "Bid Request Sent",
-      description: "Your bid request has been sent to the contractor.",
-    });
+    const contractor = contractors.find(c => c.id === contractorId);
     
-    // In a real implementation, this would submit a form or make an API call
-    console.log(`Requesting bid from contractor ${contractorId}`);
+    if (contractor) {
+      setSelectedContractor({
+        id: contractor.id,
+        name: contractor.companyName,
+        serviceCategory: getContractorPrimaryCategory(contractor)
+      });
+      setBidModalOpen(true);
+    }
   };
 
   const isLoading = isLoadingSalesperson || isLoadingCategories;
@@ -349,6 +374,18 @@ export default function SalespersonProfileV2() {
           </div>
         </div>
       </div>
+      
+      {/* Bid Request Modal */}
+      {selectedContractor && (
+        <BidRequestModal
+          open={bidModalOpen}
+          onOpenChange={setBidModalOpen}
+          contractorId={selectedContractor.id}
+          contractorName={selectedContractor.name}
+          salespersonId={salesperson ? parseInt(id || "0") : null}
+          serviceCategory={selectedContractor.serviceCategory}
+        />
+      )}
     </div>
   );
 }
