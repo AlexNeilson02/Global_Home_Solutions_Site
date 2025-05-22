@@ -225,11 +225,11 @@ export default function ProfileEditForm({ userData, roleData, userType, onSucces
                                 input.onchange = (e) => {
                                   const file = (e.target as HTMLInputElement).files?.[0];
                                   if (file) {
-                                    // Simple validation
-                                    if (file.size > 2 * 1024 * 1024) {
+                                    // Simple validation - increased to 10MB
+                                    if (file.size > 10 * 1024 * 1024) {
                                       toast({
                                         title: "File too large",
-                                        description: "Please select an image smaller than 2MB",
+                                        description: "Please select an image smaller than 10MB",
                                         variant: "destructive"
                                       });
                                       return;
@@ -243,7 +243,15 @@ export default function ProfileEditForm({ userData, roleData, userType, onSucces
                                       field.onChange(result);
                                       toast({
                                         title: "Photo selected",
-                                        description: "Your new profile photo has been selected"
+                                        description: "Your new profile photo has been selected successfully",
+                                        variant: "default"
+                                      });
+                                    };
+                                    reader.onerror = () => {
+                                      toast({
+                                        title: "Upload failed",
+                                        description: "There was a problem processing your image. Please try a different one.",
+                                        variant: "destructive"
                                       });
                                     };
                                     reader.readAsDataURL(file);
