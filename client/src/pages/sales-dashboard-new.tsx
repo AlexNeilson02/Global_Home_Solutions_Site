@@ -155,11 +155,18 @@ export default function SalesDashboardNew() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-sm font-medium">Email</label>
+                    <label className="text-sm font-medium">Work Email</label>
                     <input 
                       className="w-full px-3 py-2 border rounded-md" 
                       value={userData?.email || ""}
                       readOnly
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Phone Number</label>
+                    <input 
+                      className="w-full px-3 py-2 border rounded-md" 
+                      value={salespersonData?.phone || "(555) 123-4567"}
                     />
                   </div>
                 </div>
