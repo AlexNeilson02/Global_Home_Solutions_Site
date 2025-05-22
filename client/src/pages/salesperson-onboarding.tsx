@@ -80,7 +80,7 @@ export default function SalespersonOnboarding() {
       phone: user?.phone || "",
       bio: "",
       avatarUrl: user?.avatarUrl || "",
-      profileUrl: salespersonData?.profileUrl || `${user?.username.toLowerCase().replace(/[^a-z0-9-]/g, '-')}`,
+      profileUrl: salespersonData?.profileUrl || (user?.username ? user.username.toLowerCase().replace(/[^a-z0-9-]/g, '-') : ''),
       termsAccepted: false
     },
   });

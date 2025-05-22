@@ -4,7 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/home";
 import NfcLanding from "@/pages/nfc-landing";
-import SalespersonProfile from "@/pages/salesperson-profile";
+import SalespersonProfile from "@/pages/salesperson-profile-fixed";
 import SalespersonOnboarding from "@/pages/salesperson-onboarding";
 import Login from "@/pages/login";
 import DashboardLogin from "@/pages/dashboard-login";
