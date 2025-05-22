@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { StatsCard } from "@/components/stats-card";
+import { QRCodeDisplay } from "@/components/qr-code-display";
 import { useAuth } from "@/lib/auth";
 import { getInitials } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
@@ -148,7 +149,7 @@ export default function SalesDashboardNew() {
     return (
       <div>
         <h1 className="text-2xl font-semibold mb-6">Settings</h1>
-        <Card>
+        <Card className="mb-6">
           <CardContent className="pt-6">
             <div className="space-y-6">
               <div>
@@ -199,6 +200,57 @@ export default function SalesDashboardNew() {
                     Save Changes
                   </Button>
                 </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* QR Code Card */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Your Digital Business Card QR Code</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Your unique QR code allows customers to easily access your digital business card. 
+                  Print it on your physical business cards, display it at events, or share it digitally.
+                </p>
+                
+                <div className="p-2 bg-muted rounded-lg mb-4">
+                  <p className="font-medium mb-1 text-sm">Your Personal Profile URL:</p>
+                  <div className="flex items-center gap-2">
+                    <div className="bg-background px-3 py-2 text-sm rounded-md w-full truncate border">
+                      {window.location.origin}/s/{salespersonData?.profileUrl || "your-profile"}
+                    </div>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        navigator.clipboard.writeText(`${window.location.origin}/s/${salespersonData?.profileUrl || "your-profile"}`);
+                        alert("Profile URL copied to clipboard!");
+                      }}
+                    >
+                      Copy
+                    </Button>
+                  </div>
+                </div>
+                
+                <p className="text-sm font-medium mb-2">Benefits:</p>
+                <ul className="text-sm space-y-1 list-disc list-inside text-muted-foreground mb-4">
+                  <li>Allow customers to contact you directly</li>
+                  <li>Showcase your services and expertise</li>
+                  <li>Enable quick quote requests from prospects</li>
+                  <li>Increase your conversion rate with personalized approach</li>
+                </ul>
+              </div>
+              
+              <div className="flex justify-center items-center">
+                <QRCodeDisplay
+                  salespersonId={salespersonData?.id}
+                  profileUrl={salespersonData?.profileUrl}
+                />
               </div>
             </div>
           </CardContent>
