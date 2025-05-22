@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import QRCode from "react-qr-code";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
-import { Download, ClipboardCopy } from "lucide-react";
+import { Download, ClipboardCopy, AlertCircle } from "lucide-react";
 
 interface QRCodeDisplayProps {
   salespersonId?: number;
@@ -17,15 +17,14 @@ export function QRCodeDisplay({ salespersonId, profileUrl }: QRCodeDisplayProps)
   // Get the current domain dynamically
   const baseUrl = window.location.origin;
   
-  // Use provided profileUrl or fallback to a placeholder
-  const userProfileUrl = profileUrl || "profile";
-  
   // Add a timestamp parameter to force the page to load fresh content
   const timestamp = new Date().getTime();
-  const landingPageUrl = `${baseUrl}/s/${userProfileUrl}?t=${timestamp}`;
+  
+  // Only create a QR code if we have a valid profile URL
+  const landingPageUrl = profileUrl ? `${baseUrl}/s/${profileUrl}?t=${timestamp}` : "";
   
   const handleDownload = () => {
-    if (!qrCodeRef.current) return;
+    if (!qrCodeRef.current || !profileUrl) return;
     
     setIsDownloading(true);
     
@@ -79,12 +78,49 @@ export function QRCodeDisplay({ salespersonId, profileUrl }: QRCodeDisplayProps)
   };
   
   const copyLinkToClipboard = () => {
+    if (!profileUrl) {
+      toast({
+        title: "No Profile URL",
+        description: "There is no profile URL configured for your account yet.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     navigator.clipboard.writeText(landingPageUrl);
     toast({
       title: "Link Copied",
       description: "Your landing page link has been copied to clipboard.",
     });
   };
+  
+  // If the profile URL is missing, show a message instead of an invalid QR code
+  if (!profileUrl) {
+    return (
+      <div className="flex flex-col items-center py-4">
+        <div className="bg-muted p-6 rounded-lg text-center mb-4">
+          <AlertCircle className="mx-auto h-10 w-10 text-amber-500 mb-2" />
+          <h3 className="font-medium mb-2">Profile URL Not Configured</h3>
+          <p className="text-sm text-muted-foreground">
+            Your profile URL hasn't been set up yet. Please contact your administrator 
+            to assign you a unique profile URL.
+          </p>
+        </div>
+        <Button 
+          variant="outline"
+          size="sm"
+          onClick={() => {
+            toast({
+              title: "Request Sent",
+              description: "A request has been sent to create your profile URL.",
+            });
+          }}
+        >
+          Request Profile URL
+        </Button>
+      </div>
+    );
+  }
   
   return (
     <div className="flex flex-col items-center">
