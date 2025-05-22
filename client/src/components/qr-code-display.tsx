@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
 import { Download, ClipboardCopy, RefreshCw } from "lucide-react";
@@ -10,6 +10,7 @@ interface QRCodeDisplayProps {
 
 export function QRCodeDisplay({ salespersonId }: QRCodeDisplayProps) {
   const [isDownloading, setIsDownloading] = useState(false);
+  const queryClient = useQueryClient();
   
   const { data, isLoading, error } = useQuery<{ qrCodeDataUrl: string, landingPageUrl: string }>({
     queryKey: ["/api/salespersons", salespersonId, "qrcode"],
@@ -69,7 +70,20 @@ export function QRCodeDisplay({ salespersonId }: QRCodeDisplayProps) {
     return (
       <div className="flex flex-col items-center justify-center p-6 bg-destructive/10 rounded-lg">
         <p className="text-sm text-destructive mb-2">Failed to generate QR code</p>
-        <Button variant="outline" size="sm" onClick={() => window.location.reload()}>
+        <Button 
+          variant="outline" 
+          size="sm" 
+          onClick={() => {
+            // Use query invalidation instead of page reload to prevent authentication issues
+            if (salespersonId) {
+              queryClient.invalidateQueries({ queryKey: ["/api/salespersons", salespersonId, "qrcode"] });
+              toast({
+                title: "Retrying...",
+                description: "Attempting to generate QR code again.",
+              });
+            }
+          }}
+        >
           <RefreshCw className="h-4 w-4 mr-2" />
           Try Again
         </Button>
