@@ -128,14 +128,32 @@ export default function ProfileEditForm({ userData, roleData, userType, onSucces
   
   // API endpoint based on user type
   const getApiEndpoint = () => {
+    // Check if we have valid IDs before constructing endpoints
     switch (userType) {
       case 'salesperson':
-        return `/api/salespersons/${roleData?.id}`;
+        if (!roleData?.id) {
+          console.error("Missing salesperson ID", roleData);
+          return `/api/users/${userData?.id}`; // Fallback to user endpoint if role ID is missing
+        }
+        return `/api/salespersons/${roleData.id}`;
       case 'contractor':
-        return `/api/contractors/${roleData?.id}`;
+        if (!roleData?.id) {
+          console.error("Missing contractor ID", roleData);
+          return `/api/users/${userData?.id}`; // Fallback to user endpoint if role ID is missing
+        }
+        return `/api/contractors/${roleData.id}`;
       case 'admin':
       default:
-        return `/api/users/${userData?.id}`;
+        if (!userData?.id) {
+          console.error("Missing user ID", userData);
+          toast({
+            title: "Error",
+            description: "Could not find your user information. Please try logging in again.",
+            variant: "destructive",
+          });
+          return `/api/users/me`; // Fallback to /me endpoint which should work with session
+        }
+        return `/api/users/${userData.id}`;
     }
   };
   
@@ -164,17 +182,31 @@ export default function ProfileEditForm({ userData, roleData, userType, onSucces
   
   // Handle form submission
   const onSubmit = (data: ProfileFormValues) => {
-    // Just use basic text fields for now - disabling image upload temporarily
-    // Focus on updating the user profile info
-    const updatedData = {
-      fullName: data.fullName,
-      email: data.email,
-      phone: data.phone,
-      bio: data.bio
-    };
-    
-    // Simplify the API call to avoid potential issues with large image data
-    updateProfileMutation.mutate(updatedData as ProfileFormValues);
+    // Check if we have the avatarUrl from the preview
+    if (avatarPreview && avatarPreview !== userData?.avatarUrl) {
+      // Create a simpler version of the data to send to the API
+      const updatedData = {
+        fullName: data.fullName,
+        email: data.email,
+        phone: data.phone,
+        bio: data.bio,
+        avatarUrl: avatarPreview
+      };
+      
+      console.log("Submitting profile with avatar URL:", updatedData);
+      updateProfileMutation.mutate(updatedData as ProfileFormValues);
+    } else {
+      // Just submit the text fields if no new avatar was selected
+      const updatedData = {
+        fullName: data.fullName,
+        email: data.email,
+        phone: data.phone,
+        bio: data.bio
+      };
+      
+      console.log("Submitting profile without avatar URL:", updatedData);
+      updateProfileMutation.mutate(updatedData as ProfileFormValues);
+    }
   };
   
   return (
