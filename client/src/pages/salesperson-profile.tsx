@@ -1,168 +1,306 @@
-import { useParams } from "wouter";
+import { useEffect } from "react";
+import { useParams, useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { Helmet } from "react-helmet";
+
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ContractorCard } from "@/components/contractor-card";
-import { NfcBadge } from "@/components/nfc-badge";
-import { getInitials, timeAgo } from "@/lib/utils";
-import { Phone, Mail } from "lucide-react";
+
+import { PhoneIcon, MailIcon, MessageSquare, Award, Shield, Check, Calendar, Clock, FileText } from "lucide-react";
+import logoPng from "@assets/GLOBAL HOME SOLUTIONS LOGO-01.png";
 
 export default function SalespersonProfile() {
-  const { id } = useParams();
-  
-  // Get salesperson data by ID
-  const { data, isLoading, error } = useQuery<any>({
-    queryKey: [`/api/salesperson/${id}`],
+  const params = useParams();
+  const profileUrl = params.profileUrl;
+  const [, setLocation] = useLocation();
+
+  // Track page visit
+  useEffect(() => {
+    // Create a page visit record when the page loads
+    const createPageVisit = async () => {
+      try {
+        await fetch('/api/page-visits', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            salespersonId: salespersonData?.id,
+            path: `/s/${profileUrl}`,
+            referrer: document.referrer
+          })
+        });
+      } catch (error) {
+        console.error('Failed to record page visit', error);
+      }
+    };
+
+    if (salespersonData?.id) {
+      createPageVisit();
+    }
+  }, [profileUrl, salespersonData?.id]);
+
+  // Fetch salesperson data
+  const { data: salespersonData, isLoading, error } = useQuery<any>({
+    queryKey: [`/api/salesperson/${profileUrl}`],
   });
-  
-  const salesperson = data?.salesperson;
-  const contractors = data?.contractors;
+
+  // Fetch service categories
+  const { data: serviceCategoriesData } = useQuery<any>({
+    queryKey: ["/api/service-categories"],
+  });
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary mx-auto"></div>
-          <p className="mt-4 text-muted-foreground">Loading salesperson profile...</p>
-        </div>
+      <div className="flex h-screen items-center justify-center">
+        <div className="animate-spin h-10 w-10 border-4 border-primary border-t-transparent rounded-full"></div>
       </div>
     );
   }
 
-  if (error || !salesperson) {
+  if (error || !salespersonData) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center max-w-md mx-auto p-6 bg-background rounded-lg shadow-lg">
-          <h2 className="text-2xl font-bold mb-4">Profile Not Found</h2>
-          <p className="text-muted-foreground mb-6">
-            Sorry, we couldn't find the salesperson profile you're looking for. 
-            The link might be incorrect or the profile may have been removed.
-          </p>
-          <Button onClick={() => window.location.href = "/"}>
-            Return Home
-          </Button>
-        </div>
+      <div className="flex h-screen flex-col items-center justify-center p-4 text-center">
+        <h1 className="text-3xl font-bold mb-4">Sales Representative Not Found</h1>
+        <p className="mb-6 text-muted-foreground">
+          The sales representative profile you're looking for cannot be found. 
+          The link might be incorrect or the profile has been removed.
+        </p>
+        <Button onClick={() => window.location.href = "/"}>
+          Return to Home
+        </Button>
       </div>
     );
   }
+
+  const { user, salesperson } = salespersonData;
+
+  const handleRequestBid = () => {
+    setLocation(`/request-quote/${profileUrl}`);
+  };
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header Banner */}
-      <div className="bg-primary w-full h-32 md:h-48"></div>
-      
-      {/* Profile Section */}
-      <div className="container-custom -mt-16 md:-mt-24">
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex flex-col md:flex-row gap-6">
-              <div className="flex flex-col items-center md:items-start">
-                <Avatar className="w-32 h-32 border-4 border-white shadow-lg">
-                  <AvatarImage src={salesperson.avatarUrl || ""} alt={salesperson.fullName} />
-                  <AvatarFallback className="text-4xl">{getInitials(salesperson.fullName)}</AvatarFallback>
+    <>
+      <Helmet>
+        <title>{user.fullName} | Global Home Solutions</title>
+        <meta name="description" content={`${user.fullName} is a verified sales representative for Global Home Solutions, specializing in home improvement services.`} />
+      </Helmet>
+
+      <div className="min-h-screen bg-background">
+        {/* Header */}
+        <header className="bg-primary text-white p-4 shadow-md">
+          <div className="container mx-auto flex justify-between items-center">
+            <div className="flex items-center gap-2">
+              <img src={logoPng} alt="Global Home Solutions" className="h-10 w-auto" />
+              <div className="hidden md:block text-lg font-semibold">Global Home Solutions</div>
+            </div>
+            <div>
+              <Button variant="secondary" onClick={handleRequestBid}>
+                Request a Quote
+              </Button>
+            </div>
+          </div>
+        </header>
+
+        <main className="container mx-auto py-8 px-4">
+          <Card className="mb-8 overflow-hidden">
+            <div className="h-36 bg-gradient-to-r from-primary/90 to-primary/50"></div>
+            <CardContent className="pt-0 relative">
+              <div className="flex flex-col md:flex-row gap-6 -mt-12">
+                <Avatar className="h-24 w-24 md:h-32 md:w-32 border-4 border-background ring-2 ring-primary/20">
+                  <AvatarImage src={user.avatarUrl} />
+                  <AvatarFallback className="text-2xl bg-primary/20">
+                    {user.fullName?.charAt(0)}
+                  </AvatarFallback>
                 </Avatar>
-                
-                <div className="mt-4 flex flex-col items-center md:items-start">
-                  <h1 className="text-2xl font-bold">{salesperson.fullName}</h1>
-                  <p className="text-muted-foreground">Sales Representative</p>
-                  <Badge variant="secondary" className="mt-2 bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100">Verified</Badge>
-                </div>
-              </div>
-              
-              <div className="flex-1 flex flex-col md:flex-row gap-6 justify-between">
-                <div className="space-y-4">
-                  <div className="flex items-center">
-                    <Phone className="h-5 w-5 text-muted-foreground mr-2" />
-                    <span>{salesperson.phone || "Phone number not available"}</span>
+
+                <div className="space-y-2 mt-4 md:mt-6">
+                  <div className="flex flex-col md:flex-row md:items-center gap-2">
+                    <h1 className="text-2xl md:text-3xl font-bold">{user.fullName}</h1>
+                    <Badge className="w-fit" variant="outline">
+                      <Shield className="h-3 w-3 mr-1" /> Verified Sales Representative
+                    </Badge>
                   </div>
-                  <div className="flex items-center">
-                    <Mail className="h-5 w-5 text-muted-foreground mr-2" />
-                    <span>{salesperson.email}</span>
-                  </div>
-                  {salesperson.nfcId && (
+                  
+                  <div className="text-muted-foreground flex flex-wrap gap-y-1 gap-x-4">
                     <div className="flex items-center">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-muted-foreground mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-                      </svg>
-                      <span>ID: {salesperson.nfcId}</span>
+                      <PhoneIcon className="h-4 w-4 mr-2" />
+                      <span>{user.phone || "Contact via email"}</span>
                     </div>
+                    <div className="flex items-center">
+                      <MailIcon className="h-4 w-4 mr-2" />
+                      <span>{user.email}</span>
+                    </div>
+                  </div>
+
+                  {salesperson.bio && (
+                    <p className="text-sm md:text-base max-w-2xl mt-2">
+                      {salesperson.bio}
+                    </p>
                   )}
                 </div>
-                
-                <div className="flex items-center">
-                  <div className="text-center md:text-right">
-                    <div className="flex items-center justify-center md:justify-end gap-3 mb-4">
-                      <NfcBadge size="md" />
-                      <div className="text-left">
-                        <p className="font-semibold">NFC Verified</p>
-                        <p className="text-xs text-muted-foreground">
-                          Last active {salesperson.lastScanned ? timeAgo(salesperson.lastScanned) : "recently"}
-                        </p>
-                      </div>
-                    </div>
-                    <Button size="lg" className="w-full md:w-auto">
-                      Connect Now
-                    </Button>
-                  </div>
-                </div>
               </div>
-            </div>
-          </CardContent>
-        </Card>
-        
-        {/* Tabs for Contractors and Info */}
-        <div className="mt-8 mb-16">
-          <Tabs defaultValue="contractors">
-            <TabsList className="mb-6">
-              <TabsTrigger value="contractors">Contractors</TabsTrigger>
-              <TabsTrigger value="about">About</TabsTrigger>
+
+              <div className="flex justify-end mt-4 md:absolute md:top-4 md:right-4">
+                <Button onClick={handleRequestBid} className="w-full md:w-auto">
+                  Request a Quote
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Tabs defaultValue="services" className="w-full">
+            <TabsList className="grid w-full grid-cols-3">
+              <TabsTrigger value="services">Services</TabsTrigger>
+              <TabsTrigger value="experience">Experience</TabsTrigger>
+              <TabsTrigger value="process">How It Works</TabsTrigger>
             </TabsList>
             
-            <TabsContent value="contractors">
-              <h2 className="text-2xl font-semibold mb-6">Represented Contractors</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {contractors?.map((contractor: any) => (
-                  <ContractorCard
-                    key={contractor.id}
-                    id={contractor.id}
-                    companyName={contractor.companyName}
-                    description={contractor.description}
-                    specialties={contractor.specialties}
-                    rating={contractor.rating}
-                    reviewCount={contractor.reviewCount}
-                    hourlyRate={contractor.hourlyRate}
-                    logoUrl={contractor.logoUrl}
-                    onGetQuote={(id) => {
-                      console.log(`Get quote from contractor ${id}`);
-                    }}
-                  />
+            <TabsContent value="services" className="mt-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {serviceCategoriesData?.categories.map((category: any) => (
+                  <Card key={category.id} className="overflow-hidden">
+                    <CardHeader className="bg-primary/5 pb-2">
+                      <CardTitle className="text-lg">{category.name}</CardTitle>
+                    </CardHeader>
+                    <CardContent className="pt-4">
+                      <p className="text-muted-foreground text-sm">{category.description}</p>
+                    </CardContent>
+                    <CardFooter className="flex justify-end border-t bg-muted/20 pt-2">
+                      <Button variant="ghost" size="sm" onClick={handleRequestBid}>
+                        Get Quote
+                      </Button>
+                    </CardFooter>
+                  </Card>
                 ))}
               </div>
+            </TabsContent>
+            
+            <TabsContent value="experience" className="mt-6 space-y-4">
+              {salesperson.specialties && salesperson.specialties.length > 0 && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-lg">Areas of Expertise</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex flex-wrap gap-2">
+                      {salesperson.specialties.map((specialty: string, index: number) => (
+                        <Badge key={index} variant="secondary">
+                          <Check className="h-3 w-3 mr-1" /> {specialty}
+                        </Badge>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
               
-              {(!contractors || contractors.length === 0) && (
-                <div className="text-center p-8 bg-muted rounded-lg">
-                  <p className="text-muted-foreground">No contractors available at the moment.</p>
-                </div>
+              {salesperson.certifications && salesperson.certifications.length > 0 && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-lg">Certifications</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-2">
+                      {salesperson.certifications.map((cert: string, index: number) => (
+                        <div key={index} className="flex items-center">
+                          <Award className="h-4 w-4 mr-2 text-primary" />
+                          <span>{cert}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+              
+              {salesperson.yearsExperience && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-lg">Experience</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex items-center">
+                      <Calendar className="h-5 w-5 mr-2 text-primary" />
+                      <span>
+                        <strong>{salesperson.yearsExperience}</strong> years of experience in home improvement services
+                      </span>
+                    </div>
+                  </CardContent>
+                </Card>
               )}
             </TabsContent>
             
-            <TabsContent value="about">
-              <h2 className="text-2xl font-semibold mb-6">About {salesperson.fullName}</h2>
-              <div className="bg-card p-6 rounded-lg">
-                <p className="text-card-foreground mb-4">
-                  {salesperson.fullName} is a dedicated sales representative with extensive experience in connecting homeowners with the right contractors for their home improvement projects.
-                </p>
-                <p className="text-card-foreground">
-                  With a customer-first approach, {salesperson.fullName.split(' ')[0]} works to understand your needs and match you with qualified professionals who can bring your vision to life.
-                </p>
-              </div>
+            <TabsContent value="process" className="mt-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Our Simple Process</CardTitle>
+                  <CardDescription>Here's how we help you improve your home</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div className="flex flex-col md:flex-row gap-4 items-start">
+                    <div className="flex-shrink-0 bg-primary text-white rounded-full h-10 w-10 flex items-center justify-center font-bold">1</div>
+                    <div>
+                      <h3 className="text-lg font-medium mb-1">Request a Quote</h3>
+                      <p className="text-muted-foreground">Fill out our simple form with your project details. It takes less than 5 minutes.</p>
+                    </div>
+                  </div>
+                  <Separator />
+                  <div className="flex flex-col md:flex-row gap-4 items-start">
+                    <div className="flex-shrink-0 bg-primary text-white rounded-full h-10 w-10 flex items-center justify-center font-bold">2</div>
+                    <div>
+                      <h3 className="text-lg font-medium mb-1">Free Consultation</h3>
+                      <p className="text-muted-foreground">A contractor will contact you to discuss your needs and provide expert advice.</p>
+                    </div>
+                  </div>
+                  <Separator />
+                  <div className="flex flex-col md:flex-row gap-4 items-start">
+                    <div className="flex-shrink-0 bg-primary text-white rounded-full h-10 w-10 flex items-center justify-center font-bold">3</div>
+                    <div>
+                      <h3 className="text-lg font-medium mb-1">Detailed Proposal</h3>
+                      <p className="text-muted-foreground">Receive a comprehensive quote with transparent pricing and timeline.</p>
+                    </div>
+                  </div>
+                  <Separator />
+                  <div className="flex flex-col md:flex-row gap-4 items-start">
+                    <div className="flex-shrink-0 bg-primary text-white rounded-full h-10 w-10 flex items-center justify-center font-bold">4</div>
+                    <div>
+                      <h3 className="text-lg font-medium mb-1">Quality Work</h3>
+                      <p className="text-muted-foreground">Our verified contractors complete your project to the highest standards.</p>
+                    </div>
+                  </div>
+                </CardContent>
+                <CardFooter>
+                  <Button onClick={handleRequestBid} className="w-full">
+                    Get Started Today
+                  </Button>
+                </CardFooter>
+              </Card>
             </TabsContent>
           </Tabs>
-        </div>
+        </main>
+
+        <footer className="bg-muted py-8 px-4 mt-12">
+          <div className="container mx-auto">
+            <div className="flex flex-col md:flex-row justify-between items-center">
+              <div className="flex items-center mb-4 md:mb-0">
+                <img src={logoPng} alt="Global Home Solutions" className="h-8 w-auto mr-2" />
+                <span className="text-sm">© 2025 Global Home Solutions. All rights reserved.</span>
+              </div>
+              <div className="flex gap-4">
+                <Button variant="ghost" size="sm">
+                  Privacy Policy
+                </Button>
+                <Button variant="ghost" size="sm">
+                  Terms of Service
+                </Button>
+              </div>
+            </div>
+          </div>
+        </footer>
       </div>
-    </div>
+    </>
   );
 }
