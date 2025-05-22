@@ -157,6 +157,9 @@ export default function SalesDashboard() {
   const renderContent = () => {
     // Extract the path segments to determine which content to show
     const pathSegments = location.split('/');
+    console.log("Current location:", location);
+    console.log("Path segments:", pathSegments);
+    // The path is the 3rd segment (index 2) in /sales-dashboard/section
     const path = pathSegments.length > 2 ? pathSegments[2] : '';
     
     if (showProfileEdit) {
@@ -788,6 +791,8 @@ export default function SalesDashboard() {
     );
   };
 
+  // If we're on a subpage of sales-dashboard, we need to show the appropriate content
+  // But we're still displaying the main dashboard component with the sidebar
   return (
     <div className="flex min-h-screen bg-background">
       {/* Sidebar */}
