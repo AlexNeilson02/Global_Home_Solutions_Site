@@ -116,6 +116,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       localStorage.removeItem('authToken');
       localStorage.removeItem('user');
       setUser(null);
+      
+      // Redirect to login page after logout
+      window.location.href = '/login';
     }
   };
 

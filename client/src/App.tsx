@@ -39,11 +39,10 @@ function Router() {
     }
   };
   
-  // Protected route helper - Modified to allow direct access for testing
+  // Protected route helper
   const ProtectedRoute = ({ children, roles = [] }: { children: React.ReactNode, roles?: string[] }) => {
-    // For testing purposes, allow direct access to dashboards
-    // This is a temporary solution until we fix the authentication system
-    const isTestMode = true; // Set to true to allow direct access
+    // We now have proper authentication, so we can disable test mode
+    const isTestMode = false;
     
     if (isTestMode) {
       return <>{children}</>;
@@ -52,12 +51,27 @@ function Router() {
     if (isLoading) return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
     
     if (!user) {
+      // Redirect to login page if not authenticated
       window.location.href = "/login";
       return null;
     }
     
     if (roles.length > 0 && !roles.includes(user.role)) {
-      window.location.href = getDashboardRoute();
+      // Redirect to their respective dashboard if they don't have access to this route
+      // Never redirect to home
+      switch (user.role) {
+        case "salesperson":
+          window.location.href = "/sales-dashboard";
+          break;
+        case "contractor":
+          window.location.href = "/contractor-dashboard";
+          break;
+        case "admin":
+          window.location.href = "/admin-dashboard";
+          break;
+        default:
+          window.location.href = "/login";
+      }
       return null;
     }
     

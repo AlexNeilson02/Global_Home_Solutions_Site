@@ -90,7 +90,7 @@ export default function Login() {
       confirmPassword: "",
       email: "",
       fullName: "",
-      role: "homeowner",
+      role: "salesperson", // Default role is now salesperson
     },
   });
 
@@ -121,14 +121,16 @@ export default function Login() {
           navigate("/admin-dashboard");
           break;
         case "homeowner":
-          // Homeowners shouldn't be accessing dashboards, redirect to home
+          // Homeowners shouldn't be accessing dashboards, but we'll redirect to a specific page
+          // rather than the home screen
           setError("Homeowner accounts don't have dashboard access");
           localStorage.removeItem('authToken');
           localStorage.removeItem('user');
-          navigate("/");
+          navigate("/login"); // Send back to login instead of home
           break;
         default:
-          navigate("/");
+          // Default fallback - redirect to login screen instead of home
+          navigate("/login");
       }
     } catch (err: any) {
       console.error("Login error:", err);
@@ -357,6 +359,32 @@ export default function Login() {
                         <FormControl>
                           <Input type="password" placeholder="Confirm your password" {...field} />
                         </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={registerForm.control}
+                    name="role"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Register as</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select your role" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="salesperson">Sales Representative</SelectItem>
+                            <SelectItem value="contractor">Contractor</SelectItem>
+                            <SelectItem value="admin">Administrator</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormDescription>
+                          Select your role in the Global Home Solutions platform
+                        </FormDescription>
                         <FormMessage />
                       </FormItem>
                     )}
