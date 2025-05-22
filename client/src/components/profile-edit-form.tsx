@@ -164,23 +164,17 @@ export default function ProfileEditForm({ userData, roleData, userType, onSucces
   
   // Handle form submission
   const onSubmit = (data: ProfileFormValues) => {
-    // The avatarUrl field is already updated by the handleAvatarChange function
-    // We only need to include it if there's a preview available
-    if (!data.avatarUrl && avatarPreview) {
-      data.avatarUrl = avatarPreview;
-    }
+    // Just use basic text fields for now - disabling image upload temporarily
+    // Focus on updating the user profile info
+    const updatedData = {
+      fullName: data.fullName,
+      email: data.email,
+      phone: data.phone,
+      bio: data.bio
+    };
     
-    // Remove unnecessarily large data URLs if they're too long to prevent API issues
-    if (data.avatarUrl && data.avatarUrl.length > 500000) {
-      toast({
-        title: "Image too large",
-        description: "Please select a smaller image for your profile picture.",
-        variant: "destructive",
-      });
-      return;
-    }
-    
-    updateProfileMutation.mutate(data);
+    // Simplify the API call to avoid potential issues with large image data
+    updateProfileMutation.mutate(updatedData as ProfileFormValues);
   };
   
   return (
