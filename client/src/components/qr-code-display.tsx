@@ -17,6 +17,16 @@ export function QRCodeDisplay({ salesperson, user }: QRCodeDisplayProps) {
   const { toast } = useToast();
   const [isGenerating, setIsGenerating] = useState(false);
 
+  // Handle cases where data isn't loaded yet
+  if (!salesperson || !user) {
+    return (
+      <div className="text-center py-8">
+        <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full mx-auto mb-4"></div>
+        <p className="text-muted-foreground">Loading your QR code...</p>
+      </div>
+    );
+  }
+
   // Generate the landing page URL
   const landingPageUrl = `${window.location.origin}/sales/${salesperson?.profileUrl}`;
 

@@ -9,6 +9,7 @@ import { QRCodeDisplay } from "@/components/qr-code-display";
 import { useAuth } from "@/lib/auth";
 import { getInitials } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
+import QRCode from "react-qr-code";
 import { 
   UserCheck, 
   DollarSign, 
@@ -246,12 +247,52 @@ export default function SalesDashboardNew() {
                 </ul>
               </div>
               
-              <div className="flex justify-center items-center">
-                <QRCodeDisplay
-                  salesperson={salespersonData}
-                  user={userData}
-                />
+              {/* Simple QR Code Display */}
+              <div className="mt-6 p-4 border rounded-lg bg-white">
+                <h3 className="font-semibold text-lg mb-4 text-center">Your QR Code</h3>
+                <div className="flex flex-col items-center space-y-4">
+                  <div className="w-48 h-48 bg-gray-100 border-2 border-dashed border-gray-300 flex items-center justify-center">
+                    <QRCode
+                      value={`${window.location.origin}/sales/alexneilson02`}
+                      size={180}
+                      level="M"
+                    />
+                  </div>
+                  <div className="text-center">
+                    <p className="text-sm text-gray-600 mb-2">
+                      Scan to visit your personal landing page
+                    </p>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          navigator.clipboard.writeText(`${window.location.origin}/sales/alexneilson02`);
+                          alert("Link copied to clipboard!");
+                        }}
+                      >
+                        Copy Link
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          const canvas = document.querySelector('canvas');
+                          if (canvas) {
+                            const link = document.createElement('a');
+                            link.download = 'my-qr-code.png';
+                            link.href = canvas.toDataURL();
+                            link.click();
+                          }
+                        }}
+                      >
+                        Download QR
+                      </Button>
+                    </div>
+                  </div>
+                </div>
               </div>
+
             </div>
           </CardContent>
         </Card>
