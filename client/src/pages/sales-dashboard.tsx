@@ -35,7 +35,21 @@ import {
   XCircle,
   PhoneCall,
   Clock,
-  ClipboardList
+  ClipboardList,
+  Plus,
+  Users,
+  Briefcase,
+  Settings,
+  Mail,
+  Phone,
+  ArrowUpRight,
+  CreditCard,
+  FileText,
+  BarChart3,
+  PieChart,
+  UserCog,
+  Star,
+  Switch
 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { queryClient, apiRequest } from "@/lib/queryClient";
@@ -236,10 +250,14 @@ export default function SalesDashboard() {
             
             {/* Tabs Navigation */}
             <Tabs defaultValue="overview" value={selectedTab} onValueChange={setSelectedTab} className="mb-8">
-              <TabsList>
+              <TabsList className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-7 w-full">
                 <TabsTrigger value="overview">Overview</TabsTrigger>
+                <TabsTrigger value="leads">My Leads</TabsTrigger>
                 <TabsTrigger value="bid-requests">Bid Requests</TabsTrigger>
-                <TabsTrigger value="analytics">Analytics</TabsTrigger>
+                <TabsTrigger value="contractors">Contractors</TabsTrigger>
+                <TabsTrigger value="schedule">Schedule</TabsTrigger>
+                <TabsTrigger value="commissions">Commissions</TabsTrigger>
+                <TabsTrigger value="settings">Settings</TabsTrigger>
               </TabsList>
               
               <TabsContent value="overview" className="pt-4">
@@ -647,6 +665,79 @@ export default function SalesDashboard() {
                       </CardContent>
                     </Card>
                   </div>
+                </div>
+              </TabsContent>
+              
+              <TabsContent value="leads" className="pt-4">
+                {/* My Leads Content */}
+                <div className="space-y-6">
+                  <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                      <CardTitle className="text-xl font-semibold">My Leads</CardTitle>
+                      <Button size="sm" className="h-8">
+                        <Plus className="h-4 w-4 mr-1" /> New Lead
+                      </Button>
+                    </CardHeader>
+                    <CardContent>
+                      {isLoadingProjects ? (
+                        <div className="flex justify-center py-8">
+                          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                        </div>
+                      ) : projectsData?.projects && projectsData.projects.length > 0 ? (
+                        <div className="overflow-x-auto">
+                          <table className="w-full">
+                            <thead>
+                              <tr className="border-b">
+                                <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground">Name</th>
+                                <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground">Project Type</th>
+                                <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground">Date Added</th>
+                                <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground">Status</th>
+                                <th className="text-right px-4 py-3 text-xs font-semibold text-muted-foreground">Actions</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {projectsData.projects.map((project: any) => (
+                                <tr key={project.id} className="border-b hover:bg-muted/50">
+                                  <td className="px-4 py-3">
+                                    <div className="flex items-center">
+                                      <Avatar className="h-8 w-8 mr-2">
+                                        <AvatarFallback>{getInitials(project.homeownerName)}</AvatarFallback>
+                                      </Avatar>
+                                      <div>
+                                        <p className="font-medium">{project.homeownerName}</p>
+                                        <p className="text-xs text-muted-foreground">{project.address}</p>
+                                      </div>
+                                    </div>
+                                  </td>
+                                  <td className="px-4 py-3">{project.serviceType}</td>
+                                  <td className="px-4 py-3 text-sm">{new Date(project.createdAt).toLocaleDateString()}</td>
+                                  <td className="px-4 py-3">
+                                    <Badge variant={getStatusColor(project.status)}>
+                                      {project.status}
+                                    </Badge>
+                                  </td>
+                                  <td className="px-4 py-3 text-right">
+                                    <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                                      <MoreHorizontal className="h-4 w-4" />
+                                    </Button>
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      ) : (
+                        <div className="py-8 text-center">
+                          <Building className="h-12 w-12 text-muted-foreground mx-auto mb-4 opacity-50" />
+                          <h3 className="text-lg font-medium mb-1">No leads yet</h3>
+                          <p className="text-muted-foreground text-sm">Start adding your first lead or check back later</p>
+                          <Button className="mt-4">
+                            <Plus className="h-4 w-4 mr-1" /> Add New Lead
+                          </Button>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
                 </div>
               </TabsContent>
               
