@@ -5,6 +5,7 @@ import NotFound from "@/pages/not-found";
 import Home from "@/pages/home";
 import NfcLanding from "@/pages/nfc-landing";
 import SalespersonProfile from "@/pages/salesperson-profile-fixed";
+import SalespersonLanding from "@/pages/salesperson-landing";
 import SalespersonOnboarding from "@/pages/salesperson-onboarding";
 import Login from "@/pages/login";
 import QuickLogin from "@/pages/quick-login";
@@ -116,6 +117,7 @@ function Router() {
           <Route path="/dashboard" component={DashboardRedirect} />
           <Route path="/rep/:profileUrl" component={NfcLanding} />
           <Route path="/s/:profileUrl" component={SalespersonProfile} />
+          <Route path="/sales/:profileUrl" component={SalespersonLanding} />
           <Route path="/salesperson-onboarding" component={SalespersonOnboarding} />
           
           {/* Protected routes */}

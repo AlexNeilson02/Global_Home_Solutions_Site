@@ -122,8 +122,31 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createSalesperson(insertSalesperson: InsertSalesperson): Promise<Salesperson> {
+    // Create the salesperson first
     const [salesperson] = await db.insert(salespersons).values(insertSalesperson).returning();
-    return salesperson;
+    
+    // Generate QR code for this salesperson
+    try {
+      const baseUrl = process.env.NODE_ENV === 'production' 
+        ? process.env.PRODUCTION_URL || 'https://your-domain.com'
+        : 'http://localhost:5000';
+      
+      const landingPageUrl = QRCodeService.generateLandingPageUrl(baseUrl, salesperson.profileUrl);
+      const qrCodeDataURL = await QRCodeService.generateQRCode(landingPageUrl);
+      
+      // Update the salesperson with the QR code
+      const [updatedSalesperson] = await db
+        .update(salespersons)
+        .set({ qrCodeUrl: qrCodeDataURL })
+        .where(eq(salespersons.id, salesperson.id))
+        .returning();
+      
+      return updatedSalesperson;
+    } catch (error) {
+      console.error('Failed to generate QR code for salesperson:', error);
+      // Return the salesperson even if QR code generation fails
+      return salesperson;
+    }
   }
 
   async updateSalesperson(id: number, salespersonData: Partial<Salesperson>): Promise<Salesperson | undefined> {

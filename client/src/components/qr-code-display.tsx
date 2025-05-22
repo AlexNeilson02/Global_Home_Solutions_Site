@@ -1,177 +1,285 @@
-import { useState, useRef, useEffect } from "react";
-import QRCode from "react-qr-code";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { toast } from "@/hooks/use-toast";
-import { Download, ClipboardCopy, AlertCircle } from "lucide-react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
+import { useToast } from "@/hooks/use-toast";
+import { QrCode, Download, Copy, ExternalLink, Share2, Eye, Calendar, BarChart3 } from "lucide-react";
 
 interface QRCodeDisplayProps {
-  salespersonId?: number;
-  profileUrl?: string;
+  salesperson: any;
+  user: any;
 }
 
-export function QRCodeDisplay({ salespersonId, profileUrl }: QRCodeDisplayProps) {
-  const [isDownloading, setIsDownloading] = useState(false);
-  const qrCodeRef = useRef<HTMLDivElement>(null);
-  
-  // Generate an absolute URL that will work on mobile devices
-  // Get the current domain dynamically
-  const baseUrl = window.location.origin;
-  
-  // Add a timestamp parameter to force the page to load fresh content
-  const timestamp = new Date().getTime();
-  
-  // Only create a QR code if we have a valid profile URL
-  const landingPageUrl = profileUrl ? `${baseUrl}/s/${profileUrl}?t=${timestamp}` : "";
-  
-  const handleDownload = () => {
-    if (!qrCodeRef.current || !profileUrl) return;
-    
-    setIsDownloading(true);
+export function QRCodeDisplay({ salesperson, user }: QRCodeDisplayProps) {
+  const { toast } = useToast();
+  const [isGenerating, setIsGenerating] = useState(false);
+
+  // Generate the landing page URL
+  const landingPageUrl = `${window.location.origin}/sales/${salesperson?.profileUrl}`;
+
+  const handleCopyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(landingPageUrl);
+      toast({
+        title: "Link Copied!",
+        description: "Your landing page link has been copied to clipboard.",
+      });
+    } catch (error) {
+      toast({
+        title: "Copy Failed",
+        description: "Unable to copy link. Please copy manually.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleDownloadQR = () => {
+    if (!salesperson?.qrCodeUrl) return;
     
     try {
-      // Create a canvas from the QR code SVG
-      const svg = qrCodeRef.current.querySelector("svg");
-      const svgData = new XMLSerializer().serializeToString(svg!);
-      const canvas = document.createElement("canvas");
-      const ctx = canvas.getContext("2d");
-      const img = new Image();
+      // Create a download link for the QR code
+      const link = document.createElement('a');
+      link.href = salesperson.qrCodeUrl;
+      link.download = `${user.fullName?.replace(/\s+/g, '_')}_QR_Code.png`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
       
-      // Set canvas size to match SVG
-      canvas.width = svg!.width.baseVal.value;
-      canvas.height = svg!.height.baseVal.value;
-      
-      img.onload = () => {
-        // Draw white background
-        ctx!.fillStyle = "white";
-        ctx!.fillRect(0, 0, canvas.width, canvas.height);
-        
-        // Draw the SVG image on the canvas
-        ctx!.drawImage(img, 0, 0);
-        
-        // Convert canvas to data URL and download
-        const dataUrl = canvas.toDataURL("image/png");
-        const link = document.createElement("a");
-        link.href = dataUrl;
-        link.download = `salesperson-qrcode-${salespersonId || "profile"}.png`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        
-        toast({
-          title: "QR Code Downloaded",
-          description: "Your QR code has been downloaded successfully.",
-        });
-        
-        setIsDownloading(false);
-      };
-      
-      img.src = "data:image/svg+xml;base64," + btoa(svgData);
-    } catch (err) {
+      toast({
+        title: "QR Code Downloaded!",
+        description: "Your QR code has been downloaded successfully.",
+      });
+    } catch (error) {
       toast({
         title: "Download Failed",
-        description: "There was an error downloading your QR code.",
+        description: "Unable to download QR code. Please try again.",
         variant: "destructive",
       });
-      console.error("QR code download error:", err);
-      setIsDownloading(false);
     }
   };
-  
-  const copyLinkToClipboard = () => {
-    if (!profileUrl) {
-      toast({
-        title: "No Profile URL",
-        description: "There is no profile URL configured for your account yet.",
-        variant: "destructive",
-      });
-      return;
+
+  const handleShare = async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: `${user.fullName} - Global Home Solutions`,
+          text: `Get a quote for your home improvement project from ${user.fullName}`,
+          url: landingPageUrl,
+        });
+      } catch (error) {
+        // User cancelled or share failed, fallback to copy
+        handleCopyLink();
+      }
+    } else {
+      // Fallback for browsers that don't support Web Share API
+      handleCopyLink();
     }
-    
-    navigator.clipboard.writeText(landingPageUrl);
-    toast({
-      title: "Link Copied",
-      description: "Your landing page link has been copied to clipboard.",
-    });
   };
-  
-  // If the profile URL is missing, show a message instead of an invalid QR code
-  if (!profileUrl) {
-    return (
-      <div className="flex flex-col items-center py-4">
-        <div className="bg-muted p-6 rounded-lg text-center mb-4">
-          <AlertCircle className="mx-auto h-10 w-10 text-amber-500 mb-2" />
-          <h3 className="font-medium mb-2">Profile URL Not Configured</h3>
-          <p className="text-sm text-muted-foreground">
-            Your profile URL hasn't been set up yet. Please contact your administrator 
-            to assign you a unique profile URL.
-          </p>
-        </div>
-        <Button 
-          variant="outline"
-          size="sm"
-          onClick={() => {
-            toast({
-              title: "Request Sent",
-              description: "A request has been sent to create your profile URL.",
-            });
-          }}
-        >
-          Request Profile URL
-        </Button>
-      </div>
-    );
-  }
-  
+
+  const handlePreview = () => {
+    window.open(landingPageUrl, '_blank');
+  };
+
   return (
-    <div className="flex flex-col items-center">
-      <div 
-        ref={qrCodeRef} 
-        className="qr-code-container p-4 bg-white rounded-lg mb-3"
-      >
-        <QRCode
-          value={landingPageUrl}
-          size={200}
-          style={{ height: "auto", maxWidth: "100%", width: "100%" }}
-          fgColor="#003366"
-          level="H"
-        />
-      </div>
-      
-      <div className="flex gap-2 w-full">
-        <Button 
-          variant="outline" 
-          size="sm" 
-          className="flex-1"
-          onClick={handleDownload}
-          disabled={isDownloading}
-        >
-          {isDownloading ? (
-            <>
-              <div className="h-3.5 w-3.5 animate-spin rounded-full border-b-2 border-current mr-1"></div>
-              Downloading...
-            </>
+    <div className="space-y-6">
+      {/* QR Code Card */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center gap-2">
+            <QrCode className="h-5 w-5" />
+            <CardTitle>Your QR Code</CardTitle>
+          </div>
+          <CardDescription>
+            Share this QR code to direct customers to your personalized landing page
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {salesperson?.qrCodeUrl ? (
+            <div className="flex flex-col lg:flex-row gap-6">
+              {/* QR Code Display */}
+              <div className="flex flex-col items-center space-y-4">
+                <div className="bg-white p-4 rounded-lg border shadow-sm">
+                  <img 
+                    src={salesperson.qrCodeUrl} 
+                    alt="QR Code"
+                    className="h-48 w-48 object-contain"
+                  />
+                </div>
+                <div className="flex gap-2">
+                  <Button onClick={handleDownloadQR} variant="outline" size="sm">
+                    <Download className="h-4 w-4 mr-2" />
+                    Download
+                  </Button>
+                  <Button onClick={handleShare} variant="outline" size="sm">
+                    <Share2 className="h-4 w-4 mr-2" />
+                    Share
+                  </Button>
+                </div>
+              </div>
+
+              {/* Landing Page Info */}
+              <div className="flex-1 space-y-4">
+                <div>
+                  <Label htmlFor="landing-url">Landing Page URL</Label>
+                  <div className="flex gap-2 mt-1">
+                    <Input
+                      id="landing-url"
+                      value={landingPageUrl}
+                      readOnly
+                      className="font-mono text-sm"
+                    />
+                    <Button onClick={handleCopyLink} variant="outline" size="sm">
+                      <Copy className="h-4 w-4" />
+                    </Button>
+                    <Button onClick={handlePreview} variant="outline" size="sm">
+                      <ExternalLink className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  <h4 className="font-medium">How to use your QR code:</h4>
+                  <ul className="text-sm text-muted-foreground space-y-2">
+                    <li className="flex items-start gap-2">
+                      <span className="font-medium text-primary">1.</span>
+                      Download and print your QR code on business cards, flyers, or marketing materials
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="font-medium text-primary">2.</span>
+                      Customers scan the code with their phone camera to visit your landing page
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="font-medium text-primary">3.</span>
+                      They see your profile and available contractors, then can request quotes directly
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="font-medium text-primary">4.</span>
+                      Track your conversions and analytics in the dashboard
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
           ) : (
-            <>
-              <Download className="h-3.5 w-3.5 mr-1" />
-              Download
-            </>
+            <div className="text-center py-8">
+              <QrCode className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+              <h3 className="text-lg font-medium mb-2">QR Code Not Available</h3>
+              <p className="text-muted-foreground mb-4">
+                Your QR code is being generated. Please refresh the page in a moment.
+              </p>
+              <Button onClick={() => window.location.reload()} variant="outline">
+                Refresh Page
+              </Button>
+            </div>
           )}
-        </Button>
-        
-        <Button 
-          variant="outline" 
-          size="sm" 
-          className="flex-1"
-          onClick={copyLinkToClipboard}
-        >
-          <ClipboardCopy className="h-3.5 w-3.5 mr-1" />
-          Copy Link
-        </Button>
-      </div>
-      
-      <p className="text-xs text-muted-foreground mt-2 text-center">
-        Share this QR code to allow customers to quickly access your profile.
-      </p>
+        </CardContent>
+      </Card>
+
+      {/* Landing Page Preview Card */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Eye className="h-5 w-5" />
+              <CardTitle>Landing Page Preview</CardTitle>
+            </div>
+            <Button onClick={handlePreview} variant="outline" size="sm">
+              <ExternalLink className="h-4 w-4 mr-2" />
+              View Full Page
+            </Button>
+          </div>
+          <CardDescription>
+            This is what customers see when they scan your QR code
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="border rounded-lg p-4 bg-muted/50">
+            <div className="space-y-4">
+              <div className="flex items-center gap-3">
+                <div className="h-12 w-12 bg-primary/20 rounded-full flex items-center justify-center">
+                  <span className="text-lg font-bold">{user.fullName?.charAt(0)}</span>
+                </div>
+                <div>
+                  <h3 className="font-semibold">{user.fullName}</h3>
+                  <div className="flex items-center gap-2">
+                    <Badge variant="outline" className="text-xs">Verified Sales Rep</Badge>
+                  </div>
+                </div>
+              </div>
+              
+              <Separator />
+              
+              <div className="space-y-2">
+                <p className="text-sm font-medium">Contact Information:</p>
+                <div className="text-sm text-muted-foreground">
+                  <p>📧 {user.email}</p>
+                  {user.phone && <p>📞 {user.phone}</p>}
+                </div>
+              </div>
+              
+              <Separator />
+              
+              <div className="space-y-2">
+                <p className="text-sm font-medium">Available Services:</p>
+                <div className="grid grid-cols-2 gap-2 text-xs">
+                  <Badge variant="outline">Plumbing</Badge>
+                  <Badge variant="outline">Electrical</Badge>
+                  <Badge variant="outline">HVAC</Badge>
+                  <Badge variant="outline">Roofing</Badge>
+                </div>
+              </div>
+              
+              <div className="pt-2">
+                <Button className="w-full" size="sm">
+                  Request a Quote
+                </Button>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Usage Tips Card */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center gap-2">
+            <BarChart3 className="h-5 w-5" />
+            <CardTitle>Marketing Tips</CardTitle>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <h4 className="font-medium flex items-center gap-2">
+                <Calendar className="h-4 w-4" />
+                Best Practices
+              </h4>
+              <ul className="text-sm text-muted-foreground space-y-1">
+                <li>• Include QR codes on all printed materials</li>
+                <li>• Place codes at eye level for easy scanning</li>
+                <li>• Test the code before printing large quantities</li>
+                <li>• Include a brief call-to-action near the code</li>
+              </ul>
+            </div>
+            
+            <div className="space-y-2">
+              <h4 className="font-medium flex items-center gap-2">
+                <Share2 className="h-4 w-4" />
+                Where to Use
+              </h4>
+              <ul className="text-sm text-muted-foreground space-y-1">
+                <li>• Business cards and flyers</li>
+                <li>• Door hangers and yard signs</li>
+                <li>• Vehicle decals and uniforms</li>
+                <li>• Digital signatures and social media</li>
+              </ul>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
