@@ -13,12 +13,13 @@ export function QRCodeDisplay({ salespersonId, profileUrl = "james-wilson" }: QR
   const [isDownloading, setIsDownloading] = useState(false);
   const qrCodeRef = useRef<HTMLDivElement>(null);
   
-  // Use Replit domain for mobile access when in development
-  const baseUrl = process.env.NODE_ENV === 'production' 
-    ? window.location.origin 
-    : "https://e4465d17-fbc4-4632-9fc6-647805444a45-00-34kcklenmaaiq.janeway.replit.dev";
+  // Generate an absolute URL that will work on mobile devices
+  // Using the Replit domain and a direct path that doesn't require client-side routing
+  const baseUrl = "https://e4465d17-fbc4-4632-9fc6-647805444a45-00-34kcklenmaaiq.janeway.replit.dev";
   
-  const landingPageUrl = `${baseUrl}/s/${profileUrl}`;
+  // Add a timestamp parameter to force the page to load fresh content
+  const timestamp = new Date().getTime();
+  const landingPageUrl = `${baseUrl}/s/${profileUrl}?t=${timestamp}`;
   
   const handleDownload = () => {
     if (!qrCodeRef.current) return;
