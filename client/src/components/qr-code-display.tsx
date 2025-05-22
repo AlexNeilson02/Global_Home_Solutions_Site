@@ -1,40 +1,64 @@
-import { useState } from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useState, useRef, useEffect } from "react";
+import QRCode from "react-qr-code";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
-import { Download, ClipboardCopy, RefreshCw } from "lucide-react";
+import { Download, ClipboardCopy } from "lucide-react";
 
 interface QRCodeDisplayProps {
   salespersonId?: number;
+  profileUrl?: string;
 }
 
-export function QRCodeDisplay({ salespersonId }: QRCodeDisplayProps) {
+export function QRCodeDisplay({ salespersonId, profileUrl = "james-wilson" }: QRCodeDisplayProps) {
   const [isDownloading, setIsDownloading] = useState(false);
-  const queryClient = useQueryClient();
+  const qrCodeRef = useRef<HTMLDivElement>(null);
   
-  const { data, isLoading, error } = useQuery<{ qrCodeDataUrl: string, landingPageUrl: string }>({
-    queryKey: ["/api/salespersons", salespersonId, "qrcode"],
-    enabled: !!salespersonId
-  });
+  // Generate landing page URL - hardcoded for demo
+  const landingPageUrl = `${window.location.origin}/s/${profileUrl}`;
   
   const handleDownload = () => {
-    if (!data?.qrCodeDataUrl) return;
+    if (!qrCodeRef.current) return;
     
     setIsDownloading(true);
     
     try {
-      // Create a link element
-      const link = document.createElement("a");
-      link.href = data.qrCodeDataUrl;
-      link.download = `salesperson-qrcode-${salespersonId}.png`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+      // Create a canvas from the QR code SVG
+      const svg = qrCodeRef.current.querySelector("svg");
+      const svgData = new XMLSerializer().serializeToString(svg!);
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d");
+      const img = new Image();
       
-      toast({
-        title: "QR Code Downloaded",
-        description: "Your QR code has been downloaded successfully.",
-      });
+      // Set canvas size to match SVG
+      canvas.width = svg!.width.baseVal.value;
+      canvas.height = svg!.height.baseVal.value;
+      
+      img.onload = () => {
+        // Draw white background
+        ctx!.fillStyle = "white";
+        ctx!.fillRect(0, 0, canvas.width, canvas.height);
+        
+        // Draw the SVG image on the canvas
+        ctx!.drawImage(img, 0, 0);
+        
+        // Convert canvas to data URL and download
+        const dataUrl = canvas.toDataURL("image/png");
+        const link = document.createElement("a");
+        link.href = dataUrl;
+        link.download = `salesperson-qrcode-${salespersonId || "profile"}.png`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        toast({
+          title: "QR Code Downloaded",
+          description: "Your QR code has been downloaded successfully.",
+        });
+        
+        setIsDownloading(false);
+      };
+      
+      img.src = "data:image/svg+xml;base64," + btoa(svgData);
     } catch (err) {
       toast({
         title: "Download Failed",
@@ -42,62 +66,30 @@ export function QRCodeDisplay({ salespersonId }: QRCodeDisplayProps) {
         variant: "destructive",
       });
       console.error("QR code download error:", err);
-    } finally {
       setIsDownloading(false);
     }
   };
   
   const copyLinkToClipboard = () => {
-    if (!data?.landingPageUrl) return;
-    
-    navigator.clipboard.writeText(data.landingPageUrl);
+    navigator.clipboard.writeText(landingPageUrl);
     toast({
       title: "Link Copied",
       description: "Your landing page link has been copied to clipboard.",
     });
   };
   
-  if (isLoading) {
-    return (
-      <div className="flex flex-col items-center justify-center p-6 bg-muted/30 rounded-lg">
-        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary mb-2"></div>
-        <p className="text-sm text-muted-foreground">Generating QR code...</p>
-      </div>
-    );
-  }
-  
-  if (error || !data) {
-    return (
-      <div className="flex flex-col items-center justify-center p-6 bg-destructive/10 rounded-lg">
-        <p className="text-sm text-destructive mb-2">Failed to generate QR code</p>
-        <Button 
-          variant="outline" 
-          size="sm" 
-          onClick={() => {
-            // Use query invalidation instead of page reload to prevent authentication issues
-            if (salespersonId) {
-              queryClient.invalidateQueries({ queryKey: ["/api/salespersons", salespersonId, "qrcode"] });
-              toast({
-                title: "Retrying...",
-                description: "Attempting to generate QR code again.",
-              });
-            }
-          }}
-        >
-          <RefreshCw className="h-4 w-4 mr-2" />
-          Try Again
-        </Button>
-      </div>
-    );
-  }
-  
   return (
     <div className="flex flex-col items-center">
-      <div className="qr-code-container p-4 bg-white rounded-lg mb-3">
-        <img 
-          src={data.qrCodeDataUrl} 
-          alt="QR Code for Salesperson Profile" 
-          className="w-full max-w-[200px] h-auto"
+      <div 
+        ref={qrCodeRef} 
+        className="qr-code-container p-4 bg-white rounded-lg mb-3"
+      >
+        <QRCode
+          value={landingPageUrl}
+          size={200}
+          style={{ height: "auto", maxWidth: "100%", width: "100%" }}
+          fgColor="#003366"
+          level="H"
         />
       </div>
       

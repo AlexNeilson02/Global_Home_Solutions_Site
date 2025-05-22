@@ -358,8 +358,11 @@ export default function SalesDashboard() {
                         </Button>
                       </div>
                       
-                      {/* Always use salesperson ID 1 for testing since we know it works */}
-                      <QRCodeDisplay salespersonId={1} />
+                      {/* Use current salesperson's profile URL for QR code */}
+                      <QRCodeDisplay 
+                        salespersonId={salespersonData?.id} 
+                        profileUrl={salespersonData?.profileUrl || "profile"}
+                      />
                     </div>
                   </div>
                 </CardContent>
