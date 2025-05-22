@@ -159,6 +159,12 @@ export default function SalesDashboard() {
     const pathSegments = location.split('/');
     console.log("Current location:", location);
     console.log("Path segments:", pathSegments);
+    
+    // For the base dashboard URL, we should just show the dashboard
+    if (location === '/sales-dashboard' || location === '/sales-dashboard/') {
+      return renderDashboard();
+    }
+    
     // The path is the 3rd segment (index 2) in /sales-dashboard/section
     const path = pathSegments.length > 2 ? pathSegments[2] : '';
     
