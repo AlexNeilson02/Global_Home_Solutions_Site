@@ -115,7 +115,7 @@ function Router() {
           <Route path="/salesperson-onboarding" component={SalespersonOnboarding} />
           
           {/* Protected routes */}
-          <Route path="/sales-dashboard">
+          <Route path="/sales-dashboard/:section*">
             <ProtectedRoute roles={["salesperson", "admin"]}>
               <SalesDashboard />
             </ProtectedRoute>

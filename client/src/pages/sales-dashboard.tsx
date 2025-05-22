@@ -155,8 +155,9 @@ export default function SalesDashboard() {
 
   // Render the appropriate content based on the current URL path
   const renderContent = () => {
-    // Extract the path to determine which content to show
-    const path = location.split('/')[2] || '';
+    // Extract the path segments to determine which content to show
+    const pathSegments = location.split('/');
+    const path = pathSegments.length > 2 ? pathSegments[2] : '';
     
     if (showProfileEdit) {
       return (
