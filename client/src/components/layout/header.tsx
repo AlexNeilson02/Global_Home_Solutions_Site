@@ -37,7 +37,14 @@ export function Header() {
       <div className="container-custom">
         <div className="flex justify-between items-center py-4">
           <div className="flex items-center space-x-2">
-            <Link href="/" className="text-primary text-xl font-bold flex items-center">
+            <Link 
+              href={user ? (
+                user.role === "salesperson" ? "/sales-dashboard" :
+                user.role === "contractor" ? "/contractor-dashboard" :
+                user.role === "admin" ? "/admin-dashboard" : "/"
+              ) : "/"} 
+              className="text-primary text-xl font-bold flex items-center"
+            >
               <img src={globalLogoPath} alt="Global Home Solutions" className="h-10 mr-2" />
               <span>Global Home Solutions</span>
             </Link>
@@ -47,9 +54,13 @@ export function Header() {
           <div className="hidden md:flex items-center space-x-6">
             {!isSalespersonPage && (
               <>
-                <Link href="/">
+                <Link href={user ? (
+                  user.role === "salesperson" ? "/sales-dashboard" :
+                  user.role === "contractor" ? "/contractor-dashboard" :
+                  user.role === "admin" ? "/admin-dashboard" : "/"
+                ) : "/"}>
                   <Button variant="default">
-                    Request a Quote
+                    {user ? "Dashboard" : "Request a Quote"}
                   </Button>
                 </Link>
     
