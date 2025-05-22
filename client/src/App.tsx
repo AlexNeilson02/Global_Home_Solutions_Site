@@ -8,7 +8,7 @@ import SalespersonProfile from "@/pages/salesperson-profile-fixed";
 import SalespersonOnboarding from "@/pages/salesperson-onboarding";
 import Login from "@/pages/login";
 import DashboardLogin from "@/pages/dashboard-login";
-import SalesDashboard from "@/pages/sales-dashboard-new";
+import SalesDashboard from "@/pages/sales-dashboard";
 import ContractorDashboard from "@/pages/contractor-dashboard";
 import AdminDashboard from "@/pages/admin-dashboard";
 import { Header } from "@/components/layout/header";
