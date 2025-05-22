@@ -10,6 +10,8 @@ import { NfcBadge } from "@/components/nfc-badge";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 import { QRCodeDisplay } from "@/components/qr-code-display";
 import ProfileEditForm from "@/components/profile-edit-form";
 import { 
@@ -48,8 +50,7 @@ import {
   BarChart3,
   PieChart,
   UserCog,
-  Star,
-  Switch
+  Star
 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { queryClient, apiRequest } from "@/lib/queryClient";
@@ -741,9 +742,349 @@ export default function SalesDashboard() {
                 </div>
               </TabsContent>
               
+              <TabsContent value="contractors" className="pt-4">
+                {/* Contractors Tab Content */}
+                <div className="space-y-6">
+                  <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                      <CardTitle className="text-xl font-semibold">Partner Contractors</CardTitle>
+                      <div className="flex items-center space-x-2">
+                        <Input
+                          placeholder="Search contractors..."
+                          className="w-60"
+                        />
+                        <Button variant="outline" size="sm" className="h-9">
+                          <Search className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-2">
+                        {/* Contractor Cards */}
+                        {Array.from({ length: 6 }).map((_, i) => (
+                          <Card key={i} className="overflow-hidden">
+                            <div className="h-32 bg-primary/10 relative">
+                              {i % 2 === 0 && <div className="absolute top-2 right-2">
+                                <Badge className="bg-green-500 text-white">
+                                  Preferred Partner
+                                </Badge>
+                              </div>}
+                            </div>
+                            <CardContent className="pt-4">
+                              <div className="flex items-center">
+                                <Avatar className="h-14 w-14 border-4 border-background -mt-10 mr-3">
+                                  <AvatarFallback className="bg-primary text-primary-foreground">
+                                    {String.fromCharCode(65 + i)}C
+                                  </AvatarFallback>
+                                </Avatar>
+                                <div>
+                                  <h3 className="font-semibold">{["Premier Roofing", "All Seasons HVAC", "Green Earth Solar", "Modern Floors", "Elite Kitchens", "Backyard Pools"][i]}</h3>
+                                  <p className="text-xs text-muted-foreground">
+                                    {["Roofing Specialists", "Heating & Cooling", "Solar Installation", "Flooring Services", "Kitchen Remodeling", "Pool Installation"][i]}
+                                  </p>
+                                </div>
+                              </div>
+                              <div className="flex items-center mt-4 justify-between text-sm">
+                                <div className="flex items-center">
+                                  <Star className="h-4 w-4 text-amber-500 mr-1" />
+                                  <span className="font-medium">{(4 + (i % 2) * 0.5).toFixed(1)}</span>
+                                  <span className="text-muted-foreground ml-1">({40 + i * 12} reviews)</span>
+                                </div>
+                                <Badge variant="outline" className="ml-2">
+                                  {["Residential", "Commercial", "Both"][i % 3]}
+                                </Badge>
+                              </div>
+                              <div className="grid grid-cols-2 gap-2 mt-4">
+                                <Button variant="outline" size="sm" className="text-xs">
+                                  <Phone className="h-3.5 w-3.5 mr-1" />
+                                  Contact
+                                </Button>
+                                <Button size="sm" className="text-xs">
+                                  <ArrowUpRight className="h-3.5 w-3.5 mr-1" />
+                                  Refer Lead
+                                </Button>
+                              </div>
+                            </CardContent>
+                          </Card>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              </TabsContent>
+              
+              <TabsContent value="schedule" className="pt-4">
+                {/* Schedule Tab Content */}
+                <div className="space-y-6">
+                  <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                      <CardTitle className="text-xl font-semibold">My Schedule</CardTitle>
+                      <div className="flex items-center space-x-2">
+                        <Button variant="outline" size="sm">
+                          <Calendar className="h-4 w-4 mr-1" />
+                          Today
+                        </Button>
+                        <Button variant="outline" size="sm">
+                          This Week
+                        </Button>
+                        <Button variant="outline" size="sm">
+                          This Month
+                        </Button>
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="rounded-md border mt-2">
+                        <div className="grid grid-cols-7 text-sm font-medium bg-muted">
+                          {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day, i) => (
+                            <div key={i} className="py-2 text-center">
+                              {day}
+                            </div>
+                          ))}
+                        </div>
+                        <div className="grid grid-cols-7 text-sm">
+                          {Array.from({ length: 35 }).map((_, i) => {
+                            const isToday = i === 16;
+                            const hasEvent = [11, 16, 17, 22, 24, 26].includes(i);
+                            return (
+                              <div key={i} className={`min-h-[100px] p-1 border-t border-r ${isToday ? 'bg-primary/5' : ''}`}>
+                                <div className="flex justify-between">
+                                  <span className={`text-xs p-1 ${isToday ? 'font-bold' : ''}`}>
+                                    {(i % 31) + 1}
+                                  </span>
+                                  {isToday && (
+                                    <span className="h-4 w-4 rounded-full bg-primary"></span>
+                                  )}
+                                </div>
+                                {hasEvent && (
+                                  <div className={`text-xs p-1 mt-1 rounded-md ${i === 16 ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}>
+                                    {i === 11 && "9:00 AM - Site Visit"}
+                                    {i === 16 && "11:30 AM - Client Meeting"}
+                                    {i === 17 && "2:00 PM - Follow-up Call"}
+                                    {i === 22 && "10:00 AM - Home Expo"}
+                                    {i === 24 && "3:30 PM - Contractor Mtg"}
+                                    {i === 26 && "1:00 PM - Team Meeting"}
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                      <div className="flex justify-end mt-4">
+                        <Button>
+                          <Plus className="h-4 w-4 mr-1" />
+                          Add Event
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              </TabsContent>
+
+              <TabsContent value="commissions" className="pt-4">
+                {/* Commissions Tab Content */}
+                <div className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <Card>
+                      <CardHeader className="pb-2">
+                        <CardTitle className="text-lg">Total Earnings</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="flex items-center">
+                          <DollarSign className="h-8 w-8 text-primary mr-2" />
+                          <div>
+                            <p className="text-3xl font-bold">{formatCurrency(12850)}</p>
+                            <p className="text-sm text-muted-foreground">This year</p>
+                          </div>
+                        </div>
+                        <div className="mt-4 h-1 bg-muted rounded-full overflow-hidden">
+                          <div className="h-full bg-primary" style={{ width: '68%' }}></div>
+                        </div>
+                        <p className="text-xs text-muted-foreground mt-1">68% of annual target</p>
+                      </CardContent>
+                    </Card>
+                    
+                    <Card>
+                      <CardHeader className="pb-2">
+                        <CardTitle className="text-lg">Pending Commissions</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="flex items-center">
+                          <CreditCard className="h-8 w-8 text-amber-500 mr-2" />
+                          <div>
+                            <p className="text-3xl font-bold">{formatCurrency(3450)}</p>
+                            <p className="text-sm text-muted-foreground">To be paid</p>
+                          </div>
+                        </div>
+                        <div className="mt-4 grid grid-cols-3 gap-1">
+                          <div className="text-center p-1 bg-muted rounded-md">
+                            <p className="text-xl font-semibold">{formatCurrency(1200)}</p>
+                            <p className="text-xs text-muted-foreground">This month</p>
+                          </div>
+                          <div className="text-center p-1 bg-muted rounded-md">
+                            <p className="text-xl font-semibold">{formatCurrency(2250)}</p>
+                            <p className="text-xs text-muted-foreground">Next month</p>
+                          </div>
+                          <div className="text-center p-1 bg-muted rounded-md">
+                            <p className="text-xl font-semibold">4</p>
+                            <p className="text-xs text-muted-foreground">Projects</p>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                    
+                    <Card>
+                      <CardHeader className="pb-2">
+                        <CardTitle className="text-lg">Commission Rates</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-3">
+                          <div className="flex justify-between items-center">
+                            <div className="flex items-center">
+                              <div className="h-3 w-3 rounded-full bg-primary mr-2"></div>
+                              <span className="text-sm">Roofing</span>
+                            </div>
+                            <span className="font-semibold">8%</span>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <div className="flex items-center">
+                              <div className="h-3 w-3 rounded-full bg-green-500 mr-2"></div>
+                              <span className="text-sm">Solar</span>
+                            </div>
+                            <span className="font-semibold">10%</span>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <div className="flex items-center">
+                              <div className="h-3 w-3 rounded-full bg-amber-500 mr-2"></div>
+                              <span className="text-sm">HVAC</span>
+                            </div>
+                            <span className="font-semibold">7%</span>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <div className="flex items-center">
+                              <div className="h-3 w-3 rounded-full bg-blue-500 mr-2"></div>
+                              <span className="text-sm">Kitchen</span>
+                            </div>
+                            <span className="font-semibold">6%</span>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <div className="flex items-center">
+                              <div className="h-3 w-3 rounded-full bg-purple-500 mr-2"></div>
+                              <span className="text-sm">Bathroom</span>
+                            </div>
+                            <span className="font-semibold">6%</span>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
+                </div>
+              </TabsContent>
+
+              <TabsContent value="settings" className="pt-4">
+                {/* Settings Tab Content */}
+                <div className="space-y-6">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Account Settings</CardTitle>
+                      <CardDescription>Manage your account preferences and settings</CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-6">
+                      {/* Personal Information Section */}
+                      <div>
+                        <h3 className="text-lg font-medium mb-4">Personal Information</h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                            <label className="text-sm font-medium">Full Name</label>
+                            <Input 
+                              placeholder="Your full name" 
+                              value={effectiveUserData?.fullName || ""} 
+                              disabled 
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <label className="text-sm font-medium">Email Address</label>
+                            <Input 
+                              type="email" 
+                              placeholder="Your email" 
+                              value={effectiveUserData?.email || ""} 
+                              disabled 
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <label className="text-sm font-medium">Phone Number</label>
+                            <Input 
+                              placeholder="Your phone number" 
+                              value={salespersonData?.phone || "(555) 123-4567"} 
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <label className="text-sm font-medium">Job Title</label>
+                            <Input 
+                              placeholder="Your job title" 
+                              value={salespersonData?.jobTitle || "Sales Representative"} 
+                            />
+                          </div>
+                        </div>
+                        <div className="mt-4">
+                          <Button>
+                            Save Changes
+                          </Button>
+                        </div>
+                      </div>
+                      
+                      {/* Profile Settings Section */}
+                      <div className="pt-4 border-t">
+                        <h3 className="text-lg font-medium mb-4">Profile Settings</h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <div className="mb-4">
+                              <label className="text-sm font-medium">Profile URL</label>
+                              <div className="flex mt-1">
+                                <div className="bg-muted px-3 py-2 text-sm rounded-l-md border border-r-0 text-muted-foreground">
+                                  {window.location.origin}/s/
+                                </div>
+                                <Input 
+                                  className="rounded-l-none" 
+                                  value={salespersonData?.profileUrl || "alexneilson"} 
+                                />
+                              </div>
+                              <p className="text-xs text-muted-foreground mt-1">
+                                This is your unique profile URL for your digital business card
+                              </p>
+                            </div>
+                            <div className="space-y-2">
+                              <label className="text-sm font-medium">NFC Badge ID</label>
+                              <Input value={salespersonData?.nfcId || "SP12345"} disabled />
+                              <p className="text-xs text-muted-foreground">
+                                Your unique NFC badge identifier
+                              </p>
+                            </div>
+                          </div>
+                          <div>
+                            <label className="text-sm font-medium">Profile Picture</label>
+                            <div className="mt-1 flex items-center">
+                              <Avatar className="h-16 w-16 mr-4">
+                                <AvatarImage src={effectiveUserData?.avatarUrl || undefined} />
+                                <AvatarFallback className="text-lg">
+                                  {getInitials(effectiveUserData?.fullName || "")}
+                                </AvatarFallback>
+                              </Avatar>
+                              <Button variant="outline">
+                                Change Picture
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              </TabsContent>
+              
               <TabsContent value="analytics">
                 {/* Analytics Content */}
-                <div className="grid grid-cols-1 gap-6">
+                <div className="grid grid-cols-1 gap-6 pt-4">
                   <Card>
                     <CardHeader>
                       <CardTitle className="text-lg">Sales Performance</CardTitle>
