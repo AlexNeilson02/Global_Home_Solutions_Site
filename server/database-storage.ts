@@ -12,6 +12,7 @@ import {
   type PageVisit, type InsertPageVisit
 } from "@shared/schema";
 import { IStorage } from "./storage";
+import { QRCodeService } from "./qr-service";
 
 export class DatabaseStorage implements IStorage {
   // User methods

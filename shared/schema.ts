@@ -50,6 +50,7 @@ export const salespersons = pgTable("salespersons", {
   userId: integer("user_id").notNull().references(() => users.id),
   nfcId: text("nfc_id").notNull().unique(),
   profileUrl: text("profile_url").notNull().unique(),
+  qrCodeUrl: text("qr_code_url"),
   lastScanned: timestamp("last_scanned"),
   isActive: boolean("is_active").default(true),
   bio: text("bio"),
