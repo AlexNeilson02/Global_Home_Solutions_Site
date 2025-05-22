@@ -17,6 +17,7 @@ import {
 export default function SalesDashboardNew() {
   const [location] = useLocation();
   const { user } = useAuth();
+  const [phoneNumber, setPhoneNumber] = useState("");
   
   // Get user data
   const { data: userData } = useQuery({
@@ -35,6 +36,13 @@ export default function SalesDashboardNew() {
     queryKey: ["/api/salespersons", user?.id, "analytics"],
     enabled: !!user?.id && user?.role === "salesperson",
   });
+  
+  // Set phone number from salesperson data when available
+  useEffect(() => {
+    if (salespersonData?.phone) {
+      setPhoneNumber(salespersonData.phone);
+    }
+  }, [salespersonData?.phone]);
 
   // Determine which section to show based on URL path
   const getActiveSection = () => {
@@ -166,7 +174,9 @@ export default function SalesDashboardNew() {
                     <label className="text-sm font-medium">Phone Number</label>
                     <input 
                       className="w-full px-3 py-2 border rounded-md" 
-                      value={salespersonData?.phone || "(555) 123-4567"}
+                      value={phoneNumber}
+                      onChange={(e) => setPhoneNumber(e.target.value)}
+                      placeholder="(555) 123-4567"
                     />
                   </div>
                 </div>
@@ -179,6 +189,15 @@ export default function SalesDashboardNew() {
                     <AvatarFallback>{getInitials(userData?.fullName || "")}</AvatarFallback>
                   </Avatar>
                   <Button variant="outline">Change Picture</Button>
+                </div>
+                
+                <div className="mt-4">
+                  <Button onClick={() => {
+                    alert("Phone number updated: " + phoneNumber);
+                    // In real implementation, this would save to the backend
+                  }}>
+                    Save Changes
+                  </Button>
                 </div>
               </div>
             </div>
