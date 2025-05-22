@@ -23,13 +23,27 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
+  FormDescription,
 } from "@/components/ui/form";
+import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { loginSchema } from "@shared/schema";
 import { insertUserSchema } from "@shared/schema";
 
+// Modify the registration schema to ensure role is selected
 const registerSchema = insertUserSchema.extend({
   confirmPassword: z.string().min(6, {
     message: "Password must be at least 6 characters.",
+  }),
+  // Enforce role selection among specific options (excluding homeowner)
+  role: z.enum(["salesperson", "contractor", "admin"], {
+    required_error: "Please select a role",
+    invalid_type_error: "Please select a valid role",
   }),
 }).superRefine(({ password, confirmPassword }, ctx) => {
   if (password !== confirmPassword) {
