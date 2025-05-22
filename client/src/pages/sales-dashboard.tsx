@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Sidebar } from "@/components/layout/sidebar";
 import { StatsCard } from "@/components/stats-card";
@@ -331,14 +331,14 @@ export default function SalesDashboard() {
                       <div className="flex flex-col items-center justify-center mb-4">
                         <div className="relative">
                           <Avatar className="h-20 w-20 mb-2">
-                            <AvatarImage src={user?.avatarUrl || undefined} />
+                            <AvatarImage src={effectiveUserData?.avatarUrl || undefined} />
                             <AvatarFallback className="text-lg">
-                              {getInitials(user?.fullName || "")}
+                              {getInitials(effectiveUserData?.fullName || "")}
                             </AvatarFallback>
                           </Avatar>
                           <NfcBadge className="absolute -bottom-1 -right-1" />
                         </div>
-                        <h3 className="text-lg font-medium mt-2">{user?.fullName}</h3>
+                        <h3 className="text-lg font-medium mt-2">{effectiveUserData?.fullName}</h3>
                         <p className="text-muted-foreground text-sm">Sales Representative</p>
                       </div>
                       
