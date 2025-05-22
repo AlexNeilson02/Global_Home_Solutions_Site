@@ -67,10 +67,33 @@ export default function ProfileEditForm({ userData, roleData, userType, onSucces
   const handleAvatarChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      // Simple preview for now
+      // Check file size (limit to 2MB)
+      if (file.size > 2 * 1024 * 1024) {
+        toast({
+          title: "File too large",
+          description: "Please select an image smaller than 2MB.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Check file type
+      if (!file.type.startsWith('image/')) {
+        toast({
+          title: "Invalid file type",
+          description: "Please select a valid image file.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Create a preview
       const reader = new FileReader();
       reader.onload = (e) => {
-        setAvatarPreview(e.target?.result as string);
+        const result = e.target?.result as string;
+        setAvatarPreview(result);
+        // Store the data URL in a hidden form field
+        form.setValue('avatarUrl', result);
       };
       reader.readAsDataURL(file);
     }
@@ -114,10 +137,20 @@ export default function ProfileEditForm({ userData, roleData, userType, onSucces
   
   // Handle form submission
   const onSubmit = (data: ProfileFormValues) => {
-    // If we had a real avatar upload, we would include the URL here
-    if (avatarPreview && avatarPreview !== userData?.avatarUrl) {
-      // In a real implementation, this would be the URL returned from the storage service
+    // The avatarUrl field is already updated by the handleAvatarChange function
+    // We only need to include it if there's a preview available
+    if (!data.avatarUrl && avatarPreview) {
       data.avatarUrl = avatarPreview;
+    }
+    
+    // Remove unnecessarily large data URLs if they're too long to prevent API issues
+    if (data.avatarUrl && data.avatarUrl.length > 500000) {
+      toast({
+        title: "Image too large",
+        description: "Please select a smaller image for your profile picture.",
+        variant: "destructive",
+      });
+      return;
     }
     
     updateProfileMutation.mutate(data);
