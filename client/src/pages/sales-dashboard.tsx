@@ -162,7 +162,7 @@ export default function SalesDashboard() {
     
     // For the base dashboard URL, we should just show the dashboard
     if (location === '/sales-dashboard' || location === '/sales-dashboard/') {
-      return renderDashboard();
+      return renderDashboardOverview();
     }
     
     // The path is the 3rd segment (index 2) in /sales-dashboard/section
