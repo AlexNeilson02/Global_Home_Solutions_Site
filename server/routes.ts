@@ -595,8 +595,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  // Generate QR code for salesperson's landing page
-  apiRouter.get("/salespersons/:id/qrcode", authenticate, async (req: Request, res: Response) => {
+  // Generate QR code for salesperson's landing page - public access
+  apiRouter.get("/salespersons/:id/qrcode", async (req: Request, res: Response) => {
     try {
       const id = Number(req.params.id);
       const salesperson = await storage.getSalesperson(id);
@@ -605,10 +605,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Salesperson not found" });
       }
       
-      // Only allow admins or the salesperson themselves to access their QR code
-      if (req.user.role !== "admin" && req.user.id !== salesperson.userId) {
-        return res.status(403).json({ message: "Forbidden" });
-      }
+      // This endpoint is now public, no need for authentication checks
       
       // Construct the URL for the salesperson's landing page
       const baseUrl = process.env.BASE_URL || `${req.protocol}://${req.get('host')}`;
