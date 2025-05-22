@@ -11,13 +11,10 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { getInitials } from "@/lib/utils";
-import { useTheme } from "@/components/ui/theme-provider";
 import { 
   Menu, 
   User, 
-  LogOut, 
-  Sun, 
-  Moon
+  LogOut
 } from "lucide-react";
 import globalLogoPath from "@/assets/global-home-solutions-logo.png";
 
@@ -25,7 +22,7 @@ export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { user, logout } = useAuth();
   const [location] = useLocation();
-  const { theme, setTheme } = useTheme();
+  // Theme functionality removed
   
   // Check if we're on a salesperson page (to hide certain elements)
   const isSalespersonPage = location.includes('/salesperson/') || location.includes('/nfc/');
@@ -33,7 +30,7 @@ export function Header() {
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
   return (
-    <header className="bg-white dark:bg-card shadow-sm sticky top-0 z-50">
+    <header className="bg-white shadow-sm sticky top-0 z-50">
       <div className="container-custom">
         <div className="flex justify-between items-center py-4">
           <div className="flex items-center space-x-2">
@@ -80,11 +77,7 @@ export function Header() {
                         <p className="text-sm text-muted-foreground">{user.email}</p>
                       </div>
                       <DropdownMenuSeparator />
-                      <DropdownMenuItem onClick={() => setTheme(theme === "light" ? "dark" : "light")}>
-                        {theme === "light" ? <Moon className="mr-2 h-4 w-4" /> : <Sun className="mr-2 h-4 w-4" />}
-                        {theme === "light" ? "Dark Mode" : "Light Mode"}
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator />
+                      {/* Dark mode option removed */}
                       <DropdownMenuItem onClick={() => logout()}>
                         <LogOut className="mr-2 h-4 w-4" />
                         <span>Log out</span>
@@ -104,12 +97,7 @@ export function Header() {
               </>
             )}
             
-            {/* Always show theme toggle on salesperson pages */}
-            {isSalespersonPage && (
-              <Button variant="ghost" size="icon" onClick={() => setTheme(theme === "light" ? "dark" : "light")}>
-                {theme === "light" ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
-              </Button>
-            )}
+            {/* Theme toggle removed */}
           </div>
 
           {/* Mobile Menu Button */}
@@ -170,15 +158,7 @@ export function Header() {
                 </>
               )}
               
-              {/* Always show theme toggle */}
-              <Button 
-                variant="ghost" 
-                className="w-full justify-start"
-                onClick={() => setTheme(theme === "light" ? "dark" : "light")}
-              >
-                {theme === "light" ? <Moon className="mr-2 h-4 w-4" /> : <Sun className="mr-2 h-4 w-4" />}
-                {theme === "light" ? "Dark Mode" : "Light Mode"}
-              </Button>
+              {/* Dark mode option removed from mobile menu */}
             </div>
           </div>
         )}
