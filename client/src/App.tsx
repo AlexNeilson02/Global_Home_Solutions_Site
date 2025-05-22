@@ -5,7 +5,7 @@ import NotFound from "@/pages/not-found";
 import Home from "@/pages/home";
 import NfcLanding from "@/pages/nfc-landing";
 import SalespersonProfile from "@/pages/salesperson-profile";
-import SalespersonProfileV2 from "@/pages/salesperson-profile-v2";
+import SalespersonOnboarding from "@/pages/salesperson-onboarding";
 import Login from "@/pages/login";
 import DashboardLogin from "@/pages/dashboard-login";
 import SalesDashboard from "@/pages/sales-dashboard";
@@ -23,13 +23,36 @@ function Router() {
   // Hide header and footer for NFC landing pages
   const isNfcPage = location.startsWith("/rep/");
   
-  // Dashboard routes based on user role
+  // Dashboard routes based on user role and onboarding status
   const getDashboardRoute = () => {
     if (!user) return "/login";
     
+    // Check if this is a new salesperson that needs onboarding
+    if (user.role === "salesperson") {
+      // We'll fetch the salesperson data to check if they need onboarding
+      const checkOnboardingStatus = async () => {
+        try {
+          const response = await fetch(`/api/salespersons/${user.id}`);
+          const data = await response.json();
+          
+          // If salesperson data is missing key fields like bio, redirect to onboarding
+          if (!data.salesperson?.bio) {
+            window.location.href = "/salesperson-onboarding";
+          } else {
+            window.location.href = "/sales-dashboard";
+          }
+        } catch (error) {
+          // If there's an error, default to dashboard
+          window.location.href = "/sales-dashboard";
+        }
+      };
+      
+      // Execute the check
+      checkOnboardingStatus();
+      return "/sales-dashboard"; // Default return while async check happens
+    }
+    
     switch (user.role) {
-      case "salesperson":
-        return "/sales-dashboard";
       case "contractor":
         return "/contractor-dashboard";
       case "admin":
@@ -90,7 +113,8 @@ function Router() {
           <Route path="/login" component={Login} />
           <Route path="/dashboard-login" component={DashboardLogin} />
           <Route path="/rep/:profileUrl" component={NfcLanding} />
-          <Route path="/s/:id" component={SalespersonProfileV2} />
+          <Route path="/s/:profileUrl" component={SalespersonProfile} />
+          <Route path="/salesperson-onboarding" component={SalespersonOnboarding} />
           
           {/* Protected routes */}
           <Route path="/sales-dashboard">

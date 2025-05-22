@@ -18,6 +18,11 @@ export default function SalespersonProfile() {
   const profileUrl = params.profileUrl;
   const [, setLocation] = useLocation();
 
+  // Fetch salesperson data
+  const { data: salespersonData, isLoading, error } = useQuery<any>({
+    queryKey: [`/api/salesperson/${profileUrl}`],
+  });
+  
   // Track page visit
   useEffect(() => {
     // Create a page visit record when the page loads
@@ -29,7 +34,7 @@ export default function SalespersonProfile() {
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-            salespersonId: salespersonData?.id,
+            salespersonId: salespersonData?.salesperson?.id,
             path: `/s/${profileUrl}`,
             referrer: document.referrer
           })
@@ -39,15 +44,10 @@ export default function SalespersonProfile() {
       }
     };
 
-    if (salespersonData?.id) {
+    if (salespersonData?.salesperson?.id) {
       createPageVisit();
     }
-  }, [profileUrl, salespersonData?.id]);
-
-  // Fetch salesperson data
-  const { data: salespersonData, isLoading, error } = useQuery<any>({
-    queryKey: [`/api/salesperson/${profileUrl}`],
-  });
+  }, [profileUrl, salespersonData?.salesperson?.id]);
 
   // Fetch service categories
   const { data: serviceCategoriesData } = useQuery<any>({

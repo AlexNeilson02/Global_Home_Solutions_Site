@@ -8,6 +8,7 @@ type User = {
   email: string;
   role: string;
   avatarUrl?: string | null;
+  phone?: string | null;
 };
 
 type AuthContextType = {
