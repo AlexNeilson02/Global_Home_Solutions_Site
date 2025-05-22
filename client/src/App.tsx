@@ -13,7 +13,6 @@ import ContractorDashboard from "@/pages/contractor-dashboard";
 import AdminDashboard from "@/pages/admin-dashboard";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
-import { DashboardNav } from "@/components/layout/dashboard-nav";
 import { useAuth, AuthProvider } from "@/lib/auth";
 
 function Router() {
@@ -104,7 +103,6 @@ function Router() {
   return (
     <>
       {!isNfcPage && <Header />}
-      <DashboardNav />
       
       <main>
         <Switch>
