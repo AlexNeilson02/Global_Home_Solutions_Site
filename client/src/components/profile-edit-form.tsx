@@ -51,13 +51,13 @@ export default function ProfileEditForm({ userData, roleData, userType, onSucces
   const queryClient = useQueryClient();
   const [avatarPreview, setAvatarPreview] = useState<string | null>(userData?.avatarUrl || null);
   
-  // Form setup with default values
+  // Form setup with default values - preserving existing data
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileFormSchema),
     defaultValues: {
       fullName: userData?.fullName || "",
       email: userData?.email || "",
-      phone: userData?.phone || "",
+      phone: roleData?.phone || userData?.phone || "",
       bio: roleData?.bio || "",
       avatarUrl: userData?.avatarUrl || "",
     },
@@ -88,14 +88,41 @@ export default function ProfileEditForm({ userData, roleData, userType, onSucces
       }
 
       // Create a preview
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const result = e.target?.result as string;
-        setAvatarPreview(result);
-        // Store the data URL in a hidden form field
-        form.setValue('avatarUrl', result);
-      };
-      reader.readAsDataURL(file);
+      try {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          try {
+            const result = e.target?.result as string;
+            setAvatarPreview(result);
+            // Store the data URL in a hidden form field
+            form.setValue('avatarUrl', result);
+            console.log("Image loaded successfully");
+          } catch (err) {
+            console.error("Error processing image result:", err);
+            toast({
+              title: "Error loading image",
+              description: "There was a problem processing your image. Please try a different one.",
+              variant: "destructive",
+            });
+          }
+        };
+        reader.onerror = (error) => {
+          console.error("FileReader error:", error);
+          toast({
+            title: "Error reading file",
+            description: "There was a problem reading your image file. Please try again.",
+            variant: "destructive",
+          });
+        };
+        reader.readAsDataURL(file);
+      } catch (err) {
+        console.error("FileReader setup error:", err);
+        toast({
+          title: "Error setting up file reader",
+          description: "There was a problem with your browser's file reading capabilities.",
+          variant: "destructive",
+        });
+      }
     }
   };
   
@@ -175,10 +202,12 @@ export default function ProfileEditForm({ userData, roleData, userType, onSucces
               </Avatar>
               
               <div>
-                <label htmlFor="avatar-upload" className="cursor-pointer">
-                  <Button variant="outline" size="sm" type="button" className="mt-2">
-                    Change Photo
-                  </Button>
+                <div className="flex flex-col items-center">
+                  <label htmlFor="avatar-upload" className="cursor-pointer">
+                    <Button variant="outline" size="sm" type="button" className="mt-2">
+                      Change Photo
+                    </Button>
+                  </label>
                   <input
                     id="avatar-upload"
                     type="file"
@@ -186,7 +215,10 @@ export default function ProfileEditForm({ userData, roleData, userType, onSucces
                     className="hidden"
                     onChange={handleAvatarChange}
                   />
-                </label>
+                  {avatarPreview && avatarPreview !== userData?.avatarUrl && (
+                    <p className="text-xs text-green-600 mt-1">New photo selected</p>
+                  )}
+                </div>
               </div>
             </div>
             
