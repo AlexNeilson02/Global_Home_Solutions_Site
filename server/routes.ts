@@ -547,8 +547,53 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Salesperson profile route by profile URL - publicly accessible
+  apiRouter.get("/salesperson/:profileUrl", async (req: Request, res: Response) => {
+    try {
+      const { profileUrl } = req.params;
+      
+      const salesperson = await storage.getSalespersonByProfileUrl(profileUrl);
+      
+      if (!salesperson) {
+        return res.status(400).json({ message: "Invalid salesperson profile" });
+      }
+      
+      // Increment total visits
+      await storage.incrementSalespersonStats(salesperson.id, 'totalVisits');
+      
+      // Get the user associated with this salesperson
+      const user = await storage.getUser(salesperson.userId);
+      
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      res.json({ 
+        user: {
+          fullName: user.fullName,
+          email: user.email,
+          phone: user.phone,
+          avatarUrl: user.avatarUrl
+        },
+        salesperson: {
+          id: salesperson.id,
+          profileUrl: salesperson.profileUrl,
+          bio: salesperson.bio,
+          specialties: salesperson.specialties || [],
+          certifications: salesperson.certifications || [],
+          yearsExperience: salesperson.yearsExperience,
+          totalVisits: salesperson.totalVisits,
+          successfulConversions: salesperson.successfulConversions
+        }
+      });
+    } catch (error) {
+      console.error("Error fetching salesperson profile:", error);
+      res.status(500).json({ message: "Error fetching salesperson profile" });
+    }
+  });
+  
   // Salesperson profile route by ID - publicly accessible
-  apiRouter.get("/salesperson/:id", async (req: Request, res: Response) => {
+  apiRouter.get("/salesperson/id/:id", async (req: Request, res: Response) => {
     try {
       const id = parseInt(req.params.id);
       
