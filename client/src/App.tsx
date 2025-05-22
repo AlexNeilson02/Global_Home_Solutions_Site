@@ -10,7 +10,7 @@ import Login from "@/pages/login";
 import QuickLogin from "@/pages/quick-login";
 import DashboardLogin from "@/pages/dashboard-login";
 import DashboardRedirect from "@/pages/dashboard-redirect";
-import SalesDashboard from "@/pages/sales-dashboard";
+import SalesDashboardNew from "@/pages/sales-dashboard-new";
 import ContractorDashboard from "@/pages/contractor-dashboard";
 import AdminDashboard from "@/pages/admin-dashboard";
 import { Header } from "@/components/layout/header";
@@ -121,12 +121,12 @@ function Router() {
           {/* Protected routes */}
           <Route path="/sales-dashboard">
             <ProtectedRoute roles={["salesperson", "admin"]}>
-              <SalesDashboard />
+              <SalesDashboardNew />
             </ProtectedRoute>
           </Route>
           <Route path="/sales-dashboard/:section+">
             <ProtectedRoute roles={["salesperson", "admin"]}>
-              <SalesDashboard />
+              <SalesDashboardNew />
             </ProtectedRoute>
           </Route>
           
