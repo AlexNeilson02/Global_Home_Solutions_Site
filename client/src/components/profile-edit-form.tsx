@@ -203,21 +203,67 @@ export default function ProfileEditForm({ userData, roleData, userType, onSucces
               
               <div>
                 <div className="flex flex-col items-center">
-                  <label htmlFor="avatar-upload" className="cursor-pointer">
-                    <Button variant="outline" size="sm" type="button" className="mt-2">
-                      Change Photo
-                    </Button>
-                  </label>
-                  <input
-                    id="avatar-upload"
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    onChange={handleAvatarChange}
+                  <FormField
+                    control={form.control}
+                    name="avatarUrl"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormControl>
+                          <div>
+                            <Button 
+                              type="button" 
+                              variant="outline" 
+                              size="sm" 
+                              className="mt-2"
+                              onClick={() => {
+                                // Create a file input element
+                                const input = document.createElement('input');
+                                input.type = 'file';
+                                input.accept = 'image/*';
+                                
+                                // Set up the onchange event
+                                input.onchange = (e) => {
+                                  const file = (e.target as HTMLInputElement).files?.[0];
+                                  if (file) {
+                                    // Simple validation
+                                    if (file.size > 2 * 1024 * 1024) {
+                                      toast({
+                                        title: "File too large",
+                                        description: "Please select an image smaller than 2MB",
+                                        variant: "destructive"
+                                      });
+                                      return;
+                                    }
+                                    
+                                    // Use FileReader to get data URL
+                                    const reader = new FileReader();
+                                    reader.onload = (e) => {
+                                      const result = e.target?.result as string;
+                                      setAvatarPreview(result);
+                                      field.onChange(result);
+                                      toast({
+                                        title: "Photo selected",
+                                        description: "Your new profile photo has been selected"
+                                      });
+                                    };
+                                    reader.readAsDataURL(file);
+                                  }
+                                };
+                                
+                                // Trigger the file dialog
+                                input.click();
+                              }}
+                            >
+                              Change Photo
+                            </Button>
+                          </div>
+                        </FormControl>
+                        {avatarPreview && avatarPreview !== userData?.avatarUrl && (
+                          <p className="text-xs text-green-600 mt-1 text-center">New photo selected</p>
+                        )}
+                      </FormItem>
+                    )}
                   />
-                  {avatarPreview && avatarPreview !== userData?.avatarUrl && (
-                    <p className="text-xs text-green-600 mt-1">New photo selected</p>
-                  )}
                 </div>
               </div>
             </div>
