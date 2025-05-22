@@ -248,8 +248,8 @@ export default function SalesDashboardNew() {
               
               <div className="flex justify-center items-center">
                 <QRCodeDisplay
-                  salespersonId={salespersonData?.id}
-                  profileUrl={salespersonData?.profileUrl}
+                  salesperson={salespersonData}
+                  user={userData}
                 />
               </div>
             </div>
