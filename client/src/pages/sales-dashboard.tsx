@@ -1,25 +1,19 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { useLocation } from "wouter";
 import { Sidebar } from "@/components/layout/sidebar";
-import { StatsCard } from "@/components/stats-card";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { NfcBadge } from "@/components/nfc-badge";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Switch } from "@/components/ui/switch";
-import { QRCodeDisplay } from "@/components/qr-code-display";
+import { StatsCard } from "@/components/stats-card";
 import ProfileEditForm from "@/components/profile-edit-form";
 import { 
   formatCurrency, 
   getInitials, 
-  getStatusColor,
-  formatPercentage,
-  timeAgo
+  getStatusColor
 } from "@/lib/utils";
 import { 
   UserCheck, 
@@ -29,28 +23,17 @@ import {
   Search, 
   Bell,
   MoreHorizontal,
-  RefreshCw,
-  Calendar,
-  MoveUp,
-  LineChart,
   CheckCircle,
   XCircle,
   PhoneCall,
   Clock,
   ClipboardList,
-  Plus,
-  Users,
   Briefcase,
-  Settings,
-  Mail,
   Phone,
+  Star,
   ArrowUpRight,
-  CreditCard,
-  FileText,
-  BarChart3,
-  PieChart,
-  UserCog,
-  Star
+  User,
+  Settings
 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { queryClient, apiRequest } from "@/lib/queryClient";
@@ -58,37 +41,17 @@ import { toast } from "@/hooks/use-toast";
 
 export default function SalesDashboard() {
   const { user } = useAuth();
-  const [selectedLeadId, setSelectedLeadId] = useState<number | null>(null);
-  const [selectedTab, setSelectedTab] = useState("overview");
+  const [location] = useLocation();
   const [selectedBidRequest, setSelectedBidRequest] = useState<any>(null);
   const [noteInput, setNoteInput] = useState("");
   const [showProfileEdit, setShowProfileEdit] = useState(false);
-  const [localProfileData, setLocalProfileData] = useState<any>(null);
 
   // Get salesperson data
   const { data: userData, isLoading: isLoadingUser } = useQuery<any>({
     queryKey: ["/api/users/me"],
   });
 
-  // Use local data if available (for when we're having API issues)
-  const [localUserData, setLocalUserData] = useState<any>(null);
-  
-  // On component mount, try to load data from localStorage
-  useEffect(() => {
-    try {
-      const savedData = localStorage.getItem('userData');
-      if (savedData) {
-        const parsedData = JSON.parse(savedData);
-        setLocalUserData(parsedData);
-      }
-    } catch (error) {
-      console.error("Error loading profile from localStorage:", error);
-    }
-  }, []);
-  
-  // Merge data from server and local storage, preferring local updates if available
-  const effectiveUserData = localUserData || userData;
-  const salespersonData = effectiveUserData?.roleData;
+  const salespersonData = userData?.roleData;
 
   // Get analytics data
   const { data: analyticsData, isLoading: isLoadingAnalytics } = useQuery<any>({
@@ -102,10 +65,10 @@ export default function SalesDashboard() {
     enabled: !!salespersonData?.id
   });
   
-  // Get leads/projects
-  const { data: projectsData, isLoading: isLoadingProjects } = useQuery<any>({
-    queryKey: ["/api/projects"],
-    enabled: !!user
+  // Get contractors data
+  const { data: contractorsData, isLoading: isLoadingContractors } = useQuery<any>({
+    queryKey: ["/api/contractors"],
+    enabled: true
   });
   
   // Update bid request status mutation
@@ -249,17 +212,7 @@ export default function SalesDashboard() {
               </div>
             </div>
             
-            {/* Tabs Navigation */}
-            <Tabs defaultValue="overview" value={selectedTab} onValueChange={setSelectedTab} className="mb-8">
-              <TabsList className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-7 w-full">
-                <TabsTrigger value="overview">Overview</TabsTrigger>
-                <TabsTrigger value="leads">My Leads</TabsTrigger>
-                <TabsTrigger value="bid-requests">Bid Requests</TabsTrigger>
-                <TabsTrigger value="contractors">Contractors</TabsTrigger>
-                <TabsTrigger value="schedule">Schedule</TabsTrigger>
-                <TabsTrigger value="commissions">Commissions</TabsTrigger>
-                <TabsTrigger value="settings">Settings</TabsTrigger>
-              </TabsList>
+            {/* Main Dashboard Content - No tabs needed, content is controlled via sidebar */}
               
               <TabsContent value="overview" className="pt-4">
                 {/* Stats Overview */}

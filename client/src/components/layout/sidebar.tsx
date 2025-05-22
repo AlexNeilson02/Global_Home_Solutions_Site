@@ -28,10 +28,8 @@ export function Sidebar({ className }: SidebarProps) {
       case "salesperson":
         return [
           { href: "/sales-dashboard", label: "Dashboard", icon: <LayoutDashboard className="w-5 h-5" /> },
-          { href: "/sales-dashboard/leads", label: "My Leads", icon: <Users className="w-5 h-5" /> },
           { href: "/sales-dashboard/contractors", label: "Contractors", icon: <Briefcase className="w-5 h-5" /> },
-          { href: "/sales-dashboard/schedule", label: "Schedule", icon: <Calendar className="w-5 h-5" /> },
-          { href: "/sales-dashboard/commissions", label: "Commissions", icon: <DollarSign className="w-5 h-5" /> },
+          { href: "/sales-dashboard/bid-requests", label: "Bid Requests", icon: <Users className="w-5 h-5" /> },
           { href: "/sales-dashboard/settings", label: "Settings", icon: <Settings className="w-5 h-5" /> }
         ];
       case "contractor":
