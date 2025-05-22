@@ -10,6 +10,7 @@ import { NfcBadge } from "@/components/nfc-badge";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { QRCodeDisplay } from "@/components/qr-code-display";
 import { 
   formatCurrency, 
   getInitials, 
