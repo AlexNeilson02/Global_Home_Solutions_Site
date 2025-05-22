@@ -60,13 +60,13 @@ export function Sidebar({ className }: SidebarProps) {
   const navItems = getNavItems();
 
   return (
-    <div className={cn("hidden md:block w-64 bg-white dark:bg-card shadow-sm p-6 space-y-8", className)}>      
+    <div className={cn("hidden md:block w-64 bg-white shadow-sm p-6 space-y-8", className)}>      
       <div className="space-y-1">
         {navItems.map((item) => (
           <Link key={item.href} href={item.href}>
             <div className={cn(
-              "flex items-center space-x-3 text-muted-foreground hover:text-primary hover:bg-primary-50 dark:hover:bg-primary/10 rounded-md px-3 py-2 cursor-pointer transition-colors",
-              location === item.href && "text-primary font-medium bg-primary-50 dark:bg-primary/10"
+              "flex items-center space-x-3 text-muted-foreground hover:text-primary hover:bg-primary-50 rounded-md px-3 py-2 cursor-pointer transition-colors",
+              location === item.href && "text-primary font-medium bg-primary-50"
             )}>
               {item.icon}
               <span>{item.label}</span>
