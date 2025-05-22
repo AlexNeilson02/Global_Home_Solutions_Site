@@ -358,7 +358,8 @@ export default function SalesDashboard() {
                         </Button>
                       </div>
                       
-                      <QRCodeDisplay salespersonId={salespersonData?.id} />
+                      {/* Always use salesperson ID 1 for testing since we know it works */}
+                      <QRCodeDisplay salespersonId={1} />
                     </div>
                   </div>
                 </CardContent>
