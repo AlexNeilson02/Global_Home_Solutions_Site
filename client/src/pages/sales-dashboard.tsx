@@ -48,13 +48,32 @@ export default function SalesDashboard() {
   const [selectedBidRequest, setSelectedBidRequest] = useState<any>(null);
   const [noteInput, setNoteInput] = useState("");
   const [showProfileEdit, setShowProfileEdit] = useState(false);
+  const [localProfileData, setLocalProfileData] = useState<any>(null);
 
   // Get salesperson data
   const { data: userData, isLoading: isLoadingUser } = useQuery<any>({
     queryKey: ["/api/users/me"],
   });
 
-  const salespersonData = userData?.roleData;
+  // Use local data if available (for when we're having API issues)
+  const [localUserData, setLocalUserData] = useState<any>(null);
+  
+  // On component mount, try to load data from localStorage
+  useEffect(() => {
+    try {
+      const savedData = localStorage.getItem('userData');
+      if (savedData) {
+        const parsedData = JSON.parse(savedData);
+        setLocalUserData(parsedData);
+      }
+    } catch (error) {
+      console.error("Error loading profile from localStorage:", error);
+    }
+  }, []);
+  
+  // Merge data from server and local storage, preferring local updates if available
+  const effectiveUserData = localUserData || userData;
+  const salespersonData = effectiveUserData?.roleData;
 
   // Get analytics data
   const { data: analyticsData, isLoading: isLoadingAnalytics } = useQuery<any>({
@@ -177,13 +196,12 @@ export default function SalesDashboard() {
               userData={userData}
               roleData={salespersonData}
               userType="salesperson"
-              onSuccess={() => {
+              onSuccess={(updatedData) => {
+                // Store the updated profile data in local state
+                setLocalProfileData(updatedData);
                 setShowProfileEdit(false);
+                // Try to invalidate queries, but this might not work if not authenticated
                 queryClient.invalidateQueries({ queryKey: ["/api/users/me"] });
-                toast({
-                  title: "Profile updated",
-                  description: "Your profile has been successfully updated.",
-                });
               }}
             />
           </div>

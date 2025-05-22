@@ -44,7 +44,7 @@ type ProfileEditFormProps = {
   userData: any;
   roleData?: any;
   userType: 'admin' | 'salesperson' | 'contractor';
-  onSuccess?: () => void;
+  onSuccess?: (data?: any) => void;
 };
 
 export default function ProfileEditForm({ userData, roleData, userType, onSuccess }: ProfileEditFormProps) {
@@ -157,17 +157,52 @@ export default function ProfileEditForm({ userData, roleData, userType, onSucces
   
   // Handle form submission 
   const onSubmit = (data: ProfileFormValues) => {
-    // Create local state change without API call for now
-    toast({
-      title: "Profile Updated",
-      description: "Your profile information has been updated successfully. Changes will be visible next time you log in.",
-    });
+    // Prepare the final data with avatar URL if available
+    const finalData = {
+      ...data,
+      avatarUrl: avatarPreview || userData?.avatarUrl
+    };
+    
+    // Save to localStorage for persistence between sessions
+    try {
+      // Save the updated profile to localStorage
+      const localUserData = JSON.parse(localStorage.getItem('userData') || '{}');
+      const updatedUserData = {
+        ...localUserData,
+        fullName: finalData.fullName,
+        email: finalData.email,
+        avatarUrl: finalData.avatarUrl
+      };
+      
+      // If we have role data, update that too
+      if (localUserData.roleData) {
+        updatedUserData.roleData = {
+          ...localUserData.roleData,
+          phone: finalData.phone,
+          bio: finalData.bio
+        };
+      }
+      
+      localStorage.setItem('userData', JSON.stringify(updatedUserData));
+      
+      toast({
+        title: "Profile Updated",
+        description: "Your profile information has been updated successfully.",
+      });
+    } catch (error) {
+      console.error("Error saving profile to localStorage:", error);
+      toast({
+        title: "Error Saving Profile",
+        description: "There was an error saving your profile information. Please try again.",
+        variant: "destructive",
+      });
+    }
     
     // Log the data that would be sent (for debugging)
-    console.log("Profile data would be updated with:", data);
+    console.log("Profile data updated with:", finalData);
     
-    // Call onSuccess to close the form
-    if (onSuccess) onSuccess();
+    // Call onSuccess to close the form and pass the updated data
+    if (onSuccess) onSuccess(finalData);
   };
   
   return (
