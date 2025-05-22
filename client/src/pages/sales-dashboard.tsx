@@ -320,13 +320,44 @@ export default function SalesDashboard() {
                     
                     <div className="flex items-center">
                       <Input 
-                        value={`https://example.com/rep/${salespersonData?.profileUrl || ""}`}
+                        value={`${window.location.origin}/s/${salespersonData?.profileUrl || ""}`}
                         readOnly
                         className="text-xs"
                       />
-                      <Button variant="ghost" size="sm" className="ml-2 h-10">
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="ml-2 h-10"
+                        onClick={() => {
+                          navigator.clipboard.writeText(`${window.location.origin}/s/${salespersonData?.profileUrl || ""}`);
+                          toast({
+                            title: "URL Copied",
+                            description: "Your profile link has been copied to clipboard.",
+                          });
+                        }}
+                      >
                         Copy
                       </Button>
+                    </div>
+                    
+                    {/* QR Code Section */}
+                    <div className="mt-6">
+                      <div className="flex items-center justify-between mb-2">
+                        <p className="text-sm font-medium">Your QR Code</p>
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="h-8 px-2"
+                          onClick={() => {
+                            queryClient.invalidateQueries({ queryKey: ["/api/salespersons", salespersonData?.id, "qrcode"] });
+                          }}
+                        >
+                          <RefreshCw className="h-3.5 w-3.5 mr-1" />
+                          Refresh
+                        </Button>
+                      </div>
+                      
+                      <QRCodeDisplay salespersonId={salespersonData?.id} />
                     </div>
                   </div>
                 </CardContent>

@@ -595,6 +595,46 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Generate QR code for salesperson's landing page
+  apiRouter.get("/salespersons/:id/qrcode", authenticate, async (req: Request, res: Response) => {
+    try {
+      const id = Number(req.params.id);
+      const salesperson = await storage.getSalesperson(id);
+      
+      if (!salesperson) {
+        return res.status(404).json({ message: "Salesperson not found" });
+      }
+      
+      // Only allow admins or the salesperson themselves to access their QR code
+      if (req.user.role !== "admin" && req.user.id !== salesperson.userId) {
+        return res.status(403).json({ message: "Forbidden" });
+      }
+      
+      // Construct the URL for the salesperson's landing page
+      const baseUrl = process.env.BASE_URL || `${req.protocol}://${req.get('host')}`;
+      const landingPageUrl = `${baseUrl}/s/${salesperson.profileUrl}`;
+      
+      // Generate QR code as data URL
+      const qrCodeDataUrl = await QRCode.toDataURL(landingPageUrl, {
+        errorCorrectionLevel: 'H',
+        margin: 1,
+        width: 300,
+        color: {
+          dark: '#003366',  // Blue color for QR code
+          light: '#ffffff'  // White background
+        }
+      });
+      
+      res.json({
+        qrCodeDataUrl,
+        landingPageUrl
+      });
+    } catch (error) {
+      console.error("Error generating QR code:", error);
+      res.status(500).json({ message: "Error generating QR code" });
+    }
+  });
+  
   // Service categories endpoint
   apiRouter.get("/service-categories", async (req: Request, res: Response) => {
     try {
