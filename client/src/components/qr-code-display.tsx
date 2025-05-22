@@ -13,8 +13,12 @@ export function QRCodeDisplay({ salespersonId, profileUrl = "james-wilson" }: QR
   const [isDownloading, setIsDownloading] = useState(false);
   const qrCodeRef = useRef<HTMLDivElement>(null);
   
-  // Generate landing page URL - hardcoded for demo
-  const landingPageUrl = `${window.location.origin}/s/${profileUrl}`;
+  // Use Replit domain for mobile access when in development
+  const baseUrl = process.env.NODE_ENV === 'production' 
+    ? window.location.origin 
+    : "https://e4465d17-fbc4-4632-9fc6-647805444a45-00-34kcklenmaaiq.janeway.replit.dev";
+  
+  const landingPageUrl = `${baseUrl}/s/${profileUrl}`;
   
   const handleDownload = () => {
     if (!qrCodeRef.current) return;
