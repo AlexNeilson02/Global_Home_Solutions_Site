@@ -100,6 +100,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       const user = await storage.createUser(data);
+      
+      // If the user is registering as a salesperson, create salesperson record
+      if (user.role === "salesperson") {
+        try {
+          const salespersonData = {
+            userId: user.id,
+            profileUrl: user.username, // Use username as profile URL
+            nfcId: `nfc_${user.username}_${Date.now()}`, // Generate unique NFC ID
+            bio: `Hello! I'm ${user.fullName}, your dedicated sales representative at Global Home Solutions. I'm here to help you find the perfect contractors for your home improvement projects.`,
+            totalLeads: 0,
+            totalVisits: 0,
+            successfulConversions: 0,
+            conversionRate: 0,
+            commissions: 0
+          };
+          
+          await storage.createSalesperson(salespersonData);
+        } catch (error) {
+          console.error("Failed to create salesperson record:", error);
+          // Continue with user creation even if salesperson creation fails
+        }
+      }
+      
       res.status(201).json({ 
         user: { 
           id: user.id, 
