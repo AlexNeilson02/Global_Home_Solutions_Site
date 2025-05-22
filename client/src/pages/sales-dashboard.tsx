@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { QRCodeDisplay } from "@/components/qr-code-display";
+import ProfileEditForm from "@/components/profile-edit-form";
 import { 
   formatCurrency, 
   getInitials, 
@@ -46,6 +47,7 @@ export default function SalesDashboard() {
   const [selectedTab, setSelectedTab] = useState("overview");
   const [selectedBidRequest, setSelectedBidRequest] = useState<any>(null);
   const [noteInput, setNoteInput] = useState("");
+  const [showProfileEdit, setShowProfileEdit] = useState(false);
 
   // Get salesperson data
   const { data: userData, isLoading: isLoadingUser } = useQuery<any>({
