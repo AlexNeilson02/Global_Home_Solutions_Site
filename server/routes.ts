@@ -530,16 +530,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "All required fields must be provided" });
       }
 
-      // Create bid request
+      // Create bid request with correct field names for database schema
       const bidRequest = await storage.createBidRequest({
         contractorId: Number(contractorId),
-        customerName,
-        customerEmail,
-        customerPhone,
-        projectDescription,
-        projectAddress,
-        preferredTimeframe,
+        fullName: customerName,
+        email: customerEmail,
+        phone: customerPhone,
+        description: projectDescription,
+        address: projectAddress,
+        timeline: preferredTimeframe,
         budget: budget || null,
+        preferredContactMethod: "email",
         status: "pending",
         emailSent: false,
         notes: ""

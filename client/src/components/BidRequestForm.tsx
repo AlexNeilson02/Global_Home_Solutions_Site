@@ -69,7 +69,10 @@ export default function BidRequestForm({ isOpen, onClose, contractor }: BidReque
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       });
-      if (!response.ok) throw new Error("Failed to submit bid request");
+      if (!response.ok) {
+        const errorData = await response.text();
+        throw new Error(`Failed to submit bid request: ${errorData}`);
+      }
       return response.json();
     },
     onSuccess: () => {
@@ -77,14 +80,14 @@ export default function BidRequestForm({ isOpen, onClose, contractor }: BidReque
         title: "Bid Request Sent!",
         description: `Your request has been sent to ${contractor.companyName}. They will contact you within 24 hours.`,
       });
-      queryClient.invalidateQueries({ queryKey: ["/api/bid-requests"] });
       form.reset();
       onClose();
     },
-    onError: () => {
+    onError: (error: Error) => {
+      console.error("Bid request submission error:", error);
       toast({
         title: "Error",
-        description: "Failed to send bid request. Please try again.",
+        description: error.message || "Failed to send bid request. Please try again.",
         variant: "destructive",
       });
     },
