@@ -1,11 +1,13 @@
-import React from "react";
+import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
+import BidRequestForm from "@/components/BidRequestForm";
 import "../styles/ContractorProfile.css";
 
 export default function ContractorProfileDB() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const [showBidForm, setShowBidForm] = useState(false);
 
   const { data: contractorData, isLoading, error } = useQuery({
     queryKey: ['/api/contractors', id],
@@ -77,7 +79,10 @@ export default function ContractorProfileDB() {
           </>
         )}
 
-        <button className="request-bid-profile-btn">
+        <button 
+          className="request-bid-profile-btn"
+          onClick={() => setShowBidForm(true)}
+        >
           Request Bid
         </button>
 
@@ -87,6 +92,13 @@ export default function ContractorProfileDB() {
         {contractor.website && <p>Website: {contractor.website}</p>}
         {contractor.serviceArea && <p>Service Area: {contractor.serviceArea}</p>}
       </div>
+
+      {/* Bid Request Form Modal */}
+      <BidRequestForm
+        isOpen={showBidForm}
+        onClose={() => setShowBidForm(false)}
+        contractor={contractor}
+      />
     </div>
   );
 }

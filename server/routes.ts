@@ -510,6 +510,47 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Internal server error" });
     }
   });
+
+  // Create bid request - public endpoint for customers
+  apiRouter.post("/bid-requests", async (req: Request, res: Response) => {
+    try {
+      const {
+        customerName,
+        customerEmail,
+        customerPhone,
+        projectDescription,
+        projectAddress,
+        preferredTimeframe,
+        budget,
+        contractorId
+      } = req.body;
+
+      // Validate required fields
+      if (!customerName || !customerEmail || !customerPhone || !projectDescription || !projectAddress || !preferredTimeframe || !contractorId) {
+        return res.status(400).json({ message: "All required fields must be provided" });
+      }
+
+      // Create bid request
+      const bidRequest = await storage.createBidRequest({
+        contractorId: Number(contractorId),
+        customerName,
+        customerEmail,
+        customerPhone,
+        projectDescription,
+        projectAddress,
+        preferredTimeframe,
+        budget: budget || null,
+        status: "pending",
+        emailSent: false,
+        notes: ""
+      });
+
+      res.status(201).json({ bidRequest });
+    } catch (error) {
+      console.error("Error creating bid request:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
   
   // Update bid request status - only available to the salesperson who created it or admin
   apiRouter.patch("/bid-requests/:id/status", authenticate, async (req: Request, res: Response) => {
