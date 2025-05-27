@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import contractorsData from "../sampleData/contractors";
 import logoPath from "@/assets/global-home-solutions-logo.png";
 import "../styles/HomePage.css";
@@ -9,8 +9,17 @@ const trades = [
 ];
 
 export default function HomePage() {
-  const [trade, setTrade] = useState("");
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [trade, setTrade] = useState(searchParams.get("trade") || "");
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (trade) {
+      setSearchParams({ trade });
+    } else {
+      setSearchParams({});
+    }
+  }, [trade, setSearchParams]);
 
   const filteredContractors = contractorsData.filter(
     (contractor) => contractor.trade.toLowerCase() === trade.toLowerCase()
