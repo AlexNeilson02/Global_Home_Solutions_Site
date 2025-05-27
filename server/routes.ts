@@ -46,20 +46,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
   apiRouter.post("/auth/login", async (req: Request, res: Response) => {
     try {
       const data = loginSchema.parse(req.body);
+      console.log("Login attempt for username:", data.username);
+      
       const user = await storage.getUserByUsername(data.username);
+      console.log("User found:", user ? `ID: ${user.id}, Role: ${user.role}` : "None");
       
       if (!user || user.password !== data.password) {
+        console.log("Login failed - invalid credentials");
         return res.status(401).json({ message: "Invalid credentials" });
       }
       
-      // Update last login timestamp
-      await storage.updateUserLastLogin(user.id);
-      
       const sessionId = Math.random().toString(36).substring(2, 15);
       sessions[sessionId] = { userId: user.id, role: user.role };
-      console.log("Creating session for user:", user.id, "with sessionId:", sessionId);
+      console.log("Login successful - creating session:", sessionId);
       
       res.json({ 
+        success: true,
         token: sessionId, 
         user: { 
           id: user.id, 
@@ -71,8 +73,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         } 
       });
     } catch (error) {
+      console.error("Login error:", error);
       if (error instanceof z.ZodError) {
-        return res.status(400).json({ message: error.errors });
+        return res.status(400).json({ message: "Invalid login data", errors: error.errors });
       }
       res.status(500).json({ message: "Internal server error" });
     }
