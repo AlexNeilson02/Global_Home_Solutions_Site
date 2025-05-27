@@ -45,8 +45,8 @@ export default function HomePage() {
     setSearchTriggered(false);
   };
 
-  const filteredContractors = searchTriggered && trade && contractors
-    ? contractors.filter(
+  const filteredContractors = searchTriggered && trade && contractors?.contractors
+    ? contractors.contractors.filter(
         (contractor: any) => contractor.specialties?.some((specialty: string) => 
           specialty.toLowerCase().includes(trade.toLowerCase())
         )
