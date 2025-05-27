@@ -341,6 +341,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   apiRouter.post("/contractors/register", async (req: Request, res: Response) => {
     try {
       const {
+        username,
+        password,
         fullName,
         email,
         phone,
@@ -359,7 +361,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       } = req.body;
 
       // Validate required fields
-      if (!fullName || !email || !phone || !companyName || !licenseNumber || !insuranceProvider || !businessAddress || !yearsInBusiness || !employeeCount || !specialties || specialties.length === 0 || !serviceAreas || !portfolioDescription) {
+      if (!username || !password || !fullName || !email || !phone || !companyName || !licenseNumber || !insuranceProvider || !businessAddress || !yearsInBusiness || !employeeCount || !specialties || specialties.length === 0 || !serviceAreas || !portfolioDescription) {
         return res.status(400).json({ message: "All required fields must be provided" });
       }
 
@@ -369,11 +371,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "An account with this email already exists" });
       }
 
-      // Generate a temporary password (in production, you'd send this via email)
-      const tempPassword = Math.random().toString(36).slice(-8).toUpperCase();
-      
-      // Generate username from email
-      const username = email.split('@')[0].toLowerCase();
+      // Check if username already exists
+      const existingUsername = await storage.getUserByUsername(username);
+      if (existingUsername) {
+        return res.status(400).json({ message: "This username is already taken" });
+      }
 
       // Create user account
       const user = await storage.createUser({
@@ -382,7 +384,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         email,
         phone,
         role: "contractor",
-        password: tempPassword // In production, hash this
+        password // In production, hash this
       });
 
       // Create contractor profile
@@ -395,15 +397,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         isActive: true
       });
 
-      // In production, you would:
-      // 1. Send welcome email with login credentials
-      // 2. Trigger verification process
-      // 3. Notify admin for approval
-
       res.status(201).json({ 
-        contractor,
-        message: "Registration successful! You will receive login credentials via email.",
-        tempPassword // Remove this in production
+        success: true,
+        contractor: {
+          id: contractor.id,
+          companyName: contractor.companyName,
+          username: user.username
+        },
+        message: "Registration successful! You can now log in to your contractor portal."
       });
     } catch (error) {
       console.error("Error registering contractor:", error);

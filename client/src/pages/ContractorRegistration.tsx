@@ -13,6 +13,11 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 
 const contractorRegistrationSchema = z.object({
+  // Account Information
+  username: z.string().min(3, "Username must be at least 3 characters").regex(/^[a-zA-Z0-9_]+$/, "Username can only contain letters, numbers, and underscores"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+  confirmPassword: z.string().min(6, "Please confirm your password"),
+  
   // Personal Information
   fullName: z.string().min(2, "Full name is required"),
   email: z.string().email("Please enter a valid email address"),
@@ -42,6 +47,9 @@ const contractorRegistrationSchema = z.object({
   
   // Terms
   agreeToTerms: z.boolean().refine(val => val === true, "You must agree to the terms and conditions"),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Passwords don't match",
+  path: ["confirmPassword"],
 });
 
 type ContractorRegistrationForm = z.infer<typeof contractorRegistrationSchema>;
@@ -59,6 +67,9 @@ export default function ContractorRegistration() {
   const form = useForm<ContractorRegistrationForm>({
     resolver: zodResolver(contractorRegistrationSchema),
     defaultValues: {
+      username: "",
+      password: "",
+      confirmPassword: "",
       fullName: "",
       email: "",
       phone: "",
@@ -155,6 +166,52 @@ export default function ContractorRegistration() {
           <CardContent>
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+                {/* Account Information */}
+                <div className="space-y-6">
+                  <h3 className="text-xl font-semibold text-gray-900">Account Information</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <FormField
+                      control={form.control}
+                      name="username"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Username *</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Choose a username" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="password"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Password *</FormLabel>
+                          <FormControl>
+                            <Input type="password" placeholder="Create a password" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="confirmPassword"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Confirm Password *</FormLabel>
+                          <FormControl>
+                            <Input type="password" placeholder="Confirm your password" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                </div>
+
                 {/* Personal Information */}
                 <div className="space-y-6">
                   <h3 className="text-xl font-semibold text-gray-900">Personal Information</h3>
