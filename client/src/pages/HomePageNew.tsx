@@ -11,19 +11,39 @@ const trades = [
 export default function HomePage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [trade, setTrade] = useState(searchParams.get("trade") || "");
+  const [searchTriggered, setSearchTriggered] = useState(!!searchParams.get("trade"));
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (trade) {
+    if (trade && searchTriggered) {
       setSearchParams({ trade });
-    } else {
+    } else if (!trade) {
       setSearchParams({});
+      setSearchTriggered(false);
     }
-  }, [trade, setSearchParams]);
+  }, [trade, searchTriggered, setSearchParams]);
 
-  const filteredContractors = contractorsData.filter(
-    (contractor) => contractor.trade.toLowerCase() === trade.toLowerCase()
-  ).slice(0, 5);
+  const handleCategoryClick = (category) => {
+    setTrade(category);
+    setSearchTriggered(true);
+  };
+
+  const handleFindContractor = () => {
+    if (trade.trim()) {
+      setSearchTriggered(true);
+    }
+  };
+
+  const clearSearch = () => {
+    setTrade("");
+    setSearchTriggered(false);
+  };
+
+  const filteredContractors = searchTriggered && trade 
+    ? contractorsData.filter(
+        (contractor) => contractor.trade.toLowerCase() === trade.toLowerCase()
+      ).slice(0, 5)
+    : [];
 
   return (
     <div className="homepage-container">
@@ -35,19 +55,24 @@ export default function HomePage() {
         </p>
       </header>
       <section className="search-section">
-        <input
-          type="text"
-          list="trades"
-          placeholder="Search for your trade (e.g., Plumbing, Roofing)"
-          value={trade}
-          onChange={e => setTrade(e.target.value)}
-        />
-        <datalist id="trades">
-          {trades.map(tr => (
-            <option key={tr} value={tr} />
-          ))}
-        </datalist>
-        <button className="find-contractor-btn" onClick={() => {}}>Find a Contractor</button>
+        <div className="search-input-container">
+          <select
+            className="service-dropdown"
+            value={trade}
+            onChange={e => setTrade(e.target.value)}
+          >
+            <option value="">Select a service...</option>
+            {trades.map(tr => (
+              <option key={tr} value={tr}>{tr}</option>
+            ))}
+          </select>
+          {trade && (
+            <button className="clear-search-btn" onClick={clearSearch}>
+              ✕
+            </button>
+          )}
+        </div>
+        <button className="find-contractor-btn" onClick={handleFindContractor}>Find a Contractor</button>
       </section>
 
       {/* Category Cards Section - Only show when no search is active */}
@@ -55,7 +80,7 @@ export default function HomePage() {
         <section className="category-section">
           <h2>Find the right contractor for your project</h2>
           <div className="category-grid">
-            <div className="category-card" onClick={() => setTrade("Plumbing")}>
+            <div className="category-card" onClick={() => handleCategoryClick("Plumbing")}>
               <div className="category-image plumber-bg"></div>
               <div className="category-content">
                 <h3>Plumber</h3>
@@ -63,7 +88,7 @@ export default function HomePage() {
               </div>
             </div>
 
-            <div className="category-card" onClick={() => setTrade("Electrical")}>
+            <div className="category-card" onClick={() => handleCategoryClick("Electrical")}>
               <div className="category-image electrician-bg"></div>
               <div className="category-content">
                 <h3>Electrician</h3>
@@ -71,7 +96,7 @@ export default function HomePage() {
               </div>
             </div>
 
-            <div className="category-card" onClick={() => setTrade("Flooring")}>
+            <div className="category-card" onClick={() => handleCategoryClick("Flooring")}>
               <div className="category-image flooring-bg"></div>
               <div className="category-content">
                 <h3>Flooring</h3>
@@ -79,7 +104,7 @@ export default function HomePage() {
               </div>
             </div>
 
-            <div className="category-card" onClick={() => setTrade("Concrete")}>
+            <div className="category-card" onClick={() => handleCategoryClick("Concrete")}>
               <div className="category-image concrete-bg"></div>
               <div className="category-content">
                 <h3>Concrete</h3>
