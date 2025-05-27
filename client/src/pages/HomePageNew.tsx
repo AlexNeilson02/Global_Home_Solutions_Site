@@ -147,10 +147,6 @@ export default function HomePage() {
                 <div className="contractor-info">
                   <h3>{contractor.companyName}</h3>
                   <p className="trade">{contractor.specialties?.join(', ')}</p>
-                  <div className="certifications">
-                    {contractor.isVerified && <span className="cert-badge">Verified</span>}
-                    {contractor.subscriptionTier === 'premium' && <span className="cert-badge">Premium</span>}
-                  </div>
                   <div className="contractor-actions">
                     <button 
                       className="request-bid-btn big-button"
@@ -158,7 +154,7 @@ export default function HomePage() {
                       Request Bid
                     </button>
                     <button 
-                      className="profile-btn"
+                      className="profile-btn blue-link"
                       onClick={() => navigate(`/contractor/${contractor.id}`)}
                     >
                       View Profile

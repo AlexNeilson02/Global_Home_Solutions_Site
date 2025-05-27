@@ -149,4 +149,21 @@ html, body {
   .stats-grid {
     @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6;
   }
+
+  /* Blue hyperlink style for View Profile button */
+  .blue-link {
+    background: none !important;
+    border: none !important;
+    color: #0ea5e9 !important;
+    text-decoration: underline !important;
+    cursor: pointer !important;
+    font-weight: normal !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  
+  .blue-link:hover {
+    color: #0284c7 !important;
+    text-decoration: underline !important;
+  }
 }
