@@ -297,29 +297,49 @@ const ContractorPortal: React.FC = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    {Array.isArray(bidRequests) ? bidRequests.slice(0, 5).map((request: any) => (
-                      <div key={request.id} className="flex items-center justify-between p-4 border rounded-lg">
-                        <div className="space-y-1">
-                          <p className="font-medium">{request.customerName}</p>
-                          <p className="text-sm text-gray-500">{request.customerEmail}</p>
-                          <p className="text-sm">{request.serviceDescription}</p>
-                          <p className="text-xs text-gray-400">
-                            Submitted: {new Date(request.createdAt).toLocaleDateString()}
-                          </p>
+                    {Array.isArray(bidRequests?.bidRequests) && bidRequests.bidRequests.length > 0 ? 
+                      bidRequests.bidRequests.slice(0, 5).map((request: any) => (
+                        <div key={request.id} className="flex items-center justify-between p-4 border rounded-lg bg-white dark:bg-gray-800">
+                          <div className="space-y-2 flex-1">
+                            <div className="flex items-center gap-2">
+                              <h4 className="font-medium text-lg">{request.fullName}</h4>
+                              <Badge variant={request.status === 'pending' ? 'default' : 
+                                             request.status === 'contacted' ? 'secondary' : 'outline'}>
+                                {request.status}
+                              </Badge>
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+                              <p><span className="font-medium">Email:</span> {request.email}</p>
+                              <p><span className="font-medium">Phone:</span> {request.phone}</p>
+                              <p><span className="font-medium">Timeline:</span> {request.timeline}</p>
+                              {request.budget && <p><span className="font-medium">Budget:</span> ${request.budget}</p>}
+                            </div>
+                            <p className="text-sm"><span className="font-medium">Project:</span> {request.description}</p>
+                            <p className="text-sm"><span className="font-medium">Address:</span> {request.address}</p>
+                            <p className="text-xs text-gray-500">
+                              Submitted: {new Date(request.createdAt).toLocaleDateString()} at {new Date(request.createdAt).toLocaleTimeString()}
+                            </p>
+                          </div>
+                          <div className="flex flex-col items-end space-y-2 ml-4">
+                            <Button size="sm" className="bg-blue-600 hover:bg-blue-700">
+                              Contact Customer
+                            </Button>
+                            <Button size="sm" variant="outline">
+                              View Details
+                            </Button>
+                          </div>
                         </div>
-                        <div className="flex items-center space-x-2">
-                          <Badge variant={request.status === 'pending' ? 'default' : 
-                                         request.status === 'responded' ? 'secondary' : 'success'}>
-                            {request.status}
-                          </Badge>
-                          <Button size="sm" variant="outline">
-                            Respond
-                          </Button>
+                      )) : (
+                        <div className="text-center py-12">
+                          <div className="text-gray-400 mb-2">
+                            <svg className="mx-auto h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2M4 13h2m0 0V9a2 2 0 012-2h2m0 0V6a2 2 0 012-2h1a2 2 0 012 2v1m0 0v2a2 2 0 002 2h2m0 0v1" />
+                            </svg>
+                          </div>
+                          <p className="text-gray-500 font-medium">No bid requests yet</p>
+                          <p className="text-gray-400 text-sm">New customer inquiries will appear here</p>
                         </div>
-                      </div>
-                    )) : (
-                      <p className="text-center text-gray-500 py-8">No bid requests found</p>
-                    )}
+                      )}
                   </div>
                 </CardContent>
               </Card>

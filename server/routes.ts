@@ -607,6 +607,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get bid requests for a specific contractor
+  apiRouter.get("/contractors/:id/bid-requests", authenticate, async (req: Request, res: Response) => {
+    try {
+      const contractorId = Number(req.params.id);
+      
+      // Only allow the contractor themselves or admin to access their bid requests
+      const contractor = await storage.getContractor(contractorId);
+      if (!contractor) {
+        return res.status(404).json({ message: "Contractor not found" });
+      }
+      
+      if (req.user.role !== "admin" && req.user.userId !== contractor.userId) {
+        return res.status(403).json({ message: "Forbidden" });
+      }
+      
+      const bidRequests = await storage.getBidRequestsByContractorId(contractorId);
+      res.json({ bidRequests });
+    } catch (error) {
+      console.error("Error fetching contractor bid requests:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   // Create bid request - public endpoint for customers
   apiRouter.post("/bid-requests", async (req: Request, res: Response) => {
     try {
