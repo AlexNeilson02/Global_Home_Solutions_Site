@@ -607,7 +607,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get bid requests for a specific contractor
+  // Get bid requests for a specific contractor (new endpoint)
+  apiRouter.get("/bid-requests-for-contractor/:id", async (req: Request, res: Response) => {
+    try {
+      const contractorId = Number(req.params.id);
+      console.log("Fetching bid requests for contractor:", contractorId);
+      
+      const bidRequests = await storage.getBidRequestsByContractorId(contractorId);
+      console.log("Found bid requests:", bidRequests.length);
+      res.setHeader('Content-Type', 'application/json');
+      res.json({ bidRequests });
+    } catch (error) {
+      console.error("Error fetching contractor bid requests:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Get bid requests for a specific contractor (original endpoint)
   apiRouter.get("/contractors/:id/bid-requests", async (req: Request, res: Response) => {
     try {
       const contractorId = Number(req.params.id);

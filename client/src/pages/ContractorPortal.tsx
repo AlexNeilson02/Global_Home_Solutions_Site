@@ -45,14 +45,11 @@ const ContractorPortal: React.FC = () => {
   });
 
   const { data: bidRequests, refetch: refetchBidRequests } = useQuery({
-    queryKey: ['/api/contractors', contractorId, 'bid-requests'],
+    queryKey: ['/api/bid-requests-for-contractor', contractorId],
     enabled: !!contractorId,
     queryFn: async () => {
-      const token = localStorage.getItem('authToken');
-      console.log('Fetching bid requests with token:', token ? 'present' : 'missing');
-      const response = await fetch(`/api/contractors/${contractorId}/bid-requests`, {
+      const response = await fetch(`/api/bid-requests-for-contractor/${contractorId}`, {
         headers: {
-          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         }
       });
@@ -66,7 +63,9 @@ const ContractorPortal: React.FC = () => {
       console.log('Bid requests data received:', data);
       console.log('Bid requests array:', data?.bidRequests);
       console.log('Array length:', data?.bidRequests?.length);
-      return data;
+      
+      // Ensure we return the bidRequests array directly for easy access
+      return data?.bidRequests || [];
     }
   });
 
@@ -318,8 +317,8 @@ const ContractorPortal: React.FC = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    {Array.isArray(bidRequests?.bidRequests) && bidRequests.bidRequests.length > 0 ? 
-                      bidRequests.bidRequests.slice(0, 5).map((request: any) => (
+                    {Array.isArray(bidRequests) && bidRequests.length > 0 ? 
+                      bidRequests.slice(0, 5).map((request: any) => (
                         <div key={request.id} className="flex items-center justify-between p-4 border rounded-lg bg-white dark:bg-gray-800">
                           <div className="space-y-2 flex-1">
                             <div className="flex items-center gap-2">
