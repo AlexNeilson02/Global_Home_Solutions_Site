@@ -84,10 +84,12 @@ const ContractorPortal: React.FC = () => {
   // Update contractor profile mutation
   const updateContractorMutation = useMutation({
     mutationFn: async (updatedData: any) => {
+      const token = localStorage.getItem("auth-token");
       const response = await fetch(`/api/contractors/${contractorId}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify(updatedData),
       });
