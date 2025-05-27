@@ -6,7 +6,7 @@ import "../styles/ContractorProfile.css";
 export default function ContractorProfile() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const contractor = contractorsData.find(c => c.id === Number(id));
+  const contractor = contractorsData.find((c: any) => c.id === Number(id));
 
   if (!contractor) return <div>Contractor not found.</div>;
 
@@ -25,11 +25,11 @@ export default function ContractorProfile() {
         <p>{contractor.about}</p>
         <h4>Certifications:</h4>
         <ul>
-          {contractor.certifications.map((cert, i) => <li key={i}>{cert}</li>)}
+          {contractor.certifications.map((cert: any, i: number) => <li key={i}>{cert}</li>)}
         </ul>
         <h4>Videos</h4>
         <div className="media-gallery">
-          {contractor.videos.map((v, i) => (
+          {contractor.videos.map((v: any, i: number) => (
             <video key={i} src={v} controls width="250" />
           ))}
         </div>
@@ -42,5 +42,3 @@ export default function ContractorProfile() {
     </div>
   );
 }
-
-export default ContractorProfile;

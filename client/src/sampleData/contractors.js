@@ -1,4 +1,4 @@
-const contractors = [
+export const contractors = [
   {
     id: 1,
     name: "Apex Plumbing Pros",

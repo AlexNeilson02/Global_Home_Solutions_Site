@@ -1,0 +1,131 @@
+.homepage-container {
+  background: #101a23;
+  color: #fff;
+  min-height: 100vh;
+  font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+  padding-bottom: 80px;
+}
+.logo {
+  display: block;
+  margin: 30px auto 12px auto;
+  max-width: 130px;
+}
+header h1 {
+  text-align: center;
+  color: #2ca7f8;
+}
+.culture {
+  text-align: center;
+  font-size: 1.1rem;
+  margin-bottom: 24px;
+  color: #c3e3fa;
+}
+.search-section {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 25px;
+}
+input[type="text"] {
+  padding: 10px;
+  font-size: 1.1rem;
+  width: 300px;
+  border-radius: 8px;
+  border: 1px solid #2ca7f8;
+  background: #182a38;
+  color: #fff;
+}
+.find-contractor-btn {
+  padding: 10px 24px;
+  background: #2ca7f8;
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 1.1rem;
+  cursor: pointer;
+  font-weight: bold;
+}
+.contractors-section {
+  margin: 0 auto 20px auto;
+  max-width: 900px;
+}
+.contractor-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  justify-content: center;
+}
+.contractor-card {
+  background: #1d2630;
+  border-radius: 16px;
+  padding: 20px;
+  width: 220px;
+  box-shadow: 0 2px 12px rgba(20,20,20,0.16);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.contractor-photo {
+  width: 85px;
+  height: 85px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 8px;
+  background: #222c39;
+}
+h3 {
+  margin: 10px 0 8px 0;
+  color: #2ca7f8;
+}
+.request-bid-btn {
+  margin-top: 5px;
+  padding: 8px 15px;
+  background: #15a46b;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+}
+.request-bid-btn[disabled] {
+  background: #aaa;
+  color: #eee;
+  cursor: not-allowed;
+}
+.video-gallery {
+  margin-top: 12px;
+  display: flex;
+  gap: 8px;
+}
+.info-section {
+  margin: 40px auto 0 auto;
+  max-width: 720px;
+  text-align: center;
+}
+.info-btn {
+  background: #223d57;
+  color: #2ca7f8;
+  border: none;
+  border-radius: 10px;
+  padding: 12px 32px;
+  margin-bottom: 20px;
+  font-size: 1.15rem;
+  font-weight: bold;
+  cursor: pointer;
+}
+.promise-section {
+  background: #162837;
+  border-radius: 12px;
+  padding: 22px;
+  color: #eaf6ff;
+  margin-top: 15px;
+}
+.promise-section h3 {
+  color: #2ca7f8;
+}
+ul {
+  text-align: left;
+  margin: 0 auto;
+  max-width: 380px;
+  padding-left: 18px;
+}
