@@ -123,6 +123,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
+      // If the user is registering as a contractor, create contractor record
+      if (user.role === "contractor") {
+        try {
+          const contractorData = {
+            userId: user.id,
+            companyName: `${user.fullName} Services`, // Default company name
+            description: "Professional contracting services for all your home improvement needs.",
+            specialties: ["General Contracting"],
+            hourlyRate: 75.0,
+            monthlySpendCap: 1000.0,
+            paymentMethodAdded: false,
+            mediaFiles: [],
+            isActive: true,
+            subscriptionTier: "basic",
+            reviewCount: 0,
+            rating: null
+          };
+          
+          await storage.createContractor(contractorData);
+        } catch (error) {
+          console.error("Failed to create contractor record:", error);
+          // Continue with user creation even if contractor creation fails
+        }
+      }
+      
       res.status(201).json({ 
         user: { 
           id: user.id, 
