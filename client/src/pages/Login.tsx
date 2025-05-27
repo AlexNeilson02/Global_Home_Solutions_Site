@@ -45,6 +45,9 @@ export default function Login() {
 
       const result = await response.json();
       
+      // Store the authentication token
+      localStorage.setItem("auth-token", result.token);
+      
       toast({
         title: "Login Successful!",
         description: `Welcome back, ${result.user.fullName}!`,
