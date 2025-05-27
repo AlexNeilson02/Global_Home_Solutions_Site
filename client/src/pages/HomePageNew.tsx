@@ -75,8 +75,8 @@ export default function HomePage() {
         <button className="find-contractor-btn" onClick={handleFindContractor}>Find a Contractor</button>
       </section>
 
-      {/* Category Cards Section - Only show when no search is active */}
-      {!trade && (
+      {/* Category Cards Section - Only show when no search has been triggered */}
+      {!searchTriggered && (
         <section className="category-section">
           <h2>Find the right contractor for your project</h2>
           <div className="category-grid">
@@ -114,7 +114,7 @@ export default function HomePage() {
           </div>
         </section>
       )}
-      {trade && (
+      {searchTriggered && trade && (
         <section className="contractors-section">
           <h2>{trade} Contractors</h2>
           <div className="contractor-list">
