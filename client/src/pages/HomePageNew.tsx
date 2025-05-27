@@ -45,13 +45,25 @@ export default function HomePage() {
     setSearchTriggered(false);
   };
 
-  const filteredContractors = searchTriggered && trade && contractors?.contractors
-    ? contractors.contractors.filter(
-        (contractor: any) => contractor.specialties?.some((specialty: string) => 
+  const getFilteredContractors = () => {
+    if (!searchTriggered || !trade || !contractors?.contractors) {
+      return [];
+    }
+    
+    const contractorsList = Array.isArray(contractors.contractors) ? contractors.contractors : [];
+    
+    return contractorsList
+      .filter((contractor: any) => 
+        contractor.specialties && 
+        Array.isArray(contractor.specialties) &&
+        contractor.specialties.some((specialty: string) => 
           specialty.toLowerCase().includes(trade.toLowerCase())
         )
-      ).slice(0, 5)
-    : [];
+      )
+      .slice(0, 5);
+  };
+
+  const filteredContractors = getFilteredContractors();
 
   return (
     <div className="homepage-container">
