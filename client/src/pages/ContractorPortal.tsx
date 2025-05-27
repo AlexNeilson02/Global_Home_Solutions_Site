@@ -63,7 +63,9 @@ const ContractorPortal: React.FC = () => {
         throw new Error('Failed to fetch bid requests');
       }
       const data = await response.json();
-      console.log('Bid requests data:', data);
+      console.log('Bid requests data received:', data);
+      console.log('Bid requests array:', data?.bidRequests);
+      console.log('Array length:', data?.bidRequests?.length);
       return data;
     }
   });
