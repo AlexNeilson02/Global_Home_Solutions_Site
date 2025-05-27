@@ -7,6 +7,7 @@ import ContractorProfile from "@/pages/ContractorProfile";
 import ContractorPortal from "@/pages/ContractorPortal";
 import SalesPortal from "@/pages/SalesPortal";
 import AdminPortal from "@/pages/AdminPortal";
+import PortalAccess from "@/pages/PortalAccess";
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
         <Toaster />
         <Routes>
           <Route path="/" element={<HomePage />} />
+          <Route path="/portals" element={<PortalAccess />} />
           <Route path="/contractor/:id" element={<ContractorProfile />} />
           <Route path="/portal/contractor" element={<ContractorPortal />} />
           <Route path="/portal/sales" element={<SalesPortal />} />

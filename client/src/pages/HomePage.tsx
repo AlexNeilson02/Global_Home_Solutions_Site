@@ -118,30 +118,7 @@ const HomePage: React.FC = () => {
           </div>
         </div>
 
-        {/* Portal Links */}
-        <div className="text-center mb-16">
-          <h3 className="text-2xl font-bold text-white mb-8">Access Portals</h3>
-          <div className="flex flex-wrap justify-center gap-4">
-            <Link 
-              to="/portal/contractor"
-              className="px-6 py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors"
-            >
-              Contractor Portal
-            </Link>
-            <Link 
-              to="/portal/sales"
-              className="px-6 py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors"
-            >
-              Sales Portal
-            </Link>
-            <Link 
-              to="/portal/admin"
-              className="px-6 py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors"
-            >
-              Admin Portal
-            </Link>
-          </div>
-        </div>
+
 
         {/* Our Culture Section */}
         <div className="text-center">
