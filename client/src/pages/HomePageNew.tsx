@@ -149,15 +149,15 @@ export default function HomePage() {
                   <p className="trade">{contractor.specialties?.join(', ')}</p>
                   <div className="contractor-actions">
                     <button 
-                      className="request-bid-btn big-button"
-                    >
-                      Request Bid
-                    </button>
-                    <button 
                       className="profile-btn blue-link"
                       onClick={() => navigate(`/contractor/${contractor.id}`)}
                     >
                       View Profile
+                    </button>
+                    <button 
+                      className="request-bid-btn big-button"
+                    >
+                      Request Bid
                     </button>
                   </div>
                 </div>
