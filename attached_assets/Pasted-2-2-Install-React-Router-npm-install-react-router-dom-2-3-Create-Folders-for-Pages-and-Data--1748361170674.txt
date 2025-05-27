@@ -1,0 +1,432 @@
+2.2 Install React Router
+
+npm install react-router-dom
+
+
+---
+
+2.3 Create Folders for Pages and Data
+
+Inside src/, create folders:
+
+pages
+
+sampleData
+
+styles
+
+
+
+---
+
+2.4 Add Contractor Data: src/sampleData/contractors.js
+
+const contractors = [
+  {
+    id: 1,
+    name: "Apex Plumbing Pros",
+    trade: "Plumbing",
+    photo: "/contractors/apex.jpg",
+    soldOut: false,
+    videos: ["/videos/apex1.mp4", "/videos/apex2.mp4"],
+    about: "Family-owned plumbing specialists serving the valley for over 15 years.",
+    certifications: ["Licensed", "Bonded", "Insured"],
+    contact: "info@apexplumbing.com",
+  },
+  {
+    id: 2,
+    name: "Elite Electricians",
+    trade: "Electrical",
+    photo: "/contractors/elite.jpg",
+    soldOut: false,
+    videos: ["/videos/elite1.mp4"],
+    about: "Commercial and residential electrical experts.",
+    certifications: ["Licensed", "Insured"],
+    contact: "info@elitelectric.com",
+  },
+  // ...Add more as desired
+];
+
+export default contractors;
+
+
+---
+
+2.5 Home Page: src/pages/HomePage.js
+
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import contractorsData from "../sampleData/contractors";
+import "../styles/HomePage.css";
+
+const trades = [
+  "Plumbing", "Electrical", "Flooring", "Concrete", "Roofing", "HVAC"
+];
+
+export default function HomePage() {
+  const [trade, setTrade] = useState("");
+  const navigate = useNavigate();
+
+  const filteredContractors = contractorsData.filter(
+    (contractor) => contractor.trade.toLowerCase() === trade.toLowerCase()
+  ).slice(0, 5);
+
+  return (
+    <div className="homepage-container">
+      <header>
+        <img src="/logo.png" alt="Global Home Solutions Logo" className="logo" />
+        <h1>Global Home Solutions</h1>
+        <p className="culture">
+          Browse by trade to view qualified contractors. Watch their videos, review completed projects, and select the professional who best matches your needs.
+        </p>
+      </header>
+      <section className="search-section">
+        <input
+          type="text"
+          list="trades"
+          placeholder="Search for your trade (e.g., Plumbing, Roofing)"
+          value={trade}
+          onChange={e => setTrade(e.target.value)}
+        />
+        <datalist id="trades">
+          {trades.map(tr => (
+            <option key={tr} value={tr} />
+          ))}
+        </datalist>
+        <button className="find-contractor-btn" onClick={() => {}}>Find a Contractor</button>
+      </section>
+      {trade && (
+        <section className="contractors-section">
+          <h2>{trade} Contractors</h2>
+          <div className="contractor-list">
+            {filteredContractors.length > 0 ? filteredContractors.map(c => (
+              <div key={c.id} className="contractor-card">
+                <img src={c.photo} alt={c.name} className="contractor-photo" />
+                <h3>{c.name}</h3>
+                <button onClick={() => navigate(`/contractor/${c.id}`)}>View Profile</button>
+                <button className="request-bid-btn" disabled={c.soldOut}>
+                  {c.soldOut ? "Sold Out for This Month" : "Request Bid"}
+                </button>
+                <div className="video-gallery">
+                  {c.videos.slice(0,2).map((v, idx) => (
+                    <video key={idx} src={v} controls width="150" />
+                  ))}
+                </div>
+              </div>
+            )) : <p>No contractors found for this trade.</p>}
+          </div>
+        </section>
+      )}
+      <section className="info-section">
+        <button className="info-btn">Understanding Construction & the Bid Process</button>
+        <div className="promise-section">
+          <h3>Why Homeowners Trust Global Home Solutions</h3>
+          <ul>
+            <li>Qualified contractors only</li>
+            <li>Guaranteed 24-hour response</li>
+            <li>Bids in less than 5 days</li>
+            <li>Person-to-person service</li>
+          </ul>
+        </div>
+      </section>
+    </div>
+  );
+}
+
+
+---
+
+2.6 Contractor Profile: src/pages/ContractorProfile.js
+
+import React from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import contractorsData from "../sampleData/contractors";
+import "../styles/ContractorProfile.css";
+
+export default function ContractorProfile() {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const contractor = contractorsData.find(c => c.id === Number(id));
+
+  if (!contractor) return <div>Contractor not found.</div>;
+
+  return (
+    <div className="contractor-profile">
+      <button onClick={() => navigate(-1)}>&larr; Back</button>
+      <div className="profile-header">
+        <img src={contractor.photo} alt={contractor.name} className="profile-photo" />
+        <h2>{contractor.name}</h2>
+        <span className={`status ${contractor.soldOut ? "sold-out" : "available"}`}>
+          {contractor.soldOut ? "Sold Out for This Month" : "Available"}
+        </span>
+      </div>
+      <div className="profile-content">
+        <h3>About</h3>
+        <p>{contractor.about}</p>
+        <h4>Certifications:</h4>
+        <ul>
+          {contractor.certifications.map((cert, i) => <li key={i}>{cert}</li>)}
+        </ul>
+        <h4>Videos</h4>
+        <div className="media-gallery">
+          {contractor.videos.map((v, i) => (
+            <video key={i} src={v} controls width="250" />
+          ))}
+        </div>
+        <button className="request-bid-profile-btn" disabled={contractor.soldOut}>
+          {contractor.soldOut ? "Sold Out for This Month" : "Request Bid"}
+        </button>
+        <h4>Contact</h4>
+        <p>{contractor.contact}</p>
+      </div>
+    </div>
+  );
+}
+
+
+---
+
+2.7 Contractor Portal: src/pages/ContractorPortal.js
+
+import React from "react";
+import "../styles/Portal.css";
+
+export default function ContractorPortal() {
+  return (
+    <div className="portal-dashboard">
+      <h2>Contractor Dashboard</h2>
+      <div className="dashboard-section">
+        <label>Monthly Lead Spend Cap</label>
+        <input type="range" min="0" max="5000" step="100" />
+        <span>$2,000 / $5,000</span>
+      </div>
+      <div className="dashboard-section">
+        <h3>Bid Requests</h3>
+        <ul>
+          <li>John Smith, 123 Main St. <button>View</button></li>
+          {/* Add more sample bids */}
+        </ul>
+      </div>
+      <div className="dashboard-section">
+        <h3>Payment Method</h3>
+        <button>Setup/Change Payment</button>
+      </div>
+      <div className="dashboard-section">
+        <h3>Upload Media</h3>
+        <input type="file" multiple />
+        <button>Upload</button>
+      </div>
+    </div>
+  );
+}
+
+
+---
+
+2.8 Sales Portal: src/pages/SalesPortal.js
+
+import React from "react";
+import "../styles/Portal.css";
+
+export default function SalesPortal() {
+  return (
+    <div className="portal-dashboard">
+      <h2>Sales Associate Dashboard</h2>
+      <div className="dashboard-section">
+        <h3>Referral Earnings</h3>
+        <p>$1,850 this month</p>
+      </div>
+      <div className="dashboard-section">
+        <h3>Recent Referrals</h3>
+        <ul>
+          <li>Apex Plumbing - 4 bids</li>
+          <li>Elite Electricians - 2 bids</li>
+          {/* Add more as needed */}
+        </ul>
+      </div>
+      <div className="dashboard-section">
+        <h3>Upload Contractor Media</h3>
+        <input type="file" multiple />
+        <button>Upload</button>
+      </div>
+    </div>
+  );
+}
+
+
+---
+
+2.9 Admin Portal: src/pages/AdminPortal.js
+
+import React from "react";
+import "../styles/Portal.css";
+
+export default function AdminPortal() {
+  return (
+    <div className="portal-dashboard">
+      <h2>Admin Dashboard</h2>
+      <div className="dashboard-section">
+        <h3>Company Activity</h3>
+        <ul>
+          <li>Current Bids: 123</li>
+          <li>Active Contractors: 28</li>
+          <li>Active Sales Associates: 12</li>
+        </ul>
+      </div>
+      <div className="dashboard-section">
+        <h3>CRM/Billing</h3>
+        <button>View CRM Data</button>
+        <button>View Billing</button>
+      </div>
+      <div className="dashboard-section">
+        <h3>Manage Users</h3>
+        <button>Deactivate Contractor</button>
+        <button>Deactivate Sales Associate</button>
+      </div>
+    </div>
+  );
+}
+
+
+---
+
+2.10 Basic Styles: src/styles/HomePage.css
+
+.homepage-container {
+  background: #101a23;
+  color: #fff;
+  min-height: 100vh;
+  font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+  padding-bottom: 80px;
+}
+.logo {
+  display: block;
+  margin: 30px auto 12px auto;
+  max-width: 130px;
+}
+header h1 {
+  text-align: center;
+  color: #2ca7f8;
+}
+.culture {
+  text-align: center;
+  font-size: 1.1rem;
+  margin-bottom: 24px;
+  color: #c3e3fa;
+}
+.search-section {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 25px;
+}
+input[type="text"] {
+  padding: 10px;
+  font-size: 1.1rem;
+  width: 300px;
+  border-radius: 8px;
+  border: 1px solid #2ca7f8;
+  background: #182a38;
+  color: #fff;
+}
+.find-contractor-btn {
+  padding: 10px 24px;
+  background: #2ca7f8;
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 1.1rem;
+  cursor: pointer;
+  font-weight: bold;
+}
+.contractors-section {
+  margin: 0 auto 20px auto;
+  max-width: 900px;
+}
+.contractor-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  justify-content: center;
+}
+.contractor-card {
+  background: #1d2630;
+  border-radius: 16px;
+  padding: 20px;
+  width: 220px;
+  box-shadow: 0 2px 12px rgba(20,20,20,0.16);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.contractor-photo {
+  width: 85px;
+  height: 85px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 8px;
+  background: #222c39;
+}
+h3 {
+  margin: 10px 0 8px 0;
+  color: #2ca7f8;
+}
+.request-bid-btn {
+  margin-top: 5px;
+  padding: 8px 15px;
+  background: #15a46b;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+}
+.request-bid-btn[disabled] {
+  background: #aaa;
+  color: #eee;
+  cursor: not-allowed;
+}
+.video-gallery {
+  margin-top: 12px;
+  display: flex;
+  gap: 8px;
+}
+.info-section {
+  margin: 40px auto 0 auto;
+  max-width: 720px;
+  text-align: center;
+}
+.info-btn {
+  background: #223d57;
+  color: #2ca7f8;
+  border: none;
+  border-radius: 10px;
+  padding: 12px 32px;
+  margin-bottom: 20px;
+  font-size: 1.15rem;
+  font-weight: bold;
+  cursor: pointer;
+}
+.promise-section {
+  background: #162837;
+  border-radius: 12px;
+  padding: 22px;
+  color: #eaf6ff;
+  margin-top: 15px;
+}
+.promise-section h3 {
+  color: #2ca7f8;
+}
+ul {
+  text-align: left;
+  margin: 0 auto;
+  max-width: 380px;
+  padding-left: 18px;
+}
+
+
+---
+
+2.11 Basic Styles for Portals/Profiles:
+
+Create src/styles/ContractorProfile.css and src/styles/Portal.css with similar color schemes. (Let me know if you’d like those here too!)
