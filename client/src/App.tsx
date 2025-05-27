@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import HomePage from "@/pages/HomePageNew";
-import ContractorProfile from "@/pages/ContractorProfileFixed";
+import ContractorProfile from "@/pages/ContractorProfileDB";
 import ContractorPortal from "@/pages/ContractorPortal";
 import SalesPortal from "@/pages/SalesPortal";
 import AdminPortal from "@/pages/AdminPortal";

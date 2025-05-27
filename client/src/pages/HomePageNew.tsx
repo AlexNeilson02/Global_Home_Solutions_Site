@@ -147,15 +147,16 @@ export default function HomePage() {
                 <div className="contractor-info">
                   <h3>{contractor.companyName}</h3>
                   <p className="trade">{contractor.specialties?.join(', ')}</p>
-                  <p className="about">{contractor.description}</p>
                   <div className="certifications">
                     {contractor.isVerified && <span className="cert-badge">Verified</span>}
                     {contractor.subscriptionTier === 'premium' && <span className="cert-badge">Premium</span>}
                   </div>
                   <div className="contractor-actions">
-                    {contractor.mediaFiles?.filter((file: any) => file.type === 'video').map((video: any, idx: number) => (
-                      <button key={idx} className="video-btn">▶ {video.name}</button>
-                    ))}
+                    <button 
+                      className="request-bid-btn big-button"
+                    >
+                      Request Bid
+                    </button>
                     <button 
                       className="profile-btn"
                       onClick={() => navigate(`/contractor/${contractor.id}`)}
