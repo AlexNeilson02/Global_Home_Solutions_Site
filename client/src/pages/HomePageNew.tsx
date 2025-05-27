@@ -50,51 +50,45 @@ export default function HomePage() {
         <button className="find-contractor-btn" onClick={() => {}}>Find a Contractor</button>
       </section>
 
-      {/* Category Cards Section */}
-      <section className="category-section">
-        <h2>Find the right contractor for your project</h2>
-        <div className="category-grid">
-          <div className="category-card" onClick={() => setTrade("Plumbing")}>
-            <div className="category-image plumber-bg">
-              <div className="video-icon">📹</div>
+      {/* Category Cards Section - Only show when no search is active */}
+      {!trade && (
+        <section className="category-section">
+          <h2>Find the right contractor for your project</h2>
+          <div className="category-grid">
+            <div className="category-card" onClick={() => setTrade("Plumbing")}>
+              <div className="category-image plumber-bg"></div>
+              <div className="category-content">
+                <h3>Plumber</h3>
+                <button className="category-btn">Find Plumbers</button>
+              </div>
             </div>
-            <div className="category-content">
-              <h3>Plumber</h3>
-              <button className="category-btn">REQUEST BID</button>
-            </div>
-          </div>
 
-          <div className="category-card" onClick={() => setTrade("Electrical")}>
-            <div className="category-image electrician-bg">
-              <div className="video-icon">📹</div>
+            <div className="category-card" onClick={() => setTrade("Electrical")}>
+              <div className="category-image electrician-bg"></div>
+              <div className="category-content">
+                <h3>Electrician</h3>
+                <button className="category-btn">Find Electricians</button>
+              </div>
             </div>
-            <div className="category-content">
-              <h3>Electrician</h3>
-              <button className="category-btn">REQUEST BID</button>
-            </div>
-          </div>
 
-          <div className="category-card" onClick={() => setTrade("Flooring")}>
-            <div className="category-image flooring-bg">
-              <div className="video-icon">📹</div>
+            <div className="category-card" onClick={() => setTrade("Flooring")}>
+              <div className="category-image flooring-bg"></div>
+              <div className="category-content">
+                <h3>Flooring</h3>
+                <button className="category-btn">Find Flooring Experts</button>
+              </div>
             </div>
-            <div className="category-content">
-              <h3>Flooring</h3>
-              <button className="category-btn">REQUEST BID</button>
-            </div>
-          </div>
 
-          <div className="category-card" onClick={() => setTrade("Concrete")}>
-            <div className="category-image concrete-bg">
-              <div className="video-icon">📹</div>
-            </div>
-            <div className="category-content">
-              <h3>Concrete</h3>
-              <button className="category-btn">REQUEST BID</button>
+            <div className="category-card" onClick={() => setTrade("Concrete")}>
+              <div className="category-image concrete-bg"></div>
+              <div className="category-content">
+                <h3>Concrete</h3>
+                <button className="category-btn">Find Concrete Specialists</button>
+              </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
       {trade && (
         <section className="contractors-section">
           <h2>{trade} Contractors</h2>
