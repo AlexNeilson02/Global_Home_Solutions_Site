@@ -117,10 +117,15 @@ export default function ContractorRegistration() {
     onSuccess: (data) => {
       toast({
         title: "Registration Successful!",
-        description: `Welcome ${data.contractor?.companyName || "to our network"}! Your account has been created and you'll receive login credentials via email.`,
+        description: `Welcome ${data.contractor?.companyName || "to our network"}! Your account has been created. You can now log in to your contractor portal.`,
       });
       form.reset();
       setSelectedSpecialties([]);
+      
+      // Redirect to login after a short delay
+      setTimeout(() => {
+        window.location.href = '/login';
+      }, 2000);
     },
     onError: (error: Error) => {
       console.error("Registration error:", error);

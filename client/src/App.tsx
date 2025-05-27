@@ -9,6 +9,7 @@ import SalesPortal from "@/pages/SalesPortal";
 import AdminPortal from "@/pages/AdminPortal";
 import PortalAccess from "@/pages/PortalAccess";
 import ContractorRegistration from "@/pages/ContractorRegistration";
+import Login from "@/pages/Login";
 
 function App() {
   return (
@@ -21,6 +22,10 @@ function App() {
             <Route path="/portals" element={<PortalAccess />} />
             <Route path="/contractor/:id" element={<ContractorProfile />} />
             <Route path="/contractor-registration" element={<ContractorRegistration />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/contractor-portal" element={<ContractorPortal />} />
+            <Route path="/sales-portal" element={<SalesPortal />} />
+            <Route path="/admin-portal" element={<AdminPortal />} />
             <Route path="/portal/contractor" element={<ContractorPortal />} />
             <Route path="/portal/sales" element={<SalesPortal />} />
             <Route path="/portal/admin" element={<AdminPortal />} />
