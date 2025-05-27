@@ -44,21 +44,27 @@ const ContractorPortal: React.FC = () => {
     enabled: true
   });
 
-  const { data: bidRequests } = useQuery({
+  const { data: bidRequests, refetch: refetchBidRequests } = useQuery({
     queryKey: ['/api/contractors', contractorId, 'bid-requests'],
     enabled: !!contractorId,
     queryFn: async () => {
       const token = localStorage.getItem('authToken');
+      console.log('Fetching bid requests with token:', token ? 'present' : 'missing');
       const response = await fetch(`/api/contractors/${contractorId}/bid-requests`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         }
       });
+      console.log('Bid requests response status:', response.status);
       if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Bid requests error:', errorText);
         throw new Error('Failed to fetch bid requests');
       }
-      return response.json();
+      const data = await response.json();
+      console.log('Bid requests data:', data);
+      return data;
     }
   });
 
