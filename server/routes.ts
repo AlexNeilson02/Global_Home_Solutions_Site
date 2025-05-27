@@ -607,8 +607,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get bid requests for a specific contractor (new endpoint) - NO AUTH REQUIRED
-  app.get("/api/bid-requests-for-contractor/:id", async (req: Request, res: Response) => {
+  // Get bid requests for a specific contractor - NO AUTH REQUIRED  
+  apiRouter.get("/bid-requests-for-contractor/:id", async (req: Request, res: Response) => {
     try {
       const contractorId = Number(req.params.id);
       console.log("Fetching bid requests for contractor:", contractorId);
@@ -616,8 +616,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const bidRequests = await storage.getBidRequestsByContractorId(contractorId);
       console.log("Found bid requests:", bidRequests.length);
       console.log("Bid requests data:", JSON.stringify(bidRequests, null, 2));
+      
       res.setHeader('Content-Type', 'application/json');
-      res.json({ bidRequests });
+      res.status(200).json({ bidRequests });
     } catch (error) {
       console.error("Error fetching contractor bid requests:", error);
       res.status(500).json({ message: "Internal server error" });
