@@ -13,15 +13,17 @@ function App() {
   return (
     <Router>
       <TooltipProvider>
-        <Toaster />
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/portals" element={<PortalAccess />} />
-          <Route path="/contractor/:id" element={<ContractorProfile />} />
-          <Route path="/portal/contractor" element={<ContractorPortal />} />
-          <Route path="/portal/sales" element={<SalesPortal />} />
-          <Route path="/portal/admin" element={<AdminPortal />} />
-        </Routes>
+        <div className="min-h-screen">
+          <Toaster />
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/portals" element={<PortalAccess />} />
+            <Route path="/contractor/:id" element={<ContractorProfile />} />
+            <Route path="/portal/contractor" element={<ContractorPortal />} />
+            <Route path="/portal/sales" element={<SalesPortal />} />
+            <Route path="/portal/admin" element={<AdminPortal />} />
+          </Routes>
+        </div>
       </TooltipProvider>
     </Router>
   );
