@@ -60,11 +60,16 @@ const ContractorPortal: React.FC = () => {
         throw new Error('Failed to fetch bid requests');
       }
       const data = await response.json();
-      console.log('Bid requests raw response:', data);
+      console.log('=== BID REQUESTS DEBUG ===');
+      console.log('Raw response:', data);
       console.log('Response type:', typeof data);
-      console.log('Response keys:', Object.keys(data || {}));
-      console.log('Bid requests array:', data?.bidRequests);
+      console.log('Is object:', typeof data === 'object');
+      console.log('Response keys:', data ? Object.keys(data) : 'no data');
+      console.log('bidRequests property:', data?.bidRequests);
+      console.log('bidRequests type:', typeof data?.bidRequests);
+      console.log('Is array:', Array.isArray(data?.bidRequests));
       console.log('Array length:', data?.bidRequests?.length);
+      console.log('=== END DEBUG ===');
       
       // Ensure we return the bidRequests array directly for easy access
       return data?.bidRequests || [];
