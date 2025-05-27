@@ -261,7 +261,7 @@ const ContractorPortal: React.FC = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    {projects?.slice(0, 5).map((project: any) => (
+                    {Array.isArray(projects) ? projects.slice(0, 5).map((project: any) => (
                       <div key={project.id} className="flex items-center justify-between p-4 border rounded-lg">
                         <div className="space-y-1">
                           <p className="font-medium">{project.title}</p>
@@ -278,7 +278,7 @@ const ContractorPortal: React.FC = () => {
                           </Button>
                         </div>
                       </div>
-                    )) || (
+                    )) : (
                       <p className="text-center text-gray-500 py-8">No projects found</p>
                     )}
                   </div>
@@ -295,7 +295,7 @@ const ContractorPortal: React.FC = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    {bidRequests?.slice(0, 5).map((request: any) => (
+                    {Array.isArray(bidRequests) ? bidRequests.slice(0, 5).map((request: any) => (
                       <div key={request.id} className="flex items-center justify-between p-4 border rounded-lg">
                         <div className="space-y-1">
                           <p className="font-medium">{request.customerName}</p>
@@ -315,7 +315,7 @@ const ContractorPortal: React.FC = () => {
                           </Button>
                         </div>
                       </div>
-                    )) || (
+                    )) : (
                       <p className="text-center text-gray-500 py-8">No bid requests found</p>
                     )}
                   </div>
@@ -366,6 +366,39 @@ const ContractorPortal: React.FC = () => {
                   {isEditingProfile ? (
                     // Edit Mode
                     <div className="space-y-4">
+                      {/* Profile Photo Upload Section */}
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium">Company Logo/Photo</label>
+                        <div className="flex items-center gap-4">
+                          {editForm.logoUrl && (
+                            <img 
+                              src={editForm.logoUrl} 
+                              alt="Company logo" 
+                              className="w-16 h-16 rounded-lg object-cover border"
+                            />
+                          )}
+                          <div className="flex-1">
+                            <Input
+                              type="file"
+                              accept="image/*"
+                              onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (file) {
+                                  // Convert to base64 for demo purposes
+                                  const reader = new FileReader();
+                                  reader.onload = (event) => {
+                                    setEditForm({...editForm, logoUrl: event.target?.result as string});
+                                  };
+                                  reader.readAsDataURL(file);
+                                }
+                              }}
+                              className="file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                            />
+                            <p className="text-xs text-gray-500 mt-1">Upload a high-quality image (JPG, PNG)</p>
+                          </div>
+                        </div>
+                      </div>
+                      
                       <div className="grid md:grid-cols-2 gap-4">
                         <div className="space-y-2">
                           <label className="text-sm font-medium">Company Name</label>
