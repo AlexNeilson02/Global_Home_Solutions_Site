@@ -1,9 +1,23 @@
+/* Remove default margins and padding */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+}
+
 .homepage-container {
   background: #101a23;
   color: #fff;
   min-height: 100vh;
   font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
   padding-bottom: 80px;
+  margin: 0;
+  padding-top: 0;
 }
 .logo {
   display: block;
