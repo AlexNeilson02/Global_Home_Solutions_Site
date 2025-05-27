@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
+import BidRequestForm from "@/components/BidRequestForm";
 import logoPath from "@/assets/global-home-solutions-logo.png";
 import "../styles/HomePage.css";
 
@@ -12,6 +13,8 @@ export default function HomePage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [trade, setTrade] = useState(searchParams.get("trade") || "");
   const [searchTriggered, setSearchTriggered] = useState(!!searchParams.get("trade"));
+  const [selectedContractor, setSelectedContractor] = useState<any>(null);
+  const [showBidForm, setShowBidForm] = useState(false);
   const navigate = useNavigate();
 
   // Fetch contractors from database
@@ -38,6 +41,16 @@ export default function HomePage() {
     if (trade.trim()) {
       setSearchTriggered(true);
     }
+  };
+
+  const handleRequestBid = (contractor: any) => {
+    setSelectedContractor(contractor);
+    setShowBidForm(true);
+  };
+
+  const handleCloseBidForm = () => {
+    setShowBidForm(false);
+    setSelectedContractor(null);
   };
 
   const clearSearch = () => {
@@ -156,6 +169,7 @@ export default function HomePage() {
                   <div className="contractor-actions">
                     <button 
                       className="request-bid-btn big-button"
+                      onClick={() => handleRequestBid(contractor)}
                     >
                       Request Bid
                     </button>
@@ -178,6 +192,15 @@ export default function HomePage() {
           </ul>
         </div>
       </section>
+
+      {/* Bid Request Form Modal */}
+      {selectedContractor && (
+        <BidRequestForm
+          isOpen={showBidForm}
+          onClose={handleCloseBidForm}
+          contractor={selectedContractor}
+        />
+      )}
     </div>
   );
 }
