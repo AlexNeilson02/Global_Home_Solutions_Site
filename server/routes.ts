@@ -421,6 +421,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Debug endpoint to check users
+  apiRouter.get("/debug/users", async (req: Request, res: Response) => {
+    try {
+      const users = await storage.getAllUsers();
+      console.log("All users in database:", users.map(u => ({ id: u.id, username: u.username, role: u.role })));
+      res.json({ users: users.map(u => ({ id: u.id, username: u.username, role: u.role, email: u.email })) });
+    } catch (error) {
+      console.error("Error fetching users:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   apiRouter.post("/contractors", authenticate, async (req: Request, res: Response) => {
     try {
       // Only allow admins to create contractors

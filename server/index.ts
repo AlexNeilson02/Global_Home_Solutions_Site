@@ -38,10 +38,11 @@ app.use((req, res, next) => {
 });
 
 (async () => {
+  // Register API routes FIRST, before Vite middleware
+  const server = await registerRoutes(app);
+  
   // Seed the database with initial data
   await seedDatabase();
-  
-  const server = await registerRoutes(app);
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     const status = err.status || err.statusCode || 500;
