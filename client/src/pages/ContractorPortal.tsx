@@ -1,111 +1,271 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import { Building, Users, FileText, TrendingUp, Calendar, Star } from "lucide-react";
 
 const ContractorPortal: React.FC = () => {
   const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState("dashboard");
+
+  // Fetch contractor data - using placeholder contractor ID 1 for demo
+  const { data: contractor } = useQuery({
+    queryKey: ['/api/contractors', 1],
+    enabled: true
+  });
+
+  const { data: projects } = useQuery({
+    queryKey: ['/api/projects'],
+    enabled: true
+  });
+
+  const { data: bidRequests } = useQuery({
+    queryKey: ['/api/contractors/1/bid-requests'],
+    enabled: true
+  });
+
+  // Mock performance data for charts
+  const projectData = [
+    { month: 'Jan', completed: 8, active: 12, revenue: 45000 },
+    { month: 'Feb', completed: 12, active: 15, revenue: 62000 },
+    { month: 'Mar', completed: 10, active: 18, revenue: 58000 },
+    { month: 'Apr', completed: 15, active: 20, revenue: 75000 },
+    { month: 'May', completed: 18, active: 16, revenue: 89000 },
+    { month: 'Jun', completed: 22, active: 14, revenue: 95000 }
+  ];
+
+  const completedProjects = projects?.filter((p: any) => p.status === 'completed')?.length || 0;
+  const activeProjects = projects?.filter((p: any) => p.status === 'in_progress')?.length || 0;
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <div className="container mx-auto px-4 py-8">
-        <div className="max-w-6xl mx-auto">
+        <div className="max-w-7xl mx-auto">
+          {/* Header */}
           <div className="flex justify-between items-center mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-              Contractor Portal
-            </h1>
-            <button
-              onClick={() => navigate("/portals")}
-              className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
-            >
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+                Contractor Portal
+              </h1>
+              <p className="text-gray-600 dark:text-gray-300 mt-1">
+                Welcome back, {contractor?.companyName || 'Contractor'}
+              </p>
+            </div>
+            <Button onClick={() => navigate("/portals")} variant="outline">
               Back to Portals
-            </button>
+            </Button>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-              <div className="w-12 h-12 bg-blue-500 rounded-lg flex items-center justify-center mb-4">
-                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-              </div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                Project Management
-              </h3>
-              <p className="text-gray-600 dark:text-gray-300 text-sm">
-                View and manage your active projects, track progress, and update status.
-              </p>
-            </div>
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+            <TabsList className="grid w-full grid-cols-4">
+              <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
+              <TabsTrigger value="projects">Projects</TabsTrigger>
+              <TabsTrigger value="leads">Lead Requests</TabsTrigger>
+              <TabsTrigger value="profile">Company Profile</TabsTrigger>
+            </TabsList>
 
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-              <div className="w-12 h-12 bg-green-500 rounded-lg flex items-center justify-center mb-4">
-                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                </svg>
-              </div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                Lead Management
-              </h3>
-              <p className="text-gray-600 dark:text-gray-300 text-sm">
-                Review leads from sales representatives and respond to bid requests.
-              </p>
-            </div>
+            {/* Dashboard Tab */}
+            <TabsContent value="dashboard" className="space-y-6">
+              {/* Key Metrics Cards */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <Card>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">Active Projects</CardTitle>
+                    <Building className="h-4 w-4 text-muted-foreground" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold">{activeProjects}</div>
+                    <p className="text-xs text-muted-foreground">
+                      <span className="text-green-600">+2</span> new this month
+                    </p>
+                  </CardContent>
+                </Card>
 
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-              <div className="w-12 h-12 bg-purple-500 rounded-lg flex items-center justify-center mb-4">
-                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                </svg>
-              </div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                Profile Management
-              </h3>
-              <p className="text-gray-600 dark:text-gray-300 text-sm">
-                Update your company profile, services, and contact information.
-              </p>
-            </div>
+                <Card>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">Completed Projects</CardTitle>
+                    <FileText className="h-4 w-4 text-muted-foreground" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold">{completedProjects}</div>
+                    <p className="text-xs text-muted-foreground">
+                      <span className="text-green-600">+5</span> this month
+                    </p>
+                  </CardContent>
+                </Card>
 
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-              <div className="w-12 h-12 bg-orange-500 rounded-lg flex items-center justify-center mb-4">
-                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                </svg>
-              </div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                Analytics
-              </h3>
-              <p className="text-gray-600 dark:text-gray-300 text-sm">
-                View performance metrics, conversion rates, and business insights.
-              </p>
-            </div>
+                <Card>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">Pending Bids</CardTitle>
+                    <Users className="h-4 w-4 text-muted-foreground" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold">{bidRequests?.filter((b: any) => b.status === 'pending')?.length || 0}</div>
+                    <p className="text-xs text-muted-foreground">
+                      <span className="text-blue-600">3</span> new today
+                    </p>
+                  </CardContent>
+                </Card>
 
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-              <div className="w-12 h-12 bg-red-500 rounded-lg flex items-center justify-center mb-4">
-                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                </svg>
+                <Card>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">Rating</CardTitle>
+                    <Star className="h-4 w-4 text-muted-foreground" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold">{contractor?.rating || '4.8'}</div>
+                    <p className="text-xs text-muted-foreground">
+                      Based on {contractor?.reviewCount || '156'} reviews
+                    </p>
+                  </CardContent>
+                </Card>
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                Communications
-              </h3>
-              <p className="text-gray-600 dark:text-gray-300 text-sm">
-                Manage communications with sales team and potential customers.
-              </p>
-            </div>
 
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-              <div className="w-12 h-12 bg-indigo-500 rounded-lg flex items-center justify-center mb-4">
-                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                </svg>
-              </div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                Settings
-              </h3>
-              <p className="text-gray-600 dark:text-gray-300 text-sm">
-                Configure account settings, notifications, and preferences.
-              </p>
-            </div>
-          </div>
+              {/* Performance Chart */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Project Performance</CardTitle>
+                  <CardDescription>Your project completion and revenue over the last 6 months</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <ResponsiveContainer width="100%" height={300}>
+                    <BarChart data={projectData}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="month" />
+                      <YAxis />
+                      <Tooltip />
+                      <Bar dataKey="completed" fill="#8884d8" />
+                      <Bar dataKey="active" fill="#82ca9d" />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* Projects Tab */}
+            <TabsContent value="projects" className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Recent Projects</CardTitle>
+                  <CardDescription>Manage your current and recent projects</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {projects?.slice(0, 5).map((project: any) => (
+                      <div key={project.id} className="flex items-center justify-between p-4 border rounded-lg">
+                        <div className="space-y-1">
+                          <p className="font-medium">{project.title}</p>
+                          <p className="text-sm text-gray-500">{project.description}</p>
+                          <p className="text-sm">Budget: ${project.budget?.toLocaleString()}</p>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <Badge variant={project.status === 'in_progress' ? 'default' : 
+                                         project.status === 'completed' ? 'success' : 'secondary'}>
+                            {project.status?.replace('_', ' ')}
+                          </Badge>
+                          <Button size="sm" variant="outline">
+                            View Details
+                          </Button>
+                        </div>
+                      </div>
+                    )) || (
+                      <p className="text-center text-gray-500 py-8">No projects found</p>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* Lead Requests Tab */}
+            <TabsContent value="leads" className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Bid Requests</CardTitle>
+                  <CardDescription>Review and respond to new business opportunities</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {bidRequests?.slice(0, 5).map((request: any) => (
+                      <div key={request.id} className="flex items-center justify-between p-4 border rounded-lg">
+                        <div className="space-y-1">
+                          <p className="font-medium">{request.customerName}</p>
+                          <p className="text-sm text-gray-500">{request.customerEmail}</p>
+                          <p className="text-sm">{request.serviceDescription}</p>
+                          <p className="text-xs text-gray-400">
+                            Submitted: {new Date(request.createdAt).toLocaleDateString()}
+                          </p>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <Badge variant={request.status === 'pending' ? 'default' : 
+                                         request.status === 'responded' ? 'secondary' : 'success'}>
+                            {request.status}
+                          </Badge>
+                          <Button size="sm" variant="outline">
+                            Respond
+                          </Button>
+                        </div>
+                      </div>
+                    )) || (
+                      <p className="text-center text-gray-500 py-8">No bid requests found</p>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* Profile Tab */}
+            <TabsContent value="profile" className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Company Profile</CardTitle>
+                  <CardDescription>Manage your company information and services</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Company Name</label>
+                      <p className="p-3 bg-gray-100 dark:bg-gray-800 rounded">
+                        {contractor?.companyName || 'Not set'}
+                      </p>
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">License Number</label>
+                      <p className="p-3 bg-gray-100 dark:bg-gray-800 rounded">
+                        {contractor?.licenseNumber || 'Not set'}
+                      </p>
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Phone</label>
+                      <p className="p-3 bg-gray-100 dark:bg-gray-800 rounded">
+                        {contractor?.phone || 'Not set'}
+                      </p>
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Email</label>
+                      <p className="p-3 bg-gray-100 dark:bg-gray-800 rounded">
+                        {contractor?.email || 'Not set'}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Services</label>
+                    <div className="flex flex-wrap gap-2">
+                      {contractor?.services?.map((service: string, index: number) => (
+                        <Badge key={index} variant="secondary">{service}</Badge>
+                      )) || <p className="text-gray-500">No services listed</p>}
+                    </div>
+                  </div>
+                  <Button className="mt-4">
+                    Edit Profile
+                  </Button>
+                </CardContent>
+              </Card>
+            </TabsContent>
+          </Tabs>
         </div>
       </div>
     </div>

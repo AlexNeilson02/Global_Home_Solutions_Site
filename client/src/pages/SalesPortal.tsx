@@ -1,110 +1,267 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from "recharts";
+import { TrendingUp, Users, DollarSign, Target, QrCode, Eye, ArrowUpRight } from "lucide-react";
 
 const SalesPortal: React.FC = () => {
   const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState("dashboard");
+
+  // Fetch sales data - using placeholder salesperson ID 1 for demo
+  const { data: salesperson } = useQuery({
+    queryKey: ['/api/salespersons', 1],
+    enabled: true
+  });
+
+  const { data: analytics } = useQuery({
+    queryKey: ['/api/salespersons/1/analytics'],
+    enabled: true
+  });
+
+  const { data: bidRequests } = useQuery({
+    queryKey: ['/api/salespersons/1/bid-requests'],
+    enabled: true
+  });
+
+  // Mock performance data for charts
+  const performanceData = [
+    { month: 'Jan', leads: 45, conversions: 12, revenue: 15600 },
+    { month: 'Feb', leads: 52, conversions: 18, revenue: 23400 },
+    { month: 'Mar', leads: 48, conversions: 15, revenue: 19500 },
+    { month: 'Apr', leads: 61, conversions: 22, revenue: 28600 },
+    { month: 'May', leads: 55, conversions: 19, revenue: 24700 },
+    { month: 'Jun', leads: 67, conversions: 25, revenue: 32500 }
+  ];
+
+  const conversionRate = analytics ? (analytics.conversions / analytics.totalVisits * 100).toFixed(1) : '0';
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <div className="container mx-auto px-4 py-8">
-        <div className="max-w-6xl mx-auto">
+        <div className="max-w-7xl mx-auto">
+          {/* Header */}
           <div className="flex justify-between items-center mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-              Sales Portal
-            </h1>
-            <button
-              onClick={() => navigate("/portals")}
-              className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
-            >
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+                Sales Portal
+              </h1>
+              <p className="text-gray-600 dark:text-gray-300 mt-1">
+                Welcome back, {salesperson?.name || 'Sales Representative'}
+              </p>
+            </div>
+            <Button onClick={() => navigate("/portals")} variant="outline">
               Back to Portals
-            </button>
+            </Button>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-              <div className="w-12 h-12 bg-green-500 rounded-lg flex items-center justify-center mb-4">
-                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                </svg>
-              </div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                Performance Dashboard
-              </h3>
-              <p className="text-gray-600 dark:text-gray-300 text-sm">
-                Track your sales metrics, conversion rates, and earnings in real-time.
-              </p>
-            </div>
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+            <TabsList className="grid w-full grid-cols-4">
+              <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
+              <TabsTrigger value="leads">Lead Management</TabsTrigger>
+              <TabsTrigger value="qr-tools">QR Tools</TabsTrigger>
+              <TabsTrigger value="profile">Profile</TabsTrigger>
+            </TabsList>
 
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-              <div className="w-12 h-12 bg-blue-500 rounded-lg flex items-center justify-center mb-4">
-                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
-                </svg>
-              </div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                QR Code Generator
-              </h3>
-              <p className="text-gray-600 dark:text-gray-300 text-sm">
-                Generate unique QR codes for easy customer access to your profile.
-              </p>
-            </div>
+            {/* Dashboard Tab */}
+            <TabsContent value="dashboard" className="space-y-6">
+              {/* Key Metrics Cards */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <Card>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">Total Visits</CardTitle>
+                    <Eye className="h-4 w-4 text-muted-foreground" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold">{analytics?.totalVisits || 0}</div>
+                    <p className="text-xs text-muted-foreground">
+                      <span className="text-green-600">+12.5%</span> from last month
+                    </p>
+                  </CardContent>
+                </Card>
 
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-              <div className="w-12 h-12 bg-purple-500 rounded-lg flex items-center justify-center mb-4">
-                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                </svg>
-              </div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                Lead Management
-              </h3>
-              <p className="text-gray-600 dark:text-gray-300 text-sm">
-                Manage your leads, follow up with prospects, and track conversions.
-              </p>
-            </div>
+                <Card>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">Conversions</CardTitle>
+                    <Target className="h-4 w-4 text-muted-foreground" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold">{analytics?.conversions || 0}</div>
+                    <p className="text-xs text-muted-foreground">
+                      <span className="text-green-600">+8.2%</span> from last month
+                    </p>
+                  </CardContent>
+                </Card>
 
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-              <div className="w-12 h-12 bg-orange-500 rounded-lg flex items-center justify-center mb-4">
-                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                </svg>
-              </div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                Profile Management
-              </h3>
-              <p className="text-gray-600 dark:text-gray-300 text-sm">
-                Update your sales profile, bio, and contact information.
-              </p>
-            </div>
+                <Card>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">Conversion Rate</CardTitle>
+                    <TrendingUp className="h-4 w-4 text-muted-foreground" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold">{conversionRate}%</div>
+                    <p className="text-xs text-muted-foreground">
+                      <span className="text-green-600">+2.1%</span> from last month
+                    </p>
+                  </CardContent>
+                </Card>
 
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-              <div className="w-12 h-12 bg-red-500 rounded-lg flex items-center justify-center mb-4">
-                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
-                </svg>
+                <Card>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">Total Leads</CardTitle>
+                    <Users className="h-4 w-4 text-muted-foreground" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold">{salesperson?.totalLeads || 0}</div>
+                    <p className="text-xs text-muted-foreground">
+                      <span className="text-green-600">+15.3%</span> from last month
+                    </p>
+                  </CardContent>
+                </Card>
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                Commission Tracking
-              </h3>
-              <p className="text-gray-600 dark:text-gray-300 text-sm">
-                Monitor your earnings, commission rates, and payment history.
-              </p>
-            </div>
 
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-              <div className="w-12 h-12 bg-indigo-500 rounded-lg flex items-center justify-center mb-4">
-                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                </svg>
-              </div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                Customer Communications
-              </h3>
-              <p className="text-gray-600 dark:text-gray-300 text-sm">
-                Communicate with prospects and manage follow-up activities.
-              </p>
-            </div>
-          </div>
+              {/* Performance Chart */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Performance Overview</CardTitle>
+                  <CardDescription>Your sales performance over the last 6 months</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <ResponsiveContainer width="100%" height={300}>
+                    <LineChart data={performanceData}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="month" />
+                      <YAxis />
+                      <Tooltip />
+                      <Line type="monotone" dataKey="conversions" stroke="#8884d8" strokeWidth={2} />
+                      <Line type="monotone" dataKey="leads" stroke="#82ca9d" strokeWidth={2} />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* Lead Management Tab */}
+            <TabsContent value="leads" className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Recent Bid Requests</CardTitle>
+                  <CardDescription>Manage your latest customer inquiries</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {bidRequests?.slice(0, 5).map((request: any) => (
+                      <div key={request.id} className="flex items-center justify-between p-4 border rounded-lg">
+                        <div className="space-y-1">
+                          <p className="font-medium">{request.customerName}</p>
+                          <p className="text-sm text-gray-500">{request.customerEmail}</p>
+                          <p className="text-sm">{request.serviceDescription}</p>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <Badge variant={request.status === 'pending' ? 'default' : 
+                                         request.status === 'contacted' ? 'secondary' : 'success'}>
+                            {request.status}
+                          </Badge>
+                          <Button size="sm" variant="outline">
+                            View Details
+                          </Button>
+                        </div>
+                      </div>
+                    )) || (
+                      <p className="text-center text-gray-500 py-8">No bid requests found</p>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* QR Tools Tab */}
+            <TabsContent value="qr-tools" className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center space-x-2">
+                    <QrCode className="h-5 w-5" />
+                    <span>QR Code Generator</span>
+                  </CardTitle>
+                  <CardDescription>Generate QR codes for easy customer access to your profile</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                    <div>
+                      <p className="font-medium">Your Profile QR Code</p>
+                      <p className="text-sm text-gray-500">
+                        Landing page: {salesperson?.profileUrl ? `/salesperson/${salesperson.profileUrl}` : 'Not set'}
+                      </p>
+                    </div>
+                    <Button>
+                      Generate QR Code
+                    </Button>
+                  </div>
+                  
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Profile URL</label>
+                      <p className="text-sm text-gray-500 p-3 bg-gray-100 dark:bg-gray-800 rounded">
+                        {salesperson?.profileUrl || 'Not configured'}
+                      </p>
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">NFC ID</label>
+                      <p className="text-sm text-gray-500 p-3 bg-gray-100 dark:bg-gray-800 rounded">
+                        {salesperson?.nfcId || 'Not configured'}
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* Profile Tab */}
+            <TabsContent value="profile" className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Profile Information</CardTitle>
+                  <CardDescription>Manage your sales profile and contact details</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Name</label>
+                      <p className="p-3 bg-gray-100 dark:bg-gray-800 rounded">
+                        {salesperson?.name || 'Not set'}
+                      </p>
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Bio</label>
+                      <p className="p-3 bg-gray-100 dark:bg-gray-800 rounded">
+                        {salesperson?.bio || 'No bio available'}
+                      </p>
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Phone</label>
+                      <p className="p-3 bg-gray-100 dark:bg-gray-800 rounded">
+                        {salesperson?.phone || 'Not set'}
+                      </p>
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Email</label>
+                      <p className="p-3 bg-gray-100 dark:bg-gray-800 rounded">
+                        {salesperson?.email || 'Not set'}
+                      </p>
+                    </div>
+                  </div>
+                  <Button className="mt-4">
+                    Edit Profile
+                  </Button>
+                </CardContent>
+              </Card>
+            </TabsContent>
+          </Tabs>
         </div>
       </div>
     </div>

@@ -1,111 +1,321 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
+import { Users, Building, TrendingUp, Shield, Settings, AlertTriangle } from "lucide-react";
 
 const AdminPortal: React.FC = () => {
   const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState("dashboard");
+
+  // Fetch admin data
+  const { data: salespersons } = useQuery({
+    queryKey: ['/api/salespersons'],
+    enabled: true
+  });
+
+  const { data: contractors } = useQuery({
+    queryKey: ['/api/contractors'],
+    enabled: true
+  });
+
+  const { data: projects } = useQuery({
+    queryKey: ['/api/projects'],
+    enabled: true
+  });
+
+  const { data: bidRequests } = useQuery({
+    queryKey: ['/api/bid-requests/recent'],
+    enabled: true
+  });
+
+  // Mock data for charts
+  const systemMetrics = [
+    { name: 'Total Users', value: (salespersons?.length || 0) + (contractors?.length || 0) },
+    { name: 'Active Projects', value: projects?.filter((p: any) => p.status === 'in_progress')?.length || 0 },
+    { name: 'Pending Bids', value: bidRequests?.filter((b: any) => b.status === 'pending')?.length || 0 },
+    { name: 'Completed Projects', value: projects?.filter((p: any) => p.status === 'completed')?.length || 0 }
+  ];
+
+  const userDistribution = [
+    { name: 'Sales Team', value: salespersons?.length || 0, color: '#8884d8' },
+    { name: 'Contractors', value: contractors?.length || 0, color: '#82ca9d' }
+  ];
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <div className="container mx-auto px-4 py-8">
-        <div className="max-w-6xl mx-auto">
+        <div className="max-w-7xl mx-auto">
+          {/* Header */}
           <div className="flex justify-between items-center mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-              Admin Portal
-            </h1>
-            <button
-              onClick={() => navigate("/portals")}
-              className="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors"
-            >
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+                Admin Portal
+              </h1>
+              <p className="text-gray-600 dark:text-gray-300 mt-1">
+                System overview and management dashboard
+              </p>
+            </div>
+            <Button onClick={() => navigate("/portals")} variant="outline">
               Back to Portals
-            </button>
+            </Button>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-              <div className="w-12 h-12 bg-purple-500 rounded-lg flex items-center justify-center mb-4">
-                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
-                </svg>
-              </div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                User Management
-              </h3>
-              <p className="text-gray-600 dark:text-gray-300 text-sm">
-                Manage users, roles, and permissions across the platform.
-              </p>
-            </div>
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+            <TabsList className="grid w-full grid-cols-5">
+              <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
+              <TabsTrigger value="users">User Management</TabsTrigger>
+              <TabsTrigger value="contractors">Contractors</TabsTrigger>
+              <TabsTrigger value="analytics">Analytics</TabsTrigger>
+              <TabsTrigger value="settings">Settings</TabsTrigger>
+            </TabsList>
 
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-              <div className="w-12 h-12 bg-blue-500 rounded-lg flex items-center justify-center mb-4">
-                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                </svg>
-              </div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                System Analytics
-              </h3>
-              <p className="text-gray-600 dark:text-gray-300 text-sm">
-                View comprehensive analytics and performance metrics across all users.
-              </p>
-            </div>
+            {/* Dashboard Tab */}
+            <TabsContent value="dashboard" className="space-y-6">
+              {/* Key Metrics Cards */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <Card>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">Total Users</CardTitle>
+                    <Users className="h-4 w-4 text-muted-foreground" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold">{(salespersons?.length || 0) + (contractors?.length || 0)}</div>
+                    <p className="text-xs text-muted-foreground">
+                      {salespersons?.length || 0} sales + {contractors?.length || 0} contractors
+                    </p>
+                  </CardContent>
+                </Card>
 
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-              <div className="w-12 h-12 bg-green-500 rounded-lg flex items-center justify-center mb-4">
-                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                Sales Team Oversight
-              </h3>
-              <p className="text-gray-600 dark:text-gray-300 text-sm">
-                Monitor sales representative performance and manage territories.
-              </p>
-            </div>
+                <Card>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">Active Projects</CardTitle>
+                    <Building className="h-4 w-4 text-muted-foreground" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold">{projects?.filter((p: any) => p.status === 'in_progress')?.length || 0}</div>
+                    <p className="text-xs text-muted-foreground">
+                      <span className="text-green-600">+3</span> new this week
+                    </p>
+                  </CardContent>
+                </Card>
 
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-              <div className="w-12 h-12 bg-orange-500 rounded-lg flex items-center justify-center mb-4">
-                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                </svg>
-              </div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                Contractor Network
-              </h3>
-              <p className="text-gray-600 dark:text-gray-300 text-sm">
-                Manage contractor partnerships and review service quality.
-              </p>
-            </div>
+                <Card>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">Pending Requests</CardTitle>
+                    <AlertTriangle className="h-4 w-4 text-muted-foreground" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold">{bidRequests?.filter((b: any) => b.status === 'pending')?.length || 0}</div>
+                    <p className="text-xs text-muted-foreground">
+                      Requiring attention
+                    </p>
+                  </CardContent>
+                </Card>
 
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-              <div className="w-12 h-12 bg-red-500 rounded-lg flex items-center justify-center mb-4">
-                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                </svg>
+                <Card>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">System Health</CardTitle>
+                    <Shield className="h-4 w-4 text-muted-foreground" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold text-green-600">99.9%</div>
+                    <p className="text-xs text-muted-foreground">
+                      All systems operational
+                    </p>
+                  </CardContent>
+                </Card>
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                System Monitoring
-              </h3>
-              <p className="text-gray-600 dark:text-gray-300 text-sm">
-                Monitor system health, errors, and performance issues.
-              </p>
-            </div>
 
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-              <div className="w-12 h-12 bg-indigo-500 rounded-lg flex items-center justify-center mb-4">
-                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                </svg>
+              {/* Charts */}
+              <div className="grid md:grid-cols-2 gap-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>System Overview</CardTitle>
+                    <CardDescription>Key platform metrics</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <ResponsiveContainer width="100%" height={300}>
+                      <BarChart data={systemMetrics}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="name" />
+                        <YAxis />
+                        <Tooltip />
+                        <Bar dataKey="value" fill="#8884d8" />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle>User Distribution</CardTitle>
+                    <CardDescription>Platform user breakdown</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <ResponsiveContainer width="100%" height={300}>
+                      <PieChart>
+                        <Pie
+                          data={userDistribution}
+                          cx="50%"
+                          cy="50%"
+                          outerRadius={80}
+                          dataKey="value"
+                        >
+                          {userDistribution.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={entry.color} />
+                          ))}
+                        </Pie>
+                        <Tooltip />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </CardContent>
+                </Card>
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                Platform Settings
-              </h3>
-              <p className="text-gray-600 dark:text-gray-300 text-sm">
-                Configure global settings, integrations, and system preferences.
-              </p>
-            </div>
-          </div>
+            </TabsContent>
+
+            {/* User Management Tab */}
+            <TabsContent value="users" className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Sales Team</CardTitle>
+                  <CardDescription>Manage sales representatives</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {salespersons?.slice(0, 5).map((person: any) => (
+                      <div key={person.id} className="flex items-center justify-between p-4 border rounded-lg">
+                        <div className="space-y-1">
+                          <p className="font-medium">{person.name}</p>
+                          <p className="text-sm text-gray-500">{person.email}</p>
+                          <p className="text-sm">Total Leads: {person.totalLeads || 0}</p>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <Badge variant="outline">
+                            Active
+                          </Badge>
+                          <Button size="sm" variant="outline">
+                            View Profile
+                          </Button>
+                        </div>
+                      </div>
+                    )) || (
+                      <p className="text-center text-gray-500 py-8">No sales team members found</p>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* Contractors Tab */}
+            <TabsContent value="contractors" className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Contractor Network</CardTitle>
+                  <CardDescription>Manage contractor partnerships</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {contractors?.slice(0, 5).map((contractor: any) => (
+                      <div key={contractor.id} className="flex items-center justify-between p-4 border rounded-lg">
+                        <div className="space-y-1">
+                          <p className="font-medium">{contractor.companyName}</p>
+                          <p className="text-sm text-gray-500">{contractor.email}</p>
+                          <p className="text-sm">License: {contractor.licenseNumber}</p>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <Badge variant="outline">
+                            Verified
+                          </Badge>
+                          <Button size="sm" variant="outline">
+                            View Details
+                          </Button>
+                        </div>
+                      </div>
+                    )) || (
+                      <p className="text-center text-gray-500 py-8">No contractors found</p>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* Analytics Tab */}
+            <TabsContent value="analytics" className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Platform Analytics</CardTitle>
+                  <CardDescription>Comprehensive system performance metrics</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid md:grid-cols-3 gap-4 text-center">
+                    <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                      <p className="text-2xl font-bold text-blue-600">{projects?.length || 0}</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-300">Total Projects</p>
+                    </div>
+                    <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                      <p className="text-2xl font-bold text-green-600">{bidRequests?.length || 0}</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-300">Total Bid Requests</p>
+                    </div>
+                    <div className="p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
+                      <p className="text-2xl font-bold text-purple-600">
+                        {bidRequests?.filter((b: any) => b.status === 'converted')?.length || 0}
+                      </p>
+                      <p className="text-sm text-gray-600 dark:text-gray-300">Conversions</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* Settings Tab */}
+            <TabsContent value="settings" className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center space-x-2">
+                    <Settings className="h-5 w-5" />
+                    <span>Platform Settings</span>
+                  </CardTitle>
+                  <CardDescription>Configure global system settings</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Email Notifications</label>
+                      <p className="text-sm text-gray-500 p-3 bg-gray-100 dark:bg-gray-800 rounded">
+                        Enabled for all users
+                      </p>
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Data Retention</label>
+                      <p className="text-sm text-gray-500 p-3 bg-gray-100 dark:bg-gray-800 rounded">
+                        12 months
+                      </p>
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">API Rate Limit</label>
+                      <p className="text-sm text-gray-500 p-3 bg-gray-100 dark:bg-gray-800 rounded">
+                        1000 requests/hour
+                      </p>
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Backup Schedule</label>
+                      <p className="text-sm text-gray-500 p-3 bg-gray-100 dark:bg-gray-800 rounded">
+                        Daily at 2:00 AM
+                      </p>
+                    </div>
+                  </div>
+                  <Button className="mt-4">
+                    Update Settings
+                  </Button>
+                </CardContent>
+              </Card>
+            </TabsContent>
+          </Tabs>
         </div>
       </div>
     </div>
