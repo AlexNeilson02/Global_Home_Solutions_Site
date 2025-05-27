@@ -614,7 +614,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log("Fetching bid requests for contractor:", contractorId);
       
       const bidRequests = await storage.getBidRequestsByContractorId(contractorId);
-      console.log("Found bid requests:", bidRequests.length, "Data:", JSON.stringify(bidRequests, null, 2));
+      console.log("Found bid requests:", bidRequests.length);
+      res.setHeader('Content-Type', 'application/json');
       res.json({ bidRequests });
     } catch (error) {
       console.error("Error fetching contractor bid requests:", error);
