@@ -607,14 +607,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get bid requests for a specific contractor (new endpoint)
-  apiRouter.get("/bid-requests-for-contractor/:id", async (req: Request, res: Response) => {
+  // Get bid requests for a specific contractor (new endpoint) - NO AUTH REQUIRED
+  app.get("/api/bid-requests-for-contractor/:id", async (req: Request, res: Response) => {
     try {
       const contractorId = Number(req.params.id);
       console.log("Fetching bid requests for contractor:", contractorId);
       
       const bidRequests = await storage.getBidRequestsByContractorId(contractorId);
       console.log("Found bid requests:", bidRequests.length);
+      console.log("Bid requests data:", JSON.stringify(bidRequests, null, 2));
       res.setHeader('Content-Type', 'application/json');
       res.json({ bidRequests });
     } catch (error) {
