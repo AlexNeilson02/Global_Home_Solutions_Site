@@ -371,34 +371,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Generate a temporary password (in production, you'd send this via email)
       const tempPassword = Math.random().toString(36).slice(-8).toUpperCase();
+      
+      // Generate username from email
+      const username = email.split('@')[0].toLowerCase();
 
       // Create user account
       const user = await storage.createUser({
+        username,
         fullName,
         email,
         phone,
         role: "contractor",
-        password: tempPassword, // In production, hash this
-        isActive: true
+        password: tempPassword // In production, hash this
       });
 
       // Create contractor profile
       const contractor = await storage.createContractor({
         userId: user.id,
         companyName,
-        licenseNumber,
-        insuranceProvider,
-        businessAddress,
-        yearsInBusiness,
-        employeeCount,
-        specialties,
-        serviceAreas,
         description: portfolioDescription,
-        websiteUrl: websiteUrl || null,
-        certifications: certifications || null,
-        additionalNotes: additionalNotes || null,
-        isVerified: false, // Pending verification
-        isFeatured: false
+        specialties,
+        isVerified: false,
+        isActive: true
       });
 
       // In production, you would:
