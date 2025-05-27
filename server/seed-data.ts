@@ -81,7 +81,68 @@ export async function seedDatabase() {
       avatarUrl: null
     }).returning();
 
-    // Create contractors
+    // Create additional contractor users for all the sample contractors
+    const contractorUser3 = await db.insert(users).values({
+      username: 'apexplumbing',
+      password: 'password123',
+      email: 'info@apexplumbing.com',
+      fullName: 'Robert Martinez',
+      role: 'contractor',
+      phone: '555-111-2222',
+      avatarUrl: null
+    }).returning();
+
+    const contractorUser4 = await db.insert(users).values({
+      username: 'eliteelectric',
+      password: 'password123',
+      email: 'info@elitelectric.com',
+      fullName: 'David Thompson',
+      role: 'contractor',
+      phone: '555-333-4444',
+      avatarUrl: null
+    }).returning();
+
+    const contractorUser5 = await db.insert(users).values({
+      username: 'premierflooring',
+      password: 'password123',
+      email: 'info@premierflooring.com',
+      fullName: 'Jennifer Chen',
+      role: 'contractor',
+      phone: '555-555-6666',
+      avatarUrl: null
+    }).returning();
+
+    const contractorUser6 = await db.insert(users).values({
+      username: 'solidconcrete',
+      password: 'password123',
+      email: 'info@solidconcrete.com',
+      fullName: 'Carlos Rodriguez',
+      role: 'contractor',
+      phone: '555-777-8888',
+      avatarUrl: null
+    }).returning();
+
+    const contractorUser7 = await db.insert(users).values({
+      username: 'rooftopmasters',
+      password: 'password123',
+      email: 'info@rooftopmasters.com',
+      fullName: 'Mark Anderson',
+      role: 'contractor',
+      phone: '555-999-0000',
+      avatarUrl: null
+    }).returning();
+
+    const contractorUser8 = await db.insert(users).values({
+      username: 'climatecontrol',
+      password: 'password123',
+      email: 'info@climatecontrolhvac.com',
+      fullName: 'Amanda Foster',
+      role: 'contractor',
+      phone: '555-222-3333',
+      avatarUrl: null
+    }).returning();
+
+    // Create contractors with data from the sample file
     const contractor1 = await db.insert(contractors).values({
       userId: contractorUser1[0].id,
       companyName: 'Wilson Home Improvements',
@@ -108,6 +169,117 @@ export async function seedDatabase() {
       isVerified: true,
       isActive: true,
       subscriptionTier: 'premium'
+    }).returning();
+
+    // Apex Plumbing Pros
+    const contractor3 = await db.insert(contractors).values({
+      userId: contractorUser3[0].id,
+      companyName: 'Apex Plumbing Pros',
+      description: 'Family-owned plumbing specialists serving the valley for over 15 years. We provide top-quality residential and commercial plumbing services with 24/7 emergency support.',
+      specialties: ['Plumbing', 'Emergency Repairs', 'Water Heaters'],
+      rating: 4.7,
+      reviewCount: 98,
+      hourlyRate: 90,
+      logoUrl: 'https://images.unsplash.com/photo-1607472586893-edb57bdc0e39?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=300&q=80',
+      isVerified: true,
+      isActive: true,
+      subscriptionTier: 'premium',
+      mediaFiles: [
+        { url: '/videos/apex1.mp4', type: 'video', name: 'Apex Demo 1' },
+        { url: '/videos/apex2.mp4', type: 'video', name: 'Apex Demo 2' }
+      ]
+    }).returning();
+
+    // Elite Electricians
+    const contractor4 = await db.insert(contractors).values({
+      userId: contractorUser4[0].id,
+      companyName: 'Elite Electricians',
+      description: 'Commercial and residential electrical experts with over 20 years of experience. Specializing in modern electrical installations and smart home solutions.',
+      specialties: ['Electrical', 'Smart Home', 'Commercial'],
+      rating: 4.9,
+      reviewCount: 142,
+      hourlyRate: 95,
+      logoUrl: 'https://images.unsplash.com/photo-1621905251189-08b45d6a269e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=300&q=80',
+      isVerified: true,
+      isActive: true,
+      subscriptionTier: 'premium',
+      mediaFiles: [
+        { url: '/videos/elite1.mp4', type: 'video', name: 'Elite Demo' }
+      ]
+    }).returning();
+
+    // Premier Flooring Solutions
+    const contractor5 = await db.insert(contractors).values({
+      userId: contractorUser5[0].id,
+      companyName: 'Premier Flooring Solutions',
+      description: 'Expert flooring installation and refinishing services. We work with hardwood, tile, carpet, and luxury vinyl with guaranteed craftsmanship.',
+      specialties: ['Flooring', 'Hardwood', 'Tile', 'Carpet'],
+      rating: 4.6,
+      reviewCount: 73,
+      hourlyRate: 65,
+      logoUrl: 'https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=300&q=80',
+      isVerified: true,
+      isActive: true,
+      subscriptionTier: 'pro',
+      mediaFiles: [
+        { url: '/videos/flooring1.mp4', type: 'video', name: 'Flooring Demo 1' },
+        { url: '/videos/flooring2.mp4', type: 'video', name: 'Flooring Demo 2' }
+      ]
+    }).returning();
+
+    // Solid Concrete Works
+    const contractor6 = await db.insert(contractors).values({
+      userId: contractorUser6[0].id,
+      companyName: 'Solid Concrete Works',
+      description: 'Professional concrete contractors specializing in driveways, patios, foundations, and decorative concrete work.',
+      specialties: ['Concrete', 'Driveways', 'Patios', 'Foundations'],
+      rating: 4.8,
+      reviewCount: 67,
+      hourlyRate: 70,
+      logoUrl: 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=300&q=80',
+      isVerified: true,
+      isActive: false, // This was marked as "sold out" in the original data
+      subscriptionTier: 'basic',
+      mediaFiles: [
+        { url: '/videos/concrete1.mp4', type: 'video', name: 'Concrete Demo' }
+      ]
+    }).returning();
+
+    // Rooftop Masters
+    const contractor7 = await db.insert(contractors).values({
+      userId: contractorUser7[0].id,
+      companyName: 'Rooftop Masters',
+      description: 'Complete roofing services including installation, repair, and maintenance. Storm damage specialists with insurance claim assistance.',
+      specialties: ['Roofing', 'Storm Damage', 'Insurance Claims'],
+      rating: 4.9,
+      reviewCount: 156,
+      hourlyRate: 80,
+      logoUrl: 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=300&q=80',
+      isVerified: true,
+      isActive: true,
+      subscriptionTier: 'premium',
+      mediaFiles: [
+        { url: '/videos/roofing1.mp4', type: 'video', name: 'Roofing Demo 1' },
+        { url: '/videos/roofing2.mp4', type: 'video', name: 'Roofing Demo 2' }
+      ]
+    }).returning();
+
+    // Climate Control HVAC
+    const contractor8 = await db.insert(contractors).values({
+      userId: contractorUser8[0].id,
+      companyName: 'Climate Control HVAC',
+      description: 'Heating, ventilation, and air conditioning experts. Energy-efficient solutions for residential and commercial properties.',
+      specialties: ['HVAC', 'Heating', 'Air Conditioning', 'Energy Efficiency'],
+      rating: 4.7,
+      reviewCount: 89,
+      hourlyRate: 85,
+      logoUrl: 'https://images.unsplash.com/photo-1621905251918-48416bd8575a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=300&q=80',
+      isVerified: true,
+      isActive: true,
+      subscriptionTier: 'pro',
+      mediaFiles: [
+        { url: '/videos/hvac1.mp4', type: 'video', name: 'HVAC Demo' }
+      ]
     }).returning();
 
     // Create salesperson
