@@ -148,8 +148,7 @@ export async function seedDatabase() {
       companyName: 'Wilson Home Improvements',
       description: 'Quality home renovations with over 15 years of experience',
       specialties: ['Kitchen Remodeling', 'Bathroom Renovations', 'Basement Finishing'],
-      rating: 4.8,
-      reviewCount: 124,
+
       hourlyRate: 75,
       logoUrl: null,
       isVerified: true,
@@ -162,8 +161,7 @@ export async function seedDatabase() {
       companyName: 'Brown\'s Electrical Services',
       description: 'Licensed electrical contractor specializing in residential and commercial work',
       specialties: ['Electrical', 'Lighting', 'Panel Upgrades'],
-      rating: 4.9,
-      reviewCount: 86,
+
       hourlyRate: 85,
       logoUrl: null,
       isVerified: true,
@@ -177,8 +175,7 @@ export async function seedDatabase() {
       companyName: 'Apex Plumbing Pros',
       description: 'Family-owned plumbing specialists serving the valley for over 15 years. We provide top-quality residential and commercial plumbing services with 24/7 emergency support.',
       specialties: ['Plumbing', 'Emergency Repairs', 'Water Heaters'],
-      rating: 4.7,
-      reviewCount: 98,
+
       hourlyRate: 90,
       logoUrl: 'https://images.unsplash.com/photo-1607472586893-edb57bdc0e39?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=300&q=80',
       isVerified: true,
@@ -196,8 +193,7 @@ export async function seedDatabase() {
       companyName: 'Elite Electricians',
       description: 'Commercial and residential electrical experts with over 20 years of experience. Specializing in modern electrical installations and smart home solutions.',
       specialties: ['Electrical', 'Smart Home', 'Commercial'],
-      rating: 4.9,
-      reviewCount: 142,
+
       hourlyRate: 95,
       logoUrl: 'https://images.unsplash.com/photo-1621905251189-08b45d6a269e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=300&q=80',
       isVerified: true,
@@ -214,8 +210,7 @@ export async function seedDatabase() {
       companyName: 'Premier Flooring Solutions',
       description: 'Expert flooring installation and refinishing services. We work with hardwood, tile, carpet, and luxury vinyl with guaranteed craftsmanship.',
       specialties: ['Flooring', 'Hardwood', 'Tile', 'Carpet'],
-      rating: 4.6,
-      reviewCount: 73,
+
       hourlyRate: 65,
       logoUrl: 'https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=300&q=80',
       isVerified: true,
@@ -233,8 +228,7 @@ export async function seedDatabase() {
       companyName: 'Solid Concrete Works',
       description: 'Professional concrete contractors specializing in driveways, patios, foundations, and decorative concrete work.',
       specialties: ['Concrete', 'Driveways', 'Patios', 'Foundations'],
-      rating: 4.8,
-      reviewCount: 67,
+
       hourlyRate: 70,
       logoUrl: 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=300&q=80',
       isVerified: true,
@@ -251,8 +245,7 @@ export async function seedDatabase() {
       companyName: 'Rooftop Masters',
       description: 'Complete roofing services including installation, repair, and maintenance. Storm damage specialists with insurance claim assistance.',
       specialties: ['Roofing', 'Storm Damage', 'Insurance Claims'],
-      rating: 4.9,
-      reviewCount: 156,
+
       hourlyRate: 80,
       logoUrl: 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=300&q=80',
       isVerified: true,
@@ -270,8 +263,7 @@ export async function seedDatabase() {
       companyName: 'Climate Control HVAC',
       description: 'Heating, ventilation, and air conditioning experts. Energy-efficient solutions for residential and commercial properties.',
       specialties: ['HVAC', 'Heating', 'Air Conditioning', 'Energy Efficiency'],
-      rating: 4.7,
-      reviewCount: 89,
+
       hourlyRate: 85,
       logoUrl: 'https://images.unsplash.com/photo-1621905251918-48416bd8575a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=300&q=80',
       isVerified: true,
