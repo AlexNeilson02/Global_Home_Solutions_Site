@@ -1,0 +1,90 @@
+.portal-dashboard {
+  background: #101a23;
+  color: #fff;
+  min-height: 100vh;
+  font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+  padding: 20px;
+}
+
+.portal-dashboard h2 {
+  color: #2ca7f8;
+  text-align: center;
+  margin-bottom: 30px;
+  font-size: 2.5rem;
+}
+
+.dashboard-section {
+  background: #1d2630;
+  border-radius: 16px;
+  padding: 25px;
+  margin-bottom: 25px;
+  box-shadow: 0 2px 12px rgba(20,20,20,0.16);
+}
+
+.dashboard-section h3 {
+  color: #2ca7f8;
+  font-size: 1.3rem;
+  margin-bottom: 15px;
+}
+
+.dashboard-section label {
+  color: #c3e3fa;
+  display: block;
+  margin-bottom: 10px;
+  font-weight: 500;
+}
+
+.dashboard-section input[type="range"] {
+  width: 100%;
+  margin: 10px 0;
+}
+
+.dashboard-section span {
+  color: #2ca7f8;
+  font-weight: bold;
+}
+
+.dashboard-section ul {
+  list-style: none;
+  padding: 0;
+}
+
+.dashboard-section li {
+  background: #223d57;
+  padding: 15px;
+  margin: 10px 0;
+  border-radius: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.dashboard-section button {
+  background: #2ca7f8;
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.dashboard-section button:hover {
+  background: #1e8cc8;
+}
+
+.dashboard-section input[type="file"] {
+  color: #c3e3fa;
+  background: #223d57;
+  border: 1px solid #2ca7f8;
+  border-radius: 8px;
+  padding: 10px;
+  margin-bottom: 10px;
+  width: 100%;
+}
+
+.dashboard-section p {
+  color: #c3e3fa;
+  font-size: 1.1rem;
+  margin: 0;
+}

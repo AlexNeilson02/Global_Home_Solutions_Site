@@ -1,0 +1,122 @@
+.contractor-profile {
+  background: #101a23;
+  color: #fff;
+  min-height: 100vh;
+  font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+  padding: 20px;
+}
+
+.contractor-profile button {
+  background: #2ca7f8;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-bottom: 20px;
+  font-size: 1rem;
+}
+
+.profile-header {
+  text-align: center;
+  margin-bottom: 30px;
+  padding: 20px;
+  background: #1d2630;
+  border-radius: 16px;
+}
+
+.profile-photo {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 15px;
+  background: #222c39;
+}
+
+.profile-header h2 {
+  color: #2ca7f8;
+  margin: 15px 0;
+  font-size: 2rem;
+}
+
+.status {
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-weight: bold;
+  font-size: 0.9rem;
+}
+
+.available {
+  background: #15a46b;
+  color: #fff;
+}
+
+.sold-out {
+  background: #dc2626;
+  color: #fff;
+}
+
+.profile-content {
+  max-width: 800px;
+  margin: 0 auto;
+  background: #1d2630;
+  padding: 30px;
+  border-radius: 16px;
+}
+
+.profile-content h3 {
+  color: #2ca7f8;
+  font-size: 1.5rem;
+  margin-bottom: 15px;
+}
+
+.profile-content h4 {
+  color: #2ca7f8;
+  font-size: 1.2rem;
+  margin: 25px 0 10px 0;
+}
+
+.profile-content p {
+  color: #c3e3fa;
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+
+.profile-content ul {
+  color: #c3e3fa;
+  margin-left: 20px;
+  margin-bottom: 20px;
+}
+
+.media-gallery {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+  margin: 20px 0;
+}
+
+.media-gallery video {
+  border-radius: 8px;
+  background: #222c39;
+}
+
+.request-bid-profile-btn {
+  background: #15a46b;
+  color: #fff;
+  border: none;
+  padding: 12px 30px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1.1rem;
+  font-weight: bold;
+  margin: 20px 0;
+  display: block;
+  width: 100%;
+}
+
+.request-bid-profile-btn[disabled] {
+  background: #aaa;
+  color: #eee;
+  cursor: not-allowed;
+}
