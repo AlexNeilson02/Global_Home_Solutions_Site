@@ -49,6 +49,52 @@ export default function HomePage() {
         </datalist>
         <button className="find-contractor-btn" onClick={() => {}}>Find a Contractor</button>
       </section>
+
+      {/* Category Cards Section */}
+      <section className="category-section">
+        <h2>Find the right contractor for your project</h2>
+        <div className="category-grid">
+          <div className="category-card" onClick={() => setTrade("Plumbing")}>
+            <div className="category-image plumber-bg">
+              <div className="video-icon">📹</div>
+            </div>
+            <div className="category-content">
+              <h3>Plumber</h3>
+              <button className="category-btn">REQUEST BID</button>
+            </div>
+          </div>
+
+          <div className="category-card" onClick={() => setTrade("Electrical")}>
+            <div className="category-image electrician-bg">
+              <div className="video-icon">📹</div>
+            </div>
+            <div className="category-content">
+              <h3>Electrician</h3>
+              <button className="category-btn">REQUEST BID</button>
+            </div>
+          </div>
+
+          <div className="category-card" onClick={() => setTrade("Flooring")}>
+            <div className="category-image flooring-bg">
+              <div className="video-icon">📹</div>
+            </div>
+            <div className="category-content">
+              <h3>Flooring</h3>
+              <button className="category-btn">REQUEST BID</button>
+            </div>
+          </div>
+
+          <div className="category-card" onClick={() => setTrade("Concrete")}>
+            <div className="category-image concrete-bg">
+              <div className="video-icon">📹</div>
+            </div>
+            <div className="category-content">
+              <h3>Concrete</h3>
+              <button className="category-btn">REQUEST BID</button>
+            </div>
+          </div>
+        </div>
+      </section>
       {trade && (
         <section className="contractors-section">
           <h2>{trade} Contractors</h2>
