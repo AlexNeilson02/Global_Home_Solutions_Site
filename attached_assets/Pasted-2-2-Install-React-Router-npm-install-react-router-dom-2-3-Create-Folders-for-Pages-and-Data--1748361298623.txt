@@ -1,0 +1,164 @@
+2.2 Install React Router
+
+npm install react-router-dom
+
+
+---
+
+2.3 Create Folders for Pages and Data
+
+Inside src/, create folders:
+
+pages
+
+sampleData
+
+styles
+
+
+
+---
+
+2.4 Add Contractor Data: src/sampleData/contractors.js
+
+const contractors = [
+  {
+    id: 1,
+    name: "Apex Plumbing Pros",
+    trade: "Plumbing",
+    photo: "/contractors/apex.jpg",
+    soldOut: false,
+    videos: ["/videos/apex1.mp4", "/videos/apex2.mp4"],
+    about: "Family-owned plumbing specialists serving the valley for over 15 years.",
+    certifications: ["Licensed", "Bonded", "Insured"],
+    contact: "info@apexplumbing.com",
+  },
+  {
+    id: 2,
+    name: "Elite Electricians",
+    trade: "Electrical",
+    photo: "/contractors/elite.jpg",
+    soldOut: false,
+    videos: ["/videos/elite1.mp4"],
+    about: "Commercial and residential electrical experts.",
+    certifications: ["Licensed", "Insured"],
+    contact: "info@elitelectric.com",
+  },
+  // ...Add more as desired
+];
+
+export default contractors;
+
+
+---
+
+2.5 Home Page: src/pages/HomePage.js
+
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import contractorsData from "../sampleData/contractors";
+import "../styles/HomePage.css";
+
+const trades = [
+  "Plumbing", "Electrical", "Flooring", "Concrete", "Roofing", "HVAC"
+];
+
+export default function HomePage() {
+  const [trade, setTrade] = useState("");
+  const navigate = useNavigate();
+
+  const filteredContractors = contractorsData.filter(
+    (contractor) => contractor.trade.toLowerCase() === trade.toLowerCase()
+  ).slice(0, 5);
+
+  return (
+    <div className="homepage-container">
+      <header>
+        <img src="/logo.png" alt="Global Home Solutions Logo" className="logo" />
+        <h1>Global Home Solutions</h1>
+        <p className="culture">
+          Browse by trade to view qualified contractors. Watch their videos, review completed projects, and select the professional who best matches your needs.
+        </p>
+      </header>
+      <section className="search-section">
+        <input
+          type="text"
+          list="trades"
+          placeholder="Search for your trade (e.g., Plumbing, Roofing)"
+          value={trade}
+          onChange={e => setTrade(e.target.value)}
+        />
+        <datalist id="trades">
+          {trades.map(tr => (
+            <option key={tr} value={tr} />
+          ))}
+        </datalist>
+        <button className="find-contractor-btn" onClick={() => {}}>Find a Contractor</button>
+      </section>
+      {trade && (
+        <section className="contractors-section">
+          <h2>{trade} Contractors</h2>
+          <div className="contractor-list">
+            {filteredContractors.length > 0 ? filteredContractors.map(c => (
+              <div key={c.id} className="contractor-card">
+                <img src={c.photo} alt={c.name} className="contractor-photo" />
+                <h3>{c.name}</h3>
+                <button onClick={() => navigate(`/contractor/${c.id}`)}>View Profile</button>
+                <button className="request-bid-btn" disabled={c.soldOut}>
+                  {c.soldOut ? "Sold Out for This Month" : "Request Bid"}
+                </button>
+                <div className="video-gallery">
+                  {c.videos.slice(0,2).map((v, idx) => (
+                    <video key={idx} src={v} controls width="150" />
+                  ))}
+                </div>
+              </div>
+            )) : <p>No contractors found for this trade.</p>}
+          </div>
+        </section>
+      )}
+      <section className="info-section">
+        <button className="info-btn">Understanding Construction & the Bid Process</button>
+        <div className="promise-section">
+          <h3>Why Homeowners Trust Global Home Solutions</h3>
+          <ul>
+            <li>Qualified contractors only</li>
+            <li>Guaranteed 24-hour response</li>
+            <li>Bids in less than 5 days</li>
+            <li>Person-to-person service</li>
+          </ul>
+        </div>
+      </section>
+    </div>
+  );
+}
+
+
+---
+
+2.6 Contractor Profile: src/pages/ContractorProfile.js
+
+import React from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import contractorsData from "../sampleData/contractors";
+import "../styles/ContractorProfile.css";
+
+export default function ContractorProfile() {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const contractor = contractorsData.find(c => c.id === Number(id));
+
+  if (!contractor) return <div>Contractor not found.</div>;
+
+  return (
+    <div className="contractor-profile">
+      <button onClick={() => navigate(-1)}>&larr; Back</button>
+      <div className="profile-header">
+        <img src={contractor.photo} alt={contractor.name} className="profile-photo" />
+        <h2>{contractor.name}</h2>
+        <span className={`status ${contractor.soldOut ? "sold-out" : "available"}`}>
+          {contractor.soldOut ? "Sold Out for This Month" : "Available"}
+        </span>
+      </div>
+      <div className="profile-content">
+   ...
