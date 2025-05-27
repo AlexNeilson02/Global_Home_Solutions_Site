@@ -13,10 +13,10 @@ const SalesPortal: React.FC = () => {
               Sales Portal
             </h1>
             <button
-              onClick={() => navigate("/")}
+              onClick={() => navigate("/portals")}
               className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
             >
-              Back to Home
+              Back to Portals
             </button>
           </div>
 

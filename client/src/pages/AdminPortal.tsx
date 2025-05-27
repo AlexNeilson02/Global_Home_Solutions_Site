@@ -13,10 +13,10 @@ const AdminPortal: React.FC = () => {
               Admin Portal
             </h1>
             <button
-              onClick={() => navigate("/")}
+              onClick={() => navigate("/portals")}
               className="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors"
             >
-              Back to Home
+              Back to Portals
             </button>
           </div>
 
