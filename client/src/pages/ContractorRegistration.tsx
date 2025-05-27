@@ -91,17 +91,28 @@ export default function ContractorRegistration() {
         throw new Error(`Registration failed: ${errorData}`);
       }
       
-      return response.json();
+      const responseText = await response.text();
+      if (!responseText) {
+        return { success: true, contractor: { companyName: data.companyName } };
+      }
+      
+      try {
+        return JSON.parse(responseText);
+      } catch (e) {
+        console.warn("Response is not valid JSON:", responseText);
+        return { success: true, contractor: { companyName: data.companyName } };
+      }
     },
     onSuccess: (data) => {
       toast({
         title: "Registration Successful!",
-        description: `Welcome ${data.contractor.companyName}! Your account has been created and you'll receive login credentials via email.`,
+        description: `Welcome ${data.contractor?.companyName || "to our network"}! Your account has been created and you'll receive login credentials via email.`,
       });
       form.reset();
       setSelectedSpecialties([]);
     },
     onError: (error: Error) => {
+      console.error("Registration error:", error);
       toast({
         title: "Registration Failed",
         description: error.message || "There was an error creating your account. Please try again.",
