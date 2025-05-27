@@ -633,11 +633,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const bidRequests = await storage.getBidRequestsByContractorId(contractorId);
       console.log("Found bid requests:", bidRequests.length);
+      console.log("Bid requests data:", JSON.stringify(bidRequests, null, 2));
+      
       res.setHeader('Content-Type', 'application/json');
-      res.json({ bidRequests });
+      res.status(200).json({ 
+        success: true,
+        bidRequests: bidRequests,
+        count: bidRequests.length 
+      });
     } catch (error) {
       console.error("Error fetching contractor bid requests:", error);
-      res.status(500).json({ message: "Internal server error" });
+      res.status(500).json({ message: "Internal server error", success: false });
     }
   });
 

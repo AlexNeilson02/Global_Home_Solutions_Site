@@ -44,37 +44,28 @@ const ContractorPortal: React.FC = () => {
     enabled: true
   });
 
-  const { data: bidRequests, refetch: refetchBidRequests } = useQuery({
-    queryKey: ['/api/bid-requests-for-contractor', contractorId],
-    enabled: !!contractorId,
-    queryFn: async () => {
-      const response = await fetch(`/api/bid-requests-for-contractor/${contractorId}`, {
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
-      console.log('Bid requests response status:', response.status);
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('Bid requests error:', errorText);
-        throw new Error('Failed to fetch bid requests');
-      }
-      const data = await response.json();
-      console.log('=== BID REQUESTS DEBUG ===');
-      console.log('Raw response:', data);
-      console.log('Response type:', typeof data);
-      console.log('Is object:', typeof data === 'object');
-      console.log('Response keys:', data ? Object.keys(data) : 'no data');
-      console.log('bidRequests property:', data?.bidRequests);
-      console.log('bidRequests type:', typeof data?.bidRequests);
-      console.log('Is array:', Array.isArray(data?.bidRequests));
-      console.log('Array length:', data?.bidRequests?.length);
-      console.log('=== END DEBUG ===');
-      
-      // Ensure we return the bidRequests array directly for easy access
-      return data?.bidRequests || [];
+  // Simple state-based approach for bid requests
+  const [bidRequests, setBidRequests] = useState([]);
+  const [loadingBids, setLoadingBids] = useState(false);
+
+  // Fetch bid requests directly when contractor ID is available
+  useEffect(() => {
+    if (contractorId) {
+      setLoadingBids(true);
+      fetch(`/api/contractors/${contractorId}/bid-requests`)
+        .then(response => response.json())
+        .then(data => {
+          console.log('Fetched bid requests:', data);
+          setBidRequests(data?.bidRequests || []);
+          setLoadingBids(false);
+        })
+        .catch(error => {
+          console.error('Error fetching bid requests:', error);
+          setBidRequests([]);
+          setLoadingBids(false);
+        });
     }
-  });
+  }, [contractorId]);
 
   // Initialize edit form with contractor data
   useEffect(() => {
