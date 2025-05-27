@@ -25,9 +25,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   const authenticate = (req: Request, res: Response, next: Function) => {
     const sessionId = req.headers.authorization?.split(" ")[1];
     if (!sessionId || !sessions[sessionId]) {
+      console.log("Authentication failed - sessionId:", sessionId, "sessions:", Object.keys(sessions));
       return res.status(401).json({ message: "Unauthorized" });
     }
-    req.user = sessions[sessionId];
+    (req as any).user = sessions[sessionId];
     next();
   };
 
@@ -56,6 +57,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const sessionId = Math.random().toString(36).substring(2, 15);
       sessions[sessionId] = { userId: user.id, role: user.role };
+      console.log("Creating session for user:", user.id, "with sessionId:", sessionId);
       
       res.json({ 
         token: sessionId, 

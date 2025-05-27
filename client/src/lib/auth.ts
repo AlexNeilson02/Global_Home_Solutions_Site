@@ -34,7 +34,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   
   // Check for existing token on initial load
   useEffect(() => {
-    const storedToken = localStorage.getItem('authToken');
+    const storedToken = localStorage.getItem('auth-token');
     const storedUser = localStorage.getItem('user');
     
     if (storedToken && storedUser) {
@@ -83,7 +83,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
       
       // Store token and user in localStorage for persistence
-      localStorage.setItem('authToken', data.token);
+      localStorage.setItem('auth-token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
       
       // Update state with user info
