@@ -42,6 +42,9 @@ export const contractors = pgTable("contractors", {
   isVerified: boolean("is_verified").default(false),
   isActive: boolean("is_active").default(true),
   subscriptionTier: text("subscription_tier").default("basic"), // basic, premium, pro
+  monthlySpendCap: real("monthly_spend_cap").default(1000),
+  paymentMethodAdded: boolean("payment_method_added").default(false),
+  mediaFiles: json("media_files").$type<{url: string, type: 'image' | 'video', name: string}[]>().default([]),
 });
 
 // Salespersons table

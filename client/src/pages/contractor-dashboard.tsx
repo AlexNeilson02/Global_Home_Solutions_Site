@@ -1,33 +1,77 @@
-import { useQuery } from "@tanstack/react-query";
-import { Sidebar } from "@/components/layout/sidebar";
-import { StatsCard } from "@/components/stats-card";
+import { useAuth } from "@/lib/auth";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { queryClient, apiRequest } from "@/lib/queryClient";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Label } from "@/components/ui/label";
+import { Slider } from "@/components/ui/slider";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { useToast } from "@/hooks/use-toast";
+import { useState, useRef } from "react";
 import { 
-  formatCurrency, 
-  getInitials, 
-  getStatusColor, 
-  formatPercentage 
-} from "@/lib/utils";
-import { 
-  Search, 
-  Bell, 
-  Building, 
-  Users, 
-  Clock, 
-  DollarSign,
-  Calendar, 
-  MoreHorizontal,
-  ChevronRight
+  CreditCard,
+  Upload,
+  X,
+  Play,
+  Image as ImageIcon,
+  FileVideo,
+  LogOut,
+  Phone,
+  Mail,
+  MapPin
 } from "lucide-react";
-import { useAuth } from "@/lib/auth";
 
-export default function ContractorDashboard() {
-  const { user } = useAuth();
+function formatCurrency(amount: number | null | undefined): string {
+  if (amount == null) return "$0";
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(amount);
+}
+
+interface MediaFile {
+  url: string;
+  type: 'image' | 'video';
+  name: string;
+}
+
+// Sample bid requests data
+const sampleBidRequests = [
+  {
+    id: 1,
+    customer: "John Smith",
+    contact: "john.smith@email.com | (555) 123-4567",
+    details: "Kitchen renovation - full remodel with new cabinets and countertops",
+    status: "pending"
+  },
+  {
+    id: 2,
+    customer: "Sarah Johnson",
+    contact: "sarah.j@email.com | (555) 987-6543",
+    details: "Bathroom upgrade - new tile, vanity, and lighting fixtures",
+    status: "contacted"
+  },
+  {
+    id: 3,
+    customer: "Mike Davis",
+    contact: "mike.davis@email.com | (555) 456-7890",
+    details: "Basement finishing - flooring, drywall, and electrical work",
+    status: "quoted"
+  }
+];
+
+function ContractorDashboard() {
+  const { user, logout } = useAuth();
+  const { toast } = useToast();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  
+  const [spendCap, setSpendCap] = useState([1000]);
+  const [uploadedFiles, setUploadedFiles] = useState<MediaFile[]>([]);
+  const [paymentMethodAdded, setPaymentMethodAdded] = useState(false);
 
   // Get contractor data
   const { data: userData, isLoading: isLoadingUser } = useQuery<any>({
@@ -36,11 +80,83 @@ export default function ContractorDashboard() {
 
   const contractorData = userData?.roleData;
 
-  // Get projects
-  const { data: projectsData, isLoading: isLoadingProjects } = useQuery<any>({
-    queryKey: ["/api/projects"],
-    enabled: !!user
+  // Get bid requests for this contractor
+  const { data: bidRequestsData, isLoading: isLoadingBids } = useQuery<any>({
+    queryKey: ["/api/salespersons", contractorData?.id, "bid-requests"],
+    enabled: !!contractorData?.id
   });
+
+  // Update spend cap mutation
+  const updateSpendCapMutation = useMutation({
+    mutationFn: async (newSpendCap: number) => {
+      return apiRequest("PATCH", `/api/contractors/${contractorData.id}`, {
+        monthlySpendCap: newSpendCap
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/users/me"] });
+      toast({
+        title: "Spend cap updated",
+        description: "Your monthly spend cap has been successfully updated.",
+      });
+    }
+  });
+
+  const handleSpendCapChange = (value: number[]) => {
+    setSpendCap(value);
+    updateSpendCapMutation.mutate(value[0]);
+  };
+
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (!files) return;
+
+    Array.from(files).forEach(file => {
+      const maxSize = 50 * 1024 * 1024; // 50MB
+      if (file.size > maxSize) {
+        toast({
+          title: "File too large",
+          description: "Please select files smaller than 50MB.",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const url = e.target?.result as string;
+        const type = file.type.startsWith('video/') ? 'video' : 'image';
+        
+        setUploadedFiles(prev => [...prev, {
+          url,
+          type,
+          name: file.name
+        }]);
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const removeFile = (index: number) => {
+    setUploadedFiles(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const handleAddPaymentMethod = () => {
+    setPaymentMethodAdded(true);
+    toast({
+      title: "Payment method setup",
+      description: "Payment method setup would be integrated here.",
+    });
+  };
+
+  const getStatusBadgeVariant = (status: string) => {
+    switch (status) {
+      case 'pending': return 'secondary';
+      case 'contacted': return 'default';
+      case 'quoted': return 'outline';
+      default: return 'secondary';
+    }
+  };
 
   if (isLoadingUser) {
     return (
@@ -51,323 +167,219 @@ export default function ContractorDashboard() {
   }
 
   return (
-    <div className="flex min-h-screen bg-background">
-      {/* Sidebar */}
-      <Sidebar />
-      
-      {/* Main Content Area */}
-      <div className="flex-1 p-6">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-2xl font-semibold">Contractor Dashboard</h1>
-          
-          <div className="flex items-center space-x-4">
-            <div className="relative">
-              <Input
-                placeholder="Search..."
-                className="pl-9 pr-4 py-2 w-64"
-              />
-              <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-            </div>
-            
-            <Button variant="outline" size="icon" className="relative">
-              <Bell className="h-5 w-5 text-muted-foreground" />
-              <span className="absolute -top-1 -right-1 h-4 w-4 bg-destructive text-destructive-foreground text-xs rounded-full flex items-center justify-center">2</span>
+    <div className="min-h-screen bg-background">
+      {/* Header */}
+      <div className="border-b border-border bg-white dark:bg-background">
+        <div className="max-w-7xl mx-auto px-6 py-4">
+          <div className="flex justify-between items-center">
+            <h1 className="text-3xl font-bold text-foreground">CONTRACTOR PORTAL</h1>
+            <Button 
+              variant="outline" 
+              onClick={() => logout()}
+              className="flex items-center gap-2"
+            >
+              <LogOut className="h-4 w-4" />
+              LOG OUT
             </Button>
           </div>
         </div>
-        
-        {/* Stats Overview */}
-        <div className="stats-grid mb-8">
-          <StatsCard
-            title="Active Projects"
-            value={projectsData?.projects?.filter((p: any) => p.status === "in_progress").length || 0}
-            trend={{ value: "3 new this month", positive: true }}
-            icon={Building}
-            iconBgColor="bg-primary-50 dark:bg-primary/10"
-            iconColor="text-primary"
-            chart={
-              <div className="h-10 flex items-end space-x-1">
-                <div className="w-1 h-3 bg-primary/20 rounded-t"></div>
-                <div className="w-1 h-5 bg-primary/40 rounded-t"></div>
-                <div className="w-1 h-7 bg-primary/60 rounded-t"></div>
-                <div className="w-1 h-6 bg-primary/40 rounded-t"></div>
-                <div className="w-1 h-8 bg-primary/60 rounded-t"></div>
-                <div className="w-1 h-10 bg-primary rounded-t"></div>
-              </div>
-            }
-          />
-          
-          <StatsCard
-            title="New Leads"
-            value={projectsData?.projects?.filter((p: any) => p.status === "pending").length || 0}
-            trend={{ value: "15% increase", positive: true }}
-            icon={Users}
-            iconBgColor="bg-secondary-50 dark:bg-secondary/10"
-            iconColor="text-secondary"
-            chart={
-              <div className="h-10 w-16 bg-secondary-50 dark:bg-secondary/10 rounded-md relative overflow-hidden">
-                <div className="absolute bottom-0 left-0 w-full h-3/4 bg-secondary rounded-md"></div>
-              </div>
-            }
-          />
-          
-          <StatsCard
-            title="Pending Bids"
-            value={4}
-            trend={{ value: "Same as last week", neutral: true }}
-            icon={Clock}
-            iconBgColor="bg-warning-50 dark:bg-warning/10"
-            iconColor="text-warning"
-            chart={
-              <div className="h-10 flex items-end space-x-1">
-                <div className="w-1 h-4 bg-warning/20 rounded-t"></div>
-                <div className="w-1 h-6 bg-warning/40 rounded-t"></div>
-                <div className="w-1 h-5 bg-warning/40 rounded-t"></div>
-                <div className="w-1 h-7 bg-warning/60 rounded-t"></div>
-                <div className="w-1 h-8 bg-warning/60 rounded-t"></div>
-                <div className="w-1 h-10 bg-warning rounded-t"></div>
-              </div>
-            }
-          />
-          
-          <StatsCard
-            title="Total Revenue"
-            value={formatCurrency(32500)}
-            trend={{ value: "12% this month", positive: true }}
-            icon={DollarSign}
-            iconBgColor="bg-success-50 dark:bg-success/10"
-            iconColor="text-success"
-            chart={
-              <div className="grid grid-cols-4 gap-1 w-20">
-                <div className="h-2 bg-success/20 rounded"></div>
-                <div className="h-2 bg-success/40 rounded"></div>
-                <div className="h-2 bg-success/60 rounded"></div>
-                <div className="h-2 bg-success rounded"></div>
-                <div className="h-2 bg-success/20 rounded"></div>
-                <div className="h-2 bg-success/40 rounded"></div>
-                <div className="h-2 bg-success/60 rounded"></div>
-                <div className="h-2 bg-success rounded"></div>
-              </div>
-            }
-          />
-        </div>
-        
-        {/* Company Profile */}
-        <Card className="mb-8">
-          <CardContent className="p-6">
-            <div className="flex flex-col md:flex-row items-start md:items-center">
-              <div className="flex items-center mb-4 md:mb-0 md:mr-8">
-                <Avatar className="w-16 h-16 mr-4">
-                  <AvatarImage src={contractorData?.logoUrl || ""} alt={contractorData?.companyName} />
-                  <AvatarFallback className="bg-primary text-primary-foreground">
-                    {contractorData?.companyName?.charAt(0) || user?.fullName?.charAt(0) || "C"}
-                  </AvatarFallback>
-                </Avatar>
-                <div>
-                  <h3 className="font-semibold text-lg">{contractorData?.companyName || "Your Company"}</h3>
-                  <div className="flex items-center mt-1">
-                    <div className="flex items-center">
-                      {[...Array(5)].map((_, i) => (
-                        <svg 
-                          key={i}
-                          xmlns="http://www.w3.org/2000/svg" 
-                          viewBox="0 0 24 24" 
-                          fill={i < Math.floor(contractorData?.rating || 0) ? "currentColor" : "none"}
-                          stroke="currentColor"
-                          className={`h-4 w-4 ${i < Math.floor(contractorData?.rating || 0) ? "text-yellow-400" : "text-muted-foreground"}`}
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        >
-                          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-                        </svg>
-                      ))}
-                      <span className="ml-1 text-sm">({contractorData?.reviewCount || 0})</span>
-                    </div>
-                  </div>
-                  <div className="flex flex-wrap items-center gap-1 mt-1">
-                    {contractorData?.specialties?.map((specialty: string, index: number) => (
-                      <Badge key={index} variant="outline" className="bg-primary-50 dark:bg-primary/10 text-primary text-xs">
-                        {specialty}
-                      </Badge>
-                    ))}
-                  </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="max-w-7xl mx-auto px-6 py-8 space-y-8">
+        {/* Contractor Dashboard Card */}
+        <Card className="w-full">
+          <CardHeader>
+            <CardTitle className="text-2xl font-bold text-center">CONTRACTOR DASHBOARD</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            {/* Monthly Spend Cap Slider */}
+            <div className="space-y-4">
+              <Label className="text-lg font-semibold">MONTHLY SPEND CAP</Label>
+              <div className="px-4">
+                <Slider
+                  value={spendCap}
+                  onValueChange={handleSpendCapChange}
+                  max={10000}
+                  min={100}
+                  step={100}
+                  className="w-full"
+                />
+                <div className="flex justify-between text-sm text-muted-foreground mt-2">
+                  <span>$100</span>
+                  <span className="font-semibold text-primary">{formatCurrency(spendCap[0])}</span>
+                  <span>$10,000</span>
                 </div>
-              </div>
-              
-              <div className="md:ml-auto flex space-x-4">
-                <Badge variant="outline" className={`px-2 py-1 ${contractorData?.isVerified ? "bg-success-50 text-success dark:bg-success/10" : "bg-warning-50 text-warning dark:bg-warning/10"}`}>
-                  {contractorData?.isVerified ? "Verified" : "Verification Pending"}
-                </Badge>
-                <Badge variant="outline" className="bg-primary-50 dark:bg-primary/10 text-primary px-2 py-1 capitalize">
-                  {contractorData?.subscriptionTier || "Basic"} Plan
-                </Badge>
               </div>
             </div>
           </CardContent>
         </Card>
-        
-        {/* Projects and Schedule Tabs */}
-        <Tabs defaultValue="projects">
-          <TabsList className="mb-6">
-            <TabsTrigger value="projects">Projects</TabsTrigger>
-            <TabsTrigger value="upcoming">Upcoming Schedule</TabsTrigger>
-            <TabsTrigger value="leads">New Leads</TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="projects">
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-lg">Active Projects</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="overflow-x-auto">
-                  {isLoadingProjects ? (
-                    <div className="py-8 flex justify-center">
-                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-                    </div>
-                  ) : projectsData?.projects?.filter((p: any) => p.status === "in_progress").length > 0 ? (
-                    <table className="min-w-full">
-                      <thead>
-                        <tr className="border-b border-border">
-                          <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider py-3 px-4">Project</th>
-                          <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider py-3 px-4">Customer</th>
-                          <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider py-3 px-4">Start Date</th>
-                          <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider py-3 px-4">Value</th>
-                          <th className="text-right text-xs font-medium text-muted-foreground uppercase tracking-wider py-3 px-4">Action</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {projectsData.projects
-                          .filter((project: any) => project.status === "in_progress")
-                          .map((project: any) => (
-                            <tr key={project.id} className="border-b border-border hover:bg-muted/50">
-                              <td className="py-3 px-4 font-medium">{project.title}</td>
-                              <td className="py-3 px-4">Customer #{project.homeownerId}</td>
-                              <td className="py-3 px-4">{new Date(project.createdAt).toLocaleDateString()}</td>
-                              <td className="py-3 px-4">{formatCurrency(project.budget)}</td>
-                              <td className="py-3 px-4 text-right">
-                                <Button variant="ghost" size="sm" className="text-primary hover:text-primary">
-                                  <MoreHorizontal className="h-4 w-4" />
-                                </Button>
-                              </td>
-                            </tr>
-                          ))}
-                      </tbody>
-                    </table>
-                  ) : (
-                    <div className="py-8 text-center text-muted-foreground">
-                      No active projects found.
-                    </div>
-                  )}
+
+        {/* Bid Requests Table */}
+        <Card className="w-full">
+          <CardHeader>
+            <CardTitle className="text-2xl font-bold text-center">BID REQUESTS</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow className="border-b-2 border-border">
+                    <TableHead className="font-bold text-base">CUSTOMER</TableHead>
+                    <TableHead className="font-bold text-base">CONTACT</TableHead>
+                    <TableHead className="font-bold text-base">DETAILS</TableHead>
+                    <TableHead className="font-bold text-base">STATUS</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {sampleBidRequests.map((request) => (
+                    <TableRow key={request.id} className="border-b border-border">
+                      <TableCell className="font-medium">{request.customer}</TableCell>
+                      <TableCell>
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-2">
+                            <Mail className="h-4 w-4" />
+                            <span className="text-sm">{request.contact.split(' | ')[0]}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Phone className="h-4 w-4" />
+                            <span className="text-sm">{request.contact.split(' | ')[1]}</span>
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell className="max-w-xs">
+                        <p className="text-sm">{request.details}</p>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant={getStatusBadgeVariant(request.status)} className="capitalize">
+                          {request.status}
+                        </Badge>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Bottom Row - Payment Setup and Upload Media */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Payment Setup */}
+          <Card className="w-full">
+            <CardHeader>
+              <CardTitle className="text-xl font-bold text-center">PAYMENT SETUP</CardTitle>
+            </CardHeader>
+            <CardContent className="flex flex-col items-center justify-center py-12">
+              {!paymentMethodAdded ? (
+                <Button 
+                  onClick={handleAddPaymentMethod}
+                  className="flex items-center gap-2 text-lg px-8 py-3"
+                  size="lg"
+                >
+                  <CreditCard className="h-5 w-5" />
+                  ADD PAYMENT METHOD
+                </Button>
+              ) : (
+                <div className="text-center space-y-4">
+                  <div className="flex items-center justify-center w-16 h-16 bg-green-100 dark:bg-green-900/20 rounded-full">
+                    <CreditCard className="h-8 w-8 text-green-600" />
+                  </div>
+                  <p className="text-lg font-semibold text-green-600">Payment Method Added</p>
+                  <Button variant="outline" onClick={() => setPaymentMethodAdded(false)}>
+                    Update Payment Method
+                  </Button>
                 </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-          
-          <TabsContent value="upcoming">
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-lg">Upcoming Schedule</CardTitle>
-              </CardHeader>
-              <CardContent>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Upload Media */}
+          <Card className="w-full">
+            <CardHeader>
+              <CardTitle className="text-xl font-bold text-center">UPLOAD MEDIA</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {/* Upload Area */}
+              <div 
+                className="border-2 border-dashed border-border rounded-lg p-8 text-center cursor-pointer hover:border-primary transition-colors"
+                onClick={() => fileInputRef.current?.click()}
+              >
+                <Upload className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+                <p className="text-lg font-semibold mb-2">UPLOAD</p>
+                <p className="text-sm text-muted-foreground">
+                  Click to upload images or videos (up to 50MB each)
+                </p>
+              </div>
+              
+              <input
+                ref={fileInputRef}
+                type="file"
+                multiple
+                accept="image/*,video/*"
+                onChange={handleFileUpload}
+                className="hidden"
+              />
+
+              {/* Uploaded Files Preview */}
+              {uploadedFiles.length > 0 && (
                 <div className="space-y-4">
-                  <div className="flex items-center p-3 border border-border rounded-md">
-                    <div className="bg-primary-50 dark:bg-primary/10 text-primary w-12 h-12 rounded-md flex items-center justify-center mr-4">
-                      <Calendar className="h-6 w-6" />
-                    </div>
-                    <div className="flex-1">
-                      <h4 className="font-medium">Kitchen Renovation - Initial Consultation</h4>
-                      <p className="text-sm text-muted-foreground">Tomorrow, 10:00 AM - 11:30 AM</p>
-                    </div>
-                    <Badge className="bg-secondary-50 dark:bg-secondary/10 text-secondary">Confirmed</Badge>
-                    <Button variant="ghost" size="sm" className="ml-2">
-                      <ChevronRight className="h-4 w-4" />
-                    </Button>
-                  </div>
-                  
-                  <div className="flex items-center p-3 border border-border rounded-md">
-                    <div className="bg-primary-50 dark:bg-primary/10 text-primary w-12 h-12 rounded-md flex items-center justify-center mr-4">
-                      <Calendar className="h-6 w-6" />
-                    </div>
-                    <div className="flex-1">
-                      <h4 className="font-medium">Bathroom Remodel - Final Inspection</h4>
-                      <p className="text-sm text-muted-foreground">Friday, 2:00 PM - 3:30 PM</p>
-                    </div>
-                    <Badge className="bg-secondary-50 dark:bg-secondary/10 text-secondary">Confirmed</Badge>
-                    <Button variant="ghost" size="sm" className="ml-2">
-                      <ChevronRight className="h-4 w-4" />
-                    </Button>
-                  </div>
-                  
-                  <div className="flex items-center p-3 border border-border rounded-md">
-                    <div className="bg-warning-50 dark:bg-warning/10 text-warning w-12 h-12 rounded-md flex items-center justify-center mr-4">
-                      <Calendar className="h-6 w-6" />
-                    </div>
-                    <div className="flex-1">
-                      <h4 className="font-medium">New Project - Site Assessment</h4>
-                      <p className="text-sm text-muted-foreground">Monday, 9:00 AM - 11:00 AM</p>
-                    </div>
-                    <Badge className="bg-warning-50 dark:bg-warning/10 text-warning">Pending</Badge>
-                    <Button variant="ghost" size="sm" className="ml-2">
-                      <ChevronRight className="h-4 w-4" />
-                    </Button>
+                  <Label className="text-sm font-semibold">Uploaded Files:</Label>
+                  <div className="grid grid-cols-2 gap-4">
+                    {uploadedFiles.map((file, index) => (
+                      <div key={index} className="relative border border-border rounded-lg overflow-hidden">
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          className="absolute top-2 right-2 z-10 h-6 w-6 p-0"
+                          onClick={() => removeFile(index)}
+                        >
+                          <X className="h-3 w-3" />
+                        </Button>
+                        
+                        {file.type === 'image' ? (
+                          <div className="relative">
+                            <img 
+                              src={file.url} 
+                              alt={file.name}
+                              className="w-full h-24 object-cover"
+                            />
+                            <div className="absolute bottom-1 left-1 bg-black/50 text-white px-1 rounded text-xs flex items-center gap-1">
+                              <ImageIcon className="h-3 w-3" />
+                              IMG
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="relative">
+                            <video 
+                              src={file.url}
+                              className="w-full h-24 object-cover"
+                              controls={false}
+                            />
+                            <div className="absolute inset-0 flex items-center justify-center bg-black/20">
+                              <Play className="h-8 w-8 text-white" />
+                            </div>
+                            <div className="absolute bottom-1 left-1 bg-black/50 text-white px-1 rounded text-xs flex items-center gap-1">
+                              <FileVideo className="h-3 w-3" />
+                              VID
+                            </div>
+                          </div>
+                        )}
+                        
+                        <div className="p-2">
+                          <p className="text-xs truncate">{file.name}</p>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-          
-          <TabsContent value="leads">
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-lg">New Leads</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="overflow-x-auto">
-                  {isLoadingProjects ? (
-                    <div className="py-8 flex justify-center">
-                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-                    </div>
-                  ) : projectsData?.projects?.filter((p: any) => p.status === "pending").length > 0 ? (
-                    <table className="min-w-full">
-                      <thead>
-                        <tr className="border-b border-border">
-                          <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider py-3 px-4">Project</th>
-                          <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider py-3 px-4">Type</th>
-                          <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider py-3 px-4">Date</th>
-                          <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider py-3 px-4">Budget</th>
-                          <th className="text-right text-xs font-medium text-muted-foreground uppercase tracking-wider py-3 px-4">Action</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {projectsData.projects
-                          .filter((project: any) => project.status === "pending")
-                          .map((project: any) => (
-                            <tr key={project.id} className="border-b border-border hover:bg-muted/50">
-                              <td className="py-3 px-4 font-medium">{project.title}</td>
-                              <td className="py-3 px-4">{project.serviceType}</td>
-                              <td className="py-3 px-4">{new Date(project.createdAt).toLocaleDateString()}</td>
-                              <td className="py-3 px-4">{formatCurrency(project.budget)}</td>
-                              <td className="py-3 px-4 text-right">
-                                <Button size="sm" className="mr-2">Bid Now</Button>
-                                <Button variant="outline" size="sm">Decline</Button>
-                              </td>
-                            </tr>
-                          ))}
-                      </tbody>
-                    </table>
-                  ) : (
-                    <div className="py-8 text-center text-muted-foreground">
-                      No new leads at the moment.
-                    </div>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
+              )}
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   );
 }
+
+export default ContractorDashboard;

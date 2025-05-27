@@ -288,6 +288,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Update contractor endpoint
+  apiRouter.patch("/contractors/:id", authenticate, async (req: Request, res: Response) => {
+    try {
+      const id = Number(req.params.id);
+      const contractor = await storage.getContractor(id);
+      
+      if (!contractor) {
+        return res.status(404).json({ message: "Contractor not found" });
+      }
+      
+      // Check if user owns this contractor profile or is admin
+      if (req.user.role !== "admin" && contractor.userId !== req.user.userId) {
+        return res.status(403).json({ message: "Forbidden" });
+      }
+      
+      const updatedContractor = await storage.updateContractor(id, req.body);
+      res.json({ contractor: updatedContractor });
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   apiRouter.post("/contractors", authenticate, async (req: Request, res: Response) => {
     try {
       // Only allow admins to create contractors
