@@ -381,6 +381,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Create user account
+      console.log("Creating user with username:", username, "password:", password);
       const user = await storage.createUser({
         username,
         fullName,
@@ -389,6 +390,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         role: "contractor",
         password // In production, hash this
       });
+      console.log("User created successfully:", user.id, user.username);
 
       // Create contractor profile
       const contractor = await storage.createContractor({
@@ -399,6 +401,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         isVerified: false,
         isActive: true
       });
+      console.log("Contractor created successfully:", contractor.id);
 
       res.status(201).json({ 
         success: true,
