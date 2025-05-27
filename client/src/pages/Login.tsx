@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
-import { Link, useLocation } from "wouter";
+import { Link, useNavigate } from "react-router-dom";
 
 const loginSchema = z.object({
   username: z.string().min(1, "Username is required"),
@@ -18,7 +18,7 @@ type LoginForm = z.infer<typeof loginSchema>;
 
 export default function Login() {
   const { toast } = useToast();
-  const [, setLocation] = useLocation();
+  const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
 
   const form = useForm<LoginForm>({
@@ -131,7 +131,7 @@ export default function Login() {
                   <p className="text-sm text-gray-600">
                     Don't have an account?
                   </p>
-                  <Link href="/contractor-registration">
+                  <Link to="/contractor-registration">
                     <Button variant="outline" className="w-full">
                       Register as Contractor
                     </Button>
