@@ -631,8 +631,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const contractorId = Number(req.params.id);
       console.log("Fetching bid requests for contractor:", contractorId);
       
+      // Debug: Show all bid requests to see what's in storage
+      const allBidRequests = await storage.getRecentBidRequests(50);
+      console.log("All bid requests in system:", allBidRequests.length);
+      console.log("All bid requests:", JSON.stringify(allBidRequests.map(br => ({ 
+        id: br.id, 
+        contractorId: br.contractorId, 
+        fullName: br.fullName 
+      })), null, 2));
+      
       const bidRequests = await storage.getBidRequestsByContractorId(contractorId);
-      console.log("Found bid requests:", bidRequests.length);
+      console.log("Found bid requests for contractor", contractorId, ":", bidRequests.length);
       console.log("Bid requests data:", JSON.stringify(bidRequests, null, 2));
       
       res.setHeader('Content-Type', 'application/json');
