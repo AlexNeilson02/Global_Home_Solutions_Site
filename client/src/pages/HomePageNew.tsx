@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import contractorsData from "../sampleData/contractors";
+import { useQuery } from "@tanstack/react-query";
 import logoPath from "@/assets/global-home-solutions-logo.png";
 import "../styles/HomePage.css";
 
@@ -13,6 +13,12 @@ export default function HomePage() {
   const [trade, setTrade] = useState(searchParams.get("trade") || "");
   const [searchTriggered, setSearchTriggered] = useState(!!searchParams.get("trade"));
   const navigate = useNavigate();
+
+  // Fetch contractors from database
+  const { data: contractors, isLoading } = useQuery({
+    queryKey: ['/api/contractors'],
+    enabled: true
+  });
 
   useEffect(() => {
     if (trade && searchTriggered) {
@@ -39,9 +45,11 @@ export default function HomePage() {
     setSearchTriggered(false);
   };
 
-  const filteredContractors = searchTriggered && trade 
-    ? contractorsData.filter(
-        (contractor) => contractor.trade.toLowerCase() === trade.toLowerCase()
+  const filteredContractors = searchTriggered && trade && contractors
+    ? contractors.filter(
+        (contractor: any) => contractor.specialties?.some((specialty: string) => 
+          specialty.toLowerCase().includes(trade.toLowerCase())
+        )
       ).slice(0, 5)
     : [];
 
