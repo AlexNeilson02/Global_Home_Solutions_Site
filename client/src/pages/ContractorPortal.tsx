@@ -319,6 +319,10 @@ const ContractorPortal: React.FC = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
+                    {/* Debug info */}
+                    <div className="text-xs text-gray-500 mb-4">
+                      Debug: {Array.isArray(bidRequests) ? `${bidRequests.length} requests found` : 'No array data'}
+                    </div>
                     {Array.isArray(bidRequests) && bidRequests.length > 0 ? 
                       bidRequests.slice(0, 5).map((request: any) => (
                         <div key={request.id} className="flex items-center justify-between p-4 border rounded-lg bg-white dark:bg-gray-800">
