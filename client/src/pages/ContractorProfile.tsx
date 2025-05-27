@@ -10,7 +10,7 @@ const ContractorProfile: React.FC = () => {
     enabled: !!id
   });
 
-  const contractor = contractorData?.contractor;
+  const contractor = contractorData as any;
 
   if (isLoading) {
     return (
