@@ -5,6 +5,27 @@
 @tailwind utilities;
 
 :root {
+  /* Global Home Solutions Brand Colors */
+  --primary-blue: #0ea5e9; /* Bright blue from design */
+  --dark-navy: #1e293b; /* Dark background navy */
+  --darker-navy: #0f172a; /* Even darker navy */
+  --text-white: #ffffff;
+  --text-gray: #94a3b8;
+  --success-green: #22c55e;
+  --card-bg: #334155;
+}
+
+.dark {
+  /* Override default dark mode with Global Home Solutions theme */
+  --background: var(--darker-navy);
+  --foreground: var(--text-white);
+  --card: var(--card-bg);
+  --card-foreground: var(--text-white);
+  --primary: var(--primary-blue);
+  --primary-foreground: var(--text-white);
+}
+
+:root {
   /* Base colors */
   --background: 0 0% 100%;
   --foreground:
