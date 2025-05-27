@@ -1,5 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import logoPath from "@/assets/global-home-solutions-logo.png";
 
 const HomePage: React.FC = () => {
   return (
@@ -7,17 +8,11 @@ const HomePage: React.FC = () => {
       <div className="container mx-auto px-4 py-16">
         <div className="text-center mb-16">
           <div className="flex justify-center mb-8">
-            <div className="flex items-center space-x-3">
-              <div className="w-16 h-16 rounded-full bg-blue-500 flex items-center justify-center">
-                <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"/>
-                </svg>
-              </div>
-              <div className="text-left">
-                <div className="text-2xl font-bold text-blue-400">GLOBAL HOME</div>
-                <div className="text-lg text-blue-300">SOLUTIONS</div>
-              </div>
-            </div>
+            <img 
+              src={logoPath} 
+              alt="Global Home Solutions" 
+              className="h-32 w-auto"
+            />
           </div>
           <h1 className="text-5xl font-bold text-white mb-6">
             Find a contractor for your project
