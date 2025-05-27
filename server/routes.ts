@@ -337,6 +337,86 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Public contractor registration endpoint
+  apiRouter.post("/contractors/register", async (req: Request, res: Response) => {
+    try {
+      const {
+        fullName,
+        email,
+        phone,
+        companyName,
+        licenseNumber,
+        insuranceProvider,
+        businessAddress,
+        yearsInBusiness,
+        employeeCount,
+        specialties,
+        serviceAreas,
+        portfolioDescription,
+        websiteUrl,
+        certifications,
+        additionalNotes
+      } = req.body;
+
+      // Validate required fields
+      if (!fullName || !email || !phone || !companyName || !licenseNumber || !insuranceProvider || !businessAddress || !yearsInBusiness || !employeeCount || !specialties || specialties.length === 0 || !serviceAreas || !portfolioDescription) {
+        return res.status(400).json({ message: "All required fields must be provided" });
+      }
+
+      // Check if email already exists
+      const existingUser = await storage.getUserByEmail(email);
+      if (existingUser) {
+        return res.status(400).json({ message: "An account with this email already exists" });
+      }
+
+      // Generate a temporary password (in production, you'd send this via email)
+      const tempPassword = Math.random().toString(36).slice(-8).toUpperCase();
+
+      // Create user account
+      const user = await storage.createUser({
+        fullName,
+        email,
+        phone,
+        role: "contractor",
+        password: tempPassword, // In production, hash this
+        isActive: true
+      });
+
+      // Create contractor profile
+      const contractor = await storage.createContractor({
+        userId: user.id,
+        companyName,
+        licenseNumber,
+        insuranceProvider,
+        businessAddress,
+        yearsInBusiness,
+        employeeCount,
+        specialties,
+        serviceAreas,
+        description: portfolioDescription,
+        websiteUrl: websiteUrl || null,
+        certifications: certifications || null,
+        additionalNotes: additionalNotes || null,
+        isVerified: false, // Pending verification
+        isFeatured: false
+      });
+
+      // In production, you would:
+      // 1. Send welcome email with login credentials
+      // 2. Trigger verification process
+      // 3. Notify admin for approval
+
+      res.status(201).json({ 
+        contractor,
+        message: "Registration successful! You will receive login credentials via email.",
+        tempPassword // Remove this in production
+      });
+    } catch (error) {
+      console.error("Error registering contractor:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   apiRouter.post("/contractors", authenticate, async (req: Request, res: Response) => {
     try {
       // Only allow admins to create contractors
