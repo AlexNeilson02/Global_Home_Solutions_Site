@@ -139,6 +139,9 @@ function ContractorDashboard() {
   // Update profile mutation
   const updateProfileMutation = useMutation({
     mutationFn: async (profileData: any) => {
+      if (!contractorData?.id) {
+        throw new Error("Contractor ID not found");
+      }
       return apiRequest("PATCH", `/api/contractors/${contractorData.id}`, {
         ...profileData,
         mediaFiles: uploadedFiles
@@ -150,6 +153,14 @@ function ContractorDashboard() {
       toast({
         title: "Profile updated",
         description: "Your company profile has been successfully updated.",
+      });
+    },
+    onError: (error: any) => {
+      console.error("Profile update error:", error);
+      toast({
+        title: "Update failed",
+        description: error.message || "Failed to update profile. Please try again.",
+        variant: "destructive"
       });
     }
   });
