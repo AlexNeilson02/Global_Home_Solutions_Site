@@ -382,14 +382,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Create user account
       console.log("Creating user with username:", username, "password:", password);
-      const user = await storage.createUser({
+      const userData = {
         username,
         fullName,
         email,
         phone,
         role: "contractor",
         password // In production, hash this
-      });
+      };
+      console.log("User data to insert:", userData);
+      
+      const user = await storage.createUser(userData);
       console.log("User created successfully:", user.id, user.username);
 
       // Create contractor profile
@@ -414,7 +417,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error) {
       console.error("Error registering contractor:", error);
-      res.status(500).json({ message: "Internal server error" });
+      res.status(500).json({ message: "Registration failed", error: error.message });
     }
   });
 
