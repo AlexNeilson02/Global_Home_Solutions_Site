@@ -7,9 +7,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
+import { Textarea } from "@/components/ui/textarea";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { 
   CreditCard,
   Upload,
@@ -20,7 +22,10 @@ import {
   LogOut,
   Phone,
   Mail,
-  MapPin
+  MapPin,
+  Edit,
+  Save,
+  Building
 } from "lucide-react";
 
 function formatCurrency(amount: number | null | undefined): string {
@@ -68,10 +73,21 @@ function ContractorDashboard() {
   const { user, logout } = useAuth();
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const profileImageRef = useRef<HTMLInputElement>(null);
   
   const [spendCap, setSpendCap] = useState([1000]);
   const [uploadedFiles, setUploadedFiles] = useState<MediaFile[]>([]);
   const [paymentMethodAdded, setPaymentMethodAdded] = useState(false);
+  const [isEditingProfile, setIsEditingProfile] = useState(false);
+  
+  // Profile form state
+  const [profileForm, setProfileForm] = useState({
+    companyName: '',
+    description: '',
+    specialties: [] as string[],
+    logoUrl: '',
+    hourlyRate: 0
+  });
 
   // Get contractor data
   const { data: userData, isLoading: isLoadingUser } = useQuery<any>({
@@ -79,6 +95,24 @@ function ContractorDashboard() {
   });
 
   const contractorData = userData?.roleData;
+
+  // Populate form when contractor data loads
+  useEffect(() => {
+    if (contractorData) {
+      setProfileForm({
+        companyName: contractorData.companyName || '',
+        description: contractorData.description || '',
+        specialties: contractorData.specialties || [],
+        logoUrl: contractorData.logoUrl || '',
+        hourlyRate: contractorData.hourlyRate || 0
+      });
+      setSpendCap([contractorData.monthlySpendCap || 1000]);
+      setPaymentMethodAdded(contractorData.paymentMethodAdded || false);
+      if (contractorData.mediaFiles) {
+        setUploadedFiles(contractorData.mediaFiles);
+      }
+    }
+  }, [contractorData]);
 
   // Get bid requests for this contractor
   const { data: bidRequestsData, isLoading: isLoadingBids } = useQuery<any>({
@@ -98,6 +132,24 @@ function ContractorDashboard() {
       toast({
         title: "Spend cap updated",
         description: "Your monthly spend cap has been successfully updated.",
+      });
+    }
+  });
+
+  // Update profile mutation
+  const updateProfileMutation = useMutation({
+    mutationFn: async (profileData: any) => {
+      return apiRequest("PATCH", `/api/contractors/${contractorData.id}`, {
+        ...profileData,
+        mediaFiles: uploadedFiles
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/users/me"] });
+      setIsEditingProfile(false);
+      toast({
+        title: "Profile updated",
+        description: "Your company profile has been successfully updated.",
       });
     }
   });
@@ -139,6 +191,38 @@ function ContractorDashboard() {
 
   const removeFile = (index: number) => {
     setUploadedFiles(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const handleProfileImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const imageUrl = e.target?.result as string;
+      setProfileForm(prev => ({ ...prev, logoUrl: imageUrl }));
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleAddSpecialty = (specialty: string) => {
+    if (specialty && !profileForm.specialties.includes(specialty)) {
+      setProfileForm(prev => ({
+        ...prev,
+        specialties: [...prev.specialties, specialty]
+      }));
+    }
+  };
+
+  const removeSpecialty = (index: number) => {
+    setProfileForm(prev => ({
+      ...prev,
+      specialties: prev.specialties.filter((_, i) => i !== index)
+    }));
+  };
+
+  const handleSaveProfile = () => {
+    updateProfileMutation.mutate(profileForm);
   };
 
   const handleAddPaymentMethod = () => {
@@ -187,6 +271,167 @@ function ContractorDashboard() {
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-6 py-8 space-y-8">
+        {/* Company Profile Section */}
+        <Card className="w-full">
+          <CardHeader>
+            <div className="flex justify-between items-center">
+              <CardTitle className="text-2xl font-bold text-center flex-1">COMPANY PROFILE</CardTitle>
+              <Button
+                variant={isEditingProfile ? "default" : "outline"}
+                onClick={() => isEditingProfile ? handleSaveProfile() : setIsEditingProfile(true)}
+                disabled={updateProfileMutation.isPending}
+                className="flex items-center gap-2"
+              >
+                {isEditingProfile ? <Save className="h-4 w-4" /> : <Edit className="h-4 w-4" />}
+                {isEditingProfile ? "SAVE" : "EDIT"}
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {/* Profile Photo */}
+              <div className="space-y-4">
+                <Label className="text-sm font-semibold">PROFILE PHOTO</Label>
+                <div className="flex flex-col items-center space-y-4">
+                  <Avatar className="h-24 w-24">
+                    <AvatarImage src={profileForm.logoUrl} alt="Company Logo" />
+                    <AvatarFallback className="bg-primary text-primary-foreground text-xl">
+                      <Building className="h-8 w-8" />
+                    </AvatarFallback>
+                  </Avatar>
+                  {isEditingProfile && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => profileImageRef.current?.click()}
+                      className="flex items-center gap-2"
+                    >
+                      <Upload className="h-4 w-4" />
+                      Upload Photo
+                    </Button>
+                  )}
+                  <input
+                    ref={profileImageRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleProfileImageUpload}
+                    className="hidden"
+                  />
+                </div>
+              </div>
+
+              {/* Company Details */}
+              <div className="lg:col-span-2 space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Company Name */}
+                  <div className="space-y-2">
+                    <Label className="text-sm font-semibold">COMPANY NAME</Label>
+                    {isEditingProfile ? (
+                      <Input
+                        value={profileForm.companyName}
+                        onChange={(e) => setProfileForm(prev => ({ ...prev, companyName: e.target.value }))}
+                        placeholder="Enter company name"
+                      />
+                    ) : (
+                      <p className="text-lg font-medium">{profileForm.companyName || "Not set"}</p>
+                    )}
+                  </div>
+
+                  {/* Hourly Rate */}
+                  <div className="space-y-2">
+                    <Label className="text-sm font-semibold">HOURLY RATE</Label>
+                    {isEditingProfile ? (
+                      <div className="relative">
+                        <span className="absolute left-3 top-2.5 text-muted-foreground">$</span>
+                        <Input
+                          type="number"
+                          value={profileForm.hourlyRate}
+                          onChange={(e) => setProfileForm(prev => ({ ...prev, hourlyRate: Number(e.target.value) }))}
+                          placeholder="0"
+                          className="pl-8"
+                        />
+                      </div>
+                    ) : (
+                      <p className="text-lg font-medium">{formatCurrency(profileForm.hourlyRate)}/hour</p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Services/Specialties */}
+                <div className="space-y-2">
+                  <Label className="text-sm font-semibold">SERVICES</Label>
+                  {isEditingProfile ? (
+                    <div className="space-y-2">
+                      <div className="flex gap-2">
+                        <Input
+                          placeholder="Add a service (e.g., Kitchen Renovation)"
+                          onKeyPress={(e) => {
+                            if (e.key === 'Enter') {
+                              handleAddSpecialty(e.currentTarget.value);
+                              e.currentTarget.value = '';
+                            }
+                          }}
+                        />
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={(e) => {
+                            const input = e.currentTarget.previousSibling as HTMLInputElement;
+                            handleAddSpecialty(input.value);
+                            input.value = '';
+                          }}
+                        >
+                          Add
+                        </Button>
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        {profileForm.specialties.map((specialty, index) => (
+                          <Badge key={index} variant="secondary" className="flex items-center gap-1">
+                            {specialty}
+                            <X
+                              className="h-3 w-3 cursor-pointer"
+                              onClick={() => removeSpecialty(index)}
+                            />
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex flex-wrap gap-2">
+                      {profileForm.specialties.length > 0 ? (
+                        profileForm.specialties.map((specialty, index) => (
+                          <Badge key={index} variant="outline">
+                            {specialty}
+                          </Badge>
+                        ))
+                      ) : (
+                        <p className="text-muted-foreground">No services added</p>
+                      )}
+                    </div>
+                  )}
+                </div>
+
+                {/* Bio/Description */}
+                <div className="space-y-2">
+                  <Label className="text-sm font-semibold">BIO</Label>
+                  {isEditingProfile ? (
+                    <Textarea
+                      value={profileForm.description}
+                      onChange={(e) => setProfileForm(prev => ({ ...prev, description: e.target.value }))}
+                      placeholder="Tell customers about your company, experience, and what makes you special..."
+                      className="min-h-[100px]"
+                    />
+                  ) : (
+                    <p className="text-sm text-muted-foreground">
+                      {profileForm.description || "No bio added"}
+                    </p>
+                  )}
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
         {/* Contractor Dashboard Card */}
         <Card className="w-full">
           <CardHeader>
