@@ -138,17 +138,23 @@ export default function HomePage() {
         <section className="contractors-section">
           <h2>{trade} Contractors</h2>
           <div className="contractor-list">
-            {filteredContractors.length > 0 ? filteredContractors.map(c => (
-              <div key={c.id} className="contractor-card">
-                <img src={c.photo} alt={c.name} className="contractor-photo" />
-                <h3>{c.name}</h3>
-                <button onClick={() => navigate(`/contractor/${c.id}`)}>View Profile</button>
-                <button className="request-bid-btn" disabled={c.soldOut}>
-                  {c.soldOut ? "Sold Out for This Month" : "Request Bid"}
+            {filteredContractors.length > 0 ? filteredContractors.map((contractor: any) => (
+              <div key={contractor.id} className="contractor-card">
+                <img 
+                  src={contractor.logoUrl || 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80'} 
+                  alt={contractor.companyName} 
+                  className="contractor-photo" 
+                />
+                <h3>{contractor.companyName}</h3>
+                <p>{contractor.specialties?.join(', ')}</p>
+                <p>⭐ {contractor.rating} ({contractor.reviewCount} reviews)</p>
+                <button onClick={() => navigate(`/contractor/${contractor.id}`)}>View Profile</button>
+                <button className="request-bid-btn">
+                  Request Bid
                 </button>
                 <div className="video-gallery">
-                  {c.videos.slice(0,2).map((v, idx) => (
-                    <video key={idx} src={v} controls width="150" />
+                  {contractor.mediaFiles?.filter((file: any) => file.type === 'video').slice(0,2).map((video: any, idx: number) => (
+                    <button key={idx} className="video-btn">▶ {video.name}</button>
                   ))}
                 </div>
               </div>
