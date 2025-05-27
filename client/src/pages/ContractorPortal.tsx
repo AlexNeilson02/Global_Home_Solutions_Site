@@ -1,22 +1,46 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
-import { Building, Users, FileText, TrendingUp, Calendar, Star } from "lucide-react";
+import { Building, Users, FileText, TrendingUp, Calendar, Star, Edit, Save, X } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { useToast } from "@/hooks/use-toast";
 
 const ContractorPortal: React.FC = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("dashboard");
+  const [isEditingProfile, setIsEditingProfile] = useState(false);
+  const [editForm, setEditForm] = useState({
+    companyName: '',
+    description: '',
+    specialties: [],
+    serviceAreas: [],
+    licenseNumber: '',
+    phone: '',
+    email: ''
+  });
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
 
-  // Fetch contractor data - using placeholder contractor ID 1 for demo
-  const { data: contractor } = useQuery({
-    queryKey: ['/api/contractors', 1],
+  // Get the current user first
+  const { data: userData } = useQuery({
+    queryKey: ['/api/users/me'],
     enabled: true
   });
+
+  // Get contractor data for the current user
+  const { data: contractorData } = useQuery({
+    queryKey: ['/api/contractors', userData?.roleData?.id],
+    enabled: !!userData?.roleData?.id
+  });
+
+  const contractor = contractorData?.contractor;
+  const contractorId = contractor?.id;
 
   const { data: projects } = useQuery({
     queryKey: ['/api/projects'],
@@ -24,9 +48,76 @@ const ContractorPortal: React.FC = () => {
   });
 
   const { data: bidRequests } = useQuery({
-    queryKey: ['/api/contractors/1/bid-requests'],
-    enabled: true
+    queryKey: ['/api/contractors', contractorId, 'bid-requests'],
+    enabled: !!contractorId
   });
+
+  // Initialize edit form with contractor data
+  useEffect(() => {
+    if (contractor) {
+      setEditForm({
+        companyName: contractor.companyName || '',
+        description: contractor.description || '',
+        specialties: contractor.specialties || [],
+        serviceAreas: contractor.serviceAreas || [],
+        licenseNumber: contractor.licenseNumber || '',
+        phone: contractor.phone || '',
+        email: contractor.email || ''
+      });
+    }
+  }, [contractor]);
+
+  // Update contractor profile mutation
+  const updateContractorMutation = useMutation({
+    mutationFn: async (updatedData: any) => {
+      const response = await fetch(`/api/contractors/${contractorId}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updatedData),
+      });
+      if (!response.ok) {
+        throw new Error('Failed to update contractor profile');
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/contractors', contractorId] });
+      setIsEditingProfile(false);
+      toast({
+        title: "Profile Updated!",
+        description: "Your company profile has been successfully updated.",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Update Failed",
+        description: "There was an error updating your profile. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleSaveProfile = () => {
+    updateContractorMutation.mutate(editForm);
+  };
+
+  const handleCancelEdit = () => {
+    setIsEditingProfile(false);
+    // Reset form to original values
+    if (contractor) {
+      setEditForm({
+        companyName: contractor.companyName || '',
+        description: contractor.description || '',
+        specialties: contractor.specialties || [],
+        serviceAreas: contractor.serviceAreas || [],
+        licenseNumber: contractor.licenseNumber || '',
+        phone: contractor.phone || '',
+        email: contractor.email || ''
+      });
+    }
+  };
 
   // Mock performance data for charts
   const projectData = [
@@ -220,48 +311,161 @@ const ContractorPortal: React.FC = () => {
             {/* Profile Tab */}
             <TabsContent value="profile" className="space-y-6">
               <Card>
-                <CardHeader>
-                  <CardTitle>Company Profile</CardTitle>
-                  <CardDescription>Manage your company information and services</CardDescription>
+                <CardHeader className="flex flex-row items-center justify-between">
+                  <div>
+                    <CardTitle>Company Profile</CardTitle>
+                    <CardDescription>Manage your company information and services</CardDescription>
+                  </div>
+                  <div className="flex gap-2">
+                    {isEditingProfile ? (
+                      <>
+                        <Button 
+                          onClick={handleSaveProfile} 
+                          disabled={updateContractorMutation.isPending}
+                          size="sm"
+                        >
+                          <Save className="h-4 w-4 mr-2" />
+                          {updateContractorMutation.isPending ? 'Saving...' : 'Save'}
+                        </Button>
+                        <Button 
+                          onClick={handleCancelEdit} 
+                          variant="outline" 
+                          size="sm"
+                        >
+                          <X className="h-4 w-4 mr-2" />
+                          Cancel
+                        </Button>
+                      </>
+                    ) : (
+                      <Button 
+                        onClick={() => setIsEditingProfile(true)} 
+                        size="sm"
+                      >
+                        <Edit className="h-4 w-4 mr-2" />
+                        Edit Profile
+                      </Button>
+                    )}
+                  </div>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium">Company Name</label>
-                      <p className="p-3 bg-gray-100 dark:bg-gray-800 rounded">
-                        {contractor?.companyName || 'Not set'}
-                      </p>
+                  {isEditingProfile ? (
+                    // Edit Mode
+                    <div className="space-y-4">
+                      <div className="grid md:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <label className="text-sm font-medium">Company Name</label>
+                          <Input
+                            value={editForm.companyName}
+                            onChange={(e) => setEditForm({...editForm, companyName: e.target.value})}
+                            placeholder="Enter company name"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <label className="text-sm font-medium">License Number</label>
+                          <Input
+                            value={editForm.licenseNumber}
+                            onChange={(e) => setEditForm({...editForm, licenseNumber: e.target.value})}
+                            placeholder="Enter license number"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <label className="text-sm font-medium">Phone</label>
+                          <Input
+                            value={editForm.phone}
+                            onChange={(e) => setEditForm({...editForm, phone: e.target.value})}
+                            placeholder="Enter phone number"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <label className="text-sm font-medium">Email</label>
+                          <Input
+                            value={editForm.email}
+                            onChange={(e) => setEditForm({...editForm, email: e.target.value})}
+                            placeholder="Enter email address"
+                          />
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium">Company Description</label>
+                        <Textarea
+                          value={editForm.description}
+                          onChange={(e) => setEditForm({...editForm, description: e.target.value})}
+                          placeholder="Describe your company and services"
+                          rows={4}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium">Specialties (comma-separated)</label>
+                        <Input
+                          value={Array.isArray(editForm.specialties) ? editForm.specialties.join(', ') : ''}
+                          onChange={(e) => setEditForm({...editForm, specialties: e.target.value.split(',').map(s => s.trim())})}
+                          placeholder="e.g., Plumbing, HVAC, Electrical"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium">Service Areas (comma-separated)</label>
+                        <Input
+                          value={Array.isArray(editForm.serviceAreas) ? editForm.serviceAreas.join(', ') : ''}
+                          onChange={(e) => setEditForm({...editForm, serviceAreas: e.target.value.split(',').map(s => s.trim())})}
+                          placeholder="e.g., Salt Lake City, Provo, Ogden"
+                        />
+                      </div>
                     </div>
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium">License Number</label>
-                      <p className="p-3 bg-gray-100 dark:bg-gray-800 rounded">
-                        {contractor?.licenseNumber || 'Not set'}
-                      </p>
+                  ) : (
+                    // View Mode
+                    <div className="space-y-4">
+                      <div className="grid md:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <label className="text-sm font-medium">Company Name</label>
+                          <p className="p-3 bg-gray-100 dark:bg-gray-800 rounded">
+                            {contractor?.companyName || 'Not set'}
+                          </p>
+                        </div>
+                        <div className="space-y-2">
+                          <label className="text-sm font-medium">License Number</label>
+                          <p className="p-3 bg-gray-100 dark:bg-gray-800 rounded">
+                            {contractor?.licenseNumber || 'Not set'}
+                          </p>
+                        </div>
+                        <div className="space-y-2">
+                          <label className="text-sm font-medium">Phone</label>
+                          <p className="p-3 bg-gray-100 dark:bg-gray-800 rounded">
+                            {contractor?.phone || 'Not set'}
+                          </p>
+                        </div>
+                        <div className="space-y-2">
+                          <label className="text-sm font-medium">Email</label>
+                          <p className="p-3 bg-gray-100 dark:bg-gray-800 rounded">
+                            {contractor?.email || 'Not set'}
+                          </p>
+                        </div>
+                      </div>
+                      {contractor?.description && (
+                        <div className="space-y-2">
+                          <label className="text-sm font-medium">Company Description</label>
+                          <p className="p-3 bg-gray-100 dark:bg-gray-800 rounded">
+                            {contractor.description}
+                          </p>
+                        </div>
+                      )}
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium">Specialties</label>
+                        <div className="flex flex-wrap gap-2">
+                          {contractor?.specialties?.map((specialty: string, index: number) => (
+                            <Badge key={index} variant="secondary">{specialty}</Badge>
+                          )) || <p className="text-gray-500">No specialties listed</p>}
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium">Service Areas</label>
+                        <div className="flex flex-wrap gap-2">
+                          {contractor?.serviceAreas?.map((area: string, index: number) => (
+                            <Badge key={index} variant="outline">{area}</Badge>
+                          )) || <p className="text-gray-500">No service areas listed</p>}
+                        </div>
+                      </div>
                     </div>
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium">Phone</label>
-                      <p className="p-3 bg-gray-100 dark:bg-gray-800 rounded">
-                        {contractor?.phone || 'Not set'}
-                      </p>
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium">Email</label>
-                      <p className="p-3 bg-gray-100 dark:bg-gray-800 rounded">
-                        {contractor?.email || 'Not set'}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Services</label>
-                    <div className="flex flex-wrap gap-2">
-                      {contractor?.services?.map((service: string, index: number) => (
-                        <Badge key={index} variant="secondary">{service}</Badge>
-                      )) || <p className="text-gray-500">No services listed</p>}
-                    </div>
-                  </div>
-                  <Button className="mt-4">
-                    Edit Profile
-                  </Button>
+                  )}
                 </CardContent>
               </Card>
             </TabsContent>

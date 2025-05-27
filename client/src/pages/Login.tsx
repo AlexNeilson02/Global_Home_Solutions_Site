@@ -53,16 +53,16 @@ export default function Login() {
       // Redirect based on user role
       switch (result.user.role) {
         case "contractor":
-          setLocation("/contractor-portal");
+          navigate("/contractor-portal");
           break;
         case "salesperson":
-          setLocation("/sales-portal");
+          navigate("/sales-portal");
           break;
         case "admin":
-          setLocation("/admin-portal");
+          navigate("/admin-portal");
           break;
         default:
-          setLocation("/");
+          navigate("/");
       }
     } catch (error) {
       toast({
