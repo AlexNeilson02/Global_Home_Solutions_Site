@@ -147,7 +147,6 @@ export default function HomePage() {
                 />
                 <h3>{contractor.companyName}</h3>
                 <p>{contractor.specialties?.join(', ')}</p>
-                <p>⭐ {contractor.rating} ({contractor.reviewCount} reviews)</p>
                 <button onClick={() => navigate(`/contractor/${contractor.id}`)}>View Profile</button>
                 <button className="request-bid-btn">
                   Request Bid
