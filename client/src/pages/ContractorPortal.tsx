@@ -46,7 +46,20 @@ const ContractorPortal: React.FC = () => {
 
   const { data: bidRequests } = useQuery({
     queryKey: ['/api/contractors', contractorId, 'bid-requests'],
-    enabled: !!contractorId
+    enabled: !!contractorId,
+    queryFn: async () => {
+      const token = localStorage.getItem('authToken');
+      const response = await fetch(`/api/contractors/${contractorId}/bid-requests`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      if (!response.ok) {
+        throw new Error('Failed to fetch bid requests');
+      }
+      return response.json();
+    }
   });
 
   // Initialize edit form with contractor data
