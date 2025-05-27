@@ -540,10 +540,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         address: projectAddress,
         timeline: preferredTimeframe,
         budget: budget || null,
-        preferredContactMethod: "email",
-        status: "pending",
-        emailSent: false,
-        notes: ""
+        preferredContactMethod: "email"
       });
 
       res.status(201).json({ bidRequest });

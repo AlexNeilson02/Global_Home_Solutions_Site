@@ -73,7 +73,19 @@ export default function BidRequestForm({ isOpen, onClose, contractor }: BidReque
         const errorData = await response.text();
         throw new Error(`Failed to submit bid request: ${errorData}`);
       }
-      return response.json();
+      
+      // Check if response has content before parsing JSON
+      const responseText = await response.text();
+      if (!responseText) {
+        return { success: true };
+      }
+      
+      try {
+        return JSON.parse(responseText);
+      } catch (e) {
+        console.warn("Response is not valid JSON:", responseText);
+        return { success: true };
+      }
     },
     onSuccess: () => {
       toast({
