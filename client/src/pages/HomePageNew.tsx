@@ -143,18 +143,26 @@ export default function HomePage() {
                 <img 
                   src={contractor.logoUrl || 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80'} 
                   alt={contractor.companyName} 
-                  className="contractor-photo" 
                 />
-                <h3>{contractor.companyName}</h3>
-                <p>{contractor.specialties?.join(', ')}</p>
-                <button onClick={() => navigate(`/contractor/${contractor.id}`)}>View Profile</button>
-                <button className="request-bid-btn">
-                  Request Bid
-                </button>
-                <div className="video-gallery">
-                  {contractor.mediaFiles?.filter((file: any) => file.type === 'video').slice(0,2).map((video: any, idx: number) => (
-                    <button key={idx} className="video-btn">▶ {video.name}</button>
-                  ))}
+                <div className="contractor-info">
+                  <h3>{contractor.companyName}</h3>
+                  <p className="trade">{contractor.specialties?.join(', ')}</p>
+                  <p className="about">{contractor.description}</p>
+                  <div className="certifications">
+                    {contractor.isVerified && <span className="cert-badge">Verified</span>}
+                    {contractor.subscriptionTier === 'premium' && <span className="cert-badge">Premium</span>}
+                  </div>
+                  <div className="contractor-actions">
+                    {contractor.mediaFiles?.filter((file: any) => file.type === 'video').map((video: any, idx: number) => (
+                      <button key={idx} className="video-btn">▶ {video.name}</button>
+                    ))}
+                    <button 
+                      className="profile-btn"
+                      onClick={() => navigate(`/contractor/${contractor.id}`)}
+                    >
+                      View Profile
+                    </button>
+                  </div>
                 </div>
               </div>
             )) : <p>No contractors found for this trade.</p>}
