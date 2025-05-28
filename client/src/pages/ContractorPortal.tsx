@@ -115,7 +115,20 @@ const ContractorPortal: React.FC = () => {
     try {
       console.log('Marking customer as contacted, ID:', requestId);
       
-      // Update the local state immediately for instant UI feedback
+      // Update the database first
+      const response = await fetch(`/api/contractor/bid-requests/${requestId}/status`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ status: 'contacted' }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update bid request status');
+      }
+      
+      // Update the local state after successful database update
       setBidRequests(prevRequests => {
         const updatedRequests = prevRequests.map((request: any) => 
           request.id === requestId 
@@ -132,8 +145,8 @@ const ContractorPortal: React.FC = () => {
       });
 
       toast({
-        title: "Customer Contacted",
-        description: "The customer has been marked as contacted.",
+        title: "Bid Sent!",
+        description: "The customer has been contacted and your bid has been sent.",
       });
       
     } catch (error) {
@@ -468,7 +481,7 @@ const ContractorPortal: React.FC = () => {
                                     <h4 className="text-sm font-semibold text-gray-700 mb-3">
                                       Project Media ({mediaUrls.length} files)
                                     </h4>
-                                    <div className="grid grid-cols-3 gap-3">
+                                    <div className="grid grid-cols-4 gap-2">
                                       {mediaUrls.map((url: string, idx: number) => {
                                         const isImage = url.includes('data:image/');
                                         const isVideo = url.includes('data:video/');
@@ -483,26 +496,26 @@ const ContractorPortal: React.FC = () => {
                                               <img
                                                 src={url}
                                                 alt={`Media ${idx + 1}`}
-                                                className="w-full h-24 object-cover rounded-lg border-2 border-gray-200 hover:border-blue-400 transition-colors"
+                                                className="w-full h-16 object-cover rounded border-2 border-gray-200 hover:border-blue-400 transition-colors"
                                               />
                                             ) : isVideo ? (
                                               <div className="relative">
                                                 <video
                                                   src={url}
-                                                  className="w-full h-24 object-cover rounded-lg border-2 border-gray-200 hover:border-blue-400 transition-colors"
+                                                  className="w-full h-16 object-cover rounded border-2 border-gray-200 hover:border-blue-400 transition-colors"
                                                   muted
                                                 />
-                                                <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-30 rounded-lg">
-                                                  <div className="bg-white bg-opacity-90 rounded-full p-2">
-                                                    <svg className="w-6 h-6 text-gray-800" fill="currentColor" viewBox="0 0 20 20">
+                                                <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-30 rounded">
+                                                  <div className="bg-white bg-opacity-90 rounded-full p-1">
+                                                    <svg className="w-4 h-4 text-gray-800" fill="currentColor" viewBox="0 0 20 20">
                                                       <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
                                                     </svg>
                                                   </div>
                                                 </div>
                                               </div>
                                             ) : (
-                                              <div className="w-full h-24 bg-gray-200 rounded-lg border-2 border-gray-200 hover:border-blue-400 flex items-center justify-center transition-colors">
-                                                <span className="text-gray-600 text-sm">File</span>
+                                              <div className="w-full h-16 bg-gray-200 rounded border-2 border-gray-200 hover:border-blue-400 flex items-center justify-center transition-colors">
+                                                <span className="text-gray-600 text-xs">File</span>
                                               </div>
                                             )}
                                             
@@ -536,8 +549,8 @@ const ContractorPortal: React.FC = () => {
                           </div>
                           <div className="flex flex-col items-end space-y-2 ml-4">
                             {request.status === 'contacted' ? (
-                              <Button size="sm" variant="secondary" disabled>
-                                Customer Contacted
+                              <Button size="sm" variant="secondary" disabled className="bg-green-100 text-green-700 border-green-300">
+                                BID SENT
                               </Button>
                             ) : (
                               <Button 
@@ -548,9 +561,6 @@ const ContractorPortal: React.FC = () => {
                                 Contact Customer
                               </Button>
                             )}
-                            <Button size="sm" variant="outline">
-                              View Details
-                            </Button>
                           </div>
                         </div>
                       )) : (
