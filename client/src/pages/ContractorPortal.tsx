@@ -473,7 +473,7 @@ const ContractorPortal: React.FC = () => {
                                                   onClick={() => openMediaViewer(mediaUrl, 'image', index, mediaData.mediaUrls)}
                                                 />
                                                 <div className="absolute top-1 right-1 bg-blue-600 text-white text-xs px-1 py-0.5 rounded">
-                                                  📷
+                                                  IMG
                                                 </div>
                                               </div>
                                             ) : mediaUrl.startsWith('data:video/') ? (
@@ -487,7 +487,7 @@ const ContractorPortal: React.FC = () => {
                                                   Your browser does not support the video tag.
                                                 </video>
                                                 <div className="absolute top-1 right-1 bg-red-600 text-white text-xs px-1 py-0.5 rounded">
-                                                  🎥
+                                                  VID
                                                 </div>
                                                 <div className="absolute inset-0 flex items-center justify-center">
                                                   <div className="bg-black bg-opacity-50 rounded-full p-2">
