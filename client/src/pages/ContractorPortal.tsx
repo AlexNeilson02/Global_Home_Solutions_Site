@@ -557,13 +557,42 @@ const ContractorPortal: React.FC = () => {
                           <Badge variant="secondary" className="bg-green-100 text-green-700 border-green-300">
                             BID SENT
                           </Badge>
-                          <Button 
-                            size="sm" 
-                            variant="outline"
-                            onClick={() => setViewingBidDetails(project)}
-                          >
-                            View Details
-                          </Button>
+                          <div className="flex flex-col space-y-2">
+                            <Button 
+                              size="sm" 
+                              variant="outline"
+                              onClick={() => setViewingBidDetails(project)}
+                            >
+                              View Details
+                            </Button>
+                            <div className="flex space-x-2">
+                              <Button 
+                                size="sm" 
+                                className="bg-green-600 hover:bg-green-700 text-white"
+                                onClick={() => updateProjectStatus(project.id, 'won')}
+                                title="Mark project as won"
+                              >
+                                Won
+                              </Button>
+                              <Button 
+                                size="sm" 
+                                variant="outline"
+                                className="text-orange-600 border-orange-300 hover:bg-orange-50"
+                                onClick={() => updateProjectStatus(project.id, 'lost')}
+                                title="Mark project as lost"
+                              >
+                                Lost
+                              </Button>
+                              <Button 
+                                size="sm" 
+                                variant="destructive"
+                                onClick={() => deleteBidRequest(project.id, 'removed')}
+                                title="Remove from projects"
+                              >
+                                Delete
+                              </Button>
+                            </div>
+                          </div>
                         </div>
                       </div>
                     )) : (
@@ -690,21 +719,63 @@ const ContractorPortal: React.FC = () => {
                           </div>
                           <div className="flex flex-col items-end space-y-2 ml-4">
                             {request.status === 'pending' ? (
-                              <Button 
-                                size="sm" 
-                                className="bg-blue-600 hover:bg-blue-700"
-                                onClick={() => markCustomerContacted(request.id)}
-                              >
-                                Contact Customer
-                              </Button>
+                              <div className="flex flex-col space-y-2">
+                                <Button 
+                                  size="sm" 
+                                  className="bg-blue-600 hover:bg-blue-700"
+                                  onClick={() => markCustomerContacted(request.id)}
+                                >
+                                  Contact Customer
+                                </Button>
+                                <div className="flex space-x-2">
+                                  <Button 
+                                    size="sm" 
+                                    variant="destructive"
+                                    onClick={() => deleteBidRequest(request.id, 'not_interested')}
+                                    title="Customer not interested"
+                                  >
+                                    Not Interested
+                                  </Button>
+                                  <Button 
+                                    size="sm" 
+                                    variant="outline"
+                                    className="text-gray-500 border-gray-300 hover:bg-gray-50"
+                                    onClick={() => deleteBidRequest(request.id, 'no_response')}
+                                    title="Customer didn't respond"
+                                  >
+                                    No Response
+                                  </Button>
+                                </div>
+                              </div>
                             ) : request.status === 'contacted' ? (
-                              <Button 
-                                size="sm" 
-                                className="bg-green-600 hover:bg-green-700"
-                                onClick={() => sendBidToCustomer(request.id)}
-                              >
-                                Send Bid
-                              </Button>
+                              <div className="flex flex-col space-y-2">
+                                <Button 
+                                  size="sm" 
+                                  className="bg-green-600 hover:bg-green-700"
+                                  onClick={() => sendBidToCustomer(request.id)}
+                                >
+                                  Send Bid
+                                </Button>
+                                <div className="flex space-x-2">
+                                  <Button 
+                                    size="sm" 
+                                    variant="destructive"
+                                    onClick={() => deleteBidRequest(request.id, 'not_interested')}
+                                    title="Customer not interested"
+                                  >
+                                    Not Interested
+                                  </Button>
+                                  <Button 
+                                    size="sm" 
+                                    variant="outline"
+                                    className="text-gray-500 border-gray-300 hover:bg-gray-50"
+                                    onClick={() => deleteBidRequest(request.id, 'no_response')}
+                                    title="Customer didn't respond"
+                                  >
+                                    No Response
+                                  </Button>
+                                </div>
+                              </div>
                             ) : null}
                           </div>
                         </div>

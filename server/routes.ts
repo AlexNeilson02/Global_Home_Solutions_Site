@@ -1237,6 +1237,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.error('WebSocket error:', error);
     });
   });
+
+  // Delete bid request
+  apiRouter.delete("/bid-requests/:id", async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      
+      // Mark as deleted by updating status
+      const deletedBidRequest = await storage.updateBidRequestStatus(parseInt(id), 'deleted');
+      
+      if (!deletedBidRequest) {
+        return res.status(404).json({ success: false, message: "Bid request not found" });
+      }
+      
+      res.json({ success: true, message: "Bid request deleted successfully" });
+    } catch (error) {
+      console.error('Error deleting bid request:', error);
+      res.status(500).json({ success: false, message: "Failed to delete bid request" });
+    }
+  });
   
   return httpServer;
 }
