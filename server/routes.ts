@@ -678,11 +678,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Create bid request - public endpoint for customers with file upload support
-  apiRouter.post("/bid-requests", upload.array('media', 10), async (req: Request, res: Response) => {
+  // Create bid request - public endpoint for customers with optional file upload support
+  apiRouter.post("/bid-requests", (req: Request, res: Response, next) => {
+    // Check if this is a multipart request (has files)
+    if (req.headers['content-type']?.includes('multipart/form-data')) {
+      upload.array('media', 10)(req, res, next);
+    } else {
+      next();
+    }
+  }, async (req: Request, res: Response) => {
     try {
       console.log('Received bid request data:', req.body);
       console.log('Received files:', req.files);
+      console.log('Content-Type:', req.headers['content-type']);
       
       const {
         customerName,
