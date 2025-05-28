@@ -346,7 +346,7 @@ export class DatabaseStorage implements IStorage {
   }
   
   async getBidRequestsByContractorId(contractorId: number): Promise<BidRequest[]> {
-    return db.select().from(bidRequests).where(eq(bidRequests.contractorId, contractorId));
+    return db.select().from(bidRequests).where(eq(bidRequests.contractorId, contractorId)).orderBy(desc(bidRequests.createdAt));
   }
   
   async getBidRequestsBySalespersonId(salespersonId: number): Promise<BidRequest[]> {
