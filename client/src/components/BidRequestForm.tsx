@@ -22,6 +22,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
+import { Upload, X, Image, Video, File } from "lucide-react";
 
 const bidRequestSchema = z.object({
   customerName: z.string().min(2, "Name must be at least 2 characters"),
@@ -48,6 +49,8 @@ interface BidRequestFormProps {
 export default function BidRequestForm({ isOpen, onClose, contractor }: BidRequestFormProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
+  const [filePreviewUrls, setFilePreviewUrls] = useState<string[]>([]);
 
   const form = useForm<BidRequestForm>({
     resolver: zodResolver(bidRequestSchema),
@@ -62,12 +65,80 @@ export default function BidRequestForm({ isOpen, onClose, contractor }: BidReque
     },
   });
 
+  // Handle file upload
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(event.target.files || []);
+    const validFiles = files.filter(file => {
+      const isValidType = file.type.startsWith('image/') || file.type.startsWith('video/');
+      const isValidSize = file.size <= 50 * 1024 * 1024; // 50MB limit
+      
+      if (!isValidType) {
+        toast({
+          title: "Invalid file type",
+          description: "Please upload only images or videos",
+          variant: "destructive",
+        });
+        return false;
+      }
+      
+      if (!isValidSize) {
+        toast({
+          title: "File too large",
+          description: "Please upload files smaller than 50MB",
+          variant: "destructive",
+        });
+        return false;
+      }
+      
+      return true;
+    });
+
+    if (validFiles.length > 0) {
+      setUploadedFiles(prev => [...prev, ...validFiles]);
+      
+      // Create preview URLs for images
+      validFiles.forEach(file => {
+        if (file.type.startsWith('image/')) {
+          const url = URL.createObjectURL(file);
+          setFilePreviewUrls(prev => [...prev, url]);
+        }
+      });
+
+      toast({
+        title: "Files uploaded",
+        description: `${validFiles.length} file(s) added successfully`,
+      });
+    }
+  };
+
+  const removeFile = (index: number) => {
+    const fileToRemove = uploadedFiles[index];
+    if (fileToRemove && fileToRemove.type.startsWith('image/')) {
+      URL.revokeObjectURL(filePreviewUrls[index]);
+    }
+    
+    setUploadedFiles(prev => prev.filter((_, i) => i !== index));
+    setFilePreviewUrls(prev => prev.filter((_, i) => i !== index));
+  };
+
   const submitBidRequest = useMutation({
     mutationFn: async (data: BidRequestForm & { contractorId: number }) => {
+      // Create FormData for file uploads
+      const formData = new FormData();
+      
+      // Add form fields
+      Object.entries(data).forEach(([key, value]) => {
+        formData.append(key, value.toString());
+      });
+      
+      // Add files
+      uploadedFiles.forEach((file, index) => {
+        formData.append(`media_${index}`, file);
+      });
+
       const response = await fetch("/api/bid-requests", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
+        body: formData, // Use FormData instead of JSON
       });
       if (!response.ok) {
         const errorData = await response.text();
@@ -226,6 +297,81 @@ export default function BidRequestForm({ isOpen, onClose, contractor }: BidReque
                 </FormItem>
               )}
             />
+
+            {/* Media Upload Section */}
+            <div className="space-y-4">
+              <div>
+                <label className="text-sm font-medium">Project Photos & Videos (Optional)</label>
+                <p className="text-sm text-muted-foreground mb-3">
+                  Upload photos or short videos to help contractors understand your project better
+                </p>
+                
+                <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-6 text-center hover:border-muted-foreground/50 transition-colors">
+                  <input
+                    type="file"
+                    id="media-upload"
+                    multiple
+                    accept="image/*,video/*"
+                    onChange={handleFileUpload}
+                    className="hidden"
+                  />
+                  <label
+                    htmlFor="media-upload"
+                    className="cursor-pointer flex flex-col items-center gap-2"
+                  >
+                    <Upload className="h-8 w-8 text-muted-foreground" />
+                    <span className="text-sm font-medium">Click to upload photos or videos</span>
+                    <span className="text-xs text-muted-foreground">
+                      Supports: JPG, PNG, MP4, MOV (max 50MB each)
+                    </span>
+                  </label>
+                </div>
+              </div>
+
+              {/* Display uploaded files */}
+              {uploadedFiles.length > 0 && (
+                <div className="space-y-3">
+                  <h4 className="text-sm font-medium">Uploaded Files ({uploadedFiles.length})</h4>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                    {uploadedFiles.map((file, index) => (
+                      <div key={index} className="relative group border rounded-lg overflow-hidden">
+                        {file.type.startsWith('image/') ? (
+                          <div className="relative">
+                            <img
+                              src={filePreviewUrls[index]}
+                              alt={`Preview ${index + 1}`}
+                              className="w-full h-24 object-cover"
+                            />
+                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
+                              <Image className="h-4 w-4 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="h-24 bg-muted flex items-center justify-center">
+                            <Video className="h-6 w-6 text-muted-foreground" />
+                          </div>
+                        )}
+                        
+                        <div className="p-2">
+                          <p className="text-xs font-medium truncate">{file.name}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {(file.size / 1024 / 1024).toFixed(1)} MB
+                          </p>
+                        </div>
+                        
+                        <button
+                          type="button"
+                          onClick={() => removeFile(index)}
+                          className="absolute top-1 right-1 bg-destructive text-destructive-foreground rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
             
             <div className="flex justify-end space-x-2 pt-4">
               <Button type="button" variant="outline" onClick={onClose}>
