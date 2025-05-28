@@ -81,37 +81,28 @@ const ContractorPortal: React.FC = () => {
   const markCustomerContacted = async (requestId: number) => {
     try {
       console.log('Marking customer as contacted, ID:', requestId);
-      const response = await fetch(`/api/contractor/bid-requests/${requestId}/status`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ status: 'contacted' })
+      
+      // Update the local state immediately for instant UI feedback
+      setBidRequests(prevRequests => {
+        const updatedRequests = prevRequests.map((request: any) => 
+          request.id === requestId 
+            ? { ...request, status: 'contacted' }
+            : request
+        );
+        
+        // Sort the updated requests to move contacted ones to bottom
+        return updatedRequests.sort((a: any, b: any) => {
+          if (a.status === 'pending' && b.status === 'contacted') return -1;
+          if (a.status === 'contacted' && b.status === 'pending') return 1;
+          return 0;
+        });
       });
 
-      console.log('Response status:', response.status);
-      const responseText = await response.text();
-      console.log('Response text:', responseText);
+      toast({
+        title: "Customer Contacted",
+        description: "The customer has been marked as contacted.",
+      });
       
-      let responseData;
-      try {
-        responseData = JSON.parse(responseText);
-        console.log('Response data:', responseData);
-      } catch (e) {
-        console.error('Failed to parse JSON response:', e);
-        throw new Error('Invalid JSON response from server');
-      }
-
-      if (response.ok) {
-        // Refresh bid requests to show updated status and reorder
-        fetchBidRequests();
-        toast({
-          title: "Customer Contacted",
-          description: "The customer has been marked as contacted.",
-        });
-      } else {
-        throw new Error('Failed to update status: ' + response.status);
-      }
     } catch (error) {
       console.error('Error updating bid request status:', error);
       toast({
