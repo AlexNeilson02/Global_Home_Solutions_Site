@@ -60,7 +60,13 @@ const ContractorPortal: React.FC = () => {
         .then(response => response.json())
         .then(data => {
           console.log('Fetched bid requests:', data);
-          setBidRequests(data?.bidRequests || []);
+          // Sort bid requests: pending first, contacted last
+          const sortedRequests = (data?.bidRequests || []).sort((a: any, b: any) => {
+            if (a.status === 'pending' && b.status === 'contacted') return -1;
+            if (a.status === 'contacted' && b.status === 'pending') return 1;
+            return 0;
+          });
+          setBidRequests(sortedRequests);
           setLoadingBids(false);
         })
         .catch(error => {
@@ -68,6 +74,37 @@ const ContractorPortal: React.FC = () => {
           setBidRequests([]);
           setLoadingBids(false);
         });
+    }
+  };
+
+  // Function to mark customer as contacted
+  const markCustomerContacted = async (requestId: number) => {
+    try {
+      const response = await fetch(`/api/bid-requests/${requestId}/status`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ status: 'contacted' })
+      });
+
+      if (response.ok) {
+        // Refresh bid requests to show updated status and reorder
+        fetchBidRequests();
+        toast({
+          title: "Customer Contacted",
+          description: "The customer has been marked as contacted.",
+        });
+      } else {
+        throw new Error('Failed to update status');
+      }
+    } catch (error) {
+      console.error('Error updating bid request status:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update customer contact status.",
+        variant: "destructive"
+      });
     }
   };
 
@@ -432,9 +469,19 @@ const ContractorPortal: React.FC = () => {
                             </p>
                           </div>
                           <div className="flex flex-col items-end space-y-2 ml-4">
-                            <Button size="sm" className="bg-blue-600 hover:bg-blue-700">
-                              Contact Customer
-                            </Button>
+                            {request.status === 'contacted' ? (
+                              <Button size="sm" variant="secondary" disabled>
+                                Customer Contacted
+                              </Button>
+                            ) : (
+                              <Button 
+                                size="sm" 
+                                className="bg-blue-600 hover:bg-blue-700"
+                                onClick={() => markCustomerContacted(request.id)}
+                              >
+                                Contact Customer
+                              </Button>
+                            )}
                             <Button size="sm" variant="outline">
                               View Details
                             </Button>
