@@ -1,5 +1,6 @@
 import express, { type Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
+import { WebSocketServer, WebSocket } from "ws";
 import { storage } from "./storage";
 import { z } from "zod";
 import QRCode from "qrcode";
@@ -20,6 +21,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Session management - for simplicity using in-memory sessions
   const sessions: Record<string, { userId: number, role: string }> = {};
+  
+  // WebSocket connections for real-time notifications
+  const contractorConnections = new Map<number, WebSocket[]>();
 
   // Middleware to check authentication
   const authenticate = (req: Request, res: Response, next: Function) => {
@@ -688,6 +692,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
         preferredContactMethod: "email"
       });
 
+      // Send real-time notification to contractor if connected
+      const contractorWSConnections = contractorConnections.get(Number(contractorId)) || [];
+      const notification = {
+        type: 'NEW_BID_REQUEST',
+        data: {
+          id: bidRequest.id,
+          customerName: bidRequest.fullName,
+          projectDescription: bidRequest.description,
+          timeline: bidRequest.timeline,
+          budget: bidRequest.budget,
+          email: bidRequest.email,
+          phone: bidRequest.phone,
+          address: bidRequest.address,
+          createdAt: bidRequest.createdAt
+        }
+      };
+
+      contractorWSConnections.forEach(ws => {
+        if (ws.readyState === WebSocket.OPEN) {
+          ws.send(JSON.stringify(notification));
+          console.log('Sent real-time notification to contractor:', contractorId);
+        }
+      });
+
       res.status(201).json({ bidRequest });
     } catch (error) {
       console.error("Error creating bid request:", error);
@@ -1084,5 +1112,59 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Create HTTP server
   const httpServer = createServer(app);
+  
+  // Create WebSocket server for real-time notifications
+  const wss = new WebSocketServer({ server: httpServer, path: '/ws' });
+  
+  wss.on('connection', (ws, req) => {
+    console.log('New WebSocket connection established');
+    
+    ws.on('message', (message) => {
+      try {
+        const data = JSON.parse(message.toString());
+        
+        if (data.type === 'CONTRACTOR_CONNECT' && data.contractorId) {
+          const contractorId = Number(data.contractorId);
+          
+          // Add this connection to the contractor's connections
+          if (!contractorConnections.has(contractorId)) {
+            contractorConnections.set(contractorId, []);
+          }
+          contractorConnections.get(contractorId)!.push(ws);
+          
+          console.log(`Contractor ${contractorId} connected for real-time notifications`);
+          
+          // Send confirmation
+          ws.send(JSON.stringify({
+            type: 'CONNECTION_CONFIRMED',
+            contractorId: contractorId
+          }));
+        }
+      } catch (error) {
+        console.error('Error parsing WebSocket message:', error);
+      }
+    });
+    
+    ws.on('close', () => {
+      // Remove this connection from all contractor lists
+      contractorConnections.forEach((connections, contractorId) => {
+        const index = connections.indexOf(ws);
+        if (index !== -1) {
+          connections.splice(index, 1);
+          console.log(`Contractor ${contractorId} disconnected from real-time notifications`);
+          
+          // Clean up empty arrays
+          if (connections.length === 0) {
+            contractorConnections.delete(contractorId);
+          }
+        }
+      });
+    });
+    
+    ws.on('error', (error) => {
+      console.error('WebSocket error:', error);
+    });
+  });
+  
   return httpServer;
 }
