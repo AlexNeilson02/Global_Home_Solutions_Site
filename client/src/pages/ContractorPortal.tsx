@@ -51,6 +51,14 @@ const ContractorPortal: React.FC = () => {
   // Simple state-based approach for bid requests
   const [bidRequests, setBidRequests] = useState([]);
   const [loadingBids, setLoadingBids] = useState(false);
+  
+  // Media viewer modal state
+  const [viewingMedia, setViewingMedia] = useState<{url: string, type: 'image' | 'video', index: number} | null>(null);
+
+  // Function to open media viewer
+  const openMediaViewer = (url: string, type: 'image' | 'video', index: number) => {
+    setViewingMedia({ url, type, index });
+  };
 
   // Function to fetch bid requests
   const fetchBidRequests = () => {
@@ -436,13 +444,13 @@ const ContractorPortal: React.FC = () => {
                                                 src={mediaUrl}
                                                 alt={`Project image ${index + 1}`}
                                                 className="w-full h-20 object-cover rounded border cursor-pointer hover:opacity-80 transition-opacity"
-                                                onClick={() => window.open(mediaUrl, '_blank')}
+                                                onClick={() => openMediaViewer(mediaUrl, 'image', index)}
                                               />
                                             ) : mediaUrl.startsWith('data:video/') ? (
                                               <video
                                                 src={mediaUrl}
                                                 className="w-full h-20 object-cover rounded border cursor-pointer hover:opacity-80 transition-opacity"
-                                                onClick={() => window.open(mediaUrl, '_blank')}
+                                                onClick={() => openMediaViewer(mediaUrl, 'video', index)}
                                                 muted
                                               >
                                                 Your browser does not support the video tag.
@@ -705,6 +713,47 @@ const ContractorPortal: React.FC = () => {
           </Tabs>
         </div>
       </div>
+
+      {/* Media Viewer Modal */}
+      {viewingMedia && (
+        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50" onClick={() => setViewingMedia(null)}>
+          <div className="relative max-w-4xl max-h-[90vh] w-full h-full flex items-center justify-center p-4">
+            {/* Close button */}
+            <button 
+              onClick={() => setViewingMedia(null)}
+              className="absolute top-4 right-4 text-white hover:text-gray-300 z-10"
+            >
+              <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+            
+            {/* Media content */}
+            <div onClick={(e) => e.stopPropagation()} className="max-w-full max-h-full">
+              {viewingMedia.type === 'image' ? (
+                <img 
+                  src={viewingMedia.url} 
+                  alt={`Project image ${viewingMedia.index + 1}`}
+                  className="max-w-full max-h-full object-contain"
+                />
+              ) : (
+                <video 
+                  src={viewingMedia.url}
+                  controls
+                  className="max-w-full max-h-full"
+                >
+                  Your browser does not support the video tag.
+                </video>
+              )}
+            </div>
+            
+            {/* Image counter */}
+            <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-white bg-black bg-opacity-50 px-3 py-1 rounded">
+              Image {viewingMedia.index + 1}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
