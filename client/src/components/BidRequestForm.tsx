@@ -177,10 +177,19 @@ export default function BidRequestForm({ isOpen, onClose, contractor }: BidReque
   });
 
   const onSubmit = (data: BidRequestForm) => {
-    submitBidRequest.mutate({
-      ...data,
+    // Map frontend form fields to backend expected fields
+    const backendData = {
+      customerName: data.customerName,
+      customerEmail: data.customerEmail, 
+      customerPhone: data.customerPhone,
+      projectDescription: data.projectDescription,
+      projectAddress: data.projectAddress,
+      preferredTimeframe: data.preferredTimeframe,
+      budget: data.budget,
       contractorId: contractor.id,
-    });
+    };
+    
+    submitBidRequest.mutate(backendData);
   };
 
   return (

@@ -681,6 +681,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Create bid request - public endpoint for customers with file upload support
   apiRouter.post("/bid-requests", upload.array('media', 10), async (req: Request, res: Response) => {
     try {
+      console.log('Received bid request data:', req.body);
+      console.log('Received files:', req.files);
+      
       const {
         customerName,
         customerEmail,
@@ -694,6 +697,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Validate required fields
       if (!customerName || !customerEmail || !customerPhone || !projectDescription || !projectAddress || !preferredTimeframe || !contractorId) {
+        console.log('Missing required fields:', {
+          customerName: !!customerName,
+          customerEmail: !!customerEmail,
+          customerPhone: !!customerPhone,
+          projectDescription: !!projectDescription,
+          projectAddress: !!projectAddress,
+          preferredTimeframe: !!preferredTimeframe,
+          contractorId: !!contractorId
+        });
         return res.status(400).json({ message: "All required fields must be provided" });
       }
 
