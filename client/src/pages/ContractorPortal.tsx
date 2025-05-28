@@ -80,6 +80,7 @@ const ContractorPortal: React.FC = () => {
   // Function to mark customer as contacted
   const markCustomerContacted = async (requestId: number) => {
     try {
+      console.log('Marking customer as contacted, ID:', requestId);
       const response = await fetch(`/api/contractor/bid-requests/${requestId}/status`, {
         method: 'PATCH',
         headers: {
@@ -87,6 +88,10 @@ const ContractorPortal: React.FC = () => {
         },
         body: JSON.stringify({ status: 'contacted' })
       });
+
+      console.log('Response status:', response.status);
+      const responseData = await response.json();
+      console.log('Response data:', responseData);
 
       if (response.ok) {
         // Refresh bid requests to show updated status and reorder
@@ -96,7 +101,7 @@ const ContractorPortal: React.FC = () => {
           description: "The customer has been marked as contacted.",
         });
       } else {
-        throw new Error('Failed to update status');
+        throw new Error('Failed to update status: ' + response.status);
       }
     } catch (error) {
       console.error('Error updating bid request status:', error);
