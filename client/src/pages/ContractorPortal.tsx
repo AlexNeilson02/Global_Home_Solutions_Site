@@ -53,11 +53,36 @@ const ContractorPortal: React.FC = () => {
   const [loadingBids, setLoadingBids] = useState(false);
   
   // Media viewer modal state
-  const [viewingMedia, setViewingMedia] = useState<{url: string, type: 'image' | 'video', index: number} | null>(null);
+  const [viewingMedia, setViewingMedia] = useState<{url: string, type: 'image' | 'video', index: number, allMedia: any[]} | null>(null);
 
   // Function to open media viewer
-  const openMediaViewer = (url: string, type: 'image' | 'video', index: number) => {
-    setViewingMedia({ url, type, index });
+  const openMediaViewer = (url: string, type: 'image' | 'video', index: number, allMedia: any[] = []) => {
+    setViewingMedia({ url, type, index, allMedia });
+  };
+
+  // Navigate between media files
+  const navigateMedia = (direction: 'prev' | 'next') => {
+    if (!viewingMedia || !viewingMedia.allMedia) return;
+    
+    const currentIndex = viewingMedia.index;
+    let newIndex = currentIndex;
+    
+    if (direction === 'next' && currentIndex < viewingMedia.allMedia.length - 1) {
+      newIndex = currentIndex + 1;
+    } else if (direction === 'prev' && currentIndex > 0) {
+      newIndex = currentIndex - 1;
+    }
+    
+    if (newIndex !== currentIndex) {
+      const newMediaUrl = viewingMedia.allMedia[newIndex];
+      const newType = newMediaUrl.startsWith('data:image/') ? 'image' : 'video';
+      setViewingMedia({
+        ...viewingMedia,
+        url: newMediaUrl,
+        type: newType,
+        index: newIndex
+      });
+    }
   };
 
   // Function to fetch bid requests
@@ -436,33 +461,51 @@ const ContractorPortal: React.FC = () => {
                                   return (
                                     <div className="space-y-2 mt-3">
                                       <p className="text-sm font-medium">Project Photos & Videos:</p>
-                                      <div className="grid grid-cols-3 gap-2 max-w-md">
+                                      <div className="grid grid-cols-4 gap-2 max-w-lg">
                                         {mediaData.mediaUrls.map((mediaUrl: string, index: number) => (
                                           <div key={index} className="relative group">
                                             {mediaUrl.startsWith('data:image/') ? (
-                                              <img
-                                                src={mediaUrl}
-                                                alt={`Project image ${index + 1}`}
-                                                className="w-full h-20 object-cover rounded border cursor-pointer hover:opacity-80 transition-opacity"
-                                                onClick={() => openMediaViewer(mediaUrl, 'image', index)}
-                                              />
+                                              <div className="relative">
+                                                <img
+                                                  src={mediaUrl}
+                                                  alt={`Project image ${index + 1}`}
+                                                  className="w-full h-20 object-cover rounded border cursor-pointer hover:opacity-80 transition-opacity"
+                                                  onClick={() => openMediaViewer(mediaUrl, 'image', index, mediaData.mediaUrls)}
+                                                />
+                                                <div className="absolute top-1 right-1 bg-blue-600 text-white text-xs px-1 py-0.5 rounded">
+                                                  📷
+                                                </div>
+                                              </div>
                                             ) : mediaUrl.startsWith('data:video/') ? (
-                                              <video
-                                                src={mediaUrl}
-                                                className="w-full h-20 object-cover rounded border cursor-pointer hover:opacity-80 transition-opacity"
-                                                onClick={() => openMediaViewer(mediaUrl, 'video', index)}
-                                                muted
-                                              >
-                                                Your browser does not support the video tag.
-                                              </video>
+                                              <div className="relative">
+                                                <video
+                                                  src={mediaUrl}
+                                                  className="w-full h-20 object-cover rounded border cursor-pointer hover:opacity-80 transition-opacity"
+                                                  onClick={() => openMediaViewer(mediaUrl, 'video', index, mediaData.mediaUrls)}
+                                                  muted
+                                                >
+                                                  Your browser does not support the video tag.
+                                                </video>
+                                                <div className="absolute top-1 right-1 bg-red-600 text-white text-xs px-1 py-0.5 rounded">
+                                                  🎥
+                                                </div>
+                                                <div className="absolute inset-0 flex items-center justify-center">
+                                                  <div className="bg-black bg-opacity-50 rounded-full p-2">
+                                                    <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
+                                                    </svg>
+                                                  </div>
+                                                </div>
+                                              </div>
                                             ) : (
-                                              <div className="w-full h-20 bg-gray-100 rounded border flex items-center justify-center">
-                                                <span className="text-xs text-gray-500">Media</span>
+                                              <div className="w-full h-20 bg-gray-100 rounded border flex items-center justify-center cursor-pointer"
+                                                   onClick={() => openMediaViewer(mediaUrl, 'image', index, mediaData.mediaUrls)}>
+                                                <span className="text-xs text-gray-500">📎 File</span>
                                               </div>
                                             )}
                                             <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 rounded transition-all duration-200 flex items-center justify-center">
-                                              <span className="text-white text-xs opacity-0 group-hover:opacity-100 transition-opacity">
-                                                Click to view
+                                              <span className="text-white text-xs opacity-0 group-hover:opacity-100 transition-opacity font-medium">
+                                                View Full Size
                                               </span>
                                             </div>
                                           </div>
@@ -714,43 +757,97 @@ const ContractorPortal: React.FC = () => {
         </div>
       </div>
 
-      {/* Media Viewer Modal */}
+      {/* Enhanced Media Viewer Modal */}
       {viewingMedia && (
-        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50" onClick={() => setViewingMedia(null)}>
-          <div className="relative max-w-4xl max-h-[90vh] w-full h-full flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50" 
+             onClick={() => setViewingMedia(null)}
+             onKeyDown={(e) => {
+               if (e.key === 'Escape') setViewingMedia(null);
+               if (e.key === 'ArrowLeft') navigateMedia('prev');
+               if (e.key === 'ArrowRight') navigateMedia('next');
+             }}
+             tabIndex={0}>
+          <div className="relative max-w-5xl max-h-[95vh] w-full h-full flex items-center justify-center p-4">
             {/* Close button */}
             <button 
               onClick={() => setViewingMedia(null)}
-              className="absolute top-4 right-4 text-white hover:text-gray-300 z-10"
+              className="absolute top-4 right-4 text-white hover:text-gray-300 z-20 bg-black bg-opacity-50 rounded-full p-2 transition-all"
             >
-              <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
+
+            {/* Previous button */}
+            {viewingMedia.allMedia && viewingMedia.index > 0 && (
+              <button 
+                onClick={(e) => { e.stopPropagation(); navigateMedia('prev'); }}
+                className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white hover:text-gray-300 z-20 bg-black bg-opacity-50 rounded-full p-3 transition-all"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+              </button>
+            )}
+
+            {/* Next button */}
+            {viewingMedia.allMedia && viewingMedia.index < viewingMedia.allMedia.length - 1 && (
+              <button 
+                onClick={(e) => { e.stopPropagation(); navigateMedia('next'); }}
+                className="absolute right-4 top-1/2 transform -translate-y-1/2 text-white hover:text-gray-300 z-20 bg-black bg-opacity-50 rounded-full p-3 transition-all"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+            )}
             
             {/* Media content */}
-            <div onClick={(e) => e.stopPropagation()} className="max-w-full max-h-full">
+            <div onClick={(e) => e.stopPropagation()} className="max-w-full max-h-full flex items-center justify-center">
               {viewingMedia.type === 'image' ? (
                 <img 
                   src={viewingMedia.url} 
                   alt={`Project image ${viewingMedia.index + 1}`}
-                  className="max-w-full max-h-full object-contain"
+                  className="max-w-full max-h-full object-contain rounded-lg shadow-2xl"
                 />
               ) : (
                 <video 
                   src={viewingMedia.url}
                   controls
-                  className="max-w-full max-h-full"
+                  autoPlay
+                  className="max-w-full max-h-full rounded-lg shadow-2xl"
                 >
                   Your browser does not support the video tag.
                 </video>
               )}
             </div>
             
-            {/* Image counter */}
-            <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-white bg-black bg-opacity-50 px-3 py-1 rounded">
-              Image {viewingMedia.index + 1}
+            {/* Media info bar */}
+            <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-white bg-black bg-opacity-70 px-4 py-2 rounded-lg flex items-center space-x-4">
+              <span className="text-sm">
+                {viewingMedia.type === 'image' ? '📷' : '🎥'} 
+                {viewingMedia.type === 'image' ? 'Photo' : 'Video'} {viewingMedia.index + 1}
+                {viewingMedia.allMedia && ` of ${viewingMedia.allMedia.length}`}
+              </span>
+              
+              {viewingMedia.allMedia && viewingMedia.allMedia.length > 1 && (
+                <div className="flex space-x-1">
+                  {viewingMedia.allMedia.map((_, idx) => (
+                    <div 
+                      key={idx}
+                      className={`w-2 h-2 rounded-full ${idx === viewingMedia.index ? 'bg-white' : 'bg-gray-500'}`}
+                    />
+                  ))}
+                </div>
+              )}
             </div>
+
+            {/* Navigation hint */}
+            {viewingMedia.allMedia && viewingMedia.allMedia.length > 1 && (
+              <div className="absolute top-4 left-4 text-white bg-black bg-opacity-50 px-3 py-1 rounded text-xs">
+                Use ← → keys or click arrows to navigate
+              </div>
+            )}
           </div>
         </div>
       )}
