@@ -719,34 +719,13 @@ const ContractorPortal: React.FC = () => {
                           </div>
                           <div className="flex flex-col items-end space-y-2 ml-4">
                             {request.status === 'pending' ? (
-                              <div className="flex flex-col space-y-2">
-                                <Button 
-                                  size="sm" 
-                                  className="bg-blue-600 hover:bg-blue-700"
-                                  onClick={() => markCustomerContacted(request.id)}
-                                >
-                                  Contact Customer
-                                </Button>
-                                <div className="flex space-x-2">
-                                  <Button 
-                                    size="sm" 
-                                    variant="destructive"
-                                    onClick={() => deleteBidRequest(request.id, 'not_interested')}
-                                    title="Customer not interested"
-                                  >
-                                    Not Interested
-                                  </Button>
-                                  <Button 
-                                    size="sm" 
-                                    variant="outline"
-                                    className="text-gray-500 border-gray-300 hover:bg-gray-50"
-                                    onClick={() => deleteBidRequest(request.id, 'no_response')}
-                                    title="Customer didn't respond"
-                                  >
-                                    No Response
-                                  </Button>
-                                </div>
-                              </div>
+                              <Button 
+                                size="sm" 
+                                className="bg-blue-600 hover:bg-blue-700"
+                                onClick={() => markCustomerContacted(request.id)}
+                              >
+                                Contact Customer
+                              </Button>
                             ) : request.status === 'contacted' ? (
                               <div className="flex flex-col space-y-2">
                                 <Button 

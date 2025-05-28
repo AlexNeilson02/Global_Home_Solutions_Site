@@ -1,4 +1,4 @@
-import { eq, and, desc, sql, asc, count, avg, max, lt, gt, between } from "drizzle-orm";
+import { eq, and, desc, sql, asc, count, avg, max, lt, gt, between, ne } from "drizzle-orm";
 import { db } from "./db";
 import { 
   users, contractors, salespersons, projects, testimonials, serviceCategories, bidRequests, pageVisits,
@@ -346,7 +346,12 @@ export class DatabaseStorage implements IStorage {
   }
   
   async getBidRequestsByContractorId(contractorId: number): Promise<BidRequest[]> {
-    return db.select().from(bidRequests).where(eq(bidRequests.contractorId, contractorId)).orderBy(desc(bidRequests.createdAt));
+    return db.select().from(bidRequests)
+      .where(and(
+        eq(bidRequests.contractorId, contractorId),
+        ne(bidRequests.status, 'deleted')
+      ))
+      .orderBy(desc(bidRequests.createdAt));
   }
   
   async getBidRequestsBySalespersonId(salespersonId: number): Promise<BidRequest[]> {
