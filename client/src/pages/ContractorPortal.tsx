@@ -55,6 +55,9 @@ const ContractorPortal: React.FC = () => {
   
   // Media viewer modal state
   const [viewingMedia, setViewingMedia] = useState<{url: string, type: 'image' | 'video', index: number, allMedia: any[]} | null>(null);
+  
+  // Bid details viewer state
+  const [viewingBidDetails, setViewingBidDetails] = useState<any | null>(null);
 
   // Function to open media viewer
   const openMediaViewer = (url: string, type: 'image' | 'video', index: number, allMedia: any[] = []) => {
@@ -481,25 +484,31 @@ const ContractorPortal: React.FC = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    {Array.isArray(projects) ? projects.slice(0, 5).map((project: any) => (
+                    {Array.isArray(projects) && projects.length > 0 ? projects.map((project: any) => (
                       <div key={project.id} className="flex items-center justify-between p-4 border rounded-lg">
                         <div className="space-y-1">
-                          <p className="font-medium">{project.title}</p>
+                          <p className="font-medium">{project.fullName}</p>
                           <p className="text-sm text-gray-500">{project.description}</p>
-                          <p className="text-sm">Budget: ${project.budget?.toLocaleString()}</p>
+                          <p className="text-sm">Budget: {project.budget ? `$${project.budget}` : 'Not specified'}</p>
+                          <p className="text-xs text-gray-400">
+                            Bid sent: {new Date(project.createdAt).toLocaleDateString()}
+                          </p>
                         </div>
                         <div className="flex items-center space-x-2">
-                          <Badge variant={project.status === 'in_progress' ? 'default' : 
-                                         project.status === 'completed' ? 'success' : 'secondary'}>
-                            {project.status?.replace('_', ' ')}
+                          <Badge variant="secondary" className="bg-green-100 text-green-700 border-green-300">
+                            BID SENT
                           </Badge>
-                          <Button size="sm" variant="outline">
+                          <Button 
+                            size="sm" 
+                            variant="outline"
+                            onClick={() => setViewingBidDetails(project)}
+                          >
                             View Details
                           </Button>
                         </div>
                       </div>
                     )) : (
-                      <p className="text-center text-gray-500 py-8">No projects found</p>
+                      <p className="text-center text-gray-500 py-8">No sent bids found</p>
                     )}
                   </div>
                 </CardContent>
@@ -945,6 +954,171 @@ const ContractorPortal: React.FC = () => {
                 Use ← → keys or click arrows to navigate
               </div>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* Bid Details Modal */}
+      {viewingBidDetails && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-xl font-bold">Bid Request Details</h2>
+                <button 
+                  onClick={() => setViewingBidDetails(null)}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+              
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-sm font-medium text-gray-700">Customer Name</label>
+                    <p className="mt-1 text-sm text-gray-900">{viewingBidDetails.fullName}</p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-gray-700">Email</label>
+                    <p className="mt-1 text-sm text-gray-900">{viewingBidDetails.email}</p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-gray-700">Phone</label>
+                    <p className="mt-1 text-sm text-gray-900">{viewingBidDetails.phone}</p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-gray-700">Preferred Contact</label>
+                    <p className="mt-1 text-sm text-gray-900">{viewingBidDetails.preferredContactMethod}</p>
+                  </div>
+                </div>
+                
+                <div>
+                  <label className="text-sm font-medium text-gray-700">Address</label>
+                  <p className="mt-1 text-sm text-gray-900">{viewingBidDetails.address}</p>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-sm font-medium text-gray-700">Timeline</label>
+                    <p className="mt-1 text-sm text-gray-900">{viewingBidDetails.timeline}</p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-gray-700">Budget</label>
+                    <p className="mt-1 text-sm text-gray-900">
+                      {viewingBidDetails.budget ? `$${viewingBidDetails.budget}` : 'Not specified'}
+                    </p>
+                  </div>
+                </div>
+                
+                <div>
+                  <label className="text-sm font-medium text-gray-700">Project Description</label>
+                  <p className="mt-1 text-sm text-gray-900">{viewingBidDetails.description}</p>
+                </div>
+                
+                {viewingBidDetails.additionalInformation && (
+                  <div>
+                    <label className="text-sm font-medium text-gray-700">Additional Information</label>
+                    <p className="mt-1 text-sm text-gray-900">{viewingBidDetails.additionalInformation}</p>
+                  </div>
+                )}
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-sm font-medium text-gray-700">Submitted On</label>
+                    <p className="mt-1 text-sm text-gray-900">
+                      {new Date(viewingBidDetails.createdAt).toLocaleDateString()} at {new Date(viewingBidDetails.createdAt).toLocaleTimeString()}
+                    </p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-gray-700">Status</label>
+                    <p className="mt-1">
+                      <Badge variant="secondary" className="bg-green-100 text-green-700 border-green-300">
+                        BID SENT
+                      </Badge>
+                    </p>
+                  </div>
+                </div>
+
+                {/* Show media if available */}
+                {(() => {
+                  try {
+                    const additionalInfo = viewingBidDetails.additionalInformation ? JSON.parse(viewingBidDetails.additionalInformation) : null;
+                    const mediaUrls = additionalInfo?.mediaUrls || [];
+                    
+                    if (mediaUrls.length > 0) {
+                      return (
+                        <div>
+                          <label className="text-sm font-medium text-gray-700 mb-3 block">
+                            Project Media ({mediaUrls.length} files)
+                          </label>
+                          <div className="grid grid-cols-4 gap-2">
+                            {mediaUrls.map((url: string, idx: number) => {
+                              const isImage = url.includes('data:image/');
+                              const isVideo = url.includes('data:video/');
+                              
+                              return (
+                                <div 
+                                  key={idx} 
+                                  className="relative group cursor-pointer"
+                                  onClick={() => openMediaViewer(url, isImage ? 'image' : 'video', idx, mediaUrls)}
+                                >
+                                  {isImage ? (
+                                    <img
+                                      src={url}
+                                      alt={`Media ${idx + 1}`}
+                                      className="w-full h-16 object-cover rounded border-2 border-gray-200 hover:border-blue-400 transition-colors"
+                                    />
+                                  ) : isVideo ? (
+                                    <div className="relative">
+                                      <video
+                                        src={url}
+                                        className="w-full h-16 object-cover rounded border-2 border-gray-200 hover:border-blue-400 transition-colors"
+                                        muted
+                                      />
+                                      <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-30 rounded">
+                                        <div className="bg-white bg-opacity-90 rounded-full p-1">
+                                          <svg className="w-4 h-4 text-gray-800" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
+                                          </svg>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  ) : (
+                                    <div className="w-full h-16 bg-gray-200 rounded border-2 border-gray-200 hover:border-blue-400 flex items-center justify-center transition-colors">
+                                      <span className="text-gray-600 text-xs">File</span>
+                                    </div>
+                                  )}
+                                  
+                                  <div className="absolute top-2 right-2">
+                                    <span className={`px-2 py-1 text-xs font-medium rounded-full text-white ${
+                                      isImage ? 'bg-blue-600' : isVideo ? 'bg-red-600' : 'bg-gray-600'
+                                    }`}>
+                                      {isImage ? 'IMG' : isVideo ? 'VID' : 'FILE'}
+                                    </span>
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      );
+                    }
+                    return null;
+                  } catch (e) {
+                    return null;
+                  }
+                })()}
+              </div>
+              
+              <div className="mt-6 flex justify-end">
+                <Button onClick={() => setViewingBidDetails(null)}>
+                  Close
+                </Button>
+              </div>
+            </div>
           </div>
         </div>
       )}
