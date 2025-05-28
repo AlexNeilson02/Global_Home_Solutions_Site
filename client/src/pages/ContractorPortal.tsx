@@ -240,6 +240,65 @@ const ContractorPortal: React.FC = () => {
     fetchProjects();
   }, [contractorId]);
 
+  // Function to delete bid request
+  const deleteBidRequest = async (requestId: number, reason: string) => {
+    try {
+      const response = await fetch(`/api/bid-requests/${requestId}`, {
+        method: 'DELETE',
+      });
+
+      if (response.ok) {
+        fetchBidRequests();
+        fetchProjects();
+        toast({
+          title: "Success",
+          description: `Request removed - ${reason.replace('_', ' ')}`,
+        });
+      } else {
+        throw new Error('Failed to delete request');
+      }
+    } catch (error) {
+      console.error('Error deleting request:', error);
+      toast({
+        title: "Error",
+        description: "Failed to remove request. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  // Function to update project status
+  const updateProjectStatus = async (requestId: number, status: string) => {
+    try {
+      const response = await fetch(`/api/contractor/bid-requests/${requestId}/status`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          status: status
+        }),
+      });
+
+      if (response.ok) {
+        fetchProjects();
+        toast({
+          title: "Success",
+          description: `Project marked as ${status.replace('_', ' ')}`,
+        });
+      } else {
+        throw new Error('Failed to update project status');
+      }
+    } catch (error) {
+      console.error('Error updating project:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update project. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
   // Refresh bid requests when new notification arrives
   useEffect(() => {
     if (notifications.lastNotification) {
