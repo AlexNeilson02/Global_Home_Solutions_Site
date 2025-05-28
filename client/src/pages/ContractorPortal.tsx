@@ -377,6 +377,56 @@ const ContractorPortal: React.FC = () => {
                             </div>
                             <p className="text-sm"><span className="font-medium">Project:</span> {request.description}</p>
                             <p className="text-sm"><span className="font-medium">Address:</span> {request.address}</p>
+                            
+                            {/* Media Gallery */}
+                            {request.additionalInformation && (() => {
+                              try {
+                                const mediaData = JSON.parse(request.additionalInformation);
+                                if (mediaData.mediaUrls && mediaData.mediaUrls.length > 0) {
+                                  return (
+                                    <div className="space-y-2 mt-3">
+                                      <p className="text-sm font-medium">Project Photos & Videos:</p>
+                                      <div className="grid grid-cols-3 gap-2 max-w-md">
+                                        {mediaData.mediaUrls.map((mediaUrl: string, index: number) => (
+                                          <div key={index} className="relative group">
+                                            {mediaUrl.startsWith('data:image/') ? (
+                                              <img
+                                                src={mediaUrl}
+                                                alt={`Project image ${index + 1}`}
+                                                className="w-full h-20 object-cover rounded border cursor-pointer hover:opacity-80 transition-opacity"
+                                                onClick={() => window.open(mediaUrl, '_blank')}
+                                              />
+                                            ) : mediaUrl.startsWith('data:video/') ? (
+                                              <video
+                                                src={mediaUrl}
+                                                className="w-full h-20 object-cover rounded border cursor-pointer hover:opacity-80 transition-opacity"
+                                                onClick={() => window.open(mediaUrl, '_blank')}
+                                                muted
+                                              >
+                                                Your browser does not support the video tag.
+                                              </video>
+                                            ) : (
+                                              <div className="w-full h-20 bg-gray-100 rounded border flex items-center justify-center">
+                                                <span className="text-xs text-gray-500">Media</span>
+                                              </div>
+                                            )}
+                                            <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 rounded transition-all duration-200 flex items-center justify-center">
+                                              <span className="text-white text-xs opacity-0 group-hover:opacity-100 transition-opacity">
+                                                Click to view
+                                              </span>
+                                            </div>
+                                          </div>
+                                        ))}
+                                      </div>
+                                    </div>
+                                  );
+                                }
+                              } catch (e) {
+                                // Silently ignore if not valid JSON
+                              }
+                              return null;
+                            })()}
+                            
                             <p className="text-xs text-gray-500">
                               Submitted: {new Date(request.createdAt).toLocaleDateString()} at {new Date(request.createdAt).toLocaleTimeString()}
                             </p>

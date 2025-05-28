@@ -678,8 +678,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Create bid request - public endpoint for customers
-  apiRouter.post("/bid-requests", async (req: Request, res: Response) => {
+  // Create bid request - public endpoint for customers with file upload support
+  apiRouter.post("/bid-requests", upload.array('media', 10), async (req: Request, res: Response) => {
     try {
       const {
         customerName,
@@ -697,8 +697,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "All required fields must be provided" });
       }
 
+      // Process uploaded files
+      const files = req.files as Express.Multer.File[];
+      let mediaUrls: string[] = [];
+      
+      if (files && files.length > 0) {
+        // In a production environment, you would upload these to cloud storage (AWS S3, etc.)
+        // For now, we'll convert files to base64 and store them temporarily
+        // This is not recommended for production but works for demonstration
+        mediaUrls = files.map((file, index) => {
+          const base64Data = file.buffer.toString('base64');
+          const dataUrl = `data:${file.mimetype};base64,${base64Data}`;
+          return dataUrl;
+        });
+      }
+
       // Create bid request with correct field names for database schema
-      const bidRequest = await storage.createBidRequest({
+      const bidRequestData = {
         contractorId: Number(contractorId),
         fullName: customerName,
         email: customerEmail,
@@ -707,8 +722,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         address: projectAddress,
         timeline: preferredTimeframe,
         budget: budget || null,
-        preferredContactMethod: "email"
-      });
+        preferredContactMethod: "email",
+        // Add media URLs if any files were uploaded
+        ...(mediaUrls.length > 0 && { additionalInformation: JSON.stringify({ mediaUrls }) })
+      };
+
+      const bidRequest = await storage.createBidRequest(bidRequestData);
 
       // Send real-time notification to contractor if connected
       const contractorWSConnections = contractorConnections.get(Number(contractorId)) || [];
