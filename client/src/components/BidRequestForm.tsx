@@ -128,6 +128,8 @@ export default function BidRequestForm({ isOpen, onClose, contractor }: BidReque
         // Create FormData for file uploads
         const formData = new FormData();
         
+        console.log('Submitting with files. Form data:', data);
+        
         // Add form fields with correct backend field names
         formData.append('customerName', data.customerName);
         formData.append('customerEmail', data.customerEmail);
@@ -140,8 +142,13 @@ export default function BidRequestForm({ isOpen, onClose, contractor }: BidReque
         
         // Add files
         uploadedFiles.forEach((file, index) => {
-          formData.append(`media`, file);
+          formData.append('media', file);
         });
+
+        // Debug: log FormData contents
+        for (let [key, value] of formData.entries()) {
+          console.log(`FormData ${key}:`, value);
+        }
 
         const response = await fetch("/api/bid-requests", {
           method: "POST",
