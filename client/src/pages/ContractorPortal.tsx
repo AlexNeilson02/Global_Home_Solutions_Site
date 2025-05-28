@@ -6,10 +6,11 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
-import { Building, Users, FileText, TrendingUp, Calendar, Star, Edit, Save, X } from "lucide-react";
+import { Building, Users, FileText, TrendingUp, Calendar, Star, Edit, Save, X, Bell, BellRing } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
+import { useNotifications } from "@/hooks/useNotifications";
 
 const ContractorPortal: React.FC = () => {
   const navigate = useNavigate();
@@ -39,6 +40,9 @@ const ContractorPortal: React.FC = () => {
   const contractor = contractorData?.contractor;
   const contractorId = contractor?.id;
 
+  // Real-time notifications for new bid requests
+  const notifications = useNotifications(contractorId || null);
+
   const { data: projects } = useQuery({
     queryKey: ['/api/projects'],
     enabled: true
@@ -48,8 +52,8 @@ const ContractorPortal: React.FC = () => {
   const [bidRequests, setBidRequests] = useState([]);
   const [loadingBids, setLoadingBids] = useState(false);
 
-  // Fetch bid requests directly when contractor ID is available
-  useEffect(() => {
+  // Function to fetch bid requests
+  const fetchBidRequests = () => {
     if (contractorId) {
       setLoadingBids(true);
       fetch(`/api/contractors/${contractorId}/bid-requests`)
@@ -65,7 +69,26 @@ const ContractorPortal: React.FC = () => {
           setLoadingBids(false);
         });
     }
+  };
+
+  // Fetch bid requests when contractor ID is available
+  useEffect(() => {
+    fetchBidRequests();
   }, [contractorId]);
+
+  // Refresh bid requests when new notification arrives
+  useEffect(() => {
+    if (notifications.lastNotification) {
+      console.log('New bid request notification received, refreshing list...');
+      fetchBidRequests();
+      
+      // Show toast notification
+      toast({
+        title: "New Customer Request!",
+        description: `${notifications.lastNotification.data.customerName} submitted a project request.`,
+      });
+    }
+  }, [notifications.lastNotification]);
 
   // Initialize edit form with contractor data
   useEffect(() => {
@@ -186,11 +209,27 @@ const ContractorPortal: React.FC = () => {
             </Button>
           </div>
 
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+          <Tabs value={activeTab} onValueChange={(value) => {
+            setActiveTab(value);
+            // Mark notifications as read when viewing leads
+            if (value === 'leads') {
+              notifications.markAsRead();
+            }
+          }} className="space-y-6">
             <TabsList className="grid w-full grid-cols-4">
               <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
               <TabsTrigger value="projects">Projects</TabsTrigger>
-              <TabsTrigger value="leads">Lead Requests</TabsTrigger>
+              <TabsTrigger value="leads" className="relative">
+                Lead Requests
+                {notifications.unreadCount > 0 && (
+                  <Badge 
+                    variant="destructive" 
+                    className="absolute -top-2 -right-2 h-5 w-5 text-xs flex items-center justify-center animate-pulse"
+                  >
+                    {notifications.unreadCount}
+                  </Badge>
+                )}
+              </TabsTrigger>
               <TabsTrigger value="profile">Company Profile</TabsTrigger>
             </TabsList>
 
