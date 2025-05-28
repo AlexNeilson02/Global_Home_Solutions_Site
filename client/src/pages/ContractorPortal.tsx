@@ -80,7 +80,7 @@ const ContractorPortal: React.FC = () => {
   // Function to mark customer as contacted
   const markCustomerContacted = async (requestId: number) => {
     try {
-      const response = await fetch(`/api/bid-requests/${requestId}/status`, {
+      const response = await fetch(`/api/contractor/bid-requests/${requestId}/status`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',

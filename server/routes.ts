@@ -805,6 +805,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Internal server error" });
     }
   });
+
+  // Public endpoint for contractors to update bid request status
+  apiRouter.patch("/contractor/bid-requests/:id/status", async (req: Request, res: Response) => {
+    try {
+      const id = Number(req.params.id);
+      const { status } = req.body;
+      
+      if (!status || !['pending', 'contacted', 'completed'].includes(status)) {
+        return res.status(400).json({ message: "Invalid status" });
+      }
+      
+      const bidRequest = await storage.getBidRequest(id);
+      if (!bidRequest) {
+        return res.status(404).json({ message: "Bid request not found" });
+      }
+      
+      const updatedRequest = await storage.updateBidRequestStatus(id, status);
+      res.json({ bidRequest: updatedRequest });
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
   
   // Add notes to bid request
   apiRouter.patch("/bid-requests/:id/notes", authenticate, async (req: Request, res: Response) => {
