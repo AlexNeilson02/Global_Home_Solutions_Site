@@ -90,8 +90,17 @@ const ContractorPortal: React.FC = () => {
       });
 
       console.log('Response status:', response.status);
-      const responseData = await response.json();
-      console.log('Response data:', responseData);
+      const responseText = await response.text();
+      console.log('Response text:', responseText);
+      
+      let responseData;
+      try {
+        responseData = JSON.parse(responseText);
+        console.log('Response data:', responseData);
+      } catch (e) {
+        console.error('Failed to parse JSON response:', e);
+        throw new Error('Invalid JSON response from server');
+      }
 
       if (response.ok) {
         // Refresh bid requests to show updated status and reorder
