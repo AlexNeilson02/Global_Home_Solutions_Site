@@ -875,23 +875,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.error('Error updating bid request status:', error);
       res.status(500).json({ message: "Internal server error" });
     }
-      }
-      
-      const bidRequest = await storage.getBidRequest(id);
-      if (!bidRequest) {
-        console.log('Bid request not found for ID:', id);
-        return res.status(404).json({ message: "Bid request not found" });
-      }
-      
-      console.log('Updating bid request status from', bidRequest.status, 'to', status);
-      const updatedRequest = await storage.updateBidRequestStatus(id, status);
-      console.log('Status updated successfully:', updatedRequest);
-      
-      res.json({ success: true, bidRequest: updatedRequest });
-    } catch (error) {
-      console.error('Error updating bid request status:', error);
-      res.status(500).json({ message: "Internal server error" });
-    }
   });
   
   // Add notes to bid request
