@@ -456,7 +456,9 @@ const ContractorPortal: React.FC = () => {
                             {/* Media Gallery */}
                             {request.additionalInformation && (() => {
                               try {
+                                console.log('Parsing media data for request:', request.id, request.additionalInformation);
                                 const mediaData = JSON.parse(request.additionalInformation);
+                                console.log('Parsed media data:', mediaData);
                                 if (mediaData.mediaUrls && mediaData.mediaUrls.length > 0) {
                                   return (
                                     <div className="space-y-2 mt-3">
