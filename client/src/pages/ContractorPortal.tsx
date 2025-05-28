@@ -43,14 +43,15 @@ const ContractorPortal: React.FC = () => {
   // Real-time notifications for new bid requests
   const notifications = useNotifications(contractorId || null);
 
-  const { data: projects } = useQuery({
-    queryKey: ['/api/projects'],
-    enabled: true
-  });
+
 
   // Simple state-based approach for bid requests
   const [bidRequests, setBidRequests] = useState([]);
   const [loadingBids, setLoadingBids] = useState(false);
+  
+  // State for projects (sent bids)
+  const [projects, setProjects] = useState([]);
+  const [loadingProjects, setLoadingProjects] = useState(false);
   
   // Media viewer modal state
   const [viewingMedia, setViewingMedia] = useState<{url: string, type: 'image' | 'video', index: number, allMedia: any[]} | null>(null);
@@ -93,8 +94,12 @@ const ContractorPortal: React.FC = () => {
         .then(response => response.json())
         .then(data => {
           console.log('Fetched bid requests:', data);
+          // Filter out bids that have been sent (only show pending and contacted)
+          const activeBids = (data?.bidRequests || []).filter((request: any) => 
+            request.status === 'pending' || request.status === 'contacted'
+          );
           // Sort bid requests: pending first, contacted last
-          const sortedRequests = (data?.bidRequests || []).sort((a: any, b: any) => {
+          const sortedRequests = activeBids.sort((a: any, b: any) => {
             if (a.status === 'pending' && b.status === 'contacted') return -1;
             if (a.status === 'contacted' && b.status === 'pending') return 1;
             return 0;
@@ -106,6 +111,29 @@ const ContractorPortal: React.FC = () => {
           console.error('Error fetching bid requests:', error);
           setBidRequests([]);
           setLoadingBids(false);
+        });
+    }
+  };
+
+  // Function to fetch projects (sent bids)
+  const fetchProjects = () => {
+    if (contractorId) {
+      setLoadingProjects(true);
+      fetch(`/api/contractors/${contractorId}/bid-requests`)
+        .then(response => response.json())
+        .then(data => {
+          console.log('Fetched projects:', data);
+          // Filter for bids that have been sent
+          const sentBids = (data?.bidRequests || []).filter((request: any) => 
+            request.status === 'bid_sent'
+          );
+          setProjects(sentBids);
+          setLoadingProjects(false);
+        })
+        .catch(error => {
+          console.error('Error fetching projects:', error);
+          setProjects([]);
+          setLoadingProjects(false);
         });
     }
   };
@@ -130,23 +158,16 @@ const ContractorPortal: React.FC = () => {
       
       // Update the local state after successful database update
       setBidRequests(prevRequests => {
-        const updatedRequests = prevRequests.map((request: any) => 
+        return prevRequests.map((request: any) => 
           request.id === requestId 
             ? { ...request, status: 'contacted' }
             : request
         );
-        
-        // Sort the updated requests to move contacted ones to bottom
-        return updatedRequests.sort((a: any, b: any) => {
-          if (a.status === 'pending' && b.status === 'contacted') return -1;
-          if (a.status === 'contacted' && b.status === 'pending') return 1;
-          return 0;
-        });
       });
 
       toast({
-        title: "Bid Sent!",
-        description: "The customer has been contacted and your bid has been sent.",
+        title: "Customer Contacted!",
+        description: "You can now send your bid to the customer.",
       });
       
     } catch (error) {
@@ -154,6 +175,50 @@ const ContractorPortal: React.FC = () => {
       toast({
         title: "Error",
         description: "Failed to update customer contact status.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  // Function to send bid to customer
+  const sendBidToCustomer = async (requestId: number) => {
+    try {
+      console.log('Sending bid to customer, ID:', requestId);
+      
+      // Update the database to mark bid as sent
+      const response = await fetch(`/api/contractor/bid-requests/${requestId}/status`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ status: 'bid_sent' }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update bid request status');
+      }
+      
+      // Remove from current list since it moves to projects
+      setBidRequests(prevRequests => {
+        return prevRequests.filter((request: any) => request.id !== requestId);
+      });
+
+      // Refresh the projects list to show the new bid
+      fetchProjects();
+      
+      // Switch to projects tab to show the moved request
+      setActiveTab('projects');
+
+      toast({
+        title: "Bid Sent Successfully!",
+        description: "Your bid has been sent and moved to Projects tab.",
+      });
+      
+    } catch (error) {
+      console.error('Error sending bid:', error);
+      toast({
+        title: "Error",
+        description: "Failed to send bid to customer.",
         variant: "destructive"
       });
     }
@@ -548,11 +613,7 @@ const ContractorPortal: React.FC = () => {
                             </p>
                           </div>
                           <div className="flex flex-col items-end space-y-2 ml-4">
-                            {request.status === 'contacted' ? (
-                              <Button size="sm" variant="secondary" disabled className="bg-green-100 text-green-700 border-green-300">
-                                BID SENT
-                              </Button>
-                            ) : (
+                            {request.status === 'pending' ? (
                               <Button 
                                 size="sm" 
                                 className="bg-blue-600 hover:bg-blue-700"
@@ -560,7 +621,15 @@ const ContractorPortal: React.FC = () => {
                               >
                                 Contact Customer
                               </Button>
-                            )}
+                            ) : request.status === 'contacted' ? (
+                              <Button 
+                                size="sm" 
+                                className="bg-green-600 hover:bg-green-700"
+                                onClick={() => sendBidToCustomer(request.id)}
+                              >
+                                Send Bid
+                              </Button>
+                            ) : null}
                           </div>
                         </div>
                       )) : (
