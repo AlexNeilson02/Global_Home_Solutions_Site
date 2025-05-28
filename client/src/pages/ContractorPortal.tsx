@@ -359,7 +359,7 @@ const ContractorPortal: React.FC = () => {
                       Debug: {Array.isArray(bidRequests) ? `${bidRequests.length} requests found` : 'No array data'}
                     </div>
                     {Array.isArray(bidRequests) && bidRequests.length > 0 ? 
-                      bidRequests.slice(0, 5).map((request: any) => (
+                      bidRequests.map((request: any) => (
                         <div key={request.id} className="flex items-center justify-between p-4 border rounded-lg bg-white dark:bg-gray-800">
                           <div className="space-y-2 flex-1">
                             <div className="flex items-center gap-2">
