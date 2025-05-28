@@ -123,28 +123,50 @@ export default function BidRequestForm({ isOpen, onClose, contractor }: BidReque
 
   const submitBidRequest = useMutation({
     mutationFn: async (data: BidRequestForm & { contractorId: number }) => {
-      // Create FormData for file uploads
-      const formData = new FormData();
-      
-      // Add form fields with correct backend field names
-      formData.append('customerName', data.customerName);
-      formData.append('customerEmail', data.customerEmail);
-      formData.append('customerPhone', data.customerPhone);
-      formData.append('projectDescription', data.projectDescription);
-      formData.append('projectAddress', data.projectAddress);
-      formData.append('preferredTimeframe', data.preferredTimeframe);
-      formData.append('budget', data.budget || '');
-      formData.append('contractorId', data.contractorId.toString());
-      
-      // Add files
-      uploadedFiles.forEach((file, index) => {
-        formData.append(`media`, file);
-      });
+      // If there are files, use FormData; otherwise use JSON
+      if (uploadedFiles.length > 0) {
+        // Create FormData for file uploads
+        const formData = new FormData();
+        
+        // Add form fields with correct backend field names
+        formData.append('customerName', data.customerName);
+        formData.append('customerEmail', data.customerEmail);
+        formData.append('customerPhone', data.customerPhone);
+        formData.append('projectDescription', data.projectDescription);
+        formData.append('projectAddress', data.projectAddress);
+        formData.append('preferredTimeframe', data.preferredTimeframe);
+        formData.append('budget', data.budget || '');
+        formData.append('contractorId', data.contractorId.toString());
+        
+        // Add files
+        uploadedFiles.forEach((file, index) => {
+          formData.append(`media`, file);
+        });
 
-      const response = await fetch("/api/bid-requests", {
-        method: "POST",
-        body: formData, // Use FormData instead of JSON
-      });
+        const response = await fetch("/api/bid-requests", {
+          method: "POST",
+          body: formData, // Use FormData for file uploads
+        });
+        
+        if (!response.ok) {
+          const errorData = await response.text();
+          throw new Error(`Failed to submit bid request: ${errorData}`);
+        }
+        return response.json();
+      } else {
+        // Use regular JSON for requests without files
+        const response = await fetch("/api/bid-requests", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data),
+        });
+        
+        if (!response.ok) {
+          const errorData = await response.text();
+          throw new Error(`Failed to submit bid request: ${errorData}`);
+        }
+        return response.json();
+      }
       if (!response.ok) {
         const errorData = await response.text();
         throw new Error(`Failed to submit bid request: ${errorData}`);
