@@ -809,21 +809,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Public endpoint for contractors to update bid request status
   apiRouter.patch("/contractor/bid-requests/:id/status", async (req: Request, res: Response) => {
     try {
+      console.log('Contractor status update - ID:', req.params.id, 'Body:', req.body);
       const id = Number(req.params.id);
       const { status } = req.body;
       
-      if (!status || !['pending', 'contacted', 'completed', 'bid_sent'].includes(status)) {
+      if (!status || !['pending', 'contacted', 'completed', 'bid_sent', 'not_interested', 'no_response', 'won', 'lost'].includes(status)) {
+        console.log('Invalid status received:', status);
         return res.status(400).json({ message: "Invalid status" });
       }
       
       const bidRequest = await storage.getBidRequest(id);
       if (!bidRequest) {
+        console.log('Bid request not found for ID:', id);
         return res.status(404).json({ message: "Bid request not found" });
       }
       
+      console.log('Updating bid request status from', bidRequest.status, 'to', status);
       const updatedRequest = await storage.updateBidRequestStatus(id, status);
-      res.json({ bidRequest: updatedRequest });
+      console.log('Status updated successfully:', updatedRequest);
+      
+      res.json({ success: true, bidRequest: updatedRequest });
     } catch (error) {
+      console.error('Error updating bid request status:', error);
       res.status(500).json({ message: "Internal server error" });
     }
   });
