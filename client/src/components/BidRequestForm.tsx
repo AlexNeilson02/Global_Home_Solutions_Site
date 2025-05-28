@@ -126,14 +126,19 @@ export default function BidRequestForm({ isOpen, onClose, contractor }: BidReque
       // Create FormData for file uploads
       const formData = new FormData();
       
-      // Add form fields
-      Object.entries(data).forEach(([key, value]) => {
-        formData.append(key, value.toString());
-      });
+      // Add form fields with correct backend field names
+      formData.append('customerName', data.customerName);
+      formData.append('customerEmail', data.customerEmail);
+      formData.append('customerPhone', data.customerPhone);
+      formData.append('projectDescription', data.projectDescription);
+      formData.append('projectAddress', data.projectAddress);
+      formData.append('preferredTimeframe', data.preferredTimeframe);
+      formData.append('budget', data.budget || '');
+      formData.append('contractorId', data.contractorId.toString());
       
       // Add files
       uploadedFiles.forEach((file, index) => {
-        formData.append(`media_${index}`, file);
+        formData.append(`media`, file);
       });
 
       const response = await fetch("/api/bid-requests", {
