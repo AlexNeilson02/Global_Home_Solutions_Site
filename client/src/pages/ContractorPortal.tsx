@@ -224,9 +224,10 @@ const ContractorPortal: React.FC = () => {
     }
   };
 
-  // Fetch bid requests when contractor ID is available
+  // Fetch bid requests and projects when contractor ID is available
   useEffect(() => {
     fetchBidRequests();
+    fetchProjects();
   }, [contractorId]);
 
   // Refresh bid requests when new notification arrives
