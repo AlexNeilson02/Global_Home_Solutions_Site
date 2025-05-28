@@ -812,7 +812,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const id = Number(req.params.id);
       const { status } = req.body;
       
-      if (!status || !['pending', 'contacted', 'completed'].includes(status)) {
+      if (!status || !['pending', 'contacted', 'completed', 'bid_sent'].includes(status)) {
         return res.status(400).json({ message: "Invalid status" });
       }
       

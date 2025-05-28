@@ -158,11 +158,18 @@ const ContractorPortal: React.FC = () => {
       
       // Update the local state after successful database update
       setBidRequests(prevRequests => {
-        return prevRequests.map((request: any) => 
+        const updatedRequests = prevRequests.map((request: any) => 
           request.id === requestId 
             ? { ...request, status: 'contacted' }
             : request
         );
+        
+        // Sort to move contacted ones to bottom
+        return updatedRequests.sort((a: any, b: any) => {
+          if (a.status === 'pending' && b.status === 'contacted') return -1;
+          if (a.status === 'contacted' && b.status === 'pending') return 1;
+          return 0;
+        });
       });
 
       toast({
