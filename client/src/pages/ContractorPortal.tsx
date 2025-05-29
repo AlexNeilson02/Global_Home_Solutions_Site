@@ -809,6 +809,7 @@ const ContractorPortal: React.FC = () => {
                           onClick={handleSaveProfile} 
                           disabled={updateContractorMutation.isPending}
                           size="sm"
+                          className="bg-blue-600 hover:bg-blue-700 text-white font-semibold"
                         >
                           <Save className="h-4 w-4 mr-2" />
                           {updateContractorMutation.isPending ? 'Saving...' : 'Save'}
@@ -817,6 +818,7 @@ const ContractorPortal: React.FC = () => {
                           onClick={handleCancelEdit} 
                           variant="outline" 
                           size="sm"
+                          className="border-gray-400 text-gray-900 hover:bg-gray-100 font-semibold"
                         >
                           <X className="h-4 w-4 mr-2" />
                           Cancel
@@ -826,7 +828,7 @@ const ContractorPortal: React.FC = () => {
                       <Button 
                         onClick={() => setIsEditingProfile(true)} 
                         size="sm"
-                        className="text-white font-semibold"
+                        className="bg-blue-600 hover:bg-blue-700 text-white font-semibold"
                       >
                         <Edit className="h-4 w-4 mr-2" />
                         Edit Profile
