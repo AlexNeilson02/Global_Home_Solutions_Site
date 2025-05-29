@@ -182,7 +182,7 @@ export default function ContractorRegistration() {
                         <FormItem>
                           <FormLabel>Username *</FormLabel>
                           <FormControl>
-                            <Input placeholder="Choose a username" {...field} />
+                            <Input placeholder="e.g., john_contractor or mycompany123" {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -195,7 +195,7 @@ export default function ContractorRegistration() {
                         <FormItem>
                           <FormLabel>Password *</FormLabel>
                           <FormControl>
-                            <Input type="password" placeholder="Create a password" {...field} />
+                            <Input type="password" placeholder="Minimum 6 characters" {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -208,7 +208,7 @@ export default function ContractorRegistration() {
                         <FormItem>
                           <FormLabel>Confirm Password *</FormLabel>
                           <FormControl>
-                            <Input type="password" placeholder="Confirm your password" {...field} />
+                            <Input type="password" placeholder="Re-enter the same password" {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -228,7 +228,7 @@ export default function ContractorRegistration() {
                         <FormItem>
                           <FormLabel>Full Name *</FormLabel>
                           <FormControl>
-                            <Input placeholder="John Smith" {...field} />
+                            <Input placeholder="e.g., John Smith" {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -242,7 +242,7 @@ export default function ContractorRegistration() {
                         <FormItem>
                           <FormLabel>Email Address *</FormLabel>
                           <FormControl>
-                            <Input type="email" placeholder="john@company.com" {...field} />
+                            <Input type="email" placeholder="e.g., john@company.com" {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -256,7 +256,7 @@ export default function ContractorRegistration() {
                         <FormItem>
                           <FormLabel>Phone Number *</FormLabel>
                           <FormControl>
-                            <Input placeholder="(555) 123-4567" {...field} />
+                            <Input placeholder="e.g., (555) 123-4567" {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -276,7 +276,7 @@ export default function ContractorRegistration() {
                         <FormItem>
                           <FormLabel>Company Name *</FormLabel>
                           <FormControl>
-                            <Input placeholder="ABC Construction" {...field} />
+                            <Input placeholder="e.g., ABC Construction LLC" {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -290,7 +290,7 @@ export default function ContractorRegistration() {
                         <FormItem>
                           <FormLabel>License Number *</FormLabel>
                           <FormControl>
-                            <Input placeholder="LIC123456" {...field} />
+                            <Input placeholder="e.g., LIC123456 or #ABC-789" {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -304,7 +304,7 @@ export default function ContractorRegistration() {
                         <FormItem>
                           <FormLabel>Insurance Provider *</FormLabel>
                           <FormControl>
-                            <Input placeholder="State Farm" {...field} />
+                            <Input placeholder="e.g., State Farm, Allstate, GEICO" {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -318,7 +318,7 @@ export default function ContractorRegistration() {
                         <FormItem>
                           <FormLabel>Business Address *</FormLabel>
                           <FormControl>
-                            <Input placeholder="123 Main St, City, State 12345" {...field} />
+                            <Input placeholder="e.g., 123 Main St, Your City, ST 12345" {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -413,7 +413,7 @@ export default function ContractorRegistration() {
                         <FormLabel>Service Areas *</FormLabel>
                         <FormControl>
                           <Textarea 
-                            placeholder="Describe the geographic areas you serve (cities, counties, radius from your location)"
+                            placeholder="e.g., Serving all of Orange County, within 50 miles of downtown, Los Angeles metro area"
                             {...field}
                           />
                         </FormControl>
@@ -435,7 +435,7 @@ export default function ContractorRegistration() {
                         <FormLabel>Portfolio Description *</FormLabel>
                         <FormControl>
                           <Textarea 
-                            placeholder="Describe your best work, notable projects, and what sets your company apart"
+                            placeholder="e.g., Completed 200+ kitchen remodels, specialize in luxury homes, 5-star reviews on Google"
                             {...field}
                           />
                         </FormControl>
@@ -451,7 +451,7 @@ export default function ContractorRegistration() {
                       <FormItem>
                         <FormLabel>Website URL</FormLabel>
                         <FormControl>
-                          <Input placeholder="https://www.yourcompany.com" {...field} />
+                          <Input placeholder="e.g., https://www.yourcompany.com" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -466,7 +466,7 @@ export default function ContractorRegistration() {
                         <FormLabel>Certifications</FormLabel>
                         <FormControl>
                           <Textarea 
-                            placeholder="List any relevant certifications, training, or industry memberships"
+                            placeholder="e.g., EPA Lead-Safe Certified, NARI Member, OSHA 10-Hour Training"
                             {...field}
                           />
                         </FormControl>
@@ -488,7 +488,7 @@ export default function ContractorRegistration() {
                         <FormLabel>Additional Notes</FormLabel>
                         <FormControl>
                           <Textarea 
-                            placeholder="Any additional information you'd like to share about your business"
+                            placeholder="e.g., Family-owned business, free estimates, emergency services available"
                             {...field}
                           />
                         </FormControl>

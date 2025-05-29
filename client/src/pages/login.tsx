@@ -225,7 +225,7 @@ export default function Login() {
                       <FormItem>
                         <FormLabel>Username</FormLabel>
                         <FormControl>
-                          <Input placeholder="Enter your username" {...field} />
+                          <Input placeholder="e.g., john_smith or contractor123" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -239,7 +239,7 @@ export default function Login() {
                       <FormItem>
                         <FormLabel>Password</FormLabel>
                         <FormControl>
-                          <Input type="password" placeholder="Enter your password" {...field} />
+                          <Input type="password" placeholder="Enter your secure password" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -283,7 +283,7 @@ export default function Login() {
                       <FormItem>
                         <FormLabel>Full Name</FormLabel>
                         <FormControl>
-                          <Input placeholder="Enter your full name" {...field} />
+                          <Input placeholder="e.g., John Smith" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -297,7 +297,7 @@ export default function Login() {
                       <FormItem>
                         <FormLabel>Email</FormLabel>
                         <FormControl>
-                          <Input type="email" placeholder="Enter your email" {...field} />
+                          <Input type="email" placeholder="e.g., john@company.com" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -311,7 +311,7 @@ export default function Login() {
                       <FormItem>
                         <FormLabel>Username</FormLabel>
                         <FormControl>
-                          <Input placeholder="Choose a username" {...field} />
+                          <Input placeholder="e.g., john_contractor or jsmith123" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -325,7 +325,7 @@ export default function Login() {
                       <FormItem>
                         <FormLabel>Password</FormLabel>
                         <FormControl>
-                          <Input type="password" placeholder="Create a password" {...field} />
+                          <Input type="password" placeholder="Minimum 6 characters" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -339,7 +339,7 @@ export default function Login() {
                       <FormItem>
                         <FormLabel>Confirm Password</FormLabel>
                         <FormControl>
-                          <Input type="password" placeholder="Confirm your password" {...field} />
+                          <Input type="password" placeholder="Re-enter the same password" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
