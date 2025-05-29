@@ -52,10 +52,10 @@ html, body {
   --popover-foreground: 29 29 31;
 
   --muted: 248 248 248; /* Very light gray #f8f8f8 */
-  --muted-foreground: 142 142 147; /* Apple's secondary label #8e8e93 */
+  --muted-foreground: 75 85 99; /* Darker grey for better readability #4b5563 */
 
-  --border: 229 229 234; /* Light border #e5e5ea */
-  --input: 248 248 248;
+  --border: 209 213 219; /* Stronger border #d1d5db */
+  --input: 249 250 251; /* Slight tint for input backgrounds #f9fafb */
   --ring: 0 122 255; /* Apple blue for focus rings */
 
   --destructive: 255 59 48; /* Apple's system red #ff3b30 */

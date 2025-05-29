@@ -190,7 +190,7 @@ export default function Login() {
           <CardTitle className="text-2xl font-bold text-center">
             {activeTab === "login" ? "Welcome back" : "Create an account"}
           </CardTitle>
-          <CardDescription className="text-center">
+          <CardDescription className="text-center text-foreground">
             {activeTab === "login"
               ? "Enter your credentials to sign in to your account"
               : "Fill in the form below to create your account"}
