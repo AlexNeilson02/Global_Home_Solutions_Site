@@ -826,6 +826,7 @@ const ContractorPortal: React.FC = () => {
                       <Button 
                         onClick={() => setIsEditingProfile(true)} 
                         size="sm"
+                        className="text-white font-semibold"
                       >
                         <Edit className="h-4 w-4 mr-2" />
                         Edit Profile
