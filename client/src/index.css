@@ -55,7 +55,7 @@ html, body {
   --muted-foreground: 105 105 105; /* Medium grey text #696969 */
 
   --border: 209 213 219; /* Stronger border #d1d5db */
-  --input: 240 240 245; /* More noticeable tint for input backgrounds #f0f0f5 */
+  --input: 248 248 252; /* Lighter input background for better contrast #f8f8fc */
   --ring: 0 122 255; /* Apple blue for focus rings */
 
   --destructive: 255 59 48; /* Apple's system red #ff3b30 */
@@ -159,6 +159,19 @@ html, body {
     @apply w-full px-4 py-3 text-sm bg-input border border-border rounded-[var(--radius)];
     @apply focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent;
     @apply transition-all duration-200;
+  }
+  
+  /* Enhanced placeholder visibility */
+  input::placeholder,
+  textarea::placeholder {
+    color: hsl(var(--muted-foreground));
+    opacity: 0.8;
+    font-weight: 400;
+  }
+  
+  input:focus::placeholder,
+  textarea:focus::placeholder {
+    opacity: 0.6;
   }
   
   /* Card layouts with Apple spacing */
