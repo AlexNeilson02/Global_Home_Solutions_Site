@@ -58,13 +58,22 @@ export function Sidebar({ className }: SidebarProps) {
   const navItems = getNavItems();
 
   return (
-    <div className={cn("hidden md:block w-64 bg-white shadow-sm p-6 space-y-8", className)}>      
-      <div className="space-y-1">
+    <div className={cn("hidden md:block w-64 bg-white shadow-apple-md border-r border-border p-8 space-y-8", className)}>      
+      {/* Logo Section */}
+      <div className="flex items-center space-x-3 pb-4">
+        <img src={globalLogoPath} alt="Global Home Solutions" className="h-10 w-10 rounded-apple" />
+        <h2 className="text-lg font-semibold text-foreground">Global Home</h2>
+      </div>
+      
+      {/* Navigation Items */}
+      <div className="space-y-2">
         {navItems.map((item) => (
           <Link key={item.href} href={item.href}>
             <div className={cn(
-              "flex items-center space-x-3 text-muted-foreground hover:text-primary hover:bg-primary-50 rounded-md px-3 py-2 cursor-pointer transition-colors",
-              location === item.href && "text-primary font-medium bg-primary-50"
+              "nav-item flex items-center space-x-3 px-4 py-3 rounded-apple text-sm font-medium transition-all duration-200 ease-apple cursor-pointer",
+              location === item.href 
+                ? "bg-primary text-primary-foreground shadow-apple" 
+                : "text-muted-foreground hover:text-foreground hover:bg-muted hover:scale-105 active:scale-95"
             )}>
               {item.icon}
               <span>{item.label}</span>
@@ -73,16 +82,21 @@ export function Sidebar({ className }: SidebarProps) {
         ))}
       </div>
       
+      {/* User Profile Section */}
       {user && (
-        <div className="pt-8 mt-8 border-t border-border">
-          <div className="flex items-center space-x-3">
-            <Avatar className="h-10 w-10">
-              <AvatarImage src={user.avatarUrl || ""} alt={user.fullName} />
-              <AvatarFallback>{getInitials(user.fullName)}</AvatarFallback>
-            </Avatar>
-            <div>
-              <h4 className="font-medium">{user.fullName}</h4>
-              <p className="text-xs text-muted-foreground capitalize">{user.role}</p>
+        <div className="mt-auto pt-8 border-t border-border">
+          <div className="apple-card p-4 !shadow-apple-sm">
+            <div className="flex items-center space-x-3">
+              <Avatar className="h-12 w-12 rounded-apple shadow-apple-sm">
+                <AvatarImage src={user.avatarUrl || ""} alt={user.fullName} />
+                <AvatarFallback className="bg-primary/10 text-primary font-medium">
+                  {getInitials(user.fullName)}
+                </AvatarFallback>
+              </Avatar>
+              <div className="flex-1 min-w-0">
+                <h4 className="font-semibold text-sm text-foreground truncate">{user.fullName}</h4>
+                <p className="text-xs text-muted-foreground capitalize">{user.role}</p>
+              </div>
             </div>
           </div>
         </div>
