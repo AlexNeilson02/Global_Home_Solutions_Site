@@ -1,0 +1,77 @@
+<svg width="400" height="300" viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="400" height="300" fill="#f8f9fa"/>
+  
+  <!-- Floor planks -->
+  <!-- Row 1 -->
+  <rect x="20" y="180" width="120" height="25" fill="#8B4513" stroke="#654321" stroke-width="1"/>
+  <rect x="140" y="180" width="100" height="25" fill="#A0522D" stroke="#654321" stroke-width="1"/>
+  <rect x="240" y="180" width="140" height="25" fill="#8B4513" stroke="#654321" stroke-width="1"/>
+  
+  <!-- Row 2 -->
+  <rect x="20" y="205" width="80" height="25" fill="#A0522D" stroke="#654321" stroke-width="1"/>
+  <rect x="100" y="205" width="130" height="25" fill="#8B4513" stroke="#654321" stroke-width="1"/>
+  <rect x="230" y="205" width="110" height="25" fill="#A0522D" stroke="#654321" stroke-width="1"/>
+  <rect x="340" y="205" width="40" height="25" fill="#8B4513" stroke="#654321" stroke-width="1"/>
+  
+  <!-- Row 3 -->
+  <rect x="20" y="230" width="110" height="25" fill="#8B4513" stroke="#654321" stroke-width="1"/>
+  <rect x="130" y="230" width="90" height="25" fill="#A0522D" stroke="#654321" stroke-width="1"/>
+  <rect x="220" y="230" width="120" height="25" fill="#8B4513" stroke="#654321" stroke-width="1"/>
+  <rect x="340" y="230" width="40" height="25" fill="#A0522D" stroke="#654321" stroke-width="1"/>
+  
+  <!-- Row 4 -->
+  <rect x="20" y="255" width="100" height="25" fill="#A0522D" stroke="#654321" stroke-width="1"/>
+  <rect x="120" y="255" width="80" height="25" fill="#8B4513" stroke="#654321" stroke-width="1"/>
+  <rect x="200" y="255" width="140" height="25" fill="#A0522D" stroke="#654321" stroke-width="1"/>
+  <rect x="340" y="255" width="40" height="25" fill="#8B4513" stroke="#654321" stroke-width="1"/>
+  
+  <!-- Wood grain lines for texture -->
+  <g stroke="#654321" stroke-width="0.5" opacity="0.3">
+    <!-- Row 1 grain -->
+    <line x1="25" y1="185" x2="135" y2="185"/>
+    <line x1="30" y1="195" x2="130" y2="195"/>
+    <line x1="145" y1="190" x2="235" y2="190"/>
+    <line x1="245" y1="185" x2="375" y2="185"/>
+    <line x1="250" y1="195" x2="370" y2="195"/>
+    
+    <!-- Row 2 grain -->
+    <line x1="25" y1="210" x2="95" y2="210"/>
+    <line x1="105" y1="215" x2="225" y2="215"/>
+    <line x1="235" y1="210" x2="335" y2="210"/>
+    
+    <!-- Row 3 grain -->
+    <line x1="25" y1="240" x2="125" y2="240"/>
+    <line x1="135" y1="235" x2="215" y2="235"/>
+    <line x1="225" y1="240" x2="335" y2="240"/>
+    
+    <!-- Row 4 grain -->
+    <line x1="25" y1="265" x2="115" y2="265"/>
+    <line x1="125" y1="260" x2="195" y2="260"/>
+    <line x1="205" y1="265" x2="335" y2="265"/>
+  </g>
+  
+  <!-- Installation tools -->
+  <!-- Hammer -->
+  <rect x="50" y="80" width="40" height="8" fill="#8B4513" transform="rotate(15 70 84)"/>
+  <circle cx="45" cy="82" r="8" fill="#666"/>
+  
+  <!-- Measuring tape -->
+  <rect x="120" y="75" width="25" height="15" fill="#FFD700" rx="2"/>
+  <rect x="125" y="78" width="15" height="3" fill="#FF0000"/>
+  <line x1="140" y1="80" x2="180" y2="80" stroke="#333" stroke-width="1"/>
+  
+  <!-- Level -->
+  <rect x="200" y="70" width="80" height="12" fill="#4A90E2" rx="6"/>
+  <circle cx="240" cy="76" r="3" fill="#90EE90"/>
+  <rect x="235" y="73" width="10" height="6" fill="rgba(255,255,255,0.3)" rx="1"/>
+  
+  <!-- Text label -->
+  <text x="200" y="40" font-family="Inter, Arial, sans-serif" font-size="24" font-weight="bold" fill="#2c3e50" text-anchor="middle">Professional Flooring</text>
+  <text x="200" y="60" font-family="Inter, Arial, sans-serif" font-size="16" fill="#7f8c8d" text-anchor="middle">Hardwood • Laminate • Vinyl • Tile</text>
+  
+  <!-- Installation progress indicator -->
+  <rect x="300" y="120" width="60" height="40" fill="none" stroke="#ddd" stroke-width="2" stroke-dasharray="5,5"/>
+  <text x="330" y="140" font-family="Inter, Arial, sans-serif" font-size="10" fill="#666" text-anchor="middle">Next Section</text>
+  <text x="330" y="150" font-family="Inter, Arial, sans-serif" font-size="10" fill="#666" text-anchor="middle">to Install</text>
+</svg>
