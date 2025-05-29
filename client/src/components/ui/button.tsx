@@ -9,15 +9,15 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-primary text-white border-primary hover:bg-primary/90 hover:border-primary/90 shadow-apple-md",
+        default: "bg-primary text-white border-primary hover:bg-primary/90 hover:border-primary/90 shadow-apple-md font-semibold",
         destructive:
-          "bg-destructive text-white border-destructive hover:bg-destructive/90 hover:border-destructive/90 shadow-apple",
+          "bg-red-600 text-white border-red-600 hover:bg-red-700 hover:border-red-700 shadow-apple font-semibold",
         outline:
-          "border-2 border-primary bg-white text-primary hover:bg-primary hover:text-white shadow-apple-sm",
+          "border-2 border-gray-900 bg-white text-gray-900 hover:bg-gray-900 hover:text-white shadow-apple-sm font-semibold",
         secondary:
-          "bg-gray-100 text-gray-900 border-gray-200 hover:bg-gray-200 hover:border-gray-300 shadow-apple",
-        ghost: "border-transparent bg-transparent text-foreground hover:bg-gray-100 hover:border-gray-200 shadow-none hover:shadow-apple-sm",
-        link: "text-primary underline-offset-4 hover:underline shadow-none hover:scale-100 active:scale-100 border-transparent",
+          "bg-gray-200 text-gray-900 border-gray-300 hover:bg-gray-300 hover:border-gray-400 shadow-apple font-semibold",
+        ghost: "border-transparent bg-transparent text-gray-900 hover:bg-gray-100 hover:border-gray-200 shadow-none hover:shadow-apple-sm font-semibold",
+        link: "text-primary underline-offset-4 hover:underline shadow-none hover:scale-100 active:scale-100 border-transparent font-medium",
       },
       size: {
         default: "h-11 px-6 py-3",
