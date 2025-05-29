@@ -161,30 +161,37 @@ html, body {
     @apply transition-all duration-200;
   }
   
-  /* Ensure input text is properly positioned */
+  /* Comprehensive form element styling for visibility */
   input[type="text"],
   input[type="email"], 
   input[type="password"],
   input[type="number"],
-  textarea {
+  input[type="tel"],
+  input[type="url"],
+  textarea,
+  select {
     background-color: white !important;
     color: black !important;
-    border: 1px solid #d1d5db !important;
+    border: 2px solid #d1d5db !important;
+    outline: none !important;
   }
   
   input[type="text"]:focus,
   input[type="email"]:focus, 
   input[type="password"]:focus,
   input[type="number"]:focus,
-  textarea:focus {
+  input[type="tel"]:focus,
+  input[type="url"]:focus,
+  textarea:focus,
+  select:focus {
     border-color: #3b82f6 !important;
     box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1) !important;
   }
   
-  /* Enhanced placeholder visibility */
+  /* Enhanced placeholder visibility with grey color */
   input::placeholder,
   textarea::placeholder {
-    color: #9ca3af !important;
+    color: #6b7280 !important;
     opacity: 1 !important;
     font-weight: 400;
     position: relative;
@@ -193,15 +200,80 @@ html, body {
   
   input:focus::placeholder,
   textarea:focus::placeholder {
-    color: #6b7280 !important;
-    opacity: 0.7 !important;
+    color: #9ca3af !important;
+    opacity: 0.8 !important;
   }
   
-  /* Fix Select dropdown visibility with correct selectors */
+  /* Checkbox styling with grey outline */
+  input[type="checkbox"] {
+    appearance: none !important;
+    width: 18px !important;
+    height: 18px !important;
+    border: 2px solid #6b7280 !important;
+    border-radius: 4px !important;
+    background-color: white !important;
+    position: relative !important;
+    cursor: pointer !important;
+  }
+  
+  input[type="checkbox"]:checked {
+    background-color: #3b82f6 !important;
+    border-color: #3b82f6 !important;
+  }
+  
+  input[type="checkbox"]:checked::after {
+    content: '✓' !important;
+    position: absolute !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    color: white !important;
+    font-size: 12px !important;
+    font-weight: bold !important;
+  }
+  
+  input[type="checkbox"]:focus {
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2) !important;
+  }
+  
+  /* Radio button styling */
+  input[type="radio"] {
+    appearance: none !important;
+    width: 18px !important;
+    height: 18px !important;
+    border: 2px solid #6b7280 !important;
+    border-radius: 50% !important;
+    background-color: white !important;
+    position: relative !important;
+    cursor: pointer !important;
+  }
+  
+  input[type="radio"]:checked {
+    border-color: #3b82f6 !important;
+  }
+  
+  input[type="radio"]:checked::after {
+    content: '' !important;
+    position: absolute !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    width: 8px !important;
+    height: 8px !important;
+    border-radius: 50% !important;
+    background-color: #3b82f6 !important;
+  }
+  
+  input[type="radio"]:focus {
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2) !important;
+  }
+  
+  /* Fix Select dropdown visibility with grey outlines */
   button[role="combobox"] {
     background-color: white !important;
     color: black !important;
-    border: 1px solid #d1d5db !important;
+    border: 2px solid #6b7280 !important;
+    min-height: 48px !important;
   }
   
   button[role="combobox"]:focus {
@@ -212,7 +284,7 @@ html, body {
   /* Select dropdown content */
   div[role="listbox"] {
     background-color: white !important;
-    border: 1px solid #d1d5db !important;
+    border: 2px solid #6b7280 !important;
     box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
     z-index: 50 !important;
   }
@@ -221,7 +293,8 @@ html, body {
   div[role="option"] {
     color: black !important;
     background-color: white !important;
-    padding: 8px 12px !important;
+    padding: 12px 16px !important;
+    border-bottom: 1px solid #e5e7eb !important;
   }
   
   div[role="option"]:hover,
@@ -235,10 +308,90 @@ html, body {
     color: black !important;
   }
   
-  /* Select placeholder text */
+  /* Select placeholder text with grey color */
   button[role="combobox"][data-placeholder] span {
-    color: #9ca3af !important;
+    color: #6b7280 !important;
     opacity: 1 !important;
+  }
+  
+  /* Labels visibility enhancement */
+  label {
+    color: black !important;
+    font-weight: 500 !important;
+    font-size: 14px !important;
+    margin-bottom: 4px !important;
+    display: block !important;
+  }
+  
+  /* Form descriptions and help text */
+  .text-muted-foreground,
+  .text-gray-500,
+  .text-gray-600,
+  [data-description] {
+    color: #6b7280 !important;
+    opacity: 1 !important;
+  }
+  
+  /* Error messages visibility */
+  .text-destructive,
+  .text-red-500,
+  .text-red-600 {
+    color: #dc2626 !important;
+    font-weight: 500 !important;
+  }
+  
+  /* Radix UI component fixes for visibility */
+  [data-radix-select-trigger] {
+    background-color: white !important;
+    color: black !important;
+    border: 2px solid #6b7280 !important;
+    min-height: 48px !important;
+  }
+  
+  [data-radix-select-content] {
+    background-color: white !important;
+    border: 2px solid #6b7280 !important;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1) !important;
+    z-index: 50 !important;
+  }
+  
+  [data-radix-select-item] {
+    color: black !important;
+    background-color: white !important;
+    padding: 12px 16px !important;
+  }
+  
+  [data-radix-select-item]:hover,
+  [data-radix-select-item][data-highlighted] {
+    background-color: #f3f4f6 !important;
+    color: black !important;
+  }
+  
+  /* Checkbox component styling */
+  [data-radix-checkbox-root] {
+    border: 2px solid #6b7280 !important;
+    background-color: white !important;
+    width: 18px !important;
+    height: 18px !important;
+  }
+  
+  [data-radix-checkbox-root][data-state="checked"] {
+    background-color: #3b82f6 !important;
+    border-color: #3b82f6 !important;
+  }
+  
+  /* Dialog and Modal content */
+  [data-radix-dialog-content] {
+    background-color: white !important;
+    border: 2px solid #6b7280 !important;
+    color: black !important;
+  }
+  
+  /* Popover content */
+  [data-radix-popover-content] {
+    background-color: white !important;
+    border: 2px solid #6b7280 !important;
+    color: black !important;
   }
   
   /* Card layouts with Apple spacing */
