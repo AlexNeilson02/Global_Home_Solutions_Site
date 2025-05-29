@@ -5,19 +5,19 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-apple text-sm font-medium transition-all duration-200 ease-apple focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow-apple hover:scale-105 active:scale-95",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-apple text-sm font-semibold transition-all duration-200 ease-apple focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow-apple hover:scale-105 active:scale-95 border",
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground hover:bg-primary/90 shadow-apple-md",
+        default: "bg-primary text-white border-primary hover:bg-primary/90 hover:border-primary/90 shadow-apple-md",
         destructive:
-          "bg-destructive text-destructive-foreground hover:bg-destructive/90 shadow-apple",
+          "bg-destructive text-white border-destructive hover:bg-destructive/90 hover:border-destructive/90 shadow-apple",
         outline:
-          "border border-border bg-background hover:bg-muted hover:text-foreground shadow-apple-sm",
+          "border-2 border-primary bg-white text-primary hover:bg-primary hover:text-white shadow-apple-sm",
         secondary:
-          "bg-secondary text-secondary-foreground hover:bg-secondary/80 shadow-apple",
-        ghost: "hover:bg-muted hover:text-foreground shadow-none hover:shadow-apple-sm",
-        link: "text-primary underline-offset-4 hover:underline shadow-none hover:scale-100 active:scale-100",
+          "bg-gray-100 text-gray-900 border-gray-200 hover:bg-gray-200 hover:border-gray-300 shadow-apple",
+        ghost: "border-transparent bg-transparent text-foreground hover:bg-gray-100 hover:border-gray-200 shadow-none hover:shadow-apple-sm",
+        link: "text-primary underline-offset-4 hover:underline shadow-none hover:scale-100 active:scale-100 border-transparent",
       },
       size: {
         default: "h-11 px-6 py-3",
