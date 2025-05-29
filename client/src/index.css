@@ -33,29 +33,29 @@ html, body {
   --background: 255 255 255; /* Pure white background */
   --foreground: 29 29 31; /* Apple's text black #1d1d1f */
   
-  /* Primary colors - Apple blue accent */
-  --primary: 0 122 255; /* Apple's system blue #007AFF */
+  /* Primary colors - Apple blue accent with more contrast */
+  --primary: 0 100 220; /* Slightly darker blue for better contrast #0064dc */
   --primary-foreground: 255 255 255;
   
   /* Secondary grays */
   --secondary: 242 242 247; /* Light gray #f2f2f7 */
-  --secondary-foreground: 29 29 31;
+  --secondary-foreground: 0 0 0; /* Changed brown to black */
   
   --accent: 99 99 102; /* Medium gray #636366 */
   --accent-foreground: 255 255 255;
   
   /* UI elements with subtle Apple styling */
   --card: 255 255 255; /* Pure white cards */
-  --card-foreground: 29 29 31;
+  --card-foreground: 0 0 0; /* Changed brown to black */
 
   --popover: 255 255 255;
-  --popover-foreground: 29 29 31;
+  --popover-foreground: 0 0 0; /* Changed brown to black */
 
-  --muted: 248 248 248; /* Very light gray #f8f8f8 */
-  --muted-foreground: 75 85 99; /* Darker grey for better readability #4b5563 */
+  --muted: 245 245 245; /* Slightly darker tint for better visibility #f5f5f5 */
+  --muted-foreground: 64 64 64; /* Changed pink to darker grey #404040 */
 
   --border: 209 213 219; /* Stronger border #d1d5db */
-  --input: 249 250 251; /* Slight tint for input backgrounds #f9fafb */
+  --input: 240 240 245; /* More noticeable tint for input backgrounds #f0f0f5 */
   --ring: 0 122 255; /* Apple blue for focus rings */
 
   --destructive: 255 59 48; /* Apple's system red #ff3b30 */
