@@ -420,7 +420,11 @@ export default function BidRequestForm({ isOpen, onClose, contractor }: BidReque
               <Button type="button" variant="outline" onClick={onClose}>
                 Cancel
               </Button>
-              <Button type="submit" disabled={submitBidRequest.isPending}>
+              <Button 
+                type="submit" 
+                disabled={submitBidRequest.isPending}
+                className="bg-blue-600 hover:bg-blue-700 text-white font-semibold"
+              >
                 {submitBidRequest.isPending ? "Sending..." : "Send Bid Request"}
               </Button>
             </div>
