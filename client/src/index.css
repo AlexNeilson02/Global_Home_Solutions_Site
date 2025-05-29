@@ -197,42 +197,48 @@ html, body {
     opacity: 0.7 !important;
   }
   
-  /* Fix Select dropdown visibility */
-  [data-radix-select-content] {
-    background-color: white !important;
-    border: 1px solid #d1d5db !important;
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
-  }
-  
-  [data-radix-select-item] {
-    color: black !important;
-    background-color: white !important;
-  }
-  
-  [data-radix-select-item]:hover,
-  [data-radix-select-item][data-highlighted] {
-    background-color: #f3f4f6 !important;
-    color: black !important;
-  }
-  
-  [data-radix-select-trigger] {
+  /* Fix Select dropdown visibility with correct selectors */
+  button[role="combobox"] {
     background-color: white !important;
     color: black !important;
     border: 1px solid #d1d5db !important;
   }
   
-  [data-radix-select-trigger]:focus {
+  button[role="combobox"]:focus {
     border-color: #3b82f6 !important;
     box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1) !important;
   }
   
-  [data-radix-select-value] {
+  /* Select dropdown content */
+  div[role="listbox"] {
+    background-color: white !important;
+    border: 1px solid #d1d5db !important;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+    z-index: 50 !important;
+  }
+  
+  /* Select dropdown items */
+  div[role="option"] {
+    color: black !important;
+    background-color: white !important;
+    padding: 8px 12px !important;
+  }
+  
+  div[role="option"]:hover,
+  div[role="option"][data-highlighted] {
+    background-color: #f3f4f6 !important;
     color: black !important;
   }
   
-  /* Ensure placeholder text in selects is visible */
-  [data-radix-select-trigger][data-placeholder] {
+  /* Select trigger value text */
+  span[data-radix-select-value] {
+    color: black !important;
+  }
+  
+  /* Select placeholder text */
+  button[role="combobox"][data-placeholder] span {
     color: #9ca3af !important;
+    opacity: 1 !important;
   }
   
   /* Card layouts with Apple spacing */
