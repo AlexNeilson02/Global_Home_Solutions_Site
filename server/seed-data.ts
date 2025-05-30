@@ -1,11 +1,12 @@
 import { db } from './db';
 import { 
-  users, contractors, salespersons, projects, testimonials,
+  users, contractors, salespersons, projects, testimonials, serviceCategories,
   type User, type InsertUser,
   type Contractor, type InsertContractor,
   type Salesperson, type InsertSalesperson,
   type Project, type InsertProject,
-  type Testimonial, type InsertTestimonial
+  type Testimonial, type InsertTestimonial,
+  type ServiceCategory, type InsertServiceCategory
 } from "@shared/schema";
 import { eq } from 'drizzle-orm';
 
@@ -20,6 +21,85 @@ export async function seedDatabase() {
   console.log('Seeding database...');
 
   try {
+    // First, seed the service categories with all 66 services from the CSV
+    const services = [
+      'Decks & Porches',
+      'Electrical',
+      'Epoxy Flooring',
+      'Fencing',
+      'Flooring & Hardwood',
+      'Foundation Repair',
+      'Handyman',
+      'Heating & Cooling',
+      'Insulation',
+      'Kitchen Remodeling',
+      'Outdoor Remodeling',
+      'Painting Interior & Exterior',
+      'Patio Covers',
+      'Pest Control',
+      'Plumbing',
+      'Rain Gutters',
+      'Reglazing (Bath & Countertop)',
+      'Restoration (Fire and Water)',
+      'Roofing',
+      'Room Additions/New Construction',
+      'Shutters/Shades/Blinds',
+      'Siding',
+      'Swimming Pools',
+      'Tree Service',
+      'Walk-in Tubs',
+      'Windows & Doors',
+      'Wood Refinishing',
+      'Pool service',
+      'concrete patio/drive walk',
+      'remodle',
+      'House cleaning',
+      'Block wall/ fence',
+      'landscaping',
+      'vet services',
+      'interior design',
+      'low voltage',
+      'HVAC',
+      'Turf',
+      'handy man service',
+      'sheet rock',
+      'gerneral contracting remodle',
+      'garbage haul off',
+      'solar',
+      'excavation',
+      'roofing',
+      'stone and masonary',
+      'window and door install',
+      'trim carpentry',
+      'countertops',
+      'fireplace',
+      'smart home automation',
+      'genterator install',
+      'home security and surveillance',
+      'tile',
+      'carpet',
+      'concrete polioshing',
+      'appliances',
+      'home inspection',
+      'landscape designe',
+      'outdoot kitchens',
+      'tree service',
+      'blinds and shutters',
+      'property management',
+      'hvac maintenance',
+      'water softeners and filtration',
+      'window washing',
+      'garage door'
+    ];
+
+    // Insert all services
+    for (const serviceName of services) {
+      await db.insert(serviceCategories).values({
+        name: serviceName,
+        description: `Professional ${serviceName.toLowerCase()} services`,
+        isActive: true
+      });
+    }
     // Create users
     const homeowner1 = await db.insert(users).values({
       username: 'homeowner1',

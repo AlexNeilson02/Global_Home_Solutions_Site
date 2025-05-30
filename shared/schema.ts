@@ -103,6 +103,7 @@ export const bidRequests = pgTable("bid_requests", {
   email: text("email").notNull(),
   phone: text("phone").notNull(),
   address: text("address").notNull(),
+  serviceRequested: text("service_requested").notNull(), // Specific service from the 66 services list
   description: text("description").notNull(),
   timeline: text("timeline").notNull(),
   budget: text("budget"),
