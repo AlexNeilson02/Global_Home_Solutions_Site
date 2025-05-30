@@ -693,25 +693,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log('Content-Type:', req.headers['content-type']);
       
       const {
+        fullName,
+        email,
+        phone,
+        address,
+        serviceRequested,
+        description,
+        timeline,
+        budget,
+        preferredContactMethod,
+        additionalInformation,
+        contractorId,
+        salespersonId,
+        // Legacy fields for backward compatibility
         customerName,
         customerEmail,
         customerPhone,
         projectDescription,
         projectAddress,
-        preferredTimeframe,
-        budget,
-        contractorId
+        preferredTimeframe
       } = req.body;
 
+      // Use new fields if available, fallback to legacy fields for backward compatibility
+      const finalFullName = fullName || customerName;
+      const finalEmail = email || customerEmail;
+      const finalPhone = phone || customerPhone;
+      const finalAddress = address || projectAddress;
+      const finalDescription = description || projectDescription;
+      const finalTimeline = timeline || preferredTimeframe;
+      
       // Validate required fields
-      if (!customerName || !customerEmail || !customerPhone || !projectDescription || !projectAddress || !preferredTimeframe || !contractorId) {
+      if (!finalFullName || !finalEmail || !finalPhone || !finalDescription || !finalAddress || !finalTimeline || !contractorId) {
         console.log('Missing required fields:', {
-          customerName: !!customerName,
-          customerEmail: !!customerEmail,
-          customerPhone: !!customerPhone,
-          projectDescription: !!projectDescription,
-          projectAddress: !!projectAddress,
-          preferredTimeframe: !!preferredTimeframe,
+          fullName: !!finalFullName,
+          email: !!finalEmail,
+          phone: !!finalPhone,
+          description: !!finalDescription,
+          address: !!finalAddress,
+          timeline: !!finalTimeline,
           contractorId: !!contractorId
         });
         return res.status(400).json({ message: "All required fields must be provided" });
@@ -735,16 +754,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Create bid request with correct field names for database schema
       const bidRequestData = {
         contractorId: Number(contractorId),
-        fullName: customerName,
-        email: customerEmail,
-        phone: customerPhone,
-        description: projectDescription,
-        address: projectAddress,
-        timeline: preferredTimeframe,
+        salespersonId: salespersonId ? Number(salespersonId) : null,
+        fullName: finalFullName,
+        email: finalEmail,
+        phone: finalPhone,
+        address: finalAddress,
+        serviceRequested: serviceRequested || "General Services",
+        description: finalDescription,
+        timeline: finalTimeline,
         budget: budget || null,
-        preferredContactMethod: "email",
-        // Add media URLs if any files were uploaded
-        ...(mediaUrls.length > 0 && { additionalInformation: JSON.stringify({ mediaUrls }) })
+        preferredContactMethod: preferredContactMethod || "email",
+        // Add media URLs and additional information
+        additionalInformation: additionalInformation || (mediaUrls.length > 0 ? JSON.stringify({ mediaUrls }) : null)
       };
 
       const bidRequest = await storage.createBidRequest(bidRequestData);
@@ -1086,7 +1107,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   apiRouter.get("/service-categories", async (req: Request, res: Response) => {
     try {
       const categories = await storage.getAllServiceCategories();
-      res.json({ categories });
+      res.json({ services: categories });
     } catch (error) {
       console.error("Error fetching service categories:", error);
       res.status(500).json({ message: "Internal server error" });
