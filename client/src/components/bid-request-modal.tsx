@@ -18,6 +18,7 @@ const bidRequestSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email address." }),
   phone: z.string().min(10, { message: "Phone number must be at least 10 digits." }),
   address: z.string().min(5, { message: "Please provide your complete address." }),
+  serviceRequested: z.string().min(1, { message: "Please select a service." }),
   description: z.string().min(10, { message: "Please provide more details about your project." }).max(1000, { message: "Description cannot exceed 1000 characters." }),
   timeline: z.string(),
   budget: z.string().optional(),
@@ -45,6 +46,12 @@ export function BidRequestModal({
   serviceCategory
 }: BidRequestModalProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  // Fetch available services from the database
+  const { data: servicesData } = useQuery({
+    queryKey: ["/api/service-categories"],
+    enabled: open, // Only fetch when modal is open
+  });
   
   // Generate service-specific form fields based on category
   const getServiceSpecificFields = (category?: string) => {
@@ -179,6 +186,7 @@ export function BidRequestModal({
       email: "",
       phone: "",
       address: "",
+      serviceRequested: serviceCategory || "",
       description: "",
       timeline: "1-3 months",
       budget: "",
@@ -192,13 +200,10 @@ export function BidRequestModal({
     
     try {
       // Submit the bid request to the API
-      await apiRequest("/api/bid-requests", {
-        method: "POST",
-        data: {
-          ...data,
-          contractorId,
-          salespersonId,
-        },
+      await apiRequest("POST", "/api/bid-requests", {
+        ...data,
+        contractorId,
+        salespersonId,
       });
       
       toast({
@@ -316,6 +321,34 @@ export function BidRequestModal({
                   <FormControl>
                     <Input placeholder="Enter the address where the work will be done" {...field} />
                   </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            
+            <FormField
+              control={form.control}
+              name="serviceRequested"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Service Requested</FormLabel>
+                  <Select 
+                    onValueChange={field.onChange} 
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select the service you need" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent className="max-h-60 overflow-y-auto">
+                      {servicesData?.services?.map((service: any) => (
+                        <SelectItem key={service.id} value={service.name}>
+                          {service.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                   <FormMessage />
                 </FormItem>
               )}
