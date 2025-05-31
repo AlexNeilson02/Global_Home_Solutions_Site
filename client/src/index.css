@@ -458,20 +458,57 @@ html, body {
     animation: apple-fade-in 0.5s cubic-bezier(0.4, 0.0, 0.2, 1);
   }
 
-  /* Minimal mobile fixes - only target yellow form styling */
+  /* Mobile-specific fixes for yellow and purple browser styling */
   @media (max-width: 768px) {
-    /* Fix mobile form input yellow backgrounds only */
-    input[type="text"],
-    input[type="email"], 
-    input[type="password"] {
-      -webkit-appearance: none !important;
-      appearance: none !important;
+    /* Remove browser autofill styling that causes yellow backgrounds */
+    input:-webkit-autofill,
+    input:-webkit-autofill:hover,
+    input:-webkit-autofill:focus,
+    input:-webkit-autofill:active {
+      -webkit-box-shadow: 0 0 0 1000px white inset !important;
+      -webkit-text-fill-color: black !important;
+      background-color: white !important;
+      background-clip: content-box !important;
     }
     
-    /* Only override if element has yellow styling */
-    *[style*="background-color: yellow"],
-    *[style*="background: yellow"],
-    *[style*="border-color: yellow"] {
+    /* Override mobile browser form styling */
+    input[type="text"],
+    input[type="email"], 
+    input[type="password"],
+    input[type="tel"],
+    input[type="url"],
+    input[type="number"] {
+      -webkit-appearance: none !important;
+      -moz-appearance: none !important;
+      appearance: none !important;
+      background-color: white !important;
+      background-image: none !important;
+      border-color: #d1d5db !important;
+    }
+    
+    /* Remove purple/blue selection styling on mobile */
+    input:focus,
+    textarea:focus,
+    select:focus {
+      outline: none !important;
+      border-color: #3b82f6 !important;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
+    }
+    
+    /* Force white backgrounds on cards and containers */
+    .bg-card,
+    [class*="bg-card"],
+    div[class*="Card"] {
+      background-color: white !important;
+      border-color: #e5e7eb !important;
+    }
+    
+    /* Override any system colors that might appear as yellow or purple */
+    *:not(button) {
+      background-color: inherit !important;
+    }
+    
+    button:not(.bg-blue-600):not(.bg-primary):not([class*="bg-blue"]) {
       background-color: white !important;
       border-color: #d1d5db !important;
     }
