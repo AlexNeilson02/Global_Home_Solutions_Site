@@ -457,4 +457,72 @@ html, body {
   .page-transition {
     animation: apple-fade-in 0.5s cubic-bezier(0.4, 0.0, 0.2, 1);
   }
+
+  /* Mobile-specific fixes to prevent yellow backgrounds */
+  @media (max-width: 768px) {
+    /* Force white backgrounds on all cards and containers */
+    [data-radix-dialog-content],
+    .card,
+    [role="dialog"],
+    form,
+    .form-container,
+    .login-container,
+    .card-container {
+      background-color: white !important;
+      background: white !important;
+    }
+    
+    /* Override any browser default form styling on mobile */
+    input[type="text"],
+    input[type="email"], 
+    input[type="password"],
+    input[type="number"],
+    input[type="tel"],
+    input[type="url"],
+    textarea,
+    select,
+    button[role="combobox"] {
+      background-color: white !important;
+      background: white !important;
+      -webkit-appearance: none !important;
+      appearance: none !important;
+    }
+    
+    /* Force white backgrounds on all UI components */
+    div[data-radix-popover-content],
+    div[data-radix-select-content],
+    div[data-radix-dropdown-menu-content],
+    .shadcn-card,
+    .ui-card {
+      background-color: white !important;
+      background: white !important;
+    }
+    
+    /* Ensure form containers have white backgrounds */
+    .space-y-6,
+    .space-y-8,
+    .max-w-md,
+    .w-full {
+      background-color: transparent !important;
+    }
+    
+    /* Override any webkit form styling */
+    input::-webkit-textfield-decoration-container {
+      background-color: white !important;
+    }
+    
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+      background-color: white !important;
+    }
+  }
+  
+  /* Universal white background enforcement for all card-like elements */
+  .bg-card,
+  [class*="bg-card"],
+  .card,
+  [class*="card"] {
+    background-color: white !important;
+    background: white !important;
+  }
 }
