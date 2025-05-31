@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -54,15 +54,19 @@ const contractorRegistrationSchema = z.object({
 
 type ContractorRegistrationForm = z.infer<typeof contractorRegistrationSchema>;
 
-const specialtyOptions = [
-  "Roofing", "Siding", "Windows", "Doors", "HVAC", "Plumbing", 
-  "Electrical", "Flooring", "Kitchen Remodeling", "Bathroom Remodeling",
-  "Painting", "Landscaping", "Concrete", "Fencing", "Solar Installation"
-];
-
 export default function ContractorRegistration() {
   const { toast } = useToast();
   const [selectedSpecialties, setSelectedSpecialties] = useState<string[]>([]);
+
+  // Fetch available services from the database
+  const { data: servicesData } = useQuery({
+    queryKey: ["/api/service-categories"],
+  });
+
+  // Sort services alphabetically
+  const specialtyOptions = servicesData?.services
+    ?.map((service: any) => service.name)
+    ?.sort((a: string, b: string) => a.localeCompare(b)) || [];
 
   const form = useForm<ContractorRegistrationForm>({
     resolver: zodResolver(contractorRegistrationSchema),

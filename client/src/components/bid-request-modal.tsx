@@ -342,7 +342,9 @@ export function BidRequestModal({
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent className="max-h-60 overflow-y-auto">
-                      {servicesData?.services?.map((service: any) => (
+                      {servicesData?.services
+                        ?.sort((a: any, b: any) => a.name.localeCompare(b.name))
+                        ?.map((service: any) => (
                         <SelectItem key={service.id} value={service.name}>
                           {service.name}
                         </SelectItem>
