@@ -467,9 +467,24 @@ html, body {
     form,
     .form-container,
     .login-container,
-    .card-container {
+    .card-container,
+    div[class*="Card"],
+    div[class*="card"],
+    div[class*="bg-card"],
+    *[class*="rounded"] {
       background-color: white !important;
       background: white !important;
+      border-color: #e5e7eb !important;
+    }
+    
+    /* Specifically target the login card container */
+    .max-w-md,
+    .w-full.space-y-8,
+    .space-y-8 > *,
+    .min-h-screen > * > * {
+      background-color: white !important;
+      background: white !important;
+      border-color: #e5e7eb !important;
     }
     
     /* Override any browser default form styling on mobile */
@@ -549,5 +564,28 @@ html, body {
   [class*="card"] {
     background-color: white !important;
     background: white !important;
+  }
+
+  /* Emergency mobile override - eliminate all yellow styling */
+  @media (max-width: 768px) {
+    * {
+      border-color: #e5e7eb !important;
+    }
+    
+    *:not(button):not(.bg-blue-600):not(.bg-primary):not([class*="bg-blue"]) {
+      background-color: white !important;
+      background: white !important;
+    }
+    
+    /* Specifically override any yellow colors */
+    *[style*="yellow"],
+    *[style*="#ff"],
+    *[style*="rgb(255, 255, 0)"],
+    *[class*="yellow"],
+    *[class*="bg-yellow"] {
+      background-color: white !important;
+      background: white !important;
+      border-color: #e5e7eb !important;
+    }
   }
 }
