@@ -5,10 +5,6 @@ import BidRequestForm from "@/components/BidRequestForm";
 import logoPath from "@/assets/global-home-solutions-logo.png";
 import "../styles/HomePage.css";
 
-const trades = [
-  "Plumbing", "Electrical", "Flooring", "Concrete", "Roofing", "HVAC"
-];
-
 export default function HomePage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [trade, setTrade] = useState(searchParams.get("trade") || "");
@@ -22,6 +18,16 @@ export default function HomePage() {
     queryKey: ['/api/contractors'],
     enabled: true
   });
+
+  // Fetch available services from the database
+  const { data: servicesData } = useQuery({
+    queryKey: ["/api/service-categories"],
+  });
+
+  // Sort services alphabetically for the dropdown
+  const trades = servicesData?.services
+    ?.map((service: any) => service.name)
+    ?.sort((a: string, b: string) => a.localeCompare(b)) || [];
 
   useEffect(() => {
     if (trade && searchTriggered) {
