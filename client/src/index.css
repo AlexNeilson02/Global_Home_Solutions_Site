@@ -458,134 +458,22 @@ html, body {
     animation: apple-fade-in 0.5s cubic-bezier(0.4, 0.0, 0.2, 1);
   }
 
-  /* Mobile-specific fixes to prevent yellow backgrounds */
+  /* Minimal mobile fixes - only target yellow form styling */
   @media (max-width: 768px) {
-    /* Force white backgrounds on all cards and containers */
-    [data-radix-dialog-content],
-    .card,
-    [role="dialog"],
-    form,
-    .form-container,
-    .login-container,
-    .card-container,
-    div[class*="Card"],
-    div[class*="card"],
-    div[class*="bg-card"],
-    *[class*="rounded"] {
-      background-color: white !important;
-      background: white !important;
-      border-color: #e5e7eb !important;
-    }
-    
-    /* Specifically target the login card container */
-    .max-w-md,
-    .w-full.space-y-8,
-    .space-y-8 > *,
-    .min-h-screen > * > * {
-      background-color: white !important;
-      background: white !important;
-      border-color: #e5e7eb !important;
-    }
-    
-    /* Override any browser default form styling on mobile */
+    /* Fix mobile form input yellow backgrounds only */
     input[type="text"],
     input[type="email"], 
-    input[type="password"],
-    input[type="number"],
-    input[type="tel"],
-    input[type="url"],
-    textarea,
-    select,
-    button[role="combobox"] {
-      background-color: white !important;
-      background: white !important;
-      border-color: #d1d5db !important;
+    input[type="password"] {
       -webkit-appearance: none !important;
       appearance: none !important;
     }
     
-    /* Remove yellow borders on mobile */
-    input:focus,
-    textarea:focus,
-    select:focus {
-      border-color: #3b82f6 !important;
-      outline: none !important;
-    }
-    
-    /* Preserve blue button styling on mobile */
-    button[type="submit"],
-    .bg-blue-600,
-    .bg-primary {
-      background-color: #2563eb !important;
-      background: #2563eb !important;
-      color: white !important;
-    }
-    
-    button[type="submit"]:hover,
-    .bg-blue-600:hover,
-    .hover\:bg-blue-700:hover {
-      background-color: #1d4ed8 !important;
-      background: #1d4ed8 !important;
-    }
-    
-    /* Force white backgrounds on all UI components */
-    div[data-radix-popover-content],
-    div[data-radix-select-content],
-    div[data-radix-dropdown-menu-content],
-    .shadcn-card,
-    .ui-card {
+    /* Only override if element has yellow styling */
+    *[style*="background-color: yellow"],
+    *[style*="background: yellow"],
+    *[style*="border-color: yellow"] {
       background-color: white !important;
-      background: white !important;
-    }
-    
-    /* Ensure form containers have white backgrounds */
-    .space-y-6,
-    .space-y-8,
-    .max-w-md,
-    .w-full {
-      background-color: transparent !important;
-    }
-    
-    /* Override any webkit form styling */
-    input::-webkit-textfield-decoration-container {
-      background-color: white !important;
-    }
-    
-    input::-webkit-outer-spin-button,
-    input::-webkit-inner-spin-button {
-      background-color: white !important;
-    }
-  }
-  
-  /* Universal white background enforcement for all card-like elements */
-  .bg-card,
-  [class*="bg-card"],
-  .card,
-  [class*="card"] {
-    background-color: white !important;
-    background: white !important;
-  }
-
-  /* Emergency mobile override - eliminate all yellow styling */
-  @media (max-width: 768px) {
-    * {
-      border-color: #e5e7eb !important;
-    }
-    
-    *:not(button):not(.bg-blue-600):not(.bg-primary):not([class*="bg-blue"]) {
-      background-color: white !important;
-      background: white !important;
-    }
-    
-    /* Specifically override any yellow colors */
-    *[style*="yellow"],
-    *[style*="#ff"],
-    *[style*="rgb(255, 255, 0)"],
-    *[class*="yellow"],
-    *[class*="bg-yellow"] {
-      background-color: white !important;
-      background: white !important;
-      border-color: #e5e7eb !important;
+      border-color: #d1d5db !important;
     }
   }
 }
