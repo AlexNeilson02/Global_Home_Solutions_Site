@@ -484,8 +484,33 @@ html, body {
     button[role="combobox"] {
       background-color: white !important;
       background: white !important;
+      border-color: #d1d5db !important;
       -webkit-appearance: none !important;
       appearance: none !important;
+    }
+    
+    /* Remove yellow borders on mobile */
+    input:focus,
+    textarea:focus,
+    select:focus {
+      border-color: #3b82f6 !important;
+      outline: none !important;
+    }
+    
+    /* Preserve blue button styling on mobile */
+    button[type="submit"],
+    .bg-blue-600,
+    .bg-primary {
+      background-color: #2563eb !important;
+      background: #2563eb !important;
+      color: white !important;
+    }
+    
+    button[type="submit"]:hover,
+    .bg-blue-600:hover,
+    .hover\:bg-blue-700:hover {
+      background-color: #1d4ed8 !important;
+      background: #1d4ed8 !important;
     }
     
     /* Force white backgrounds on all UI components */
