@@ -1132,6 +1132,13 @@ const ContractorPortal: React.FC = () => {
                   <p className="mt-1 text-sm text-gray-900">{viewingBidDetails.address}</p>
                 </div>
                 
+                {viewingBidDetails.serviceRequested && (
+                  <div>
+                    <label className="text-sm font-medium text-gray-700">Service Requested</label>
+                    <p className="mt-1 text-sm text-gray-900 font-medium text-blue-600">{viewingBidDetails.serviceRequested}</p>
+                  </div>
+                )}
+                
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="text-sm font-medium text-gray-700">Timeline</label>
