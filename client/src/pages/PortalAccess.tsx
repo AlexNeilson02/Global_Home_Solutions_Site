@@ -6,7 +6,7 @@ import { useAuth } from "@/hooks/useAuth";
 
 const PortalAccess: React.FC = () => {
   const [, navigate] = useLocation();
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated, user, logout } = useAuth();
   const [loginModal, setLoginModal] = useState<{
     isOpen: boolean;
     portalType: "admin" | "contractor" | "salesperson";
@@ -15,32 +15,21 @@ const PortalAccess: React.FC = () => {
     portalType: "contractor",
   });
 
-  // CRITICAL: If user is LOGGED IN, they must NEVER see the portals page
-  // They should be automatically redirected to their SINGLE designated portal
-  useEffect(() => {
-    if (isAuthenticated && user) {
-      // Each user has access to ONLY ONE portal based on their role
-      switch (user.role) {
-        case 'admin':
-          navigate('/admin-portal');
-          break;
-        case 'contractor':
-          navigate('/contractor-portal');
-          break;
-        case 'salesperson':
-          navigate('/sales-portal');
-          break;
-        default:
-          // If role is unrecognized, log them out
-          console.error('Unknown user role:', user.role);
-          break;
-      }
-    }
-  }, [isAuthenticated, user, navigate]);
+  // Temporarily allow users to stay on portals page for testing
+  // In production, this should automatically redirect authenticated users
 
   const handlePortalAccess = (portalType: "admin" | "contractor" | "salesperson") => {
-    // Users can only access the login modal if they're not authenticated
-    if (!isAuthenticated) {
+    if (isAuthenticated && user) {
+      // If user is already authenticated, check if they can access this portal
+      if (user.role === portalType) {
+        // Navigate to their portal
+        navigateToPortal(portalType);
+      } else {
+        // Show login modal for different portal type
+        setLoginModal({ isOpen: true, portalType });
+      }
+    } else {
+      // Not authenticated, show login modal
       setLoginModal({ isOpen: true, portalType });
     }
   };
@@ -66,6 +55,21 @@ const PortalAccess: React.FC = () => {
   return (
     <div className="min-h-screen bg-slate-900" style={{ backgroundColor: '#0f172a' }}>
       <div className="container mx-auto px-4 py-16">
+        {/* Header with optional logout */}
+        {isAuthenticated && user && (
+          <div className="flex justify-between items-center mb-8">
+            <div className="text-white">
+              Currently logged in as: <span className="font-semibold">{user.username}</span> ({user.role})
+            </div>
+            <button
+              onClick={() => logout()}
+              className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors"
+            >
+              Logout
+            </button>
+          </div>
+        )}
+        
         <div className="text-center mb-16">
           <div className="flex justify-center mb-8">
             <img 
