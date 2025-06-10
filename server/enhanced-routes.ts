@@ -35,10 +35,23 @@ enhancedRouter.post('/upload/contractor-media', isAuthenticated, upload.array('f
 enhancedRouter.patch('/contractors/:id/profile', isAuthenticated, async (req: Request, res: Response) => {
   try {
     const contractorId = parseInt(req.params.id);
+    
+    if (isNaN(contractorId)) {
+      return res.status(400).json({ message: 'Invalid contractor ID' });
+    }
+    
     const updateData = req.body;
+    console.log('Updating contractor:', contractorId, 'with data:', updateData);
+
+    // Ensure numeric fields are properly converted
+    const sanitizedData = {
+      ...updateData,
+      hourlyRate: updateData.hourlyRate ? parseFloat(updateData.hourlyRate) : 0,
+      isActive: updateData.isActive !== undefined ? updateData.isActive : true
+    };
 
     // Update contractor with new data including media files
-    const updatedContractor = await storage.updateContractor(contractorId, updateData);
+    const updatedContractor = await storage.updateContractor(contractorId, sanitizedData);
     
     if (!updatedContractor) {
       return res.status(404).json({ message: 'Contractor not found' });

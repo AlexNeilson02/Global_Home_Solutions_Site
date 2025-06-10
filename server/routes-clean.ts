@@ -58,7 +58,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const user = req.user as User;
       const { password, ...userInfo } = user;
-      res.json(userInfo);
+      
+      // If user is a contractor, include contractor data
+      if (user.role === 'contractor') {
+        const contractor = await storage.getContractorByUserId(user.id);
+        res.json({ ...userInfo, roleData: contractor });
+      }
+      // If user is a salesperson, include salesperson data
+      else if (user.role === 'salesperson') {
+        const salesperson = await storage.getSalespersonByUserId(user.id);
+        res.json({ ...userInfo, roleData: salesperson });
+      }
+      else {
+        res.json(userInfo);
+      }
     } catch (error) {
       console.error("Error fetching user:", error);
       res.status(500).json({ message: "Failed to fetch user" });
