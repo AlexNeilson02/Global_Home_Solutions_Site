@@ -34,569 +34,238 @@ import {
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 
-const salespersonSchema = z.object({
-  username: z.string().min(3, "Username must be at least 3 characters"),
-  email: z.string().email("Please enter a valid email address"),
-  fullName: z.string().min(2, "Full name must be at least 2 characters"),
-  phone: z.string().min(10, "Please enter a valid phone number"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
-});
-
-type SalespersonFormData = z.infer<typeof salespersonSchema>;
-
-const SalespersonForm: React.FC<{ queryClient: any }> = ({ queryClient }) => {
-  const { toast } = useToast();
-  
-  const form = useForm<SalespersonFormData>({
-    resolver: zodResolver(salespersonSchema),
-    defaultValues: {
-      username: "",
-      email: "",
-      fullName: "",
-      phone: "",
-      password: "",
-    },
-  });
-
-  const createSalespersonMutation = useMutation({
-    mutationFn: async (data: SalespersonFormData) => {
-      const response = await fetch('/api/auth/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          ...data,
-          role: 'salesperson'
-        }),
-      });
-      
-      if (!response.ok) {
-        const error = await response.text();
-        throw new Error(error);
-      }
-      
-      return response.json();
-    },
-    onSuccess: () => {
-      toast({
-        title: "Success",
-        description: "Salesperson created successfully",
-      });
-      form.reset();
-      queryClient.invalidateQueries({ queryKey: ['/api/salespersons'] });
-    },
-    onError: (error: Error) => {
-      toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive",
-      });
-    },
-  });
-
-  const onSubmit = (data: SalespersonFormData) => {
-    createSalespersonMutation.mutate(data);
-  };
-
-  return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        <FormField
-          control={form.control}
-          name="fullName"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Full Name</FormLabel>
-              <FormControl>
-                <Input placeholder="John Smith" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        
-        <FormField
-          control={form.control}
-          name="username"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Username</FormLabel>
-              <FormControl>
-                <Input placeholder="johnsmith" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        
-        <FormField
-          control={form.control}
-          name="email"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Email</FormLabel>
-              <FormControl>
-                <Input type="email" placeholder="john@example.com" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        
-        <FormField
-          control={form.control}
-          name="phone"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Phone</FormLabel>
-              <FormControl>
-                <Input placeholder="(555) 123-4567" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        
-        <FormField
-          control={form.control}
-          name="password"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Password</FormLabel>
-              <FormControl>
-                <Input type="password" placeholder="••••••••" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        
-        <div className="flex justify-end gap-2 pt-4">
-          <Button 
-            type="submit" 
-            disabled={createSalespersonMutation.isPending}
-          >
-            {createSalespersonMutation.isPending ? "Creating..." : "Create Salesperson"}
-          </Button>
-        </div>
-      </form>
-    </Form>
-  );
-};
-
-const AdminPortalEnhanced: React.FC = () => {
+export default function AdminPortalEnhanced() {
   const [, navigate] = useLocation();
-  const [activeTab, setActiveTab] = useState("dashboard");
-  const [selectedSalesperson, setSelectedSalesperson] = useState<any>(null);
-  const [selectedContractor, setSelectedContractor] = useState<any>(null);
-  const [bidFilter, setBidFilter] = useState("all");
-  
-  const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { toast } = useToast();
 
-  // Logout mutation
-  const logoutMutation = useMutation({
-    mutationFn: async () => {
-      const response = await fetch('/api/auth/logout', {
-        method: 'POST',
-        credentials: 'include'
-      });
-      if (!response.ok) {
-        throw new Error('Logout failed');
-      }
+  // Fetch analytics data
+  const { data: analyticsData = {}, isLoading: isLoadingAnalytics } = useQuery({
+    queryKey: ['/api/admin/analytics'],
+    queryFn: async () => {
+      const response = await fetch('/api/admin/analytics');
+      if (!response.ok) throw new Error('Failed to fetch analytics');
       return response.json();
-    },
-    onSuccess: () => {
-      queryClient.clear();
-      navigate('/portals');
     }
   });
 
-  // Fetch all data
-  const { data: salespersonsData } = useQuery({
+  // Fetch users data
+  const { data: usersData = [], isLoading: isLoadingUsers } = useQuery({
+    queryKey: ['/api/admin/users'],
+    queryFn: async () => {
+      const response = await fetch('/api/admin/users');
+      if (!response.ok) throw new Error('Failed to fetch users');
+      return response.json();
+    }
+  });
+
+  // Fetch salespersons
+  const { data: salespersons = [], isLoading: isLoadingSalespersons } = useQuery({
     queryKey: ['/api/salespersons'],
-    enabled: true
+    queryFn: async () => {
+      const response = await fetch('/api/salespersons');
+      if (!response.ok) throw new Error('Failed to fetch salespersons');
+      return response.json();
+    }
   });
 
-  const { data: contractorsData } = useQuery({
+  // Fetch contractors
+  const { data: contractors = [], isLoading: isLoadingContractors } = useQuery({
     queryKey: ['/api/contractors'],
-    enabled: true
+    queryFn: async () => {
+      const response = await fetch('/api/contractors');
+      if (!response.ok) throw new Error('Failed to fetch contractors');
+      return response.json();
+    }
   });
 
-  const { data: projectsData } = useQuery({
+  // Fetch projects
+  const { data: projects = [], isLoading: isLoadingProjects } = useQuery({
     queryKey: ['/api/projects'],
-    enabled: true
+    queryFn: async () => {
+      const response = await fetch('/api/projects');
+      if (!response.ok) throw new Error('Failed to fetch projects');
+      return response.json();
+    }
   });
 
-  const { data: bidRequestsData } = useQuery({
+  // Fetch bid requests
+  const { data: bidRequests = [], isLoading: isLoadingBidRequests } = useQuery({
     queryKey: ['/api/bid-requests/recent'],
-    enabled: true
+    queryFn: async () => {
+      const response = await fetch('/api/bid-requests/recent');
+      if (!response.ok) throw new Error('Failed to fetch bid requests');
+      return response.json();
+    }
   });
 
-  // Extract data arrays
-  const salespersons = salespersonsData?.salespersons || [];
-  const contractors = contractorsData?.contractors || [];
-  const projects = projectsData?.projects || [];
-  const bidRequests = bidRequestsData?.bidRequests || [];
-
-  // Update salesperson status mutation
-  const updateSalespersonStatusMutation = useMutation({
-    mutationFn: async ({ salespersonId, isActive }: { salespersonId: number; isActive: boolean }) => {
-      const response = await fetch(`/api/salespersons/${salespersonId}/profile`, {
+  const updateUserStatus = useMutation({
+    mutationFn: async ({ userId, status }: { userId: number; status: string }) => {
+      const response = await fetch(`/api/admin/users/${userId}/status`, {
         method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify({ isActive }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status })
       });
-      if (!response.ok) {
-        throw new Error('Failed to update salesperson status');
-      }
+      if (!response.ok) throw new Error('Failed to update user status');
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/salespersons'] });
-      toast({
-        title: "Salesperson Updated",
-        description: "User status has been successfully updated.",
-      });
-    },
-    onError: () => {
-      toast({
-        title: "Update Failed",
-        description: "Failed to update user status.",
-        variant: "destructive",
-      });
-    },
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/users'] });
+      toast({ title: "Success", description: "User status updated successfully" });
+    }
   });
 
-  // Update bid request status mutation
-  const updateBidStatusMutation = useMutation({
-    mutationFn: async ({ bidId, status }: { bidId: number; status: string }) => {
-      const response = await fetch(`/api/bid-requests/${bidId}/status`, {
+  const updateBidRequestStatus = useMutation({
+    mutationFn: async ({ bidRequestId, status }: { bidRequestId: number; status: string }) => {
+      const response = await fetch(`/api/admin/bid-requests/${bidRequestId}/status`, {
         method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify({ status }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status })
       });
-      if (!response.ok) {
-        throw new Error('Failed to update bid status');
-      }
+      if (!response.ok) throw new Error('Failed to update bid request status');
       return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/bid-requests/recent'] });
-      toast({
-        title: "Bid Updated",
-        description: "Bid request status has been updated.",
-      });
-    },
-    onError: () => {
-      toast({
-        title: "Update Failed",
-        description: "Failed to update bid status.",
-        variant: "destructive",
-      });
-    },
+      toast({ title: "Success", description: "Bid request status updated successfully" });
+    }
   });
 
-  // Delete bid request mutation
-  const deleteBidMutation = useMutation({
-    mutationFn: async (bidId: number) => {
-      const response = await fetch(`/api/bid-requests/${bidId}`, {
-        method: 'DELETE',
-        credentials: 'include',
+  const deleteBidRequest = useMutation({
+    mutationFn: async (bidRequestId: number) => {
+      const response = await fetch(`/api/admin/bid-requests/${bidRequestId}`, {
+        method: 'DELETE'
       });
-      if (!response.ok) {
-        throw new Error('Failed to delete bid request');
-      }
+      if (!response.ok) throw new Error('Failed to delete bid request');
       return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/bid-requests/recent'] });
-      toast({
-        title: "Bid Deleted",
-        description: "Bid request has been deleted.",
-      });
-    },
-    onError: () => {
-      toast({
-        title: "Delete Failed",
-        description: "Failed to delete bid request.",
-        variant: "destructive",
-      });
-    },
+      toast({ title: "Success", description: "Bid request deleted successfully" });
+    }
   });
 
-  // Calculate system metrics
-  const totalContractors = contractors.length;
-  const totalSalespersons = salespersons.length;
-  const totalProjects = projects.length;
-  const activeProjects = projects.filter((p: any) => p.status === 'in_progress').length;
-  const completedProjects = projects.filter((p: any) => p.status === 'completed').length;
-  const pendingBids = bidRequests.filter((b: any) => b.status === 'pending').length;
-  const totalRevenue = projects
-    .filter((p: any) => p.status === 'completed')
-    .reduce((sum: number, p: any) => sum + (p.budget || 0), 0);
-
-  // Filter functions
-  const filteredBids = bidRequests.filter((bid: any) => {
-    if (bidFilter === "all") return true;
-    return bid.status === bidFilter;
-  });
-
-  // Chart data - Focus on business metrics
-  const teamGrowthData = [
-    { month: 'Jan', contractors: 12, salespersons: 8, projects: 15 },
-    { month: 'Feb', contractors: 15, salespersons: 10, projects: 22 },
-    { month: 'Mar', contractors: 18, salespersons: 12, projects: 28 },
-    { month: 'Apr', contractors: 22, salespersons: 15, projects: 35 },
-    { month: 'May', contractors: 28, salespersons: 18, projects: 42 },
-    { month: 'Jun', contractors: 32, salespersons: 22, projects: 48 }
+  // Chart data
+  const monthlyData = [
+    { name: 'Jan', leads: 65, conversions: 45 },
+    { name: 'Feb', leads: 78, conversions: 52 },
+    { name: 'Mar', leads: 90, conversions: 61 },
+    { name: 'Apr', leads: 81, conversions: 58 },
+    { name: 'May', leads: 95, conversions: 67 },
+    { name: 'Jun', leads: 102, conversions: 73 }
   ];
 
-  const teamDistribution = [
-    { name: 'Contractors', value: contractors.length, color: '#3b82f6' },
-    { name: 'Salespersons', value: salespersons.length, color: '#10b981' }
+  const pieData = [
+    { name: 'Active Sales Reps', value: salespersons.filter((s: any) => s.isActive).length, color: '#10b981' },
+    { name: 'Inactive Sales Reps', value: salespersons.filter((s: any) => !s.isActive).length, color: '#ef4444' }
   ];
 
-  const revenueData = [
-    { month: 'Jan', revenue: 45000, projects: 8 },
-    { month: 'Feb', revenue: 62000, projects: 12 },
-    { month: 'Mar', revenue: 58000, projects: 10 },
-    { month: 'Apr', revenue: 75000, projects: 15 },
-    { month: 'May', revenue: 89000, projects: 18 },
-    { month: 'Jun', revenue: 95000, projects: 22 }
-  ];
+  const COLORS = ['#10b981', '#ef4444', '#f59e0b', '#8b5cf6'];
+
+  if (isLoadingAnalytics || isLoadingUsers || isLoadingSalespersons || isLoadingContractors) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading admin dashboard...</p>
+        </div>
+      </div>
+    );
+  }
+
+  const stats = {
+    totalSalespersons: salespersons.length,
+    activeSalespersons: salespersons.filter((s: any) => s.isActive).length,
+    totalContractors: contractors.length,
+    activeContractors: contractors.filter((c: any) => c.isActive).length,
+    totalProjects: projects.length,
+    totalBidRequests: bidRequests.length,
+    pendingBidRequests: bidRequests.filter((br: any) => br.status === 'pending').length
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <div className="container mx-auto px-4 py-8">
-        <div className="max-w-7xl mx-auto">
-          {/* Header */}
-          <div className="flex justify-between items-center mb-8">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-                Admin Portal
-              </h1>
-              <p className="text-gray-600 dark:text-gray-300 mt-1">
-                System overview and management dashboard
-              </p>
-            </div>
-            <Button onClick={() => logoutMutation.mutate()} variant="outline" disabled={logoutMutation.isPending}>
-              {logoutMutation.isPending ? "Logging out..." : "Back to Portals"}
-            </Button>
-          </div>
+      <div className="p-6">
+        {/* Header */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Admin Dashboard</h1>
+          <p className="text-gray-600 dark:text-gray-300 mt-2">
+            Comprehensive management portal for sales representatives and contractors
+          </p>
+        </div>
 
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-            <TabsList className="grid w-full grid-cols-5">
-              <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
-              <TabsTrigger value="contractors">Contractors</TabsTrigger>
-              <TabsTrigger value="sales">Sales Team</TabsTrigger>
-              <TabsTrigger value="bids">Bid Requests</TabsTrigger>
-              <TabsTrigger value="analytics">Analytics</TabsTrigger>
-            </TabsList>
-
-            {/* Dashboard Tab */}
-            <TabsContent value="dashboard" className="space-y-6">
-              {/* Key Metrics */}
-              <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
-                <Card>
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Total Contractors</CardTitle>
-                    <Building2 className="h-4 w-4 text-muted-foreground" />
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold">{totalContractors}</div>
-                    <p className="text-xs text-muted-foreground">Active contractors</p>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Sales Team</CardTitle>
-                    <Users className="h-4 w-4 text-muted-foreground" />
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold">{totalSalespersons}</div>
-                    <p className="text-xs text-muted-foreground">Active sales reps</p>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Active Projects</CardTitle>
-                    <TrendingUp className="h-4 w-4 text-muted-foreground" />
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold">{activeProjects}</div>
-                    <p className="text-xs text-muted-foreground">{completedProjects} completed</p>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Pending Bids</CardTitle>
-                    <FileText className="h-4 w-4 text-muted-foreground" />
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold">{pendingBids}</div>
-                    <p className="text-xs text-muted-foreground">Awaiting review</p>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
-                    <DollarSign className="h-4 w-4 text-muted-foreground" />
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold">${totalRevenue.toLocaleString()}</div>
-                    <p className="text-xs text-muted-foreground">From completed projects</p>
-                  </CardContent>
-                </Card>
+        {/* Quick Stats */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600 dark:text-gray-300">Sales Reps</p>
+                  <p className="text-2xl font-bold text-gray-900 dark:text-white">{stats.totalSalespersons}</p>
+                  <p className="text-xs text-green-600">{stats.activeSalespersons} active</p>
+                </div>
+                <Users className="h-8 w-8 text-blue-600" />
               </div>
+            </CardContent>
+          </Card>
 
-              {/* Charts */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Team Growth</CardTitle>
-                    <CardDescription>Monthly growth in contractors and sales team</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <ResponsiveContainer width="100%" height={300}>
-                      <BarChart data={teamGrowthData}>
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="month" />
-                        <YAxis />
-                        <Tooltip />
-                        <Bar dataKey="contractors" fill="#3b82f6" name="Contractors" />
-                        <Bar dataKey="salespersons" fill="#10b981" name="Salespersons" />
-                        <Bar dataKey="projects" fill="#f59e0b" name="Projects" />
-                      </BarChart>
-                    </ResponsiveContainer>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader>
-                    <CardTitle>User Role Distribution</CardTitle>
-                    <CardDescription>Breakdown of users by role</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <ResponsiveContainer width="100%" height={300}>
-                      <PieChart>
-                        <Pie
-                          data={teamDistribution}
-                          cx="50%"
-                          cy="50%"
-                          innerRadius={60}
-                          outerRadius={120}
-                          paddingAngle={5}
-                          dataKey="value"
-                        >
-                          {teamDistribution.map((entry: any, index: number) => (
-                            <Cell key={`cell-${index}`} fill={entry.color} />
-                          ))}
-                        </Pie>
-                        <Tooltip />
-                      </PieChart>
-                    </ResponsiveContainer>
-                  </CardContent>
-                </Card>
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600 dark:text-gray-300">Contractors</p>
+                  <p className="text-2xl font-bold text-gray-900 dark:text-white">{stats.totalContractors}</p>
+                  <p className="text-xs text-green-600">{stats.activeContractors} verified</p>
+                </div>
+                <Building2 className="h-8 w-8 text-green-600" />
               </div>
+            </CardContent>
+          </Card>
 
-              {/* Recent Activity */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Recent System Activity</CardTitle>
-                  <CardDescription>Latest user registrations and project completions</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {projects.slice(0, 5).map((project: any) => (
-                      <div key={project.id} className="flex items-center justify-between p-3 border rounded-lg">
-                        <div>
-                          <h4 className="font-medium">{project.title}</h4>
-                          <p className="text-sm text-gray-600 dark:text-gray-300">{project.serviceType}</p>
-                        </div>
-                        <Badge variant={
-                          project.status === 'completed' ? 'default' :
-                          project.status === 'in_progress' ? 'secondary' : 'outline'
-                        }>
-                          {project.status.replace('_', ' ')}
-                        </Badge>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600 dark:text-gray-300">Total Projects</p>
+                  <p className="text-2xl font-bold text-gray-900 dark:text-white">{stats.totalProjects}</p>
+                  <p className="text-xs text-blue-600">Active projects</p>
+                </div>
+                <FileText className="h-8 w-8 text-purple-600" />
+              </div>
+            </CardContent>
+          </Card>
 
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600 dark:text-gray-300">Bid Requests</p>
+                  <p className="text-2xl font-bold text-gray-900 dark:text-white">{stats.totalBidRequests}</p>
+                  <p className="text-xs text-orange-600">{stats.pendingBidRequests} pending</p>
+                </div>
+                <Target className="h-8 w-8 text-orange-600" />
+              </div>
+            </CardContent>
+          </Card>
+        </div>
 
+        {/* Main Content */}
+        <Tabs defaultValue="salespersons" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-4">
+            <TabsTrigger value="salespersons">Sales Representatives</TabsTrigger>
+            <TabsTrigger value="contractors">Contractors</TabsTrigger>
+            <TabsTrigger value="bid-requests">Bid Requests</TabsTrigger>
+            <TabsTrigger value="analytics">Analytics</TabsTrigger>
+          </TabsList>
 
-            {/* Contractors Tab */}
-            <TabsContent value="contractors" className="space-y-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Contractor Management</CardTitle>
-                  <CardDescription>Manage contractor profiles and verification status</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {contractors.map((contractor: any) => (
-                      <div key={contractor.id} className="border rounded-lg p-4">
-                        <div className="flex justify-between items-start mb-3">
-                          <div className="flex-1">
-                            <h4 className="font-semibold">{contractor.companyName}</h4>
-                            <p className="text-sm text-gray-600 dark:text-gray-300">{contractor.description}</p>
-                            <div className="flex items-center gap-4 mt-2 text-sm text-gray-500">
-                              <span>Rate: ${contractor.hourlyRate || 0}/hr</span>
-                              <span>Specialties: {contractor.specialties?.length || 0}</span>
-                            </div>
-                          </div>
-                          <div className="flex gap-2">
-                            <Badge variant={contractor.isVerified ? "default" : "outline"}>
-                              {contractor.isVerified ? "Verified" : "Unverified"}
-                            </Badge>
-                            <Badge variant={contractor.isActive ? "default" : "destructive"}>
-                              {contractor.isActive ? "Active" : "Inactive"}
-                            </Badge>
-                          </div>
-                        </div>
-                        <div className="flex justify-end gap-2">
-                          <Button size="sm" variant="outline">
-                            <Eye className="h-3 w-3 mr-1" />
-                            View Profile
-                          </Button>
-                          <Button size="sm" variant="outline">
-                            <Edit3 className="h-3 w-3 mr-1" />
-                            Edit
-                          </Button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            {/* Sales Team Tab */}
-            <TabsContent value="sales" className="space-y-6">
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between">
+          {/* Sales Representatives Tab */}
+          <TabsContent value="salespersons">
+            <Card>
+              <CardHeader>
+                <div className="flex justify-between items-center">
                   <div>
-                    <CardTitle>Sales Team Management</CardTitle>
+                    <CardTitle>Sales Representatives Management</CardTitle>
                     <CardDescription>Monitor sales performance and manage team members</CardDescription>
                   </div>
                   <Dialog>
@@ -613,243 +282,330 @@ const AdminPortalEnhanced: React.FC = () => {
                           Add a new sales representative to the team
                         </DialogDescription>
                       </DialogHeader>
-                      <SalespersonForm queryClient={queryClient} />
+                      <div className="space-y-4">
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <label className="text-sm font-medium">Username</label>
+                            <input 
+                              type="text" 
+                              className="w-full p-2 border rounded-md" 
+                              placeholder="Enter username"
+                              id="username"
+                            />
+                          </div>
+                          <div>
+                            <label className="text-sm font-medium">Full Name</label>
+                            <input 
+                              type="text" 
+                              className="w-full p-2 border rounded-md" 
+                              placeholder="Enter full name"
+                              id="fullName"
+                            />
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <label className="text-sm font-medium">Email</label>
+                            <input 
+                              type="email" 
+                              className="w-full p-2 border rounded-md" 
+                              placeholder="Enter email"
+                              id="email"
+                            />
+                          </div>
+                          <div>
+                            <label className="text-sm font-medium">Phone</label>
+                            <input 
+                              type="tel" 
+                              className="w-full p-2 border rounded-md" 
+                              placeholder="Enter phone number"
+                              id="phone"
+                            />
+                          </div>
+                        </div>
+                        <div>
+                          <label className="text-sm font-medium">Password</label>
+                          <input 
+                            type="password" 
+                            className="w-full p-2 border rounded-md" 
+                            placeholder="Enter password"
+                            id="password"
+                          />
+                        </div>
+                        <Button 
+                          type="button" 
+                          className="w-full"
+                          onClick={async () => {
+                            const username = (document.getElementById('username') as HTMLInputElement)?.value;
+                            const fullName = (document.getElementById('fullName') as HTMLInputElement)?.value;
+                            const email = (document.getElementById('email') as HTMLInputElement)?.value;
+                            const phone = (document.getElementById('phone') as HTMLInputElement)?.value;
+                            const password = (document.getElementById('password') as HTMLInputElement)?.value;
+                            
+                            if (!username || !fullName || !email || !password) {
+                              alert('Please fill in all required fields');
+                              return;
+                            }
+                            
+                            try {
+                              const response = await fetch('/api/auth/register', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                  username,
+                                  fullName,
+                                  email,
+                                  phone: phone || null,
+                                  password,
+                                  role: 'salesperson'
+                                })
+                              });
+                              
+                              if (response.ok) {
+                                queryClient.invalidateQueries({ queryKey: ['/api/salespersons'] });
+                                // Clear form
+                                (document.getElementById('username') as HTMLInputElement).value = '';
+                                (document.getElementById('fullName') as HTMLInputElement).value = '';
+                                (document.getElementById('email') as HTMLInputElement).value = '';
+                                (document.getElementById('phone') as HTMLInputElement).value = '';
+                                (document.getElementById('password') as HTMLInputElement).value = '';
+                                alert('Salesperson created successfully!');
+                              } else {
+                                const error = await response.text();
+                                alert(`Error: ${error}`);
+                              }
+                            } catch (error) {
+                              alert(`Error: ${error}`);
+                            }
+                          }}
+                        >
+                          Create Salesperson
+                        </Button>
+                      </div>
                     </DialogContent>
                   </Dialog>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {salespersons.map((salesperson: any) => (
-                      <div key={salesperson.id} className="border rounded-lg p-4">
-                        <div className="flex justify-between items-start mb-3">
-                          <div className="flex-1">
-                            <h4 className="font-semibold">{salesperson.fullName || 'Sales Rep'}</h4>
-                            <p className="text-sm text-gray-600 dark:text-gray-300">
-                              Profile: {salesperson.profileUrl}
-                            </p>
-                            <div className="grid grid-cols-3 gap-4 mt-3">
-                              <div className="text-center">
-                                <div className="text-lg font-bold">{salesperson.totalLeads || 0}</div>
-                                <div className="text-xs text-gray-500">Total Leads</div>
-                              </div>
-                              <div className="text-center">
-                                <div className="text-lg font-bold">{((salesperson.conversionRate || 0) * 100).toFixed(1)}%</div>
-                                <div className="text-xs text-gray-500">Conversion Rate</div>
-                              </div>
-                              <div className="text-center">
-                                <div className="text-lg font-bold">${(salesperson.commissions || 0).toLocaleString()}</div>
-                                <div className="text-xs text-gray-500">Commissions</div>
-                              </div>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {salespersons.map((salesperson: any) => (
+                    <div key={salesperson.id} className="border rounded-lg p-4">
+                      <div className="flex justify-between items-start mb-3">
+                        <div className="flex-1">
+                          <h4 className="font-semibold">{salesperson.fullName || 'Sales Rep'}</h4>
+                          <p className="text-sm text-gray-600 dark:text-gray-300">
+                            Profile: {salesperson.profileUrl}
+                          </p>
+                          <div className="grid grid-cols-3 gap-4 mt-3">
+                            <div className="text-center">
+                              <div className="text-lg font-bold">{salesperson.totalLeads || 0}</div>
+                              <div className="text-xs text-gray-500">Total Leads</div>
+                            </div>
+                            <div className="text-center">
+                              <div className="text-lg font-bold">{((salesperson.conversionRate || 0) * 100).toFixed(1)}%</div>
+                              <div className="text-xs text-gray-500">Conversion Rate</div>
+                            </div>
+                            <div className="text-center">
+                              <div className="text-lg font-bold">${(salesperson.commissions || 0).toLocaleString()}</div>
+                              <div className="text-xs text-gray-500">Commissions</div>
                             </div>
                           </div>
-                          <Badge variant={salesperson.isActive ? "default" : "destructive"}>
-                            {salesperson.isActive ? "Active" : "Inactive"}
+                        </div>
+                        <Badge variant={salesperson.isActive ? "default" : "destructive"}>
+                          {salesperson.isActive ? "Active" : "Inactive"}
+                        </Badge>
+                      </div>
+                      <div className="flex justify-end gap-2">
+                        <Button size="sm" variant="outline">
+                          <Eye className="h-4 w-4 mr-1" />
+                          View Details
+                        </Button>
+                        <Button size="sm" variant="outline">
+                          <Edit3 className="h-4 w-4 mr-1" />
+                          Edit
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Contractors Tab */}
+          <TabsContent value="contractors">
+            <Card>
+              <CardHeader>
+                <CardTitle>Contractors Management</CardTitle>
+                <CardDescription>Manage contractor profiles and verification status</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {contractors.map((contractor: any) => (
+                    <div key={contractor.id} className="border rounded-lg p-4">
+                      <div className="flex justify-between items-start mb-3">
+                        <div className="flex-1">
+                          <h4 className="font-semibold">{contractor.companyName}</h4>
+                          <p className="text-sm text-gray-600 dark:text-gray-300">{contractor.description}</p>
+                          <div className="flex items-center gap-4 mt-2 text-sm text-gray-500">
+                            <span>Rate: ${contractor.hourlyRate || 0}/hr</span>
+                            <span>Specialties: {contractor.specialties?.length || 0}</span>
+                          </div>
+                        </div>
+                        <div className="flex gap-2">
+                          <Badge variant={contractor.isVerified ? "default" : "outline"}>
+                            {contractor.isVerified ? "Verified" : "Unverified"}
+                          </Badge>
+                          <Badge variant={contractor.isActive ? "default" : "destructive"}>
+                            {contractor.isActive ? "Active" : "Inactive"}
                           </Badge>
                         </div>
-                        <div className="flex justify-end gap-2">
-                          <Button size="sm" variant="outline">
-                            <BarChart3 className="h-3 w-3 mr-1" />
-                            Analytics
-                          </Button>
-                          <Button size="sm" variant="outline">
-                            <Edit3 className="h-3 w-3 mr-1" />
-                            Edit
-                          </Button>
-                        </div>
                       </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            {/* Bid Requests Tab */}
-            <TabsContent value="bids" className="space-y-6">
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between">
-                  <div>
-                    <CardTitle>Bid Request Management</CardTitle>
-                    <CardDescription>Monitor and manage all bid requests in the system</CardDescription>
-                  </div>
-                  <Select value={bidFilter} onValueChange={setBidFilter}>
-                    <SelectTrigger className="w-40">
-                      <SelectValue placeholder="Filter by status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Bids</SelectItem>
-                      <SelectItem value="pending">Pending</SelectItem>
-                      <SelectItem value="contacted">Contacted</SelectItem>
-                      <SelectItem value="completed">Completed</SelectItem>
-                      <SelectItem value="declined">Declined</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {filteredBids.map((bid: any) => (
-                      <div key={bid.id} className="border rounded-lg p-4">
-                        <div className="flex justify-between items-start mb-3">
-                          <div className="flex-1">
-                            <h4 className="font-semibold">{bid.fullName}</h4>
-                            <p className="text-sm text-gray-600 dark:text-gray-300">{bid.serviceRequested}</p>
-                            <p className="text-xs text-gray-500 mt-1">{bid.description}</p>
-                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-3 text-sm">
-                              <div className="flex items-center">
-                                <Phone className="h-3 w-3 mr-1 text-gray-400" />
-                                <span>{bid.phone}</span>
-                              </div>
-                              <div className="flex items-center">
-                                <Mail className="h-3 w-3 mr-1 text-gray-400" />
-                                <span>{bid.email}</span>
-                              </div>
-                              <div className="flex items-center">
-                                <MapPin className="h-3 w-3 mr-1 text-gray-400" />
-                                <span>{bid.address}</span>
-                              </div>
-                              <div className="flex items-center">
-                                <Calendar className="h-3 w-3 mr-1 text-gray-400" />
-                                <span>{new Date(bid.createdAt).toLocaleDateString()}</span>
-                              </div>
-                            </div>
-                          </div>
-                          <div className="flex flex-col gap-2">
-                            <Badge variant={
-                              bid.status === 'completed' ? 'default' :
-                              bid.status === 'contacted' ? 'secondary' : 'outline'
-                            }>
-                              {bid.status}
-                            </Badge>
-                            {bid.budget && (
-                              <Badge variant="outline">
-                                {bid.budget}
-                              </Badge>
-                            )}
-                          </div>
-                        </div>
-                        <div className="flex justify-end gap-2">
-                          <Select
-                            value={bid.status}
-                            onValueChange={(status) => updateBidStatusMutation.mutate({
-                              bidId: bid.id,
-                              status
-                            })}
-                          >
-                            <SelectTrigger className="w-32">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="pending">Pending</SelectItem>
-                              <SelectItem value="contacted">Contacted</SelectItem>
-                              <SelectItem value="completed">Completed</SelectItem>
-                              <SelectItem value="declined">Declined</SelectItem>
-                            </SelectContent>
-                          </Select>
-                          <Button
-                            size="sm"
-                            variant="destructive"
-                            onClick={() => deleteBidMutation.mutate(bid.id)}
-                          >
-                            <Trash2 className="h-3 w-3" />
-                          </Button>
-                        </div>
+                      <div className="flex justify-end gap-2">
+                        <Button size="sm" variant="outline">
+                          <Eye className="h-4 w-4 mr-1" />
+                          View Profile
+                        </Button>
+                        <Button size="sm" variant="outline">
+                          <Edit3 className="h-4 w-4 mr-1" />
+                          Edit
+                        </Button>
                       </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            {/* Analytics Tab */}
-            <TabsContent value="analytics" className="space-y-6">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* Revenue Trends */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Revenue Trends</CardTitle>
-                    <CardDescription>Monthly revenue and project completion</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <ResponsiveContainer width="100%" height={300}>
-                      <LineChart data={revenueData}>
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="month" />
-                        <YAxis />
-                        <Tooltip />
-                        <Line type="monotone" dataKey="revenue" stroke="#3b82f6" strokeWidth={2} name="Revenue ($)" />
-                      </LineChart>
-                    </ResponsiveContainer>
-                  </CardContent>
-                </Card>
-
-                {/* System Performance */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle>System Performance</CardTitle>
-                    <CardDescription>Key performance indicators</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm font-medium">Team Engagement Rate</span>
-                        <span className="text-sm">{totalContractors + totalSalespersons > 0 ? ((activeProjects / (totalContractors + totalSalespersons)) * 100).toFixed(1) : '0'}%</span>
-                      </div>
-                      <Progress value={totalContractors + totalSalespersons > 0 ? (activeProjects / (totalContractors + totalSalespersons)) * 100 : 0} className="h-2" />
-                      
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm font-medium">Project Completion Rate</span>
-                        <span className="text-sm">{((completedProjects / totalProjects) * 100).toFixed(1)}%</span>
-                      </div>
-                      <Progress value={(completedProjects / totalProjects) * 100} className="h-2" />
-                      
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm font-medium">Contractor Utilization</span>
-                        <span className="text-sm">{((activeProjects / contractors.length)).toFixed(1)} avg projects</span>
-                      </div>
-                      <Progress value={Math.min((activeProjects / contractors.length) * 20, 100)} className="h-2" />
                     </div>
-                  </CardContent>
-                </Card>
-              </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
 
-              {/* Detailed Analytics */}
+          {/* Bid Requests Tab */}
+          <TabsContent value="bid-requests">
+            <Card>
+              <CardHeader>
+                <CardTitle>Bid Requests Management</CardTitle>
+                <CardDescription>Monitor and manage incoming bid requests</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Customer</TableHead>
+                      <TableHead>Service</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Date</TableHead>
+                      <TableHead>Salesperson</TableHead>
+                      <TableHead>Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {bidRequests.map((request: any) => (
+                      <TableRow key={request.id}>
+                        <TableCell>
+                          <div>
+                            <p className="font-medium">{request.fullName}</p>
+                            <p className="text-sm text-gray-500">{request.email}</p>
+                          </div>
+                        </TableCell>
+                        <TableCell>{request.serviceRequested}</TableCell>
+                        <TableCell>
+                          <Badge variant={
+                            request.status === 'pending' ? "outline" :
+                            request.status === 'approved' ? "default" : "destructive"
+                          }>
+                            {request.status}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>{new Date(request.createdAt).toLocaleDateString()}</TableCell>
+                        <TableCell>{request.salesperson?.fullName || 'Unassigned'}</TableCell>
+                        <TableCell>
+                          <div className="flex gap-1">
+                            <Select
+                              value={request.status}
+                              onValueChange={(value) => 
+                                updateBidRequestStatus.mutate({ 
+                                  bidRequestId: request.id, 
+                                  status: value 
+                                })
+                              }
+                            >
+                              <SelectTrigger className="w-32">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="pending">Pending</SelectItem>
+                                <SelectItem value="approved">Approved</SelectItem>
+                                <SelectItem value="rejected">Rejected</SelectItem>
+                              </SelectContent>
+                            </Select>
+                            <Button
+                              size="sm"
+                              variant="destructive"
+                              onClick={() => deleteBidRequest.mutate(request.id)}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Analytics Tab */}
+          <TabsContent value="analytics">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <Card>
                 <CardHeader>
-                  <CardTitle>Platform Analytics Overview</CardTitle>
-                  <CardDescription>Comprehensive system metrics and insights</CardDescription>
+                  <CardTitle>Monthly Performance</CardTitle>
+                  <CardDescription>Leads and conversions over time</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div className="text-center p-4 border rounded-lg">
-                      <Target className="h-8 w-8 text-blue-500 mx-auto mb-2" />
-                      <div className="text-2xl font-bold">{bidRequests.length}</div>
-                      <div className="text-sm text-gray-500">Total Bid Requests</div>
-                      <div className="text-xs text-green-600 mt-1">
-                        +{bidRequests.filter((b: any) => new Date(b.createdAt) > new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)).length} this month
-                      </div>
-                    </div>
-                    
-                    <div className="text-center p-4 border rounded-lg">
-                      <Star className="h-8 w-8 text-yellow-500 mx-auto mb-2" />
-                      <div className="text-2xl font-bold">4.8</div>
-                      <div className="text-sm text-gray-500">Average Rating</div>
-                      <div className="text-xs text-gray-400 mt-1">Based on testimonials</div>
-                    </div>
-                    
-                    <div className="text-center p-4 border rounded-lg">
-                      <TrendingUp className="h-8 w-8 text-green-500 mx-auto mb-2" />
-                      <div className="text-2xl font-bold">{Math.round((completedProjects / totalProjects) * 100)}%</div>
-                      <div className="text-sm text-gray-500">Success Rate</div>
-                      <div className="text-xs text-green-600 mt-1">+5% from last month</div>
-                    </div>
-                  </div>
+                  <ResponsiveContainer width="100%" height={300}>
+                    <BarChart data={monthlyData}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="name" />
+                      <YAxis />
+                      <Tooltip />
+                      <Bar dataKey="leads" fill="#3b82f6" name="Leads" />
+                      <Bar dataKey="conversions" fill="#10b981" name="Conversions" />
+                    </BarChart>
+                  </ResponsiveContainer>
                 </CardContent>
               </Card>
-            </TabsContent>
-          </Tabs>
-        </div>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Sales Rep Status</CardTitle>
+                  <CardDescription>Distribution of active vs inactive representatives</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <ResponsiveContainer width="100%" height={300}>
+                    <PieChart>
+                      <Pie
+                        data={pieData}
+                        cx="50%"
+                        cy="50%"
+                        outerRadius={80}
+                        fill="#8884d8"
+                        dataKey="value"
+                        label
+                      >
+                        {pieData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                        ))}
+                      </Pie>
+                      <Tooltip />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
-};
-
-export default AdminPortalEnhanced;
+}
