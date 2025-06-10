@@ -1084,6 +1084,207 @@ const ContractorPortalEnhanced: React.FC = () => {
           </Tabs>
         </div>
       </div>
+
+      {/* Bid Details Modal */}
+      {viewingBidDetails && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white dark:bg-gray-800 rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center p-6 border-b">
+              <h3 className="text-xl font-semibold">Bid Request Details</h3>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setViewingBidDetails(null)}
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+            
+            <div className="p-6 space-y-6">
+              {/* Customer Information */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-3">
+                  <h4 className="font-semibold text-lg border-b pb-2">Customer Information</h4>
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <span className="font-medium min-w-[80px]">Name:</span>
+                      <span>{viewingBidDetails.fullName}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Mail className="h-4 w-4 text-gray-500" />
+                      <span className="font-medium min-w-[80px]">Email:</span>
+                      <a href={`mailto:${viewingBidDetails.email}`} className="text-blue-600 hover:underline">
+                        {viewingBidDetails.email}
+                      </a>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Phone className="h-4 w-4 text-gray-500" />
+                      <span className="font-medium min-w-[80px]">Phone:</span>
+                      <a href={`tel:${viewingBidDetails.phone}`} className="text-blue-600 hover:underline">
+                        {viewingBidDetails.phone}
+                      </a>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <MapPin className="h-4 w-4 text-gray-500" />
+                      <span className="font-medium min-w-[80px]">Address:</span>
+                      <span>{viewingBidDetails.address}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="font-medium min-w-[80px]">Contact:</span>
+                      <span>{viewingBidDetails.preferredContactMethod || 'Email'}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  <h4 className="font-semibold text-lg border-b pb-2">Project Details</h4>
+                  <div className="space-y-2">
+                    <div>
+                      <span className="font-medium">Service:</span>
+                      <p className="mt-1">{viewingBidDetails.serviceRequested}</p>
+                    </div>
+                    <div>
+                      <span className="font-medium">Timeline:</span>
+                      <p className="mt-1">{viewingBidDetails.timeline}</p>
+                    </div>
+                    {viewingBidDetails.budget && (
+                      <div>
+                        <span className="font-medium">Budget:</span>
+                        <p className="mt-1">${viewingBidDetails.budget}</p>
+                      </div>
+                    )}
+                    <div>
+                      <span className="font-medium">Status:</span>
+                      <div className="mt-1">
+                        <Badge variant={
+                          viewingBidDetails.status === 'pending' ? 'outline' :
+                          viewingBidDetails.status === 'contacted' ? 'secondary' :
+                          viewingBidDetails.status === 'bid_sent' ? 'secondary' :
+                          viewingBidDetails.status === 'won' ? 'default' :
+                          viewingBidDetails.status === 'lost' ? 'destructive' : 'outline'
+                        }>
+                          {viewingBidDetails.status === 'bid_sent' ? 'Bid Sent' : viewingBidDetails.status.replace('_', ' ')}
+                        </Badge>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Project Description */}
+              <div className="space-y-3">
+                <h4 className="font-semibold text-lg border-b pb-2">Project Description</h4>
+                <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
+                  {viewingBidDetails.description}
+                </p>
+              </div>
+
+              {/* Timeline & Notes */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-3">
+                  <h4 className="font-semibold border-b pb-2">Timeline</h4>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span>Submitted:</span>
+                      <span>{new Date(viewingBidDetails.createdAt).toLocaleString()}</span>
+                    </div>
+                    {viewingBidDetails.lastUpdated && (
+                      <div className="flex justify-between">
+                        <span>Last Updated:</span>
+                        <span>{new Date(viewingBidDetails.lastUpdated).toLocaleString()}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {viewingBidDetails.notes && (
+                  <div className="space-y-3">
+                    <h4 className="font-semibold border-b pb-2">Notes</h4>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      {viewingBidDetails.notes}
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              {/* Additional Information */}
+              {viewingBidDetails.additionalInformation && (
+                <div className="space-y-3">
+                  <h4 className="font-semibold border-b pb-2">Additional Information</h4>
+                  <div className="bg-gray-50 dark:bg-gray-700 p-3 rounded">
+                    <p className="text-sm">{viewingBidDetails.additionalInformation}</p>
+                  </div>
+                </div>
+              )}
+
+              {/* Action Buttons */}
+              <div className="flex flex-wrap gap-3 pt-4 border-t">
+                {viewingBidDetails.status === 'pending' && (
+                  <Button
+                    className="bg-blue-600 hover:bg-blue-700 text-white"
+                    onClick={() => {
+                      contactCustomerMutation.mutate(viewingBidDetails.id);
+                      setViewingBidDetails(null);
+                    }}
+                    disabled={contactCustomerMutation.isPending}
+                  >
+                    <Phone className="h-4 w-4 mr-2" />
+                    Contact Customer
+                  </Button>
+                )}
+                
+                {(viewingBidDetails.status === 'contacted' || viewingBidDetails.status === 'pending') && (
+                  <Button
+                    className="bg-green-600 hover:bg-green-700 text-white"
+                    onClick={() => {
+                      sendBidMutation.mutate(viewingBidDetails.id);
+                      setViewingBidDetails(null);
+                    }}
+                    disabled={sendBidMutation.isPending}
+                  >
+                    <FileText className="h-4 w-4 mr-2" />
+                    Send Bid
+                  </Button>
+                )}
+
+                {viewingBidDetails.status === 'bid_sent' && (
+                  <>
+                    <Button
+                      className="bg-green-600 hover:bg-green-700 text-white"
+                      onClick={() => {
+                        updateProjectStatusMutation.mutate({ requestId: viewingBidDetails.id, status: 'won' });
+                        setViewingBidDetails(null);
+                      }}
+                      disabled={updateProjectStatusMutation.isPending}
+                    >
+                      <Star className="h-4 w-4 mr-2" />
+                      Won Project
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className="text-orange-600 border-orange-300 hover:bg-orange-50"
+                      onClick={() => {
+                        updateProjectStatusMutation.mutate({ requestId: viewingBidDetails.id, status: 'lost' });
+                        setViewingBidDetails(null);
+                      }}
+                      disabled={updateProjectStatusMutation.isPending}
+                    >
+                      Lost Project
+                    </Button>
+                  </>
+                )}
+                
+                <Button
+                  variant="outline"
+                  onClick={() => setViewingBidDetails(null)}
+                >
+                  Close
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

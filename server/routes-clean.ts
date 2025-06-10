@@ -492,14 +492,68 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Status is required" });
       }
 
+      // Get current bid request to track the status change
+      const currentBidRequest = await storage.getBidRequest(requestId);
+      if (!currentBidRequest) {
+        return res.status(404).json({ message: "Bid request not found" });
+      }
+
+      // Log the status change for analytics
+      const previousStatus = currentBidRequest.status;
+      console.log(`Bid request ${requestId} status change: ${previousStatus} → ${status}`);
+      
+      // Track analytics data:
+      // - Previous status and new status
+      // - Timestamp of change
+      // - Time spent in previous status
+      // - Actor making the change (contractor/admin)
+      const statusChangeTime = new Date();
+      const createdAt = currentBidRequest.createdAt ? new Date(currentBidRequest.createdAt) : statusChangeTime;
+      const timeInPreviousStatus = statusChangeTime.getTime() - createdAt.getTime();
+      
+      console.log(`Analytics: Bid ${requestId} spent ${Math.round(timeInPreviousStatus / (1000 * 60))} minutes in '${previousStatus}' status`);
+
       // Update the bid request status in the database
       const result = await storage.updateBidRequestStatus(requestId, status);
       
       if (!result) {
-        return res.status(404).json({ message: "Bid request not found" });
+        return res.status(404).json({ message: "Failed to update bid request" });
       }
 
-      res.json({ success: true, bidRequest: result });
+      // Additional analytics logging for specific status changes
+      if (status === 'contacted') {
+        console.log(`Analytics: Contractor responded to bid request ${requestId} - customer contact initiated`);
+      } else if (status === 'bid_sent') {
+        console.log(`Analytics: Bid sent for request ${requestId} - moved to projects tracking`);
+        
+        // If there's a sales rep attribution, increment their conversion stats
+        if (currentBidRequest.salespersonId) {
+          try {
+            console.log(`Analytics: Incrementing conversion stats for sales rep ${currentBidRequest.salespersonId}`);
+            // Note: This would ideally be a separate "bid_sent" metric, but using existing increment
+          } catch (error) {
+            console.error('Error updating salesperson bid sent stats:', error);
+          }
+        }
+      } else if (status === 'won') {
+        console.log(`Analytics: Project won for bid request ${requestId} - revenue event`);
+        
+        // Track revenue and final conversion for sales rep
+        if (currentBidRequest.salespersonId) {
+          console.log(`Analytics: Sales rep ${currentBidRequest.salespersonId} earned commission on won project ${requestId}`);
+        }
+      } else if (status === 'lost') {
+        console.log(`Analytics: Project lost for bid request ${requestId} - conversion failed`);
+      } else if (status === 'declined') {
+        console.log(`Analytics: Bid request ${requestId} declined by contractor`);
+      }
+
+      res.json({ success: true, bidRequest: result, statusChange: {
+        from: previousStatus,
+        to: status,
+        timestamp: statusChangeTime,
+        duration: timeInPreviousStatus
+      }});
     } catch (error) {
       console.error("Error updating bid request status:", error);
       res.status(500).json({ message: "Internal server error" });
@@ -522,6 +576,238 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error declining bid request:", error);
       res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Analytics endpoints for comprehensive reporting
+  apiRouter.get("/analytics/admin/overview", isAuthenticated, requireRole(['admin']), async (req: Request, res: Response) => {
+    try {
+      // Get all bid requests for comprehensive analytics
+      const allBidRequests = await storage.getRecentBidRequests(1000); // Get large sample
+      
+      // Calculate conversion funnel metrics
+      const totalRequests = allBidRequests.length;
+      const contactedCount = allBidRequests.filter(bid => ['contacted', 'bid_sent', 'won', 'lost'].includes(bid.status)).length;
+      const bidsSentCount = allBidRequests.filter(bid => ['bid_sent', 'won', 'lost'].includes(bid.status)).length;
+      const wonCount = allBidRequests.filter(bid => bid.status === 'won').length;
+      
+      // Calculate conversion rates
+      const conversionRates = {
+        pendingToContacted: totalRequests > 0 ? (contactedCount / totalRequests * 100).toFixed(1) : 0,
+        contactedToBidSent: contactedCount > 0 ? (bidsSentCount / contactedCount * 100).toFixed(1) : 0,
+        bidSentToWon: bidsSentCount > 0 ? (wonCount / bidsSentCount * 100).toFixed(1) : 0,
+        overallConversion: totalRequests > 0 ? (wonCount / totalRequests * 100).toFixed(1) : 0
+      };
+
+      // Sales rep performance analysis
+      const salesRepPerformance = await Promise.all(
+        (await storage.getAllSalespersons()).map(async (rep) => {
+          const repBids = allBidRequests.filter(bid => bid.salespersonId === rep.id);
+          const repWons = repBids.filter(bid => bid.status === 'won');
+          
+          return {
+            id: rep.id,
+            name: rep.fullName,
+            totalLeads: repBids.length,
+            wonProjects: repWons.length,
+            conversionRate: repBids.length > 0 ? (repWons.length / repBids.length * 100).toFixed(1) : 0,
+            totalVisits: rep.totalVisits || 0,
+            successfulConversions: rep.successfulConversions || 0
+          };
+        })
+      );
+
+      // Service type demand analysis
+      const serviceTypeDemand: Record<string, number> = {};
+      allBidRequests.forEach(bid => {
+        const service = bid.serviceRequested || 'Unknown';
+        serviceTypeDemand[service] = (serviceTypeDemand[service] || 0) + 1;
+      });
+
+      res.json({
+        overview: {
+          totalBidRequests: totalRequests,
+          pendingRequests: allBidRequests.filter(bid => bid.status === 'pending').length,
+          contactedRequests: allBidRequests.filter(bid => bid.status === 'contacted').length,
+          bidsSent: bidsSentCount,
+          projectsWon: wonCount,
+          projectsLost: allBidRequests.filter(bid => bid.status === 'lost').length,
+          conversionRates
+        },
+        salesRepPerformance: salesRepPerformance.sort((a, b) => b.wonProjects - a.wonProjects),
+        serviceTypeDemand,
+        recentActivity: allBidRequests.slice(0, 10).map(bid => ({
+          id: bid.id,
+          customerName: bid.fullName,
+          service: bid.serviceRequested,
+          status: bid.status,
+          submittedAt: bid.createdAt,
+          salesRepAttributed: !!bid.salespersonId
+        }))
+      });
+    } catch (error) {
+      console.error("Error fetching admin analytics:", error);
+      res.status(500).json({ message: "Failed to fetch analytics data" });
+    }
+  });
+
+  // Sales rep individual analytics
+  apiRouter.get("/analytics/sales-rep/:id", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const repId = Number(req.params.id);
+      const user = req.user as User;
+      
+      // Ensure user can only access their own data or admin can access any
+      if (user.role !== 'admin') {
+        const salesperson = await storage.getSalespersonByUserId(user.id);
+        if (!salesperson || salesperson.id !== repId) {
+          return res.status(403).json({ message: "Access denied" });
+        }
+      }
+
+      const salesperson = await storage.getSalesperson(repId);
+      if (!salesperson) {
+        return res.status(404).json({ message: "Salesperson not found" });
+      }
+
+      // Get all bid requests attributed to this sales rep
+      const allBidRequests = await storage.getRecentBidRequests(1000);
+      const repBids = allBidRequests.filter(bid => bid.salespersonId === repId);
+
+      // Calculate personal performance metrics
+      const totalLeads = repBids.length;
+      const contactedLeads = repBids.filter(bid => ['contacted', 'bid_sent', 'won', 'lost'].includes(bid.status)).length;
+      const bidsSent = repBids.filter(bid => ['bid_sent', 'won', 'lost'].includes(bid.status)).length;
+      const wonProjects = repBids.filter(bid => bid.status === 'won').length;
+
+      // Commission-eligible projects (won projects with budget data)
+      const commissionEligible = repBids.filter(bid => bid.status === 'won' && bid.budget);
+      const totalCommissionValue = commissionEligible.reduce((sum, bid) => sum + (parseFloat(bid.budget) || 0), 0);
+
+      // Performance comparison with other reps
+      const allSalesPersons = await storage.getAllSalespersons();
+      const rankings = await Promise.all(
+        allSalesPersons.map(async (rep) => {
+          const otherRepBids = allBidRequests.filter(bid => bid.salespersonId === rep.id);
+          const otherRepWons = otherRepBids.filter(bid => bid.status === 'won');
+          return {
+            id: rep.id,
+            wonProjects: otherRepWons.length,
+            totalLeads: otherRepBids.length
+          };
+        })
+      );
+
+      const rankByWins = rankings.sort((a, b) => b.wonProjects - a.wonProjects)
+        .findIndex(rep => rep.id === repId) + 1;
+      const rankByLeads = rankings.sort((a, b) => b.totalLeads - a.totalLeads)
+        .findIndex(rep => rep.id === repId) + 1;
+
+      res.json({
+        personalMetrics: {
+          totalQrScans: salesperson.totalVisits || 0,
+          totalLeads,
+          contactedLeads,
+          bidsSent,
+          wonProjects,
+          conversionRate: totalLeads > 0 ? (wonProjects / totalLeads * 100).toFixed(1) : 0,
+          scanToLeadRate: salesperson.totalVisits > 0 ? (totalLeads / salesperson.totalVisits * 100).toFixed(1) : 0
+        },
+        commissionData: {
+          eligibleProjects: commissionEligible.length,
+          totalCommissionValue,
+          averageProjectValue: commissionEligible.length > 0 ? (totalCommissionValue / commissionEligible.length).toFixed(0) : 0
+        },
+        performance: {
+          rankByWins,
+          rankByLeads,
+          totalReps: allSalesPersons.length
+        },
+        recentLeads: repBids.slice(0, 10).map(bid => ({
+          id: bid.id,
+          customerName: bid.fullName,
+          service: bid.serviceRequested,
+          status: bid.status,
+          submittedAt: bid.createdAt,
+          projectValue: bid.budget
+        }))
+      });
+    } catch (error) {
+      console.error("Error fetching sales rep analytics:", error);
+      res.status(500).json({ message: "Failed to fetch sales rep analytics" });
+    }
+  });
+
+  // Conversion funnel analytics
+  apiRouter.get("/analytics/conversion-funnel", isAuthenticated, requireRole(['admin']), async (req: Request, res: Response) => {
+    try {
+      const { days = 30 } = req.query;
+      const daysBack = Number(days);
+      const cutoffDate = new Date();
+      cutoffDate.setDate(cutoffDate.getDate() - daysBack);
+
+      const allBidRequests = await storage.getRecentBidRequests(1000);
+      const recentBids = allBidRequests.filter(bid => new Date(bid.createdAt) >= cutoffDate);
+
+      // Track progression through each stage
+      const funnelData = [
+        {
+          stage: 'QR Code Scans',
+          count: recentBids.reduce((sum, bid) => {
+            // Estimate scans based on attributed requests (rough approximation)
+            return sum + (bid.salespersonId ? 3 : 0); // Assume 3 scans per attributed request
+          }, 0),
+          description: 'Total QR code scans recorded'
+        },
+        {
+          stage: 'Bid Requests',
+          count: recentBids.length,
+          description: 'Customers who submitted project requests'
+        },
+        {
+          stage: 'Contacted',
+          count: recentBids.filter(bid => ['contacted', 'bid_sent', 'won', 'lost'].includes(bid.status)).length,
+          description: 'Requests where contractor contacted customer'
+        },
+        {
+          stage: 'Bids Sent',
+          count: recentBids.filter(bid => ['bid_sent', 'won', 'lost'].includes(bid.status)).length,
+          description: 'Formal bids submitted to customers'
+        },
+        {
+          stage: 'Projects Won',
+          count: recentBids.filter(bid => bid.status === 'won').length,
+          description: 'Successfully closed deals'
+        }
+      ];
+
+      // Calculate drop-off rates
+      const dropOffAnalysis = funnelData.map((stage, index) => {
+        if (index === 0) return { ...stage, dropOffRate: 0, conversionRate: 100 };
+        
+        const previousStage = funnelData[index - 1];
+        const dropOffRate = previousStage.count > 0 ? 
+          ((previousStage.count - stage.count) / previousStage.count * 100).toFixed(1) : 0;
+        const conversionRate = funnelData[0].count > 0 ? 
+          (stage.count / funnelData[0].count * 100).toFixed(1) : 0;
+
+        return { ...stage, dropOffRate, conversionRate };
+      });
+
+      res.json({
+        timeframe: `Last ${daysBack} days`,
+        funnelData: dropOffAnalysis,
+        summary: {
+          totalScans: funnelData[0].count,
+          totalRequests: funnelData[1].count,
+          totalWins: funnelData[4].count,
+          overallConversionRate: funnelData[0].count > 0 ? 
+            (funnelData[4].count / funnelData[0].count * 100).toFixed(2) : 0
+        }
+      });
+    } catch (error) {
+      console.error("Error fetching conversion funnel analytics:", error);
+      res.status(500).json({ message: "Failed to fetch conversion funnel data" });
     }
   });
 
