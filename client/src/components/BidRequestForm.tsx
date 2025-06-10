@@ -247,6 +247,8 @@ export default function BidRequestForm({ isOpen, onClose, contractor, trackedSal
       preferredTimeframe: data.preferredTimeframe,
       budget: data.budget,
       contractorId: contractor.id,
+      // Add salesperson attribution for commission tracking
+      ...(trackedSalesperson && { salespersonId: trackedSalesperson.id })
     };
     
     submitBidRequest.mutate(backendData);

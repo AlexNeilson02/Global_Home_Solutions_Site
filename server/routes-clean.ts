@@ -462,6 +462,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get bid requests for a specific contractor
+  apiRouter.get("/contractors/:id/bid-requests", async (req: Request, res: Response) => {
+    try {
+      const contractorId = Number(req.params.id);
+      console.log("Fetching bid requests for contractor:", contractorId);
+      
+      const bidRequests = await storage.getBidRequestsByContractorId(contractorId);
+      console.log("Found bid requests for contractor", contractorId, ":", bidRequests.length);
+      
+      res.status(200).json({ 
+        success: true,
+        bidRequests: bidRequests,
+        count: bidRequests.length 
+      });
+    } catch (error) {
+      console.error("Error fetching contractor bid requests:", error);
+      res.status(500).json({ message: "Internal server error", success: false });
+    }
+  });
+
   // Projects routes
   apiRouter.get("/projects", isAuthenticated, async (req: Request, res: Response) => {
     try {
