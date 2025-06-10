@@ -48,6 +48,8 @@ const ContractorPortalEnhanced: React.FC = () => {
   const [logoPreview, setLogoPreview] = useState<string>('');
   const [mediaFiles, setMediaFiles] = useState<{url: string, type: 'image' | 'video', name: string}[]>([]);
   const [newSpecialty, setNewSpecialty] = useState('');
+  const [viewingBidDetails, setViewingBidDetails] = useState<any | null>(null);
+  const [viewingMedia, setViewingMedia] = useState<{url: string, type: 'image' | 'video', index: number, allMedia: any[]} | null>(null);
   const [newServiceArea, setNewServiceArea] = useState('');
   
   const { toast } = useToast();
@@ -96,6 +98,114 @@ const ContractorPortalEnhanced: React.FC = () => {
   });
 
   const bidRequests = bidRequestsData?.bidRequests || [];
+
+  // Contact customer mutation
+  const contactCustomerMutation = useMutation({
+    mutationFn: async (requestId: number) => {
+      const response = await fetch(`/api/bid-requests/${requestId}/status`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'contacted' })
+      });
+      if (!response.ok) throw new Error('Failed to update status');
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [`/api/contractors/${contractor?.id}/bid-requests`] });
+      toast({
+        title: "Customer Contacted",
+        description: "Status updated successfully"
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to update status",
+        variant: "destructive"
+      });
+    }
+  });
+
+  // Send bid mutation
+  const sendBidMutation = useMutation({
+    mutationFn: async (requestId: number) => {
+      const response = await fetch(`/api/bid-requests/${requestId}/status`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'bid_sent' })
+      });
+      if (!response.ok) throw new Error('Failed to send bid');
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [`/api/contractors/${contractor?.id}/bid-requests`] });
+      queryClient.invalidateQueries({ queryKey: ['/api/projects'] });
+      toast({
+        title: "Bid Sent",
+        description: "Request moved to projects tab"
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to send bid",
+        variant: "destructive"
+      });
+    }
+  });
+
+  // Update project status mutation
+  const updateProjectStatusMutation = useMutation({
+    mutationFn: async ({ requestId, status }: { requestId: number, status: string }) => {
+      const response = await fetch(`/api/bid-requests/${requestId}/status`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status })
+      });
+      if (!response.ok) throw new Error('Failed to update project status');
+      return response.json();
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: [`/api/contractors/${contractor?.id}/bid-requests`] });
+      queryClient.invalidateQueries({ queryKey: ['/api/projects'] });
+      toast({
+        title: "Project Updated",
+        description: `Project marked as ${variables.status.replace('_', ' ')}`
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to update project status",
+        variant: "destructive"
+      });
+    }
+  });
+
+  // Delete bid request mutation
+  const deleteBidRequestMutation = useMutation({
+    mutationFn: async (requestId: number) => {
+      const response = await fetch(`/api/bid-requests/${requestId}`, {
+        method: 'DELETE'
+      });
+      if (!response.ok) throw new Error('Failed to delete bid request');
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [`/api/contractors/${contractor?.id}/bid-requests`] });
+      toast({
+        title: "Request Removed",
+        description: "Bid request deleted successfully"
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to delete bid request",
+        variant: "destructive"
+      });
+    }
+  });
 
   // Initialize edit form with contractor data
   useEffect(() => {
