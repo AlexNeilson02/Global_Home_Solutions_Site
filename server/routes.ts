@@ -1072,9 +1072,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // This endpoint is now public, no need for authentication checks
       
-      // Construct the URL for the salesperson's landing page
+      // Construct the URL for the salesperson's tracked landing page
       const baseUrl = process.env.BASE_URL || `${req.protocol}://${req.get('host')}`;
-      const landingPageUrl = `${baseUrl}/s/${salesperson.profileUrl}`;
+      const landingPageUrl = `${baseUrl}/?ref=${salesperson.profileUrl}`;
       
       // Generate QR code as data URL
       const qrCodeDataUrl = await QRCode.toDataURL(landingPageUrl, {
@@ -1097,6 +1097,49 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Track page visit for QR code attribution - public endpoint
+  apiRouter.post("/track-visit", async (req: Request, res: Response) => {
+    try {
+      const { salespersonProfileUrl, userAgent, referrer } = req.body;
+      
+      if (!salespersonProfileUrl) {
+        return res.status(400).json({ message: "Salesperson profile URL is required" });
+      }
+
+      // Get salesperson by profile URL
+      const salesperson = await storage.getSalespersonByProfileUrl(salespersonProfileUrl);
+      
+      if (!salesperson) {
+        return res.status(404).json({ message: "Salesperson not found" });
+      }
+
+      // Create page visit record for tracking
+      const pageVisit = await storage.createPageVisit({
+        salespersonId: salesperson.id,
+        visitedAt: new Date(),
+        userAgent: userAgent || null,
+        referrer: referrer || null,
+        converted: false
+      });
+
+      // Increment total visits for the salesperson
+      await storage.incrementSalespersonStats(salesperson.id, 'totalVisits');
+
+      res.json({ 
+        success: true, 
+        visitId: pageVisit.id,
+        salesperson: {
+          id: salesperson.id,
+          fullName: salesperson.fullName,
+          profileUrl: salesperson.profileUrl
+        }
+      });
+    } catch (error) {
+      console.error("Error tracking page visit:", error);
+      res.status(500).json({ message: "Error tracking visit" });
+    }
+  });
+
   // Service categories endpoint
   apiRouter.get("/service-categories", async (req: Request, res: Response) => {
     try {

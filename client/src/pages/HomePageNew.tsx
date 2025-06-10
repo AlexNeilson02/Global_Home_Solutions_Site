@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
 import BidRequestForm from "@/components/BidRequestForm";
 import logoPath from "@/assets/global-home-solutions-logo.png";
 import "../styles/HomePage.css";
@@ -11,6 +12,7 @@ export default function HomePage() {
   const [searchTriggered, setSearchTriggered] = useState(false);
   const [selectedContractor, setSelectedContractor] = useState<any>(null);
   const [showBidForm, setShowBidForm] = useState(false);
+  const [trackedSalesperson, setTrackedSalesperson] = useState<any>(null);
 
   // Fetch contractors from database
   const { data: contractors, isLoading } = useQuery({
@@ -27,6 +29,40 @@ export default function HomePage() {
   const trades = servicesData?.services
     ?.map((service: any) => service.name)
     ?.sort((a: string, b: string) => a.localeCompare(b)) || [];
+
+  // Track QR code visits for sales rep attribution
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const refParam = urlParams.get('ref');
+    
+    if (refParam && !trackedSalesperson) {
+      // Track the visit for commission attribution
+      apiRequest('/api/track-visit', {
+        method: 'POST',
+        body: {
+          salespersonProfileUrl: refParam,
+          userAgent: navigator.userAgent,
+          referrer: document.referrer
+        }
+      })
+      .then((response) => {
+        if (response.success) {
+          setTrackedSalesperson(response.salesperson);
+          // Store in sessionStorage to persist during the session
+          sessionStorage.setItem('trackedSalesperson', JSON.stringify(response.salesperson));
+        }
+      })
+      .catch((error) => {
+        console.log('Visit tracking failed:', error);
+      });
+    } else if (!trackedSalesperson) {
+      // Check if we have a tracked salesperson from sessionStorage
+      const stored = sessionStorage.getItem('trackedSalesperson');
+      if (stored) {
+        setTrackedSalesperson(JSON.parse(stored));
+      }
+    }
+  }, [trackedSalesperson]);
 
   useEffect(() => {
     if (!trade) {
