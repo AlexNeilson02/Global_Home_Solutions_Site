@@ -84,22 +84,16 @@ const AdminPortalEnhanced: React.FC = () => {
     enabled: true
   });
 
-  const { data: usersData } = useQuery({
-    queryKey: ['/api/users/role/all'],
-    enabled: true
-  });
-
   // Extract data arrays
   const salespersons = salespersonsData?.salespersons || [];
   const contractors = contractorsData?.contractors || [];
   const projects = projectsData?.projects || [];
   const bidRequests = bidRequestsData?.bidRequests || [];
-  const allUsers = usersData?.users || [];
 
-  // Update user status mutation
-  const updateUserStatusMutation = useMutation({
-    mutationFn: async ({ userId, isActive }: { userId: number; isActive: boolean }) => {
-      const response = await fetch(`/api/users/${userId}`, {
+  // Update salesperson status mutation
+  const updateSalespersonStatusMutation = useMutation({
+    mutationFn: async ({ salespersonId, isActive }: { salespersonId: number; isActive: boolean }) => {
+      const response = await fetch(`/api/salespersons/${salespersonId}/profile`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -108,16 +102,14 @@ const AdminPortalEnhanced: React.FC = () => {
         body: JSON.stringify({ isActive }),
       });
       if (!response.ok) {
-        throw new Error('Failed to update user status');
+        throw new Error('Failed to update salesperson status');
       }
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/users/role/all'] });
       queryClient.invalidateQueries({ queryKey: ['/api/salespersons'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/contractors'] });
       toast({
-        title: "User Updated",
+        title: "Salesperson Updated",
         description: "User status has been successfully updated.",
       });
     },
@@ -191,8 +183,8 @@ const AdminPortalEnhanced: React.FC = () => {
   });
 
   // Calculate system metrics
-  const totalUsers = allUsers.length;
-  const activeUsers = allUsers.filter((u: any) => u.isActive !== false).length;
+  const totalContractors = contractors.length;
+  const totalSalespersons = salespersons.length;
   const totalProjects = projects.length;
   const activeProjects = projects.filter((p: any) => p.status === 'in_progress').length;
   const completedProjects = projects.filter((p: any) => p.status === 'completed').length;
@@ -202,30 +194,24 @@ const AdminPortalEnhanced: React.FC = () => {
     .reduce((sum: number, p: any) => sum + (p.budget || 0), 0);
 
   // Filter functions
-  const filteredUsers = allUsers.filter((user: any) => {
-    if (userFilter === "all") return true;
-    return user.role === userFilter;
-  });
-
   const filteredBids = bidRequests.filter((bid: any) => {
     if (bidFilter === "all") return true;
     return bid.status === bidFilter;
   });
 
-  // Chart data
-  const userGrowthData = [
-    { month: 'Jan', users: 45, contractors: 12, salespersons: 8 },
-    { month: 'Feb', users: 52, contractors: 15, salespersons: 10 },
-    { month: 'Mar', users: 61, contractors: 18, salespersons: 12 },
-    { month: 'Apr', users: 73, contractors: 22, salespersons: 15 },
-    { month: 'May', users: 89, contractors: 28, salespersons: 18 },
-    { month: 'Jun', users: 105, contractors: 32, salespersons: 22 }
+  // Chart data - Focus on business metrics
+  const teamGrowthData = [
+    { month: 'Jan', contractors: 12, salespersons: 8, projects: 15 },
+    { month: 'Feb', contractors: 15, salespersons: 10, projects: 22 },
+    { month: 'Mar', contractors: 18, salespersons: 12, projects: 28 },
+    { month: 'Apr', contractors: 22, salespersons: 15, projects: 35 },
+    { month: 'May', contractors: 28, salespersons: 18, projects: 42 },
+    { month: 'Jun', contractors: 32, salespersons: 22, projects: 48 }
   ];
 
-  const roleDistribution = [
+  const teamDistribution = [
     { name: 'Contractors', value: contractors.length, color: '#3b82f6' },
-    { name: 'Salespersons', value: salespersons.length, color: '#10b981' },
-    { name: 'Homeowners', value: allUsers.filter((u: any) => u.role === 'homeowner').length, color: '#f59e0b' }
+    { name: 'Salespersons', value: salespersons.length, color: '#10b981' }
   ];
 
   const revenueData = [
@@ -257,9 +243,8 @@ const AdminPortalEnhanced: React.FC = () => {
           </div>
 
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-            <TabsList className="grid w-full grid-cols-6">
+            <TabsList className="grid w-full grid-cols-5">
               <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
-              <TabsTrigger value="users">Users</TabsTrigger>
               <TabsTrigger value="contractors">Contractors</TabsTrigger>
               <TabsTrigger value="sales">Sales Team</TabsTrigger>
               <TabsTrigger value="bids">Bid Requests</TabsTrigger>
@@ -269,15 +254,15 @@ const AdminPortalEnhanced: React.FC = () => {
             {/* Dashboard Tab */}
             <TabsContent value="dashboard" className="space-y-6">
               {/* Key Metrics */}
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Total Users</CardTitle>
-                    <Users className="h-4 w-4 text-muted-foreground" />
+                    <CardTitle className="text-sm font-medium">Total Contractors</CardTitle>
+                    <Building2 className="h-4 w-4 text-muted-foreground" />
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">{totalUsers}</div>
-                    <p className="text-xs text-muted-foreground">{activeUsers} active users</p>
+                    <div className="text-2xl font-bold">{totalContractors}</div>
+                    <p className="text-xs text-muted-foreground">Active contractors</p>
                   </CardContent>
                 </Card>
 
