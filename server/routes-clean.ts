@@ -206,6 +206,86 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // QR code generation endpoint
+  apiRouter.get("/salespersons/:id/qrcode", async (req: Request, res: Response) => {
+    try {
+      const id = Number(req.params.id);
+      const salesperson = await storage.getSalesperson(id);
+      
+      if (!salesperson) {
+        return res.status(404).json({ message: "Salesperson not found" });
+      }
+      
+      // Construct the URL for the salesperson's tracked landing page
+      const baseUrl = process.env.BASE_URL || `${req.protocol}://${req.get('host')}`;
+      const landingPageUrl = `${baseUrl}/sales/${salesperson.profileUrl}`;
+      
+      // Generate QR code as data URL
+      const qrCodeDataUrl = await QRCode.toDataURL(landingPageUrl, {
+        errorCorrectionLevel: 'H',
+        margin: 1,
+        width: 300,
+        color: {
+          dark: '#003366',  // Blue color for QR code
+          light: '#ffffff'  // White background
+        }
+      });
+      
+      res.json({
+        qrCode: qrCodeDataUrl,
+        landingPageUrl
+      });
+    } catch (error) {
+      console.error("Error generating QR code:", error);
+      res.status(500).json({ message: "Error generating QR code" });
+    }
+  });
+
+  // Salesperson profile route by profile URL - publicly accessible
+  apiRouter.get("/salesperson/:profileUrl", async (req: Request, res: Response) => {
+    try {
+      const { profileUrl } = req.params;
+      
+      const salesperson = await storage.getSalespersonByProfileUrl(profileUrl);
+      
+      if (!salesperson) {
+        return res.status(400).json({ message: "Invalid salesperson profile" });
+      }
+      
+      // Increment total visits
+      await storage.incrementSalespersonStats(salesperson.id, 'totalVisits');
+      
+      // Get the user associated with this salesperson
+      const user = await storage.getUser(salesperson.userId);
+      
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      res.json({ 
+        user: {
+          fullName: user.fullName,
+          email: user.email,
+          phone: user.phone,
+          avatarUrl: user.avatarUrl
+        },
+        salesperson: {
+          id: salesperson.id,
+          profileUrl: salesperson.profileUrl,
+          bio: salesperson.bio,
+          specialties: salesperson.specialties || [],
+          certifications: salesperson.certifications || [],
+          yearsExperience: salesperson.yearsExperience,
+          totalVisits: salesperson.totalVisits,
+          successfulConversions: salesperson.successfulConversions
+        }
+      });
+    } catch (error) {
+      console.error("Error fetching salesperson profile:", error);
+      res.status(500).json({ message: "Error fetching salesperson profile" });
+    }
+  });
+
   // Bid requests routes
   apiRouter.post("/bid-requests", upload.array('media', 10), async (req: Request, res: Response) => {
     try {
