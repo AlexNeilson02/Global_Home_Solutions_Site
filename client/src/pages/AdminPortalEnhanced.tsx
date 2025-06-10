@@ -34,6 +34,161 @@ import {
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+
+const salespersonSchema = z.object({
+  username: z.string().min(3, "Username must be at least 3 characters"),
+  email: z.string().email("Please enter a valid email address"),
+  fullName: z.string().min(2, "Full name must be at least 2 characters"),
+  phone: z.string().min(10, "Please enter a valid phone number"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+});
+
+type SalespersonFormData = z.infer<typeof salespersonSchema>;
+
+const SalespersonForm: React.FC<{ queryClient: any }> = ({ queryClient }) => {
+  const { toast } = useToast();
+  
+  const form = useForm<SalespersonFormData>({
+    resolver: zodResolver(salespersonSchema),
+    defaultValues: {
+      username: "",
+      email: "",
+      fullName: "",
+      phone: "",
+      password: "",
+    },
+  });
+
+  const createSalespersonMutation = useMutation({
+    mutationFn: async (data: SalespersonFormData) => {
+      const response = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ...data,
+          role: 'salesperson'
+        }),
+      });
+      
+      if (!response.ok) {
+        const error = await response.text();
+        throw new Error(error);
+      }
+      
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Success",
+        description: "Salesperson created successfully",
+      });
+      form.reset();
+      queryClient.invalidateQueries({ queryKey: ['/api/salespersons'] });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  const onSubmit = (data: SalespersonFormData) => {
+    createSalespersonMutation.mutate(data);
+  };
+
+  return (
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <FormField
+          control={form.control}
+          name="fullName"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Full Name</FormLabel>
+              <FormControl>
+                <Input placeholder="John Smith" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        
+        <FormField
+          control={form.control}
+          name="username"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Username</FormLabel>
+              <FormControl>
+                <Input placeholder="johnsmith" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        
+        <FormField
+          control={form.control}
+          name="email"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Email</FormLabel>
+              <FormControl>
+                <Input type="email" placeholder="john@example.com" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        
+        <FormField
+          control={form.control}
+          name="phone"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Phone</FormLabel>
+              <FormControl>
+                <Input placeholder="(555) 123-4567" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        
+        <FormField
+          control={form.control}
+          name="password"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Password</FormLabel>
+              <FormControl>
+                <Input type="password" placeholder="••••••••" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        
+        <div className="flex justify-end gap-2 pt-4">
+          <Button 
+            type="submit" 
+            disabled={createSalespersonMutation.isPending}
+          >
+            {createSalespersonMutation.isPending ? "Creating..." : "Create Salesperson"}
+          </Button>
+        </div>
+      </form>
+    </Form>
+  );
+};
 
 const AdminPortalEnhanced: React.FC = () => {
   const [, navigate] = useLocation();
@@ -439,9 +594,28 @@ const AdminPortalEnhanced: React.FC = () => {
             {/* Sales Team Tab */}
             <TabsContent value="sales" className="space-y-6">
               <Card>
-                <CardHeader>
-                  <CardTitle>Sales Team Management</CardTitle>
-                  <CardDescription>Monitor sales performance and manage team members</CardDescription>
+                <CardHeader className="flex flex-row items-center justify-between">
+                  <div>
+                    <CardTitle>Sales Team Management</CardTitle>
+                    <CardDescription>Monitor sales performance and manage team members</CardDescription>
+                  </div>
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button>
+                        <Plus className="h-4 w-4 mr-2" />
+                        Add Salesperson
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-[425px]">
+                      <DialogHeader>
+                        <DialogTitle>Create New Salesperson</DialogTitle>
+                        <DialogDescription>
+                          Add a new sales representative to the team
+                        </DialogDescription>
+                      </DialogHeader>
+                      <SalespersonForm queryClient={queryClient} />
+                    </DialogContent>
+                  </Dialog>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
