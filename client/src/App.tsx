@@ -2,6 +2,7 @@ import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { ProtectedRoute } from "@/components/ProtectedRoute";
 import HomePage from "@/pages/HomePageNew";
 import ContractorProfile from "@/pages/ContractorProfileDB";
 import ContractorPortal from "@/pages/ContractorPortal";
@@ -23,12 +24,36 @@ function App() {
             <Route path="/contractor/:id" element={<ContractorProfile />} />
             <Route path="/contractor-registration" element={<ContractorRegistration />} />
             <Route path="/login" element={<Login />} />
-            <Route path="/contractor-portal" element={<ContractorPortal />} />
-            <Route path="/sales-portal" element={<SalesPortal />} />
-            <Route path="/admin-portal" element={<AdminPortal />} />
-            <Route path="/portal/contractor" element={<ContractorPortal />} />
-            <Route path="/portal/sales" element={<SalesPortal />} />
-            <Route path="/portal/admin" element={<AdminPortal />} />
+            <Route path="/contractor-portal" element={
+              <ProtectedRoute requiredRole="contractor">
+                <ContractorPortal />
+              </ProtectedRoute>
+            } />
+            <Route path="/sales-portal" element={
+              <ProtectedRoute requiredRole="salesperson">
+                <SalesPortal />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin-portal" element={
+              <ProtectedRoute requiredRole="admin">
+                <AdminPortal />
+              </ProtectedRoute>
+            } />
+            <Route path="/portal/contractor" element={
+              <ProtectedRoute requiredRole="contractor">
+                <ContractorPortal />
+              </ProtectedRoute>
+            } />
+            <Route path="/portal/sales" element={
+              <ProtectedRoute requiredRole="salesperson">
+                <SalesPortal />
+              </ProtectedRoute>
+            } />
+            <Route path="/portal/admin" element={
+              <ProtectedRoute requiredRole="admin">
+                <AdminPortal />
+              </ProtectedRoute>
+            } />
           </Routes>
         </div>
       </TooltipProvider>
