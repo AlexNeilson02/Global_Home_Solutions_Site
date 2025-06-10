@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -10,7 +10,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import { TrendingUp, Users, DollarSign, Target, QrCode, Eye, ArrowUpRight } from "lucide-react";
 
 const SalesPortal: React.FC = () => {
-  const navigate = useNavigate();
+  const [, navigate] = useLocation();
   const [activeTab, setActiveTab] = useState("dashboard");
 
   // Fetch sales data - using placeholder salesperson ID 1 for demo

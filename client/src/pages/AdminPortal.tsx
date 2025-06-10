@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -9,7 +9,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import { Users, Building, TrendingUp, Shield, Settings, AlertTriangle } from "lucide-react";
 
 const AdminPortal: React.FC = () => {
-  const navigate = useNavigate();
+  const [, navigate] = useLocation();
   const [activeTab, setActiveTab] = useState("dashboard");
 
   // Fetch admin data
