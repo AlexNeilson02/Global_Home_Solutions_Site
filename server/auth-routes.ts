@@ -78,6 +78,31 @@ router.post("/register", async (req: Request, res: Response) => {
       password: hashedPassword,
     });
     
+    // If user is a salesperson, create salesperson record
+    if (data.role === 'salesperson') {
+      try {
+        await storage.createSalesperson({
+          userId: newUser.id,
+          nfcId: `nfc_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+          profileUrl: data.username.toLowerCase().replace(/[^a-z0-9]/g, ''),
+          isActive: true,
+          specialties: [],
+          bio: null,
+          qrCodeUrl: null,
+          lastScanned: null,
+          totalVisits: 0,
+          totalLeads: 0,
+          conversionRate: 0,
+          commissions: 0,
+          activeProjects: 0,
+          yearsExperience: null,
+          successfulConversions: 0
+        });
+      } catch (error) {
+        console.error("Error creating salesperson record:", error);
+      }
+    }
+    
     const { password, ...userInfo } = newUser;
     res.status(201).json({ message: "User created successfully", user: userInfo });
   } catch (error) {

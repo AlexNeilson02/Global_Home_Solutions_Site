@@ -287,14 +287,14 @@ export default function AdminPortalEnhanced() {
                         Add Salesperson
                       </Button>
                     </DialogTrigger>
-                    <DialogContent className="sm:max-w-[425px]">
-                      <DialogHeader>
-                        <DialogTitle>Create New Salesperson</DialogTitle>
-                        <DialogDescription>
+                    <DialogContent className="sm:max-w-[600px]">
+                      <DialogHeader className="pb-6">
+                        <DialogTitle className="text-2xl font-bold">Create New Salesperson</DialogTitle>
+                        <DialogDescription className="text-base">
                           Add a new sales representative to the team
                         </DialogDescription>
                       </DialogHeader>
-                      <div className="space-y-4">
+                      <div className="space-y-6">
                         <div className="grid grid-cols-2 gap-4">
                           <div>
                             <label className="text-sm font-medium">Username</label>
