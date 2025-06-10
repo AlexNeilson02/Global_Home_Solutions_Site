@@ -1088,7 +1088,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
       
       res.json({
-        qrCodeDataUrl,
+        qrCode: qrCodeDataUrl,
         landingPageUrl
       });
     } catch (error) {

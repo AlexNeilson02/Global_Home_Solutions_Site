@@ -584,11 +584,11 @@ const SalesPortalEnhanced: React.FC = () => {
                     <CardDescription>Use this QR code for quick access to your landing page</CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    {qrCodeData?.qrCodeUrl ? (
+                    {qrCodeData ? (
                       <div className="flex flex-col items-center space-y-4">
                         <div className="bg-white p-4 rounded-lg border">
                           <img 
-                            src={qrCodeData.qrCodeUrl} 
+                            src={qrCodeData} 
                             alt="QR Code" 
                             className="w-48 h-48"
                           />
@@ -599,7 +599,7 @@ const SalesPortalEnhanced: React.FC = () => {
                             Download
                           </Button>
                           <Button 
-                            onClick={() => copyToClipboard(qrCodeData.qrCodeUrl, 'QR Code URL')}
+                            onClick={() => copyToClipboard(qrCodeData, 'QR Code URL')}
                             variant="outline"
                           >
                             <Copy className="h-4 w-4 mr-2" />

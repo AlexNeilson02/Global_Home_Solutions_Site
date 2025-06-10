@@ -10,6 +10,7 @@ import SalesPortalEnhanced from "@/pages/SalesPortalEnhanced";
 import AdminPortalEnhanced from "@/pages/AdminPortalEnhanced";
 import PortalAccess from "@/pages/PortalAccess";
 import ContractorRegistration from "@/pages/ContractorRegistration";
+import SalespersonProfile from "@/pages/SalespersonProfile";
 import Login from "@/pages/Login";
 
 function App() {
@@ -22,6 +23,7 @@ function App() {
           <Route path="/portals" component={PortalAccess} />
           <Route path="/contractor/:id" component={ContractorProfile} />
           <Route path="/contractor-registration" component={ContractorRegistration} />
+          <Route path="/sales/:profileUrl" component={SalespersonProfile} />
           <Route path="/login" component={Login} />
           <Route path="/contractor-portal">
             <ProtectedRoute requiredRole="contractor">
