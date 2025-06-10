@@ -896,6 +896,207 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Enhanced Document Management Routes
+  apiRouter.post("/documents/upload", isAuthenticated, upload.array('files', 10), async (req: Request, res: Response) => {
+    try {
+      const user = req.user as User;
+      const files = req.files as Express.Multer.File[];
+      const { category = 'general', relatedId, relatedType, description, tags } = req.body;
+
+      if (!files || files.length === 0) {
+        return res.status(400).json({ message: 'No files uploaded' });
+      }
+
+      const uploadedDocuments = [];
+
+      for (const file of files) {
+        // Convert file to base64
+        const base64Data = `data:${file.mimetype};base64,${file.buffer.toString('base64')}`;
+        
+        // Create document record
+        const document = await storage.createDocument({
+          fileName: `${Date.now()}_${file.originalname}`,
+          originalName: file.originalname,
+          fileType: file.mimetype.startsWith('image/') ? 'image' : 'video',
+          mimeType: file.mimetype,
+          fileSize: file.size,
+          fileUrl: base64Data,
+          uploadedBy: user.id,
+          category,
+          relatedId: relatedId ? parseInt(relatedId) : null,
+          relatedType: relatedType || null,
+          description: description || null,
+          tags: tags ? tags.split(',').map((tag: string) => tag.trim()) : []
+        });
+
+        uploadedDocuments.push(document);
+      }
+
+      res.status(201).json({ 
+        message: `${uploadedDocuments.length} files uploaded successfully`,
+        documents: uploadedDocuments 
+      });
+    } catch (error) {
+      console.error("Error uploading documents:", error);
+      res.status(500).json({ message: "Failed to upload documents" });
+    }
+  });
+
+  apiRouter.get("/documents", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const user = req.user as User;
+      const { category, relatedId, search } = req.query;
+
+      let documents;
+      
+      if (search) {
+        documents = await storage.searchDocuments(search as string, category as string);
+      } else if (category) {
+        documents = await storage.getDocumentsByCategory(
+          category as string, 
+          relatedId ? parseInt(relatedId as string) : undefined
+        );
+      } else {
+        documents = await storage.getDocumentsByUser(user.id);
+      }
+
+      res.json({ documents });
+    } catch (error) {
+      console.error("Error fetching documents:", error);
+      res.status(500).json({ message: "Failed to fetch documents" });
+    }
+  });
+
+  apiRouter.get("/documents/:id", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const documentId = parseInt(req.params.id);
+      const document = await storage.getDocument(documentId);
+
+      if (!document) {
+        return res.status(404).json({ message: "Document not found" });
+      }
+
+      res.json({ document });
+    } catch (error) {
+      console.error("Error fetching document:", error);
+      res.status(500).json({ message: "Failed to fetch document" });
+    }
+  });
+
+  apiRouter.delete("/documents/:id", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const documentId = parseInt(req.params.id);
+      const user = req.user as User;
+      
+      const document = await storage.getDocument(documentId);
+      if (!document) {
+        return res.status(404).json({ message: "Document not found" });
+      }
+
+      // Check if user owns the document or is admin
+      if (document.uploadedBy !== user.id && user.role !== 'admin') {
+        return res.status(403).json({ message: "Access denied" });
+      }
+
+      const deleted = await storage.deleteDocument(documentId);
+      
+      if (deleted) {
+        res.json({ message: "Document deleted successfully" });
+      } else {
+        res.status(500).json({ message: "Failed to delete document" });
+      }
+    } catch (error) {
+      console.error("Error deleting document:", error);
+      res.status(500).json({ message: "Failed to delete document" });
+    }
+  });
+
+  // Enhanced Project Management Routes
+  apiRouter.get("/projects/:id/timeline", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const projectId = parseInt(req.params.id);
+      const timeline = await storage.getProjectTimeline(projectId);
+      res.json({ timeline });
+    } catch (error) {
+      console.error("Error fetching project timeline:", error);
+      res.status(500).json({ message: "Failed to fetch project timeline" });
+    }
+  });
+
+  apiRouter.post("/projects/:id/milestones", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const projectId = parseInt(req.params.id);
+      const user = req.user as User;
+      const { title, description, dueDate, orderIndex = 0 } = req.body;
+
+      const milestone = await storage.createProjectMilestone({
+        projectId,
+        title,
+        description,
+        dueDate: dueDate ? new Date(dueDate) : null,
+        orderIndex,
+        createdBy: user.id
+      });
+
+      res.status(201).json({ 
+        message: "Milestone created successfully", 
+        milestone 
+      });
+    } catch (error) {
+      console.error("Error creating milestone:", error);
+      res.status(400).json({ message: "Failed to create milestone" });
+    }
+  });
+
+  apiRouter.patch("/projects/:id/milestones/:milestoneId", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const milestoneId = parseInt(req.params.milestoneId);
+      const { status, completedAt, ...updateData } = req.body;
+
+      let finalUpdateData = { ...updateData };
+      
+      if (status === 'completed' && !completedAt) {
+        finalUpdateData.completedAt = new Date();
+      }
+      finalUpdateData.status = status;
+
+      const milestone = await storage.updateProjectMilestone(milestoneId, finalUpdateData);
+      
+      if (milestone) {
+        res.json({ message: "Milestone updated successfully", milestone });
+      } else {
+        res.status(404).json({ message: "Milestone not found" });
+      }
+    } catch (error) {
+      console.error("Error updating milestone:", error);
+      res.status(500).json({ message: "Failed to update milestone" });
+    }
+  });
+
+  apiRouter.post("/projects/:id/status-updates", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const projectId = parseInt(req.params.id);
+      const user = req.user as User;
+      const { status, notes, attachments = [] } = req.body;
+
+      const statusUpdate = await storage.createProjectStatusUpdate({
+        projectId,
+        status,
+        notes,
+        updatedBy: user.id,
+        attachments
+      });
+
+      res.status(201).json({ 
+        message: "Status update created successfully", 
+        statusUpdate 
+      });
+    } catch (error) {
+      console.error("Error creating status update:", error);
+      res.status(400).json({ message: "Failed to create status update" });
+    }
+  });
+
   const httpServer = createServer(app);
   
   // Temporarily disable WebSocket to fix stability issues

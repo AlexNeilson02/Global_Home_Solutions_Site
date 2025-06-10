@@ -2,6 +2,7 @@ import { eq, and, desc, sql, asc, count, avg, max, lt, gt, between, ne } from "d
 import { db } from "./db";
 import { 
   users, contractors, salespersons, projects, testimonials, serviceCategories, bidRequests, pageVisits,
+  documents, projectMilestones, projectStatusUpdates,
   type User, type InsertUser,
   type Contractor, type InsertContractor,
   type Salesperson, type InsertSalesperson,
@@ -9,7 +10,10 @@ import {
   type Testimonial, type InsertTestimonial,
   type ServiceCategory, type InsertServiceCategory,
   type BidRequest, type InsertBidRequest,
-  type PageVisit, type InsertPageVisit
+  type PageVisit, type InsertPageVisit,
+  type Document, type InsertDocument,
+  type ProjectMilestone, type InsertProjectMilestone,
+  type ProjectStatusUpdate, type InsertProjectStatusUpdate
 } from "@shared/schema";
 import { IStorage } from "./storage";
 import { QRCodeService } from "./qr-service";
@@ -96,7 +100,7 @@ export class DatabaseStorage implements IStorage {
       .select()
       .from(contractors)
       .where(eq(contractors.isActive, true))
-      .orderBy(contractors.rating)
+      .orderBy(desc(contractors.id))
       .limit(limit);
   }
 
@@ -438,28 +442,29 @@ export class DatabaseStorage implements IStorage {
     uniqueVisitors: number, 
     conversionRate: number 
   }> {
-    // Get total visits with date filtering if needed
-    let totalVisitsQuery = db
-      .select()
-      .from(pageVisits)
-      .where(eq(pageVisits.salespersonId, salespersonId));
+    // Build base query conditions
+    let whereConditions = [eq(pageVisits.salespersonId, salespersonId)];
       
     // Apply date filters if provided
     if (startDate && endDate) {
-      totalVisitsQuery = totalVisitsQuery.where(
+      whereConditions.push(
         and(
           gt(pageVisits.timestamp, startDate),
           lt(pageVisits.timestamp, endDate)
         )
       );
     } else if (startDate) {
-      totalVisitsQuery = totalVisitsQuery.where(gt(pageVisits.timestamp, startDate));
+      whereConditions.push(gt(pageVisits.timestamp, startDate));
     } else if (endDate) {
-      totalVisitsQuery = totalVisitsQuery.where(lt(pageVisits.timestamp, endDate));
+      whereConditions.push(lt(pageVisits.timestamp, endDate));
     }
     
-    // Execute queries
-    const totalVisitsResult = await totalVisitsQuery;
+    // Execute query with all conditions
+    const totalVisitsResult = await db
+      .select()
+      .from(pageVisits)
+      .where(and(...whereConditions));
+      
     const totalVisits = totalVisitsResult.length;
     
     // Get unique visitors by counting distinct IPs
@@ -477,6 +482,129 @@ export class DatabaseStorage implements IStorage {
       uniqueVisitors,
       conversionRate
     };
+  }
+
+  // Document management methods
+  async createDocument(insertDocument: InsertDocument): Promise<Document> {
+    const [document] = await db.insert(documents).values(insertDocument).returning();
+    return document;
+  }
+
+  async getDocument(id: number): Promise<Document | undefined> {
+    const [document] = await db.select().from(documents).where(eq(documents.id, id));
+    return document;
+  }
+
+  async getDocumentsByCategory(category: string, relatedId?: number): Promise<Document[]> {
+    let whereConditions = [
+      eq(documents.category, category),
+      eq(documents.isActive, true)
+    ];
+    
+    if (relatedId) {
+      whereConditions.push(eq(documents.relatedId, relatedId));
+    }
+    
+    return db.select().from(documents)
+      .where(and(...whereConditions))
+      .orderBy(desc(documents.createdAt));
+  }
+
+  async getDocumentsByUser(userId: number): Promise<Document[]> {
+    return db.select().from(documents)
+      .where(and(
+        eq(documents.uploadedBy, userId),
+        eq(documents.isActive, true)
+      ))
+      .orderBy(desc(documents.createdAt));
+  }
+
+  async searchDocuments(searchTerm: string, category?: string): Promise<Document[]> {
+    let whereConditions = [eq(documents.isActive, true)];
+    
+    if (category) {
+      whereConditions.push(eq(documents.category, category));
+    }
+    
+    // Search in filename, original name, description, and tags
+    return db.select().from(documents)
+      .where(and(...whereConditions))
+      .orderBy(desc(documents.createdAt));
+  }
+
+  async updateDocument(id: number, updateData: Partial<Document>): Promise<Document | undefined> {
+    const [document] = await db
+      .update(documents)
+      .set(updateData)
+      .where(eq(documents.id, id))
+      .returning();
+    return document;
+  }
+
+  async deleteDocument(id: number): Promise<boolean> {
+    const [document] = await db
+      .update(documents)
+      .set({ isActive: false })
+      .where(eq(documents.id, id))
+      .returning();
+    return !!document;
+  }
+
+  // Project milestone methods
+  async createProjectMilestone(insertMilestone: InsertProjectMilestone): Promise<ProjectMilestone> {
+    const [milestone] = await db.insert(projectMilestones).values(insertMilestone).returning();
+    return milestone;
+  }
+
+  async getProjectMilestones(projectId: number): Promise<ProjectMilestone[]> {
+    return db.select().from(projectMilestones)
+      .where(eq(projectMilestones.projectId, projectId))
+      .orderBy(asc(projectMilestones.orderIndex));
+  }
+
+  async updateProjectMilestone(id: number, updateData: Partial<ProjectMilestone>): Promise<ProjectMilestone | undefined> {
+    const [milestone] = await db
+      .update(projectMilestones)
+      .set(updateData)
+      .where(eq(projectMilestones.id, id))
+      .returning();
+    return milestone;
+  }
+
+  async completeProjectMilestone(id: number): Promise<ProjectMilestone | undefined> {
+    const [milestone] = await db
+      .update(projectMilestones)
+      .set({ 
+        status: 'completed',
+        completedAt: new Date()
+      })
+      .where(eq(projectMilestones.id, id))
+      .returning();
+    return milestone;
+  }
+
+  // Project status update methods
+  async createProjectStatusUpdate(insertUpdate: InsertProjectStatusUpdate): Promise<ProjectStatusUpdate> {
+    const [update] = await db.insert(projectStatusUpdates).values(insertUpdate).returning();
+    return update;
+  }
+
+  async getProjectStatusUpdates(projectId: number): Promise<ProjectStatusUpdate[]> {
+    return db.select().from(projectStatusUpdates)
+      .where(eq(projectStatusUpdates.projectId, projectId))
+      .orderBy(desc(projectStatusUpdates.createdAt));
+  }
+
+  async getProjectTimeline(projectId: number): Promise<{
+    milestones: ProjectMilestone[];
+    statusUpdates: ProjectStatusUpdate[];
+  }> {
+    const [milestones, statusUpdates] = await Promise.all([
+      this.getProjectMilestones(projectId),
+      this.getProjectStatusUpdates(projectId)
+    ]);
+
+    return { milestones, statusUpdates };
   }
 }
 
