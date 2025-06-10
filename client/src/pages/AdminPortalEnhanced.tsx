@@ -61,44 +61,56 @@ export default function AdminPortalEnhanced() {
   });
 
   // Fetch salespersons
-  const { data: salespersons = [], isLoading: isLoadingSalespersons } = useQuery({
+  const { data: salespersonsData = [], isLoading: isLoadingSalespersons } = useQuery({
     queryKey: ['/api/salespersons'],
     queryFn: async () => {
       const response = await fetch('/api/salespersons');
       if (!response.ok) throw new Error('Failed to fetch salespersons');
-      return response.json();
+      const data = await response.json();
+      return data.salespersons || [];
     }
   });
 
+  const salespersons = Array.isArray(salespersonsData) ? salespersonsData : [];
+
   // Fetch contractors
-  const { data: contractors = [], isLoading: isLoadingContractors } = useQuery({
+  const { data: contractorsData = [], isLoading: isLoadingContractors } = useQuery({
     queryKey: ['/api/contractors'],
     queryFn: async () => {
       const response = await fetch('/api/contractors');
       if (!response.ok) throw new Error('Failed to fetch contractors');
-      return response.json();
+      const data = await response.json();
+      return data.contractors || [];
     }
   });
 
+  const contractors = Array.isArray(contractorsData) ? contractorsData : [];
+
   // Fetch projects
-  const { data: projects = [], isLoading: isLoadingProjects } = useQuery({
+  const { data: projectsData = [], isLoading: isLoadingProjects } = useQuery({
     queryKey: ['/api/projects'],
     queryFn: async () => {
       const response = await fetch('/api/projects');
       if (!response.ok) throw new Error('Failed to fetch projects');
-      return response.json();
+      const data = await response.json();
+      return data.projects || [];
     }
   });
 
+  const projects = Array.isArray(projectsData) ? projectsData : [];
+
   // Fetch bid requests
-  const { data: bidRequests = [], isLoading: isLoadingBidRequests } = useQuery({
+  const { data: bidRequestsData = [], isLoading: isLoadingBidRequests } = useQuery({
     queryKey: ['/api/bid-requests/recent'],
     queryFn: async () => {
       const response = await fetch('/api/bid-requests/recent');
       if (!response.ok) throw new Error('Failed to fetch bid requests');
-      return response.json();
+      const data = await response.json();
+      return data.bidRequests || [];
     }
   });
+
+  const bidRequests = Array.isArray(bidRequestsData) ? bidRequestsData : [];
 
   const updateUserStatus = useMutation({
     mutationFn: async ({ userId, status }: { userId: number; status: string }) => {
@@ -157,8 +169,8 @@ export default function AdminPortalEnhanced() {
   ];
 
   const pieData = [
-    { name: 'Active Sales Reps', value: salespersons.filter((s: any) => s.isActive).length, color: '#10b981' },
-    { name: 'Inactive Sales Reps', value: salespersons.filter((s: any) => !s.isActive).length, color: '#ef4444' }
+    { name: 'Active Sales Reps', value: salespersons?.filter((s: any) => s.isActive)?.length || 0, color: '#10b981' },
+    { name: 'Inactive Sales Reps', value: salespersons?.filter((s: any) => !s.isActive)?.length || 0, color: '#ef4444' }
   ];
 
   const COLORS = ['#10b981', '#ef4444', '#f59e0b', '#8b5cf6'];
@@ -175,13 +187,13 @@ export default function AdminPortalEnhanced() {
   }
 
   const stats = {
-    totalSalespersons: salespersons.length,
-    activeSalespersons: salespersons.filter((s: any) => s.isActive).length,
-    totalContractors: contractors.length,
-    activeContractors: contractors.filter((c: any) => c.isActive).length,
-    totalProjects: projects.length,
-    totalBidRequests: bidRequests.length,
-    pendingBidRequests: bidRequests.filter((br: any) => br.status === 'pending').length
+    totalSalespersons: salespersons?.length || 0,
+    activeSalespersons: salespersons?.filter((s: any) => s.isActive)?.length || 0,
+    totalContractors: contractors?.length || 0,
+    activeContractors: contractors?.filter((c: any) => c.isActive)?.length || 0,
+    totalProjects: projects?.length || 0,
+    totalBidRequests: bidRequests?.length || 0,
+    pendingBidRequests: bidRequests?.filter((br: any) => br.status === 'pending')?.length || 0
   };
 
   return (
