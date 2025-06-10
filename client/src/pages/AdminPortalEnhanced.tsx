@@ -202,10 +202,22 @@ export default function AdminPortalEnhanced() {
       <div className="p-6">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Admin Dashboard</h1>
-          <p className="text-gray-600 dark:text-gray-300 mt-2">
-            Comprehensive management portal for sales representatives and contractors
-          </p>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Admin Dashboard</h1>
+              <p className="text-gray-600 dark:text-gray-300 mt-2">
+                Comprehensive management portal for sales representatives and contractors
+              </p>
+            </div>
+            <Button
+              variant="outline"
+              onClick={() => navigate('/portal-access')}
+              className="flex items-center gap-2"
+            >
+              <Users className="h-4 w-4" />
+              Back to Portals
+            </Button>
+          </div>
         </div>
 
         {/* Quick Stats */}
