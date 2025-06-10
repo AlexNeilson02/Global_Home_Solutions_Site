@@ -224,7 +224,7 @@ const ContractorPortalEnhanced: React.FC = () => {
   // Update contractor profile mutation
   const updateContractorMutation = useMutation({
     mutationFn: async (updatedData: any) => {
-      const response = await fetch(`/api/contractors/${contractor?.id}`, {
+      const response = await fetch(`/api/contractors/${contractor?.id}/profile`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -232,11 +232,13 @@ const ContractorPortalEnhanced: React.FC = () => {
         credentials: 'include',
         body: JSON.stringify({
           ...updatedData,
-          mediaFiles
+          mediaFiles: mediaFiles || [],
+          isActive: true
         }),
       });
       if (!response.ok) {
-        throw new Error('Failed to update contractor profile');
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to update contractor profile');
       }
       return response.json();
     },

@@ -44,6 +44,8 @@ const SalesPortalEnhanced: React.FC = () => {
   });
   const [newSpecialty, setNewSpecialty] = useState('');
   const [newCertification, setNewCertification] = useState('');
+  const [qrCodeData, setQrCodeData] = useState<string | null>(null);
+  const [landingPageUrl, setLandingPageUrl] = useState<string>('');
   
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -87,8 +89,8 @@ const SalesPortalEnhanced: React.FC = () => {
     enabled: !!salesperson?.id
   });
 
-  // Get QR code
-  const { data: qrCodeData } = useQuery({
+  // Get QR code data
+  const { data: qrCodeResponse } = useQuery({
     queryKey: [`/api/salespersons/${salesperson?.id}/qrcode`],
     enabled: !!salesperson?.id
   });
@@ -97,6 +99,14 @@ const SalesPortalEnhanced: React.FC = () => {
   const bidRequests = bidRequestsData?.bidRequests || [];
   const recentBidRequests = analyticsData?.recentBidRequests || [];
   const visitStats = analyticsData?.visitStats;
+  
+  // Set QR code and landing page data
+  useEffect(() => {
+    if (qrCodeResponse) {
+      setQrCodeData(qrCodeResponse.qrCode);
+      setLandingPageUrl(qrCodeResponse.landingPageUrl);
+    }
+  }, [qrCodeResponse]);
 
   // Initialize profile form
   useEffect(() => {

@@ -38,9 +38,8 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 const AdminPortalEnhanced: React.FC = () => {
   const [, navigate] = useLocation();
   const [activeTab, setActiveTab] = useState("dashboard");
-  const [selectedUser, setSelectedUser] = useState<any>(null);
-  const [isEditingUser, setIsEditingUser] = useState(false);
-  const [userFilter, setUserFilter] = useState("all");
+  const [selectedSalesperson, setSelectedSalesperson] = useState<any>(null);
+  const [selectedContractor, setSelectedContractor] = useState<any>(null);
   const [bidFilter, setBidFilter] = useState("all");
   
   const { toast } = useToast();
