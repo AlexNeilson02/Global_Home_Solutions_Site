@@ -226,9 +226,9 @@ const SalesPortalEnhanced: React.FC = () => {
 
   // Download QR code
   const downloadQRCode = () => {
-    if (qrCodeData?.qrCodeUrl) {
+    if (qrCodeData) {
       const link = document.createElement('a');
-      link.href = qrCodeData.qrCodeUrl;
+      link.href = qrCodeData;
       link.download = `${salesperson?.profileUrl || 'qrcode'}.png`;
       document.body.appendChild(link);
       link.click();
