@@ -772,7 +772,7 @@ export class DatabaseStorage implements IStorage {
     const allBids = await this.getRecentBidRequests(2000);
     const wonBids = allBids.filter(bid => {
       if (bid.status !== 'won' || !bid.budget) return false;
-      const bidDate = new Date(bid.createdAt);
+      const bidDate = new Date(bid.createdAt || new Date());
       return bidDate >= startDate && bidDate <= endDate;
     });
 

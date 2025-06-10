@@ -29,6 +29,7 @@ import {
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
+import AnalyticsDashboard from "@/components/AnalyticsDashboard";
 
 const SalesPortalEnhanced: React.FC = () => {
   const [, navigate] = useLocation();
@@ -776,102 +777,7 @@ const SalesPortalEnhanced: React.FC = () => {
 
             {/* Analytics Tab */}
             <TabsContent value="analytics" className="space-y-6">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* Conversion Funnel */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Conversion Funnel</CardTitle>
-                    <CardDescription>Track your lead generation performance</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      <div className="flex justify-between items-center p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-                        <span className="font-medium">Profile Visits</span>
-                        <span className="text-xl font-bold">{totalVisits}</span>
-                      </div>
-                      <div className="flex justify-between items-center p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
-                        <span className="font-medium">Form Submissions</span>
-                        <span className="text-xl font-bold">{totalConversions}</span>
-                      </div>
-                      <div className="flex justify-between items-center p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
-                        <span className="font-medium">Total Leads</span>
-                        <span className="text-xl font-bold">{totalLeads}</span>
-                      </div>
-                      <div className="pt-4">
-                        <div className="flex justify-between text-sm mb-2">
-                          <span>Conversion Rate</span>
-                          <span>{conversionRate}%</span>
-                        </div>
-                        <Progress value={parseFloat(conversionRate)} className="h-2" />
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Lead Status Distribution */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Lead Status Distribution</CardTitle>
-                    <CardDescription>Breakdown of your lead statuses</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <ResponsiveContainer width="100%" height={200}>
-                      <PieChart>
-                        <Pie
-                          data={statusDistribution}
-                          cx="50%"
-                          cy="50%"
-                          innerRadius={60}
-                          outerRadius={80}
-                          paddingAngle={5}
-                          dataKey="value"
-                        >
-                          {statusDistribution.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={entry.color} />
-                          ))}
-                        </Pie>
-                        <Tooltip />
-                      </PieChart>
-                    </ResponsiveContainer>
-                    <div className="grid grid-cols-3 gap-4 mt-4">
-                      {statusDistribution.map((item, index) => (
-                        <div key={index} className="text-center">
-                          <div 
-                            className="w-4 h-4 rounded mx-auto mb-1" 
-                            style={{ backgroundColor: item.color }}
-                          />
-                          <div className="text-sm font-medium">{item.value}</div>
-                          <div className="text-xs text-gray-500">{item.name}</div>
-                        </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-
-              {/* Performance Trends */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <BarChart3 className="h-5 w-5" />
-                    Performance Trends
-                  </CardTitle>
-                  <CardDescription>Monthly performance metrics over time</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <ResponsiveContainer width="100%" height={300}>
-                    <LineChart data={performanceData}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="month" />
-                      <YAxis />
-                      <Tooltip />
-                      <Line type="monotone" dataKey="visits" stroke="#3b82f6" strokeWidth={2} name="Visits" />
-                      <Line type="monotone" dataKey="conversions" stroke="#10b981" strokeWidth={2} name="Conversions" />
-                      <Line type="monotone" dataKey="leads" stroke="#f59e0b" strokeWidth={2} name="Leads" />
-                    </LineChart>
-                  </ResponsiveContainer>
-                </CardContent>
-              </Card>
+              <AnalyticsDashboard userRole="salesperson" userId={salesperson?.id} />
             </TabsContent>
           </Tabs>
         </div>
