@@ -46,9 +46,14 @@ interface BidRequestFormProps {
     companyName: string;
     specialties: string[];
   };
+  trackedSalesperson?: {
+    id: number;
+    fullName: string;
+    profileUrl: string;
+  };
 }
 
-export default function BidRequestForm({ isOpen, onClose, contractor }: BidRequestFormProps) {
+export default function BidRequestForm({ isOpen, onClose, contractor, trackedSalesperson }: BidRequestFormProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
@@ -149,6 +154,11 @@ export default function BidRequestForm({ isOpen, onClose, contractor }: BidReque
         formData.append('budget', data.budget || '');
         formData.append('contractorId', data.contractorId.toString());
         
+        // Add salesperson attribution for commission tracking
+        if (trackedSalesperson) {
+          formData.append('salespersonId', trackedSalesperson.id.toString());
+        }
+        
         // Add files
         uploadedFiles.forEach((file, index) => {
           formData.append('media', file);
@@ -171,10 +181,16 @@ export default function BidRequestForm({ isOpen, onClose, contractor }: BidReque
         return response.json();
       } else {
         // Use regular JSON for requests without files
+        const submissionData = {
+          ...data,
+          // Add salesperson attribution for commission tracking
+          ...(trackedSalesperson && { salespersonId: trackedSalesperson.id })
+        };
+        
         const response = await fetch("/api/bid-requests", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(data),
+          body: JSON.stringify(submissionData),
         });
         
         if (!response.ok) {

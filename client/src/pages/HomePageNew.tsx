@@ -118,6 +118,15 @@ export default function HomePage() {
 
   return (
     <div className="homepage-container">
+      {/* QR Code Tracking Banner */}
+      {trackedSalesperson && (
+        <div className="bg-blue-600 text-white px-4 py-3 text-center">
+          <p className="text-sm">
+            👋 Welcome! You were referred by <strong>{trackedSalesperson.fullName}</strong>, your dedicated sales representative.
+          </p>
+        </div>
+      )}
+      
       <header>
         <img src={logoPath} alt="Global Home Solutions Logo" className="logo" />
         <h1>Global Home Solutions</h1>
@@ -237,6 +246,7 @@ export default function HomePage() {
           isOpen={showBidForm}
           onClose={handleCloseBidForm}
           contractor={selectedContractor}
+          trackedSalesperson={trackedSalesperson}
         />
       )}
     </div>
