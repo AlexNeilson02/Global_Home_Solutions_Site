@@ -482,6 +482,49 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Update bid request status
+  apiRouter.patch("/bid-requests/:id/status", async (req: Request, res: Response) => {
+    try {
+      const requestId = Number(req.params.id);
+      const { status } = req.body;
+      
+      if (!status) {
+        return res.status(400).json({ message: "Status is required" });
+      }
+
+      // Update the bid request status in the database
+      const result = await storage.updateBidRequestStatus(requestId, status);
+      
+      if (!result) {
+        return res.status(404).json({ message: "Bid request not found" });
+      }
+
+      res.json({ success: true, bidRequest: result });
+    } catch (error) {
+      console.error("Error updating bid request status:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Delete bid request
+  apiRouter.delete("/bid-requests/:id", async (req: Request, res: Response) => {
+    try {
+      const requestId = Number(req.params.id);
+      
+      // For now, we'll mark as declined rather than actually deleting
+      const result = await storage.updateBidRequestStatus(requestId, 'declined');
+      
+      if (!result) {
+        return res.status(404).json({ message: "Bid request not found" });
+      }
+
+      res.json({ success: true, message: "Bid request declined successfully" });
+    } catch (error) {
+      console.error("Error declining bid request:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   // Projects routes
   apiRouter.get("/projects", isAuthenticated, async (req: Request, res: Response) => {
     try {

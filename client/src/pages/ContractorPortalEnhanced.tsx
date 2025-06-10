@@ -863,33 +863,107 @@ const ContractorPortalEnhanced: React.FC = () => {
               <Card>
                 <CardHeader>
                   <CardTitle>My Projects</CardTitle>
-                  <CardDescription>Track and manage your current and completed projects</CardDescription>
+                  <CardDescription>Track and manage sent bids and active projects</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    {projects.length > 0 ? (
-                      projects.map((project: any) => (
-                        <div key={project.id} className="border rounded-lg p-4">
+                    {bidRequests.filter((bid: any) => bid.status === 'bid_sent' || bid.status === 'won' || bid.status === 'lost').length > 0 ? (
+                      bidRequests.filter((bid: any) => bid.status === 'bid_sent' || bid.status === 'won' || bid.status === 'lost').map((project: any) => (
+                        <div key={project.id} className="border rounded-lg p-4 bg-white dark:bg-gray-800">
                           <div className="flex justify-between items-start mb-3">
-                            <div>
-                              <h4 className="font-semibold">{project.title}</h4>
-                              <p className="text-sm text-gray-600 dark:text-gray-300">{project.description}</p>
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2 mb-2">
+                                <h4 className="font-semibold text-lg">{project.fullName}</h4>
+                                <Badge variant={
+                                  project.status === 'won' ? 'default' :
+                                  project.status === 'bid_sent' ? 'secondary' : 
+                                  project.status === 'lost' ? 'destructive' : 'outline'
+                                }>
+                                  {project.status === 'bid_sent' ? 'Bid Sent' : project.status.replace('_', ' ')}
+                                </Badge>
+                              </div>
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+                                <div className="flex items-center gap-2">
+                                  <Mail className="h-4 w-4 text-gray-500" />
+                                  <span>{project.email}</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <Phone className="h-4 w-4 text-gray-500" />
+                                  <span>{project.phone}</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <MapPin className="h-4 w-4 text-gray-500" />
+                                  <span>{project.address}</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <FileText className="h-4 w-4 text-gray-500" />
+                                  <span>{project.serviceRequested}</span>
+                                </div>
+                              </div>
                             </div>
-                            <Badge variant={
-                              project.status === 'completed' ? 'default' :
-                              project.status === 'in_progress' ? 'secondary' : 'outline'
-                            }>
-                              {project.status.replace('_', ' ')}
-                            </Badge>
                           </div>
-                          <div className="flex justify-between items-center text-sm text-gray-500">
-                            <span>Service: {project.serviceType}</span>
-                            <span>Budget: ${project.budget?.toLocaleString() || 'Not specified'}</span>
+                          
+                          <div className="mb-4 p-3 bg-gray-50 dark:bg-gray-700 rounded">
+                            <p className="text-sm"><span className="font-medium">Project Description:</span></p>
+                            <p className="text-sm mt-1">{project.description}</p>
+                            <div className="flex gap-4 mt-2 text-xs text-gray-600 dark:text-gray-300">
+                              <span><strong>Timeline:</strong> {project.timeline}</span>
+                              {project.budget && <span><strong>Budget:</strong> ${project.budget}</span>}
+                              <span><strong>Bid Sent:</strong> {new Date(project.createdAt).toLocaleDateString()}</span>
+                            </div>
+                          </div>
+
+                          <div className="flex flex-wrap gap-2">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => setViewingBidDetails(project)}
+                            >
+                              <Eye className="h-4 w-4 mr-1" />
+                              View Details
+                            </Button>
+                            
+                            {project.status === 'bid_sent' && (
+                              <>
+                                <Button
+                                  size="sm"
+                                  className="bg-green-600 hover:bg-green-700 text-white"
+                                  onClick={() => updateProjectStatusMutation.mutate({ requestId: project.id, status: 'won' })}
+                                  disabled={updateProjectStatusMutation.isPending}
+                                >
+                                  <Star className="h-4 w-4 mr-1" />
+                                  Won Project
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  className="text-orange-600 border-orange-300 hover:bg-orange-50"
+                                  onClick={() => updateProjectStatusMutation.mutate({ requestId: project.id, status: 'lost' })}
+                                  disabled={updateProjectStatusMutation.isPending}
+                                >
+                                  Lost Project
+                                </Button>
+                              </>
+                            )}
+                            
+                            <Button
+                              size="sm"
+                              variant="destructive"
+                              onClick={() => deleteBidRequestMutation.mutate(project.id)}
+                              disabled={deleteBidRequestMutation.isPending}
+                            >
+                              <Trash2 className="h-4 w-4 mr-1" />
+                              Remove
+                            </Button>
                           </div>
                         </div>
                       ))
                     ) : (
-                      <p className="text-center py-8 text-gray-500">No projects found</p>
+                      <div className="text-center py-12">
+                        <Building2 className="h-12 w-12 text-gray-400 mx-auto mb-3" />
+                        <p className="text-gray-500 text-lg">No projects yet</p>
+                        <p className="text-gray-400 text-sm">Sent bids will appear here for tracking</p>
+                      </div>
                     )}
                   </div>
                 </CardContent>
@@ -906,39 +980,102 @@ const ContractorPortalEnhanced: React.FC = () => {
                 <CardContent>
                   <div className="space-y-4">
                     {bidRequests.length > 0 ? (
-                      bidRequests.map((bid: any) => (
-                        <div key={bid.id} className="border rounded-lg p-4">
+                      bidRequests.filter((bid: any) => bid.status === 'pending' || bid.status === 'contacted').map((bid: any) => (
+                        <div key={bid.id} className="border rounded-lg p-4 bg-white dark:bg-gray-800">
                           <div className="flex justify-between items-start mb-3">
-                            <div>
-                              <h4 className="font-semibold">{bid.fullName}</h4>
-                              <p className="text-sm text-gray-600 dark:text-gray-300">{bid.serviceRequested}</p>
-                              <p className="text-sm text-gray-500 mt-1">{bid.description}</p>
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2 mb-2">
+                                <h4 className="font-semibold text-lg">{bid.fullName}</h4>
+                                <Badge variant={
+                                  bid.status === 'pending' ? 'outline' :
+                                  bid.status === 'contacted' ? 'secondary' : 'default'
+                                }>
+                                  {bid.status}
+                                </Badge>
+                              </div>
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+                                <div className="flex items-center gap-2">
+                                  <Mail className="h-4 w-4 text-gray-500" />
+                                  <span>{bid.email}</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <Phone className="h-4 w-4 text-gray-500" />
+                                  <span>{bid.phone}</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <MapPin className="h-4 w-4 text-gray-500" />
+                                  <span>{bid.address}</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <FileText className="h-4 w-4 text-gray-500" />
+                                  <span>{bid.serviceRequested}</span>
+                                </div>
+                              </div>
                             </div>
-                            <Badge variant={
-                              bid.status === 'completed' ? 'default' :
-                              bid.status === 'contacted' ? 'secondary' : 'outline'
-                            }>
-                              {bid.status}
-                            </Badge>
                           </div>
-                          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm text-gray-500">
-                            <div>
-                              <span className="font-medium">Phone:</span> {bid.phone}
+                          
+                          <div className="mb-4 p-3 bg-gray-50 dark:bg-gray-700 rounded">
+                            <p className="text-sm"><span className="font-medium">Project Description:</span></p>
+                            <p className="text-sm mt-1">{bid.description}</p>
+                            <div className="flex gap-4 mt-2 text-xs text-gray-600 dark:text-gray-300">
+                              <span><strong>Timeline:</strong> {bid.timeline}</span>
+                              {bid.budget && <span><strong>Budget:</strong> ${bid.budget}</span>}
+                              <span><strong>Submitted:</strong> {new Date(bid.createdAt).toLocaleDateString()}</span>
                             </div>
-                            <div>
-                              <span className="font-medium">Email:</span> {bid.email}
-                            </div>
-                            <div>
-                              <span className="font-medium">Timeline:</span> {bid.timeline}
-                            </div>
-                            <div>
-                              <span className="font-medium">Budget:</span> {bid.budget || 'Not specified'}
-                            </div>
+                          </div>
+
+                          <div className="flex flex-wrap gap-2">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => setViewingBidDetails(bid)}
+                            >
+                              <Eye className="h-4 w-4 mr-1" />
+                              View Details
+                            </Button>
+                            
+                            {bid.status === 'pending' && (
+                              <Button
+                                size="sm"
+                                className="bg-blue-600 hover:bg-blue-700 text-white"
+                                onClick={() => contactCustomerMutation.mutate(bid.id)}
+                                disabled={contactCustomerMutation.isPending}
+                              >
+                                <Phone className="h-4 w-4 mr-1" />
+                                Contact Customer
+                              </Button>
+                            )}
+                            
+                            {(bid.status === 'contacted' || bid.status === 'pending') && (
+                              <Button
+                                size="sm"
+                                className="bg-green-600 hover:bg-green-700 text-white"
+                                onClick={() => sendBidMutation.mutate(bid.id)}
+                                disabled={sendBidMutation.isPending}
+                              >
+                                <FileText className="h-4 w-4 mr-1" />
+                                Send Bid
+                              </Button>
+                            )}
+                            
+                            <Button
+                              size="sm"
+                              variant="destructive"
+                              onClick={() => deleteBidRequestMutation.mutate(bid.id)}
+                              disabled={deleteBidRequestMutation.isPending}
+                            >
+                              <Trash2 className="h-4 w-4 mr-1" />
+                              Decline
+                            </Button>
                           </div>
                         </div>
                       ))
                     ) : (
-                      <p className="text-center py-8 text-gray-500">No bid requests found</p>
+                      <div className="text-center py-12">
+                        <FileText className="h-12 w-12 text-gray-400 mx-auto mb-3" />
+                        <p className="text-gray-500 text-lg">No pending bid requests</p>
+                        <p className="text-gray-400 text-sm">New customer requests will appear here</p>
+                      </div>
                     )}
                   </div>
                 </CardContent>
