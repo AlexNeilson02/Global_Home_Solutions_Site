@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation } from 'wouter';
 import { useQuery } from '@tanstack/react-query';
 
 interface ProtectedRouteProps {
@@ -8,7 +8,7 @@ interface ProtectedRouteProps {
 }
 
 export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requiredRole }) => {
-  const navigate = useNavigate();
+  const [, navigate] = useLocation();
   const [isAuthorized, setIsAuthorized] = useState<boolean | null>(null);
 
   const { data: user, isLoading, error } = useQuery({
@@ -25,9 +25,25 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requir
       return;
     }
 
-    if (requiredRole && user.role !== requiredRole && user.role !== 'admin') {
-      // User doesn't have required role, redirect to portal access page
-      navigate('/portals');
+    // STRICT ROLE ENFORCEMENT: Users can ONLY access their designated portal
+    // No cross-portal access allowed
+    if (requiredRole && user.role !== requiredRole) {
+      // Redirect user to their correct portal based on their role
+      switch (user.role) {
+        case 'admin':
+          navigate('/admin-portal');
+          break;
+        case 'contractor':
+          navigate('/contractor-portal');
+          break;
+        case 'salesperson':
+          navigate('/sales-portal');
+          break;
+        default:
+          // Unknown role, redirect to portals for re-authentication
+          navigate('/portals');
+          break;
+      }
       return;
     }
 

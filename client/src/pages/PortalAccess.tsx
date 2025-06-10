@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
 import logoPath from "@/assets/global-home-solutions-logo.png";
 import { LoginModal } from "@/components/LoginModal";
@@ -15,15 +15,32 @@ const PortalAccess: React.FC = () => {
     portalType: "contractor",
   });
 
-  const handlePortalAccess = (portalType: "admin" | "contractor" | "salesperson") => {
+  // CRITICAL: If user is LOGGED IN, they must NEVER see the portals page
+  // They should be automatically redirected to their SINGLE designated portal
+  useEffect(() => {
     if (isAuthenticated && user) {
-      // Check if user has correct role
-      if (user.role === portalType || user.role === "admin") {
-        navigateToPortal(portalType);
-      } else {
-        setLoginModal({ isOpen: true, portalType });
+      // Each user has access to ONLY ONE portal based on their role
+      switch (user.role) {
+        case 'admin':
+          navigate('/admin-portal');
+          break;
+        case 'contractor':
+          navigate('/contractor-portal');
+          break;
+        case 'salesperson':
+          navigate('/sales-portal');
+          break;
+        default:
+          // If role is unrecognized, log them out
+          console.error('Unknown user role:', user.role);
+          break;
       }
-    } else {
+    }
+  }, [isAuthenticated, user, navigate]);
+
+  const handlePortalAccess = (portalType: "admin" | "contractor" | "salesperson") => {
+    // Users can only access the login modal if they're not authenticated
+    if (!isAuthenticated) {
       setLoginModal({ isOpen: true, portalType });
     }
   };
