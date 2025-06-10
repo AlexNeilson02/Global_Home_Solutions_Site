@@ -296,51 +296,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   const httpServer = createServer(app);
   
-  // WebSocket setup
-  const wss = new WebSocketServer({ server: httpServer });
-  
-  wss.on('connection', (ws: WebSocket, req) => {
-    console.log('New WebSocket connection');
-    
-    // Set up proper error handling
-    ws.on('error', (error) => {
-      console.error('WebSocket error:', error);
-    });
-    
-    ws.on('message', (data) => {
-      try {
-        const message = JSON.parse(data.toString());
-        if (message.type === 'contractor_subscribe' && message.contractorId) {
-          const contractorId = parseInt(message.contractorId);
-          if (!contractorConnections.has(contractorId)) {
-            contractorConnections.set(contractorId, []);
-          }
-          contractorConnections.get(contractorId)!.push(ws);
-        }
-      } catch (error) {
-        console.error('Error parsing WebSocket message:', error);
-      }
-    });
-    
-    ws.on('close', () => {
-      // Remove from all contractor connections
-      contractorConnections.forEach((connections, contractorId) => {
-        const index = connections.indexOf(ws);
-        if (index > -1) {
-          connections.splice(index, 1);
-        }
-      });
-    });
-    
-    // Send a ping to keep connection alive
-    const pingInterval = setInterval(() => {
-      if (ws.readyState === WebSocket.OPEN) {
-        ws.ping();
-      } else {
-        clearInterval(pingInterval);
-      }
-    }, 30000);
-  });
+  // Temporarily disable WebSocket to fix stability issues
+  // TODO: Re-implement WebSocket with proper error handling
   
   return httpServer;
 }
