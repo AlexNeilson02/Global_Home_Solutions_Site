@@ -148,12 +148,12 @@ const ContractorPortalEnhanced: React.FC = () => {
     if (!files) return;
 
     Array.from(files).forEach(file => {
-      // Check file size (15MB limit for videos, 5MB for images)
-      const maxSize = file.type.startsWith('video/') ? 15 * 1024 * 1024 : 5 * 1024 * 1024;
+      // Check file size (50MB limit for videos to accommodate 30-second clips, 10MB for images)
+      const maxSize = file.type.startsWith('video/') ? 50 * 1024 * 1024 : 10 * 1024 * 1024;
       if (file.size > maxSize) {
         toast({
           title: "File too large",
-          description: `${file.name} is too large. Maximum size is ${file.type.startsWith('video/') ? '15MB for videos' : '5MB for images'}.`,
+          description: `${file.name} is too large. Maximum size is ${file.type.startsWith('video/') ? '50MB for videos (up to 30 seconds)' : '10MB for images'}.`,
           variant: "destructive"
         });
         return;
@@ -724,7 +724,10 @@ const ContractorPortalEnhanced: React.FC = () => {
                           onChange={handleMediaUpload}
                           className="hidden"
                         />
-                        <p className="text-xs text-gray-500">Max 50MB per file, images and videos supported</p>
+                        <p className="text-xs text-gray-500">
+                          <strong>Images:</strong> Max 10MB (JPG, PNG, GIF, WebP)<br/>
+                          <strong>Videos:</strong> Max 50MB (MP4, WebM, MOV, AVI) - Up to 30 seconds recommended
+                        </p>
                       </div>
 
                       {/* Action Buttons */}
