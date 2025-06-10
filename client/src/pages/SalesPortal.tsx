@@ -78,8 +78,8 @@ const SalesPortal: React.FC = () => {
                 Welcome back, {salesperson?.name || 'Sales Representative'}
               </p>
             </div>
-            <Button onClick={() => navigate("/portals")} variant="outline">
-              Back to Portals
+            <Button onClick={handleBackToPortals} variant="outline" disabled={logoutMutation.isPending}>
+              {logoutMutation.isPending ? "Logging out..." : "Back to Portals"}
             </Button>
           </div>
 
