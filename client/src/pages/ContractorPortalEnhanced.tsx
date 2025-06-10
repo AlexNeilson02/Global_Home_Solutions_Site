@@ -74,7 +74,7 @@ const ContractorPortalEnhanced: React.FC = () => {
   });
 
   // Get current user data
-  const { data: userData } = useQuery({
+  const { data: userData, isLoading: userLoading } = useQuery({
     queryKey: ['/api/users/me'],
     enabled: true
   });

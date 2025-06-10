@@ -59,14 +59,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const user = req.user as User;
       const { password, ...userInfo } = user;
       
+      console.log('User role:', user.role, 'User ID:', user.id);
+      
       // If user is a contractor, include contractor data
       if (user.role === 'contractor') {
         const contractor = await storage.getContractorByUserId(user.id);
+        console.log('Found contractor data:', contractor);
         res.json({ ...userInfo, roleData: contractor });
       }
       // If user is a salesperson, include salesperson data
       else if (user.role === 'salesperson') {
         const salesperson = await storage.getSalespersonByUserId(user.id);
+        console.log('Found salesperson data:', salesperson);
         res.json({ ...userInfo, roleData: salesperson });
       }
       else {
