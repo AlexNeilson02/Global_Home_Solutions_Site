@@ -1,17 +1,16 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import BidRequestForm from "@/components/BidRequestForm";
 import logoPath from "@/assets/global-home-solutions-logo.png";
 import "../styles/HomePage.css";
 
 export default function HomePage() {
-  const [searchParams, setSearchParams] = useSearchParams();
-  const [trade, setTrade] = useState(searchParams.get("trade") || "");
-  const [searchTriggered, setSearchTriggered] = useState(!!searchParams.get("trade"));
+  const [, navigate] = useLocation();
+  const [trade, setTrade] = useState("");
+  const [searchTriggered, setSearchTriggered] = useState(false);
   const [selectedContractor, setSelectedContractor] = useState<any>(null);
   const [showBidForm, setShowBidForm] = useState(false);
-  const navigate = useNavigate();
 
   // Fetch contractors from database
   const { data: contractors, isLoading } = useQuery({
@@ -30,13 +29,10 @@ export default function HomePage() {
     ?.sort((a: string, b: string) => a.localeCompare(b)) || [];
 
   useEffect(() => {
-    if (trade && searchTriggered) {
-      setSearchParams({ trade });
-    } else if (!trade) {
-      setSearchParams({});
+    if (!trade) {
       setSearchTriggered(false);
     }
-  }, [trade, searchTriggered, setSearchParams]);
+  }, [trade, searchTriggered]);
 
   const handleCategoryClick = (category) => {
     setTrade(category);

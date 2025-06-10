@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { Router, Route } from "wouter";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
@@ -18,43 +18,26 @@ function App() {
       <TooltipProvider>
         <div className="min-h-screen">
           <Toaster />
-          <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/portals" element={<PortalAccess />} />
-            <Route path="/contractor/:id" element={<ContractorProfile />} />
-            <Route path="/contractor-registration" element={<ContractorRegistration />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/contractor-portal" element={
-              <ProtectedRoute requiredRole="contractor">
-                <ContractorPortal />
-              </ProtectedRoute>
-            } />
-            <Route path="/sales-portal" element={
-              <ProtectedRoute requiredRole="salesperson">
-                <SalesPortal />
-              </ProtectedRoute>
-            } />
-            <Route path="/admin-portal" element={
-              <ProtectedRoute requiredRole="admin">
-                <AdminPortal />
-              </ProtectedRoute>
-            } />
-            <Route path="/portal/contractor" element={
-              <ProtectedRoute requiredRole="contractor">
-                <ContractorPortal />
-              </ProtectedRoute>
-            } />
-            <Route path="/portal/sales" element={
-              <ProtectedRoute requiredRole="salesperson">
-                <SalesPortal />
-              </ProtectedRoute>
-            } />
-            <Route path="/portal/admin" element={
-              <ProtectedRoute requiredRole="admin">
-                <AdminPortal />
-              </ProtectedRoute>
-            } />
-          </Routes>
+          <Route path="/" component={HomePage} />
+          <Route path="/portals" component={PortalAccess} />
+          <Route path="/contractor/:id" component={ContractorProfile} />
+          <Route path="/contractor-registration" component={ContractorRegistration} />
+          <Route path="/login" component={Login} />
+          <Route path="/contractor-portal">
+            <ProtectedRoute requiredRole="contractor">
+              <ContractorPortal />
+            </ProtectedRoute>
+          </Route>
+          <Route path="/sales-portal">
+            <ProtectedRoute requiredRole="salesperson">
+              <SalesPortal />
+            </ProtectedRoute>
+          </Route>
+          <Route path="/admin-portal">
+            <ProtectedRoute requiredRole="admin">
+              <AdminPortal />
+            </ProtectedRoute>
+          </Route>
         </div>
       </TooltipProvider>
     </Router>
