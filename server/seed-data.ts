@@ -9,6 +9,7 @@ import {
   type ServiceCategory, type InsertServiceCategory
 } from "@shared/schema";
 import { eq } from 'drizzle-orm';
+import { hashPassword } from './auth';
 
 export async function seedDatabase() {
   // Check if we already have users in the database
@@ -21,7 +22,43 @@ export async function seedDatabase() {
   console.log('Seeding database...');
 
   try {
-    // First, seed the service categories with all 66 services from the CSV
+    // First, create test users for authentication
+    console.log('Creating test users...');
+    
+    const testUsers: InsertUser[] = [
+      {
+        username: 'admin',
+        password: await hashPassword('admin123'),
+        email: 'admin@globalhomesolutions.com',
+        fullName: 'System Administrator',
+        phone: '555-0100',
+        role: 'admin',
+        lastLogin: null,
+      },
+      {
+        username: 'contractor',
+        password: await hashPassword('contractor123'),
+        email: 'contractor@globalhomesolutions.com',
+        fullName: 'John Smith',
+        phone: '555-0101',
+        role: 'contractor',
+        lastLogin: null,
+      },
+      {
+        username: 'salesperson',
+        password: await hashPassword('sales123'),
+        email: 'sales@globalhomesolutions.com',
+        fullName: 'Jane Doe',
+        phone: '555-0102',
+        role: 'salesperson',
+        lastLogin: null,
+      }
+    ];
+
+    await db.insert(users).values(testUsers);
+    console.log('Test users created successfully');
+
+    // Then, seed the service categories with all 66 services from the CSV
     const services = [
       'Decks & Porches',
       'Electrical',

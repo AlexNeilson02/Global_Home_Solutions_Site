@@ -31,10 +31,20 @@ export function useAuth() {
 
   const loginMutation = useMutation({
     mutationFn: async (credentials: LoginCredentials) => {
-      return apiRequest("/api/auth/login", {
+      const response = await fetch("/api/auth/login", {
         method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify(credentials),
       });
+      
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Login failed");
+      }
+      
+      return response.json();
     },
     onSuccess: (data) => {
       // Invalidate and refetch user data
@@ -55,9 +65,19 @@ export function useAuth() {
 
   const logoutMutation = useMutation({
     mutationFn: async () => {
-      return apiRequest("/api/auth/logout", {
+      const response = await fetch("/api/auth/logout", {
         method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
       });
+      
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Logout failed");
+      }
+      
+      return response.json();
     },
     onSuccess: () => {
       // Clear all cached data

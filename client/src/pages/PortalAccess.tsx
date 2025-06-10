@@ -1,8 +1,51 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useState } from "react";
+import { Link, useLocation } from "wouter";
 import logoPath from "@/assets/global-home-solutions-logo.png";
+import { LoginModal } from "@/components/LoginModal";
+import { useAuth } from "@/hooks/useAuth";
 
 const PortalAccess: React.FC = () => {
+  const [, navigate] = useLocation();
+  const { isAuthenticated, user } = useAuth();
+  const [loginModal, setLoginModal] = useState<{
+    isOpen: boolean;
+    portalType: "admin" | "contractor" | "salesperson";
+  }>({
+    isOpen: false,
+    portalType: "contractor",
+  });
+
+  const handlePortalAccess = (portalType: "admin" | "contractor" | "salesperson") => {
+    if (isAuthenticated && user) {
+      // Check if user has correct role
+      if (user.role === portalType || user.role === "admin") {
+        navigateToPortal(portalType);
+      } else {
+        setLoginModal({ isOpen: true, portalType });
+      }
+    } else {
+      setLoginModal({ isOpen: true, portalType });
+    }
+  };
+
+  const navigateToPortal = (portalType: string) => {
+    switch (portalType) {
+      case "admin":
+        navigate("/admin-portal");
+        break;
+      case "contractor":
+        navigate("/contractor-portal");
+        break;
+      case "salesperson":
+        navigate("/sales-portal");
+        break;
+    }
+  };
+
+  const handleLoginSuccess = (redirectTo: string) => {
+    navigate(redirectTo);
+  };
+
   return (
     <div className="min-h-screen bg-slate-900" style={{ backgroundColor: '#0f172a' }}>
       <div className="container mx-auto px-4 py-16">
@@ -33,12 +76,12 @@ const PortalAccess: React.FC = () => {
             <p className="text-slate-300 mb-6">
               Manage projects, view leads, and connect with sales representatives.
             </p>
-            <Link 
-              to="/portal/contractor"
+            <button 
+              onClick={() => handlePortalAccess("contractor")}
               className="inline-block bg-blue-500 hover:bg-blue-600 text-white font-semibold px-6 py-3 rounded-lg transition-colors w-full"
             >
               Access Portal
-            </Link>
+            </button>
           </div>
 
           <div className="bg-slate-800 rounded-lg shadow-lg p-8 text-center border border-slate-700">
@@ -51,12 +94,12 @@ const PortalAccess: React.FC = () => {
             <p className="text-slate-300 mb-6">
               Track performance, manage leads, and generate QR codes for easy access.
             </p>
-            <Link 
-              to="/portal/sales"
+            <button 
+              onClick={() => handlePortalAccess("salesperson")}
               className="inline-block bg-green-500 hover:bg-green-600 text-white font-semibold px-6 py-3 rounded-lg transition-colors w-full"
             >
               Access Portal
-            </Link>
+            </button>
           </div>
 
           <div className="bg-slate-800 rounded-lg shadow-lg p-8 text-center border border-slate-700">
@@ -70,12 +113,12 @@ const PortalAccess: React.FC = () => {
             <p className="text-slate-300 mb-6">
               Oversee operations, manage users, and access comprehensive analytics.
             </p>
-            <Link 
-              to="/portal/admin"
+            <button 
+              onClick={() => handlePortalAccess("admin")}
               className="inline-block bg-purple-500 hover:bg-purple-600 text-white font-semibold px-6 py-3 rounded-lg transition-colors w-full"
             >
               Access Portal
-            </Link>
+            </button>
           </div>
         </div>
 
@@ -88,6 +131,13 @@ const PortalAccess: React.FC = () => {
           </Link>
         </div>
       </div>
+
+      <LoginModal
+        isOpen={loginModal.isOpen}
+        onClose={() => setLoginModal({ ...loginModal, isOpen: false })}
+        portalType={loginModal.portalType}
+        onLoginSuccess={handleLoginSuccess}
+      />
     </div>
   );
 };
