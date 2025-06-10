@@ -29,6 +29,7 @@ import { useToast } from "@/hooks/use-toast";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import DocumentManager from "@/components/DocumentManager";
 import ProjectTimeline from "@/components/ProjectTimeline";
+import AnalyticsDashboard from "@/components/AnalyticsDashboard";
 
 const ContractorPortalEnhanced: React.FC = () => {
   const [, navigate] = useLocation();
@@ -463,13 +464,14 @@ const ContractorPortalEnhanced: React.FC = () => {
           </div>
 
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-            <TabsList className="grid w-full grid-cols-6">
+            <TabsList className="grid w-full grid-cols-7">
               <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
               <TabsTrigger value="profile">Company Profile</TabsTrigger>
               <TabsTrigger value="projects">Projects</TabsTrigger>
               <TabsTrigger value="bids">Bid Requests</TabsTrigger>
               <TabsTrigger value="documents">Documents</TabsTrigger>
               <TabsTrigger value="tracking">Project Tracking</TabsTrigger>
+              <TabsTrigger value="analytics">Analytics</TabsTrigger>
             </TabsList>
 
             {/* Dashboard Tab */}
@@ -1171,6 +1173,11 @@ const ContractorPortalEnhanced: React.FC = () => {
                   )}
                 </CardContent>
               </Card>
+            </TabsContent>
+
+            {/* Analytics Tab */}
+            <TabsContent value="analytics" className="space-y-6">
+              <AnalyticsDashboard userRole="contractor" userId={contractor?.id} />
             </TabsContent>
           </Tabs>
         </div>
