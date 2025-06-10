@@ -607,7 +607,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           
           return {
             id: rep.id,
-            name: rep.fullName,
+            name: `Rep ${rep.id}`,
             totalLeads: repBids.length,
             wonProjects: repWons.length,
             conversionRate: repBids.length > 0 ? (repWons.length / repBids.length * 100).toFixed(1) : 0,
@@ -682,7 +682,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Commission-eligible projects (won projects with budget data)
       const commissionEligible = repBids.filter(bid => bid.status === 'won' && bid.budget);
-      const totalCommissionValue = commissionEligible.reduce((sum, bid) => sum + (parseFloat(bid.budget) || 0), 0);
+      const totalCommissionValue = commissionEligible.reduce((sum, bid) => sum + (parseFloat(bid.budget || '0') || 0), 0);
 
       // Performance comparison with other reps
       const allSalesPersons = await storage.getAllSalespersons();
@@ -711,7 +711,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           bidsSent,
           wonProjects,
           conversionRate: totalLeads > 0 ? (wonProjects / totalLeads * 100).toFixed(1) : 0,
-          scanToLeadRate: salesperson.totalVisits > 0 ? (totalLeads / salesperson.totalVisits * 100).toFixed(1) : 0
+          scanToLeadRate: (salesperson.totalVisits || 0) > 0 ? (totalLeads / (salesperson.totalVisits || 1) * 100).toFixed(1) : 0
         },
         commissionData: {
           eligibleProjects: commissionEligible.length,
@@ -747,7 +747,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       cutoffDate.setDate(cutoffDate.getDate() - daysBack);
 
       const allBidRequests = await storage.getRecentBidRequests(1000);
-      const recentBids = allBidRequests.filter(bid => new Date(bid.createdAt) >= cutoffDate);
+      const recentBids = allBidRequests.filter(bid => {
+        const bidDate = bid.createdAt ? new Date(bid.createdAt) : new Date();
+        return bidDate >= cutoffDate;
+      });
 
       // Track progression through each stage
       const funnelData = [
