@@ -148,11 +148,25 @@ const ContractorPortalEnhanced: React.FC = () => {
     if (!files) return;
 
     Array.from(files).forEach(file => {
-      // Check file size (50MB limit for media)
-      if (file.size > 50 * 1024 * 1024) {
+      // Check file size (15MB limit for videos, 5MB for images)
+      const maxSize = file.type.startsWith('video/') ? 15 * 1024 * 1024 : 5 * 1024 * 1024;
+      if (file.size > maxSize) {
         toast({
           title: "File too large",
-          description: `${file.name} is too large. Maximum size is 50MB.`,
+          description: `${file.name} is too large. Maximum size is ${file.type.startsWith('video/') ? '15MB for videos' : '5MB for images'}.`,
+          variant: "destructive"
+        });
+        return;
+      }
+
+      // Check file type
+      const allowedImageTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+      const allowedVideoTypes = ['video/mp4', 'video/webm', 'video/mov', 'video/avi'];
+      
+      if (!allowedImageTypes.includes(file.type) && !allowedVideoTypes.includes(file.type)) {
+        toast({
+          title: "Invalid file type",
+          description: `${file.name} is not a supported file type. Please use images (JPG, PNG, GIF, WebP) or videos (MP4, WebM, MOV, AVI).`,
           variant: "destructive"
         });
         return;
@@ -169,6 +183,15 @@ const ContractorPortalEnhanced: React.FC = () => {
           name: file.name
         }]);
       };
+      
+      reader.onerror = () => {
+        toast({
+          title: "Upload failed",
+          description: `Failed to process ${file.name}. Please try again.`,
+          variant: "destructive"
+        });
+      };
+      
       reader.readAsDataURL(file);
     });
     
