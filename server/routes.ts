@@ -36,6 +36,9 @@ const upload = multer({
 });
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Setup authentication first
+  await setupAuth(app);
+  
   // API routes prefix
   const apiRouter = express.Router();
   
@@ -47,38 +50,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   app.use("/api", apiRouter);
 
-  // Session management - for simplicity using in-memory sessions
-  const sessions: Record<string, { userId: number, role: string }> = {};
-  
+  // Import and use authentication routes
+  const authRoutes = (await import("./auth-routes")).default;
+  apiRouter.use("/auth", authRoutes);
+
   // WebSocket connections for real-time notifications
   const contractorConnections = new Map<number, WebSocket[]>();
 
-  // Middleware to check authentication
-  const authenticate = (req: Request, res: Response, next: Function) => {
-    const sessionId = req.headers.authorization?.split(" ")[1];
-    if (!sessionId || !sessions[sessionId]) {
-      console.log("Authentication failed - sessionId:", sessionId, "sessions:", Object.keys(sessions));
-      return res.status(401).json({ message: "Unauthorized" });
-    }
-    (req as any).user = sessions[sessionId];
-    next();
-  };
-
-  // Middleware to check role
-  const checkRole = (allowedRoles: string[]) => {
-    return (req: Request, res: Response, next: Function) => {
-      if (!req.user || !allowedRoles.includes(req.user.role)) {
-        return res.status(403).json({ message: "Forbidden" });
-      }
-      next();
-    };
-  };
-
-  // Auth endpoints
-  apiRouter.post("/auth/login", async (req: Request, res: Response) => {
+  // Protected routes that require authentication
+  apiRouter.get("/users/me", isAuthenticated, async (req: Request, res: Response) => {
     try {
-      const data = loginSchema.parse(req.body);
-      console.log("Login attempt for username:", data.username);
+      const user = req.user as User;
+      const { password, ...userInfo } = user;
+      res.json(userInfo);
+    } catch (error) {
+      console.error("Error fetching user:", error);
+      res.status(500).json({ message: "Failed to fetch user" });
+    }
+  });
+
+  apiRouter.get("/users/:id", isAuthenticated, requireRole(["admin"]), async (req: Request, res: Response) => {
       
       const user = await storage.getUserByUsername(data.username);
       console.log("User found:", user ? `ID: ${user.id}, Role: ${user.role}` : "None");
