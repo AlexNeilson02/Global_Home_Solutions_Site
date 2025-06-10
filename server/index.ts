@@ -51,6 +51,10 @@ app.use((req, res, next) => {
   // Fix authentication credentials
   const { fixAuthCredentials } = await import("./fix-auth");
   await fixAuthCredentials();
+  
+  // Fix password hashing for existing users
+  const { fixUserPasswords } = await import("./fix-passwords");
+  await fixUserPasswords();
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     const status = err.status || err.statusCode || 500;
