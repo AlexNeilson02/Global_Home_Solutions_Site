@@ -43,6 +43,10 @@ app.use((req, res, next) => {
   
   // Seed the database with initial data
   await seedDatabase();
+  
+  // Fix authentication credentials
+  const { fixAuthCredentials } = await import("./fix-auth");
+  await fixAuthCredentials();
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     const status = err.status || err.statusCode || 500;
