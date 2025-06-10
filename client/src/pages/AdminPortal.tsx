@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useLocation } from "wouter";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -11,6 +11,29 @@ import { Users, Building, TrendingUp, Shield, Settings, AlertTriangle } from "lu
 const AdminPortal: React.FC = () => {
   const [, navigate] = useLocation();
   const [activeTab, setActiveTab] = useState("dashboard");
+  const queryClient = useQueryClient();
+
+  // Logout mutation
+  const logoutMutation = useMutation({
+    mutationFn: async () => {
+      const response = await fetch('/api/auth/logout', {
+        method: 'POST',
+        credentials: 'include'
+      });
+      if (!response.ok) {
+        throw new Error('Logout failed');
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.clear();
+      navigate('/portals');
+    }
+  });
+
+  const handleBackToPortals = () => {
+    logoutMutation.mutate();
+  };
 
   // Fetch admin data
   const { data: salespersons } = useQuery({
@@ -66,8 +89,8 @@ const AdminPortal: React.FC = () => {
                 System overview and management dashboard
               </p>
             </div>
-            <Button onClick={() => navigate("/portals")} variant="outline">
-              Back to Portals
+            <Button onClick={handleBackToPortals} variant="outline" disabled={logoutMutation.isPending}>
+              {logoutMutation.isPending ? "Logging out..." : "Back to Portals"}
             </Button>
           </div>
 

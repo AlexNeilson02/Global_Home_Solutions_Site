@@ -31,6 +31,28 @@ const ContractorPortal: React.FC = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
+  // Logout mutation
+  const logoutMutation = useMutation({
+    mutationFn: async () => {
+      const response = await fetch('/api/auth/logout', {
+        method: 'POST',
+        credentials: 'include'
+      });
+      if (!response.ok) {
+        throw new Error('Logout failed');
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.clear();
+      navigate('/portals');
+    }
+  });
+
+  const handleBackToPortals = () => {
+    logoutMutation.mutate();
+  };
+
   // Get contractor data directly - the API will use session to identify the user
   const { data: contractorData } = useQuery({
     queryKey: ['/api/contractors/11'], // Using the known contractor ID for now
@@ -445,8 +467,8 @@ const ContractorPortal: React.FC = () => {
                 Welcome back, {contractor?.companyName || 'Contractor'}
               </p>
             </div>
-            <Button onClick={() => navigate("/portals")} variant="outline">
-              Back to Portals
+            <Button onClick={handleBackToPortals} variant="outline" disabled={logoutMutation.isPending}>
+              {logoutMutation.isPending ? "Logging out..." : "Back to Portals"}
             </Button>
           </div>
 
