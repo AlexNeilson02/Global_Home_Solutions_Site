@@ -33,17 +33,23 @@ const AdminPortal: React.FC = () => {
     enabled: true
   });
 
+  // Extract arrays from API responses
+  const salespersonsList = salespersons?.salespersons || [];
+  const contractorsList = contractors?.contractors || [];
+  const projectsList = projects?.projects || [];
+  const bidRequestsList = bidRequests?.bidRequests || [];
+
   // Mock data for charts
   const systemMetrics = [
-    { name: 'Total Users', value: (salespersons?.length || 0) + (contractors?.length || 0) },
-    { name: 'Active Projects', value: projects?.filter((p: any) => p.status === 'in_progress')?.length || 0 },
-    { name: 'Pending Bids', value: bidRequests?.filter((b: any) => b.status === 'pending')?.length || 0 },
-    { name: 'Completed Projects', value: projects?.filter((p: any) => p.status === 'completed')?.length || 0 }
+    { name: 'Total Users', value: salespersonsList.length + contractorsList.length },
+    { name: 'Active Projects', value: projectsList.filter((p: any) => p.status === 'in_progress')?.length || 0 },
+    { name: 'Pending Bids', value: bidRequestsList.filter((b: any) => b.status === 'pending')?.length || 0 },
+    { name: 'Completed Projects', value: projectsList.filter((p: any) => p.status === 'completed')?.length || 0 }
   ];
 
   const userDistribution = [
-    { name: 'Sales Team', value: salespersons?.length || 0, color: '#8884d8' },
-    { name: 'Contractors', value: contractors?.length || 0, color: '#82ca9d' }
+    { name: 'Sales Team', value: salespersonsList.length, color: '#8884d8' },
+    { name: 'Contractors', value: contractorsList.length, color: '#82ca9d' }
   ];
 
   return (
@@ -84,9 +90,9 @@ const AdminPortal: React.FC = () => {
                     <Users className="h-4 w-4 text-muted-foreground" />
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">{(salespersons?.length || 0) + (contractors?.length || 0)}</div>
+                    <div className="text-2xl font-bold">{salespersonsList.length + contractorsList.length}</div>
                     <p className="text-xs text-muted-foreground">
-                      {salespersons?.length || 0} sales + {contractors?.length || 0} contractors
+                      {salespersonsList.length} sales + {contractorsList.length} contractors
                     </p>
                   </CardContent>
                 </Card>
@@ -97,7 +103,7 @@ const AdminPortal: React.FC = () => {
                     <Building className="h-4 w-4 text-muted-foreground" />
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">{projects?.filter((p: any) => p.status === 'in_progress')?.length || 0}</div>
+                    <div className="text-2xl font-bold">{projectsList.filter((p: any) => p.status === 'in_progress')?.length || 0}</div>
                     <p className="text-xs text-muted-foreground">
                       <span className="text-green-600">+3</span> new this week
                     </p>
@@ -110,7 +116,7 @@ const AdminPortal: React.FC = () => {
                     <AlertTriangle className="h-4 w-4 text-muted-foreground" />
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">{bidRequests?.filter((b: any) => b.status === 'pending')?.length || 0}</div>
+                    <div className="text-2xl font-bold">{bidRequestsList.filter((b: any) => b.status === 'pending')?.length || 0}</div>
                     <p className="text-xs text-muted-foreground">
                       Requiring attention
                     </p>
@@ -187,7 +193,7 @@ const AdminPortal: React.FC = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    {salespersons?.slice(0, 5).map((person: any) => (
+                    {salespersonsList.slice(0, 5).map((person: any) => (
                       <div key={person.id} className="flex items-center justify-between p-4 border rounded-lg">
                         <div className="space-y-1">
                           <p className="font-medium">{person.name}</p>
@@ -220,7 +226,7 @@ const AdminPortal: React.FC = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    {contractors?.slice(0, 5).map((contractor: any) => (
+                    {contractorsList.slice(0, 5).map((contractor: any) => (
                       <div key={contractor.id} className="flex items-center justify-between p-4 border rounded-lg">
                         <div className="space-y-1">
                           <p className="font-medium">{contractor.companyName}</p>
@@ -254,16 +260,16 @@ const AdminPortal: React.FC = () => {
                 <CardContent>
                   <div className="grid md:grid-cols-3 gap-4 text-center">
                     <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-                      <p className="text-2xl font-bold text-blue-600">{projects?.length || 0}</p>
+                      <p className="text-2xl font-bold text-blue-600">{projectsList.length || 0}</p>
                       <p className="text-sm text-gray-600 dark:text-gray-300">Total Projects</p>
                     </div>
                     <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
-                      <p className="text-2xl font-bold text-green-600">{bidRequests?.length || 0}</p>
+                      <p className="text-2xl font-bold text-green-600">{bidRequestsList.length || 0}</p>
                       <p className="text-sm text-gray-600 dark:text-gray-300">Total Bid Requests</p>
                     </div>
                     <div className="p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
                       <p className="text-2xl font-bold text-purple-600">
-                        {bidRequests?.filter((b: any) => b.status === 'converted')?.length || 0}
+                        {bidRequestsList.filter((b: any) => b.status === 'converted')?.length || 0}
                       </p>
                       <p className="text-sm text-gray-600 dark:text-gray-300">Conversions</p>
                     </div>

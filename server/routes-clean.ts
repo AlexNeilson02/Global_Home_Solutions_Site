@@ -302,6 +302,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   wss.on('connection', (ws: WebSocket, req) => {
     console.log('New WebSocket connection');
     
+    // Set up proper error handling
+    ws.on('error', (error) => {
+      console.error('WebSocket error:', error);
+    });
+    
     ws.on('message', (data) => {
       try {
         const message = JSON.parse(data.toString());
@@ -326,6 +331,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       });
     });
+    
+    // Send a ping to keep connection alive
+    const pingInterval = setInterval(() => {
+      if (ws.readyState === WebSocket.OPEN) {
+        ws.ping();
+      } else {
+        clearInterval(pingInterval);
+      }
+    }, 30000);
   });
   
   return httpServer;
