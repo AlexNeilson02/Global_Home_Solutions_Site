@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { useQueryClient } from "@tanstack/react-query";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -23,6 +24,7 @@ interface LoginModalProps {
 
 export function LoginModal({ isOpen, onClose, portalType, onLoginSuccess }: LoginModalProps) {
   const { login, isLoggingIn } = useAuth();
+  const queryClient = useQueryClient();
   const [error, setError] = useState<string>("");
 
   const form = useForm<LoginCredentials>({
@@ -50,22 +52,35 @@ export function LoginModal({ isOpen, onClose, portalType, onLoginSuccess }: Logi
     setError("");
     
     try {
-      const result = await new Promise((resolve, reject) => {
-        login(data, {
-          onSuccess: (response) => resolve(response),
-          onError: (error) => reject(error),
-        });
+      // Call the login mutation directly
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
       });
       
-      const response = result as any;
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Login failed");
+      }
       
-      // Check if user has correct role for portal
-      if (response.user.role !== portalType) {
+      const result = await response.json();
+      
+      // Check if user has correct role for portal (admin can access any portal)
+      if (result.user.role !== portalType && result.user.role !== 'admin') {
         setError(`Access denied. This portal is for ${portalType} users only.`);
         return;
       }
       
-      onLoginSuccess(response.redirectTo);
+      // Invalidate auth queries to trigger refetch
+      queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
+      
+      // Small delay to allow queries to update
+      await new Promise(resolve => setTimeout(resolve, 200));
+      
+      onLoginSuccess(result.redirectTo);
       onClose();
     } catch (err: any) {
       setError(err.message || "Login failed");
