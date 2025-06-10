@@ -1,5 +1,6 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes-clean";
+import { enhancedRouter } from "./enhanced-routes.js";
 import { setupVite, serveStatic, log } from "./vite";
 import { seedDatabase } from "./seed-data";
 
@@ -40,6 +41,9 @@ app.use((req, res, next) => {
 (async () => {
   // Register API routes FIRST, before Vite middleware
   const server = await registerRoutes(app);
+  
+  // Register enhanced routes for portal functionality
+  app.use('/api', enhancedRouter);
   
   // Seed the database with initial data
   await seedDatabase();
