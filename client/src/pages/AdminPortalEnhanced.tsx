@@ -268,8 +268,19 @@ const AdminPortalEnhanced: React.FC = () => {
 
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">Sales Team</CardTitle>
+                    <Users className="h-4 w-4 text-muted-foreground" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold">{totalSalespersons}</div>
+                    <p className="text-xs text-muted-foreground">Active sales reps</p>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">Active Projects</CardTitle>
-                    <Building2 className="h-4 w-4 text-muted-foreground" />
+                    <TrendingUp className="h-4 w-4 text-muted-foreground" />
                   </CardHeader>
                   <CardContent>
                     <div className="text-2xl font-bold">{activeProjects}</div>
@@ -304,18 +315,19 @@ const AdminPortalEnhanced: React.FC = () => {
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <Card>
                   <CardHeader>
-                    <CardTitle>User Growth</CardTitle>
-                    <CardDescription>Monthly user registrations by role</CardDescription>
+                    <CardTitle>Team Growth</CardTitle>
+                    <CardDescription>Monthly growth in contractors and sales team</CardDescription>
                   </CardHeader>
                   <CardContent>
                     <ResponsiveContainer width="100%" height={300}>
-                      <BarChart data={userGrowthData}>
+                      <BarChart data={teamGrowthData}>
                         <CartesianGrid strokeDasharray="3 3" />
                         <XAxis dataKey="month" />
                         <YAxis />
                         <Tooltip />
                         <Bar dataKey="contractors" fill="#3b82f6" name="Contractors" />
                         <Bar dataKey="salespersons" fill="#10b981" name="Salespersons" />
+                        <Bar dataKey="projects" fill="#f59e0b" name="Projects" />
                       </BarChart>
                     </ResponsiveContainer>
                   </CardContent>
@@ -330,7 +342,7 @@ const AdminPortalEnhanced: React.FC = () => {
                     <ResponsiveContainer width="100%" height={300}>
                       <PieChart>
                         <Pie
-                          data={roleDistribution}
+                          data={teamDistribution}
                           cx="50%"
                           cy="50%"
                           innerRadius={60}
@@ -338,7 +350,7 @@ const AdminPortalEnhanced: React.FC = () => {
                           paddingAngle={5}
                           dataKey="value"
                         >
-                          {roleDistribution.map((entry, index) => (
+                          {teamDistribution.map((entry: any, index: number) => (
                             <Cell key={`cell-${index}`} fill={entry.color} />
                           ))}
                         </Pie>
@@ -376,79 +388,7 @@ const AdminPortalEnhanced: React.FC = () => {
               </Card>
             </TabsContent>
 
-            {/* Users Tab */}
-            <TabsContent value="users" className="space-y-6">
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between">
-                  <div>
-                    <CardTitle>User Management</CardTitle>
-                    <CardDescription>Manage system users and their access</CardDescription>
-                  </div>
-                  <div className="flex gap-2">
-                    <Select value={userFilter} onValueChange={setUserFilter}>
-                      <SelectTrigger className="w-40">
-                        <SelectValue placeholder="Filter by role" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">All Users</SelectItem>
-                        <SelectItem value="admin">Admins</SelectItem>
-                        <SelectItem value="contractor">Contractors</SelectItem>
-                        <SelectItem value="salesperson">Salespersons</SelectItem>
-                        <SelectItem value="homeowner">Homeowners</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Name</TableHead>
-                        <TableHead>Email</TableHead>
-                        <TableHead>Role</TableHead>
-                        <TableHead>Status</TableHead>
-                        <TableHead>Joined</TableHead>
-                        <TableHead>Actions</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {filteredUsers.map((user: any) => (
-                        <TableRow key={user.id}>
-                          <TableCell className="font-medium">{user.fullName}</TableCell>
-                          <TableCell>{user.email}</TableCell>
-                          <TableCell>
-                            <Badge variant="outline">{user.role}</Badge>
-                          </TableCell>
-                          <TableCell>
-                            <Badge variant={user.isActive !== false ? "default" : "destructive"}>
-                              {user.isActive !== false ? "Active" : "Inactive"}
-                            </Badge>
-                          </TableCell>
-                          <TableCell>{new Date(user.createdAt).toLocaleDateString()}</TableCell>
-                          <TableCell>
-                            <div className="flex gap-2">
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => updateUserStatusMutation.mutate({
-                                  userId: user.id,
-                                  isActive: user.isActive === false
-                                })}
-                              >
-                                {user.isActive !== false ? <UserX className="h-3 w-3" /> : <UserCheck className="h-3 w-3" />}
-                              </Button>
-                              <Button size="sm" variant="outline">
-                                <Edit3 className="h-3 w-3" />
-                              </Button>
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </CardContent>
-              </Card>
-            </TabsContent>
+
 
             {/* Contractors Tab */}
             <TabsContent value="contractors" className="space-y-6">
