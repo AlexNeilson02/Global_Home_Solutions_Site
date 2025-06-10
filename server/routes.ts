@@ -3,7 +3,9 @@ import { createServer, type Server } from "http";
 import { WebSocketServer, WebSocket } from "ws";
 import multer from "multer";
 import path from "path";
-import { storage } from "./storage";
+import passport from "passport";
+import { storage } from "./database-storage";
+import { setupAuth, isAuthenticated, requireRole, hashPassword } from "./auth";
 import { z } from "zod";
 import QRCode from "qrcode";
 import { 
@@ -13,7 +15,8 @@ import {
   insertSalespersonSchema, 
   insertProjectSchema, 
   insertTestimonialSchema,
-  insertBidRequestSchema
+  insertBidRequestSchema,
+  type User
 } from "@shared/schema";
 
 // Configure multer for file uploads
