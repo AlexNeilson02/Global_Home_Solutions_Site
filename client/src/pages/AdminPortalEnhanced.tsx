@@ -616,10 +616,10 @@ const AdminPortalEnhanced: React.FC = () => {
                   <CardContent>
                     <div className="space-y-4">
                       <div className="flex justify-between items-center">
-                        <span className="text-sm font-medium">User Activation Rate</span>
-                        <span className="text-sm">{((activeUsers / totalUsers) * 100).toFixed(1)}%</span>
+                        <span className="text-sm font-medium">Team Engagement Rate</span>
+                        <span className="text-sm">{totalContractors + totalSalespersons > 0 ? ((activeProjects / (totalContractors + totalSalespersons)) * 100).toFixed(1) : '0'}%</span>
                       </div>
-                      <Progress value={(activeUsers / totalUsers) * 100} className="h-2" />
+                      <Progress value={totalContractors + totalSalespersons > 0 ? (activeProjects / (totalContractors + totalSalespersons)) * 100 : 0} className="h-2" />
                       
                       <div className="flex justify-between items-center">
                         <span className="text-sm font-medium">Project Completion Rate</span>
