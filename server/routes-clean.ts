@@ -216,9 +216,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Salesperson not found" });
       }
       
-      // Construct the URL for the salesperson's tracked landing page
+      // Construct the URL for the homepage with sales rep tracking
       const baseUrl = process.env.BASE_URL || `${req.protocol}://${req.get('host')}`;
-      const landingPageUrl = `${baseUrl}/sales/${salesperson.profileUrl}`;
+      const landingPageUrl = `${baseUrl}/?ref=${salesperson.profileUrl}`;
       
       // Generate QR code as data URL
       const qrCodeDataUrl = await QRCode.toDataURL(landingPageUrl, {
@@ -286,15 +286,168 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Track page visit for QR code attribution - public endpoint
+  apiRouter.post("/track-visit", async (req: Request, res: Response) => {
+    try {
+      const { salespersonProfileUrl, userAgent, referrer } = req.body;
+      
+      if (!salespersonProfileUrl) {
+        return res.status(400).json({ message: "Salesperson profile URL is required" });
+      }
+
+      // Get salesperson by profile URL
+      const salesperson = await storage.getSalespersonByProfileUrl(salespersonProfileUrl);
+      
+      if (!salesperson) {
+        return res.status(404).json({ message: "Salesperson not found" });
+      }
+
+      // Create page visit record for tracking
+      const pageVisit = await storage.createPageVisit({
+        salespersonId: salesperson.id,
+        path: '/',
+        userAgent: userAgent || null,
+        referrer: referrer || null,
+        visitorIp: req.ip || null
+      });
+
+      // Increment salesperson's total visits
+      await storage.incrementSalespersonStats(salesperson.id, 'totalVisits');
+
+      res.json({ 
+        success: true, 
+        salesperson: {
+          id: salesperson.id,
+          profileUrl: salesperson.profileUrl
+        }
+      });
+    } catch (error) {
+      console.error("Error tracking visit:", error);
+      res.status(500).json({ message: "Error tracking visit" });
+    }
+  });
+
   // Bid requests routes
   apiRouter.post("/bid-requests", upload.array('media', 10), async (req: Request, res: Response) => {
     try {
-      const data = insertBidRequestSchema.parse(req.body);
-      const bidRequest = await storage.createBidRequest(data);
-      res.status(201).json({ message: "Bid request created successfully", bidRequest });
+      console.log('Processing bid request with body:', req.body);
+      
+      const {
+        // New field names
+        fullName,
+        email,
+        phone,
+        address,
+        description,
+        timeline,
+        budget,
+        serviceRequested,
+        preferredContactMethod,
+        additionalInformation,
+        contractorId,
+        salespersonId,
+        // Legacy fields for backward compatibility
+        customerName,
+        customerEmail,
+        customerPhone,
+        projectDescription,
+        projectAddress,
+        preferredTimeframe
+      } = req.body;
+
+      // Use new fields if available, fallback to legacy fields for backward compatibility
+      const finalFullName = fullName || customerName;
+      const finalEmail = email || customerEmail;
+      const finalPhone = phone || customerPhone;
+      const finalAddress = address || projectAddress;
+      const finalDescription = description || projectDescription;
+      const finalTimeline = timeline || preferredTimeframe;
+      
+      // Validate required fields
+      if (!finalFullName || !finalEmail || !finalPhone || !finalDescription || !finalAddress || !finalTimeline || !contractorId) {
+        console.log('Missing required fields:', {
+          fullName: !!finalFullName,
+          email: !!finalEmail,
+          phone: !!finalPhone,
+          description: !!finalDescription,
+          address: !!finalAddress,
+          timeline: !!finalTimeline,
+          contractorId: !!contractorId
+        });
+        return res.status(400).json({ message: "All required fields must be provided" });
+      }
+
+      // Process uploaded files
+      const files = req.files as Express.Multer.File[];
+      let mediaUrls: string[] = [];
+      
+      if (files && files.length > 0) {
+        // Convert files to base64 for storage
+        mediaUrls = files.map((file, index) => {
+          const base64Data = file.buffer.toString('base64');
+          const dataUrl = `data:${file.mimetype};base64,${base64Data}`;
+          return dataUrl;
+        });
+      }
+
+      // Create bid request with correct field names for database schema
+      const bidRequestData = {
+        contractorId: Number(contractorId),
+        salespersonId: salespersonId ? Number(salespersonId) : null,
+        fullName: finalFullName,
+        email: finalEmail,
+        phone: finalPhone,
+        address: finalAddress,
+        serviceRequested: serviceRequested || "General Services",
+        description: finalDescription,
+        timeline: finalTimeline,
+        budget: budget || null,
+        preferredContactMethod: preferredContactMethod || "email",
+        additionalInformation: additionalInformation || (mediaUrls.length > 0 ? JSON.stringify({ mediaUrls }) : null)
+      };
+
+      console.log('Creating bid request with data:', bidRequestData);
+      const bidRequest = await storage.createBidRequest(bidRequestData);
+
+      // If there's a sales rep attribution, update their stats and notify them
+      if (salespersonId) {
+        try {
+          // Increment the salesperson's successful conversions
+          await storage.incrementSalespersonStats(Number(salespersonId), 'successfulConversions');
+          
+          // Get salesperson and user details for notification
+          const salesperson = await storage.getSalesperson(Number(salespersonId));
+          if (salesperson) {
+            const salesUser = await storage.getUser(salesperson.userId);
+            console.log(`Bid request attributed to sales rep: ${salesUser?.fullName} (ID: ${salespersonId})`);
+            
+            // Here you could send email notification to sales rep
+            // await sendSalesRepNotification(salesUser, bidRequest);
+          }
+        } catch (error) {
+          console.error('Error updating salesperson stats:', error);
+          // Don't fail the entire request if sales rep update fails
+        }
+      }
+
+      // Get contractor details for notification
+      const contractor = await storage.getContractor(Number(contractorId));
+      if (contractor) {
+        const contractorUser = await storage.getUser(contractor.userId);
+        console.log(`Bid request sent to contractor: ${contractor.companyName} (ID: ${contractorId})`);
+        
+        // Here you could send email notification to contractor
+        // await sendContractorNotification(contractorUser, bidRequest);
+      }
+
+      res.status(201).json({ 
+        message: "Bid request created successfully", 
+        bidRequest,
+        salesRepAttributed: !!salespersonId
+      });
     } catch (error) {
       console.error("Error creating bid request:", error);
-      res.status(400).json({ message: "Invalid bid request data" });
+      res.status(500).json({ message: "Internal server error" });
     }
   });
 
