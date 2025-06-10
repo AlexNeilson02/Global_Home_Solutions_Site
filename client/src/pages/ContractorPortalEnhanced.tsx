@@ -27,6 +27,8 @@ import {
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import DocumentManager from "@/components/DocumentManager";
+import ProjectTimeline from "@/components/ProjectTimeline";
 
 const ContractorPortalEnhanced: React.FC = () => {
   const [, navigate] = useLocation();
@@ -461,11 +463,13 @@ const ContractorPortalEnhanced: React.FC = () => {
           </div>
 
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-            <TabsList className="grid w-full grid-cols-4">
+            <TabsList className="grid w-full grid-cols-6">
               <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
               <TabsTrigger value="profile">Company Profile</TabsTrigger>
               <TabsTrigger value="projects">Projects</TabsTrigger>
               <TabsTrigger value="bids">Bid Requests</TabsTrigger>
+              <TabsTrigger value="documents">Documents</TabsTrigger>
+              <TabsTrigger value="tracking">Project Tracking</TabsTrigger>
             </TabsList>
 
             {/* Dashboard Tab */}
@@ -1078,6 +1082,93 @@ const ContractorPortalEnhanced: React.FC = () => {
                       </div>
                     )}
                   </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* Documents Tab */}
+            <TabsContent value="documents" className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Document Management</CardTitle>
+                  <CardDescription>
+                    Organize and manage all your business documents, contracts, and project files
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <DocumentManager 
+                    category="portfolio"
+                    relatedId={contractor?.id}
+                    relatedType="contractor"
+                    showUpload={true}
+                  />
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* Project Tracking Tab */}
+            <TabsContent value="tracking" className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Project Tracking & Management</CardTitle>
+                  <CardDescription>
+                    Track project progress with detailed timelines and milestone management
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {bidRequests.filter((bid: any) => bid.status === 'won' || bid.status === 'bid_sent').length > 0 ? (
+                    <div className="space-y-6">
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {bidRequests.filter((bid: any) => bid.status === 'won' || bid.status === 'bid_sent').map((project: any) => (
+                          <Card key={project.id} className="cursor-pointer hover:shadow-md transition-shadow">
+                            <CardHeader className="pb-3">
+                              <div className="flex items-center justify-between">
+                                <CardTitle className="text-base">{project.serviceRequested}</CardTitle>
+                                <Badge variant={
+                                  project.status === 'won' ? 'default' :
+                                  project.status === 'bid_sent' ? 'secondary' : 'outline'
+                                }>
+                                  {project.status}
+                                </Badge>
+                              </div>
+                            </CardHeader>
+                            <CardContent className="space-y-3">
+                              <p className="text-sm text-muted-foreground line-clamp-2">
+                                {project.description}
+                              </p>
+                              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                <MapPin className="h-3 w-3" />
+                                <span className="truncate">{project.address}</span>
+                              </div>
+                              {project.budget && (
+                                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                  <DollarSign className="h-3 w-3" />
+                                  <span>{project.budget}</span>
+                                </div>
+                              )}
+                              <div className="pt-2 space-y-2">
+                                <ProjectTimeline 
+                                  projectId={project.id} 
+                                  canEdit={true}
+                                />
+                              </div>
+                            </CardContent>
+                          </Card>
+                        ))}
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="text-center py-12">
+                      <Building2 className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                      <h3 className="text-lg font-medium mb-2">No Active Projects</h3>
+                      <p className="text-muted-foreground mb-4">
+                        Win some bids to start tracking projects with detailed timelines
+                      </p>
+                      <Button onClick={() => setActiveTab('bids')}>
+                        View Bid Requests
+                      </Button>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             </TabsContent>
