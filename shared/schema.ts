@@ -125,6 +125,7 @@ export const bidRequests = pgTable("bid_requests", {
   emailSent: boolean("email_sent").default(false),
   lastUpdated: timestamp("last_updated"),
   notes: text("notes"),
+  attachments: text("attachments").array(), // document IDs
 });
 
 // Page visit tracking table
@@ -138,6 +139,50 @@ export const pageVisits = pgTable("page_visits", {
   timestamp: timestamp("timestamp").defaultNow(),
   convertedToBidRequest: boolean("converted_to_bid_request").default(false),
   bidRequestId: integer("bid_request_id").references(() => bidRequests.id),
+});
+
+// Documents/Files table for organized file management
+export const documents = pgTable("documents", {
+  id: serial("id").primaryKey(),
+  fileName: text("file_name").notNull(),
+  originalName: text("original_name").notNull(),
+  fileType: text("file_type").notNull(), // image, video, document, etc.
+  mimeType: text("mime_type").notNull(),
+  fileSize: integer("file_size").notNull(), // in bytes
+  fileUrl: text("file_url").notNull(), // base64 data URL or file path
+  uploadedBy: integer("uploaded_by").notNull().references(() => users.id),
+  category: text("category").notNull().default("general"), // project, portfolio, profile, contract, etc.
+  relatedId: integer("related_id"), // ID of related entity (project, bid request, etc.)
+  relatedType: text("related_type"), // 'project', 'bid_request', 'contractor', etc.
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  tags: text("tags").array(), // searchable tags
+  description: text("description"),
+});
+
+// Project milestones for detailed progress tracking
+export const projectMilestones = pgTable("project_milestones", {
+  id: serial("id").primaryKey(),
+  projectId: integer("project_id").notNull().references(() => projects.id),
+  title: text("title").notNull(),
+  description: text("description"),
+  status: text("status").notNull().default("pending"), // pending, in_progress, completed, blocked
+  dueDate: timestamp("due_date"),
+  completedAt: timestamp("completed_at"),
+  orderIndex: integer("order_index").notNull().default(0),
+  createdAt: timestamp("created_at").defaultNow(),
+  createdBy: integer("created_by").notNull().references(() => users.id),
+});
+
+// Project status updates for timeline tracking
+export const projectStatusUpdates = pgTable("project_status_updates", {
+  id: serial("id").primaryKey(),
+  projectId: integer("project_id").notNull().references(() => projects.id),
+  status: text("status").notNull(),
+  notes: text("notes"),
+  updatedBy: integer("updated_by").notNull().references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow(),
+  attachments: text("attachments").array(), // document IDs
 });
 
 // Insert schemas
@@ -193,12 +238,31 @@ export const insertPageVisitSchema = createInsertSchema(pageVisits).omit({
   bidRequestId: true,
 });
 
+export const insertDocumentSchema = createInsertSchema(documents).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertProjectMilestoneSchema = createInsertSchema(projectMilestones).omit({
+  id: true,
+  createdAt: true,
+  completedAt: true,
+});
+
+export const insertProjectStatusUpdateSchema = createInsertSchema(projectStatusUpdates).omit({
+  id: true,
+  createdAt: true,
+});
+
 // Relations - these are required for Drizzle ORM
 export const usersRelations = relations(users, ({ many }) => ({
   contractors: many(contractors),
   salespersons: many(salespersons),
   testimonials: many(testimonials),
   projects: many(projects, { relationName: 'homeowner' }),
+  documents: many(documents),
+  projectMilestones: many(projectMilestones),
+  projectStatusUpdates: many(projectStatusUpdates),
 }));
 
 export const contractorsRelations = relations(contractors, ({ one, many }) => ({
@@ -262,6 +326,8 @@ export const projectsRelations = relations(projects, ({ one, many }) => ({
     references: [salespersons.id],
   }),
   testimonials: many(testimonials),
+  milestones: many(projectMilestones),
+  statusUpdates: many(projectStatusUpdates),
 }));
 
 export const testimonialsRelations = relations(testimonials, ({ one }) => ({
@@ -272,6 +338,35 @@ export const testimonialsRelations = relations(testimonials, ({ one }) => ({
   project: one(projects, {
     fields: [testimonials.projectId],
     references: [projects.id],
+  }),
+}));
+
+export const documentsRelations = relations(documents, ({ one }) => ({
+  uploadedByUser: one(users, {
+    fields: [documents.uploadedBy],
+    references: [users.id],
+  }),
+}));
+
+export const projectMilestonesRelations = relations(projectMilestones, ({ one }) => ({
+  project: one(projects, {
+    fields: [projectMilestones.projectId],
+    references: [projects.id],
+  }),
+  createdByUser: one(users, {
+    fields: [projectMilestones.createdBy],
+    references: [users.id],
+  }),
+}));
+
+export const projectStatusUpdatesRelations = relations(projectStatusUpdates, ({ one }) => ({
+  project: one(projects, {
+    fields: [projectStatusUpdates.projectId],
+    references: [projects.id],
+  }),
+  updatedByUser: one(users, {
+    fields: [projectStatusUpdates.updatedBy],
+    references: [users.id],
   }),
 }));
 
@@ -299,6 +394,15 @@ export type InsertBidRequest = z.infer<typeof insertBidRequestSchema>;
 
 export type PageVisit = typeof pageVisits.$inferSelect;
 export type InsertPageVisit = z.infer<typeof insertPageVisitSchema>;
+
+export type Document = typeof documents.$inferSelect;
+export type InsertDocument = z.infer<typeof insertDocumentSchema>;
+
+export type ProjectMilestone = typeof projectMilestones.$inferSelect;
+export type InsertProjectMilestone = z.infer<typeof insertProjectMilestoneSchema>;
+
+export type ProjectStatusUpdate = typeof projectStatusUpdates.$inferSelect;
+export type InsertProjectStatusUpdate = z.infer<typeof insertProjectStatusUpdateSchema>;
 
 // Extended schemas for login
 export const loginSchema = z.object({
