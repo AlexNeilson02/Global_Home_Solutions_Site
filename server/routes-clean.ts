@@ -579,75 +579,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Analytics endpoints for comprehensive reporting
+  // Enhanced analytics endpoints with real data calculations
   apiRouter.get("/analytics/admin/overview", isAuthenticated, requireRole(['admin']), async (req: Request, res: Response) => {
     try {
-      // Get all bid requests for comprehensive analytics
-      const allBidRequests = await storage.getRecentBidRequests(1000); // Get large sample
-      
-      // Calculate conversion funnel metrics
-      const totalRequests = allBidRequests.length;
-      const contactedCount = allBidRequests.filter(bid => ['contacted', 'bid_sent', 'won', 'lost'].includes(bid.status)).length;
-      const bidsSentCount = allBidRequests.filter(bid => ['bid_sent', 'won', 'lost'].includes(bid.status)).length;
-      const wonCount = allBidRequests.filter(bid => bid.status === 'won').length;
-      
-      // Calculate conversion rates
-      const conversionRates = {
-        pendingToContacted: totalRequests > 0 ? (contactedCount / totalRequests * 100).toFixed(1) : 0,
-        contactedToBidSent: contactedCount > 0 ? (bidsSentCount / contactedCount * 100).toFixed(1) : 0,
-        bidSentToWon: bidsSentCount > 0 ? (wonCount / bidsSentCount * 100).toFixed(1) : 0,
-        overallConversion: totalRequests > 0 ? (wonCount / totalRequests * 100).toFixed(1) : 0
-      };
+      const timeRange = req.query.timeRange as string;
+      let startDate: Date, endDate: Date;
 
-      // Sales rep performance analysis
-      const salesRepPerformance = await Promise.all(
-        (await storage.getAllSalespersons()).map(async (rep) => {
-          const repBids = allBidRequests.filter(bid => bid.salespersonId === rep.id);
-          const repWons = repBids.filter(bid => bid.status === 'won');
-          
-          return {
-            id: rep.id,
-            name: `Rep ${rep.id}`,
-            totalLeads: repBids.length,
-            wonProjects: repWons.length,
-            conversionRate: repBids.length > 0 ? (repWons.length / repBids.length * 100).toFixed(1) : 0,
-            totalVisits: rep.totalVisits || 0,
-            successfulConversions: rep.successfulConversions || 0
-          };
-        })
-      );
+      switch (timeRange) {
+        case '7d':
+          startDate = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+          endDate = new Date();
+          break;
+        case '30d':
+          startDate = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+          endDate = new Date();
+          break;
+        case '90d':
+          startDate = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000);
+          endDate = new Date();
+          break;
+        default:
+          startDate = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+          endDate = new Date();
+      }
 
-      // Service type demand analysis
-      const serviceTypeDemand: Record<string, number> = {};
-      allBidRequests.forEach(bid => {
-        const service = bid.serviceRequested || 'Unknown';
-        serviceTypeDemand[service] = (serviceTypeDemand[service] || 0) + 1;
-      });
+      const comprehensiveAnalytics = await storage.getComprehensiveAnalytics({ startDate, endDate });
+      const revenueAnalytics = await storage.getRevenueAnalytics({ startDate, endDate });
 
       res.json({
-        overview: {
-          totalBidRequests: totalRequests,
-          pendingRequests: allBidRequests.filter(bid => bid.status === 'pending').length,
-          contactedRequests: allBidRequests.filter(bid => bid.status === 'contacted').length,
-          bidsSent: bidsSentCount,
-          projectsWon: wonCount,
-          projectsLost: allBidRequests.filter(bid => bid.status === 'lost').length,
-          conversionRates
-        },
-        salesRepPerformance: salesRepPerformance.sort((a, b) => b.wonProjects - a.wonProjects),
-        serviceTypeDemand,
-        recentActivity: allBidRequests.slice(0, 10).map(bid => ({
-          id: bid.id,
-          customerName: bid.fullName,
-          service: bid.serviceRequested,
-          status: bid.status,
-          submittedAt: bid.createdAt,
-          salesRepAttributed: !!bid.salespersonId
-        }))
+        timeRange: timeRange || '30d',
+        overview: comprehensiveAnalytics.overview,
+        conversions: comprehensiveAnalytics.conversions,
+        performance: comprehensiveAnalytics.performance,
+        trends: comprehensiveAnalytics.trends,
+        revenue: revenueAnalytics
       });
     } catch (error) {
       console.error("Error fetching admin analytics:", error);
-      res.status(500).json({ message: "Failed to fetch analytics data" });
+      res.status(500).json({ message: "Failed to fetch admin analytics" });
     }
   });
 

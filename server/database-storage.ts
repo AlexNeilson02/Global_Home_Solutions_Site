@@ -606,6 +606,244 @@ export class DatabaseStorage implements IStorage {
 
     return { milestones, statusUpdates };
   }
+
+  // Advanced Analytics Methods
+  async getComprehensiveAnalytics(timeRange?: { startDate: Date; endDate: Date }): Promise<{
+    overview: any;
+    conversions: any;
+    performance: any;
+    trends: any;
+  }> {
+    const startDate = timeRange?.startDate || new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+    const endDate = timeRange?.endDate || new Date();
+
+    // Get all relevant data for the time period
+    const [allBidRequests, allContractors, allSalespersons, allPageVisits] = await Promise.all([
+      this.getRecentBidRequests(1000),
+      this.getAllContractors(),
+      this.getAllSalespersons(),
+      db.select().from(pageVisits).where(
+        and(
+          gt(pageVisits.timestamp, startDate),
+          lt(pageVisits.timestamp, endDate)
+        )
+      )
+    ]);
+
+    // Filter bid requests by date
+    const filteredBidRequests = allBidRequests.filter(bid => {
+      const bidDate = new Date(bid.createdAt || new Date());
+      return bidDate >= startDate && bidDate <= endDate;
+    });
+
+    // Overview metrics
+    const overview = {
+      totalBidRequests: filteredBidRequests.length,
+      totalContractors: allContractors.length,
+      totalSalespersons: allSalespersons.length,
+      totalPageVisits: allPageVisits.length,
+      activeContractors: allContractors.filter(c => c.isActive).length,
+      activeSalespersons: allSalespersons.filter(s => s.isActive).length
+    };
+
+    // Conversion funnel analysis
+    const conversions = {
+      pending: filteredBidRequests.filter(b => b.status === 'pending').length,
+      contacted: filteredBidRequests.filter(b => ['contacted', 'bid_sent', 'won', 'lost'].includes(b.status)).length,
+      bidsSent: filteredBidRequests.filter(b => ['bid_sent', 'won', 'lost'].includes(b.status)).length,
+      won: filteredBidRequests.filter(b => b.status === 'won').length,
+      lost: filteredBidRequests.filter(b => b.status === 'lost').length,
+      conversionRate: filteredBidRequests.length > 0 ? 
+        (filteredBidRequests.filter(b => b.status === 'won').length / filteredBidRequests.length * 100) : 0
+    };
+
+    // Performance analysis by salesperson
+    const salespersonPerformance = await Promise.all(
+      allSalespersons.map(async (salesperson) => {
+        const repBids = filteredBidRequests.filter(bid => bid.salespersonId === salesperson.id);
+        const repVisits = allPageVisits.filter(visit => visit.salespersonId === salesperson.id);
+        const wonBids = repBids.filter(bid => bid.status === 'won');
+        
+        const user = await this.getUser(salesperson.userId);
+        return {
+          id: salesperson.id,
+          name: user?.fullName || `Salesperson ${salesperson.id}`,
+          totalVisits: repVisits.length,
+          totalLeads: repBids.length,
+          wonProjects: wonBids.length,
+          conversionRate: repBids.length > 0 ? (wonBids.length / repBids.length * 100) : 0,
+          revenue: wonBids.reduce((sum, bid) => sum + (parseFloat(bid.budget || '0') || 0), 0)
+        };
+      })
+    );
+
+    // Time-based trends (weekly breakdown)
+    const trends = this.calculateTimeTrends(filteredBidRequests, startDate, endDate);
+
+    return {
+      overview,
+      conversions,
+      performance: salespersonPerformance.sort((a, b) => b.revenue - a.revenue),
+      trends
+    };
+  }
+
+  private calculateTimeTrends(bidRequests: any[], startDate: Date, endDate: Date): any[] {
+    const weeks: any[] = [];
+    const weekMs = 7 * 24 * 60 * 60 * 1000;
+    
+    for (let date = new Date(startDate); date <= endDate; date = new Date(date.getTime() + weekMs)) {
+      const weekEnd = new Date(Math.min(date.getTime() + weekMs, endDate.getTime()));
+      const weekBids = bidRequests.filter(bid => {
+        const bidDate = new Date(bid.createdAt);
+        return bidDate >= date && bidDate < weekEnd;
+      });
+
+      weeks.push({
+        week: date.toISOString().slice(0, 10),
+        totalRequests: weekBids.length,
+        contacted: weekBids.filter(b => ['contacted', 'bid_sent', 'won', 'lost'].includes(b.status)).length,
+        won: weekBids.filter(b => b.status === 'won').length,
+        revenue: weekBids
+          .filter(b => b.status === 'won')
+          .reduce((sum, bid) => sum + (parseFloat(bid.budget || '0') || 0), 0)
+      });
+    }
+
+    return weeks;
+  }
+
+  async getContractorAnalytics(contractorId: number, timeRange?: { startDate: Date; endDate: Date }): Promise<any> {
+    const startDate = timeRange?.startDate || new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+    const endDate = timeRange?.endDate || new Date();
+
+    const contractorBids = await this.getBidRequestsByContractorId(contractorId);
+    const filteredBids = contractorBids.filter(bid => {
+      const bidDate = new Date(bid.createdAt || new Date());
+      return bidDate >= startDate && bidDate <= endDate;
+    });
+
+    const responseAnalytics = {
+      totalRequests: filteredBids.length,
+      responded: filteredBids.filter(b => b.status !== 'pending').length,
+      bidsSent: filteredBids.filter(b => ['bid_sent', 'won', 'lost'].includes(b.status)).length,
+      won: filteredBids.filter(b => b.status === 'won').length,
+      lost: filteredBids.filter(b => b.status === 'lost').length,
+      revenue: filteredBids
+        .filter(b => b.status === 'won')
+        .reduce((sum, bid) => sum + (parseFloat(bid.budget || '0') || 0), 0),
+      averageResponseTime: this.calculateAverageResponseTime(filteredBids),
+      serviceTypeBreakdown: this.getServiceTypeBreakdown(filteredBids)
+    };
+
+    return responseAnalytics;
+  }
+
+  private calculateAverageResponseTime(bidRequests: any[]): number {
+    const responseTimes = bidRequests
+      .filter(bid => bid.lastUpdated && bid.status !== 'pending')
+      .map(bid => {
+        const created = new Date(bid.createdAt).getTime();
+        const updated = new Date(bid.lastUpdated).getTime();
+        return (updated - created) / (1000 * 60 * 60); // hours
+      });
+
+    return responseTimes.length > 0 ? 
+      responseTimes.reduce((sum, time) => sum + time, 0) / responseTimes.length : 0;
+  }
+
+  private getServiceTypeBreakdown(bidRequests: any[]): any[] {
+    const serviceCount: { [key: string]: number } = {};
+    
+    bidRequests.forEach(bid => {
+      const service = bid.serviceRequested || 'Unknown';
+      serviceCount[service] = (serviceCount[service] || 0) + 1;
+    });
+
+    return Object.entries(serviceCount)
+      .map(([service, count]) => ({ service, count }))
+      .sort((a, b) => b.count - a.count);
+  }
+
+  async getRevenueAnalytics(timeRange?: { startDate: Date; endDate: Date }): Promise<any> {
+    const startDate = timeRange?.startDate || new Date(Date.now() - 365 * 24 * 60 * 60 * 1000);
+    const endDate = timeRange?.endDate || new Date();
+
+    const allBids = await this.getRecentBidRequests(2000);
+    const wonBids = allBids.filter(bid => {
+      if (bid.status !== 'won' || !bid.budget) return false;
+      const bidDate = new Date(bid.createdAt);
+      return bidDate >= startDate && bidDate <= endDate;
+    });
+
+    const monthlyRevenue = this.calculateMonthlyRevenue(wonBids);
+    const revenueByService = this.calculateRevenueByService(wonBids);
+    const revenueByContractor = await this.calculateRevenueByContractor(wonBids);
+
+    return {
+      totalRevenue: wonBids.reduce((sum, bid) => sum + (parseFloat(bid.budget || '0') || 0), 0),
+      averageProjectValue: wonBids.length > 0 ? 
+        wonBids.reduce((sum, bid) => sum + (parseFloat(bid.budget || '0') || 0), 0) / wonBids.length : 0,
+      projectCount: wonBids.length,
+      monthlyRevenue,
+      revenueByService,
+      revenueByContractor
+    };
+  }
+
+  private calculateMonthlyRevenue(wonBids: any[]): any[] {
+    const monthlyData: { [key: string]: number } = {};
+    
+    wonBids.forEach(bid => {
+      const date = new Date(bid.createdAt);
+      const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+      const revenue = parseFloat(bid.budget || '0') || 0;
+      monthlyData[monthKey] = (monthlyData[monthKey] || 0) + revenue;
+    });
+
+    return Object.entries(monthlyData)
+      .map(([month, revenue]) => ({ month, revenue }))
+      .sort((a, b) => a.month.localeCompare(b.month));
+  }
+
+  private calculateRevenueByService(wonBids: any[]): any[] {
+    const serviceRevenue: { [key: string]: number } = {};
+    
+    wonBids.forEach(bid => {
+      const service = bid.serviceRequested || 'Unknown';
+      const revenue = parseFloat(bid.budget || '0') || 0;
+      serviceRevenue[service] = (serviceRevenue[service] || 0) + revenue;
+    });
+
+    return Object.entries(serviceRevenue)
+      .map(([service, revenue]) => ({ service, revenue }))
+      .sort((a, b) => b.revenue - a.revenue);
+  }
+
+  private async calculateRevenueByContractor(wonBids: any[]): Promise<any[]> {
+    const contractorRevenue: { [key: number]: { name: string; revenue: number; projects: number } } = {};
+    
+    for (const bid of wonBids) {
+      if (bid.contractorId) {
+        const contractor = await this.getContractor(bid.contractorId);
+        const revenue = parseFloat(bid.budget || '0') || 0;
+        
+        if (!contractorRevenue[bid.contractorId]) {
+          contractorRevenue[bid.contractorId] = {
+            name: contractor?.companyName || 'Unknown Contractor',
+            revenue: 0,
+            projects: 0
+          };
+        }
+        
+        contractorRevenue[bid.contractorId].revenue += revenue;
+        contractorRevenue[bid.contractorId].projects += 1;
+      }
+    }
+
+    return Object.values(contractorRevenue)
+      .sort((a, b) => b.revenue - a.revenue);
+  }
 }
 
 export const storage = new DatabaseStorage();
