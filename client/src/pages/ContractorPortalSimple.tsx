@@ -250,7 +250,7 @@ const ContractorPortalSimple: React.FC = () => {
                 <div>
                   <label className="text-sm font-medium">Company Name</label>
                   <p className="text-sm text-gray-600">
-                    {roleData.data?.companyName || (user as User).fullName}
+                    {roleData.data?.contractor?.companyName || (user as User).fullName}
                   </p>
                 </div>
                 <div>
@@ -261,21 +261,21 @@ const ContractorPortalSimple: React.FC = () => {
                   <label className="text-sm font-medium">Role</label>
                   <p className="text-sm text-gray-600">{(user as User).role}</p>
                 </div>
-                {roleData.data && (
+                {roleData.data?.contractor && (
                   <>
                     <div>
                       <label className="text-sm font-medium">Phone</label>
-                      <p className="text-sm text-gray-600">{roleData.data.phone || 'Not provided'}</p>
+                      <p className="text-sm text-gray-600">{roleData.data.contractor.phone || 'Not provided'}</p>
                     </div>
                     <div>
                       <label className="text-sm font-medium">Description</label>
-                      <p className="text-sm text-gray-600">{roleData.data.description || 'No description available'}</p>
+                      <p className="text-sm text-gray-600">{roleData.data.contractor.description || 'No description available'}</p>
                     </div>
-                    {roleData.data.specialties && roleData.data.specialties.length > 0 && (
+                    {roleData.data.contractor.specialties && roleData.data.contractor.specialties.length > 0 && (
                       <div>
                         <label className="text-sm font-medium">Specialties</label>
                         <div className="flex flex-wrap gap-2 mt-1">
-                          {roleData.data.specialties.map((specialty: string, index: number) => (
+                          {roleData.data.contractor.specialties.map((specialty: string, index: number) => (
                             <Badge key={index} variant="secondary">{specialty}</Badge>
                           ))}
                         </div>
