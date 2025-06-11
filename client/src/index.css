@@ -557,6 +557,36 @@ textarea:-moz-autofill {
   color: black !important;
 }
 
+/* Portal Cards White Background Fix */
+.portal-white-cards .bg-gray-50 {
+  background-color: white !important;
+}
+
+.portal-white-cards [data-radix-card],
+.portal-white-cards .card,
+.portal-white-cards [class*="card"] {
+  background-color: white !important;
+  border: 1px solid #d1d5db !important;
+  color: black !important;
+}
+
+.portal-white-cards input,
+.portal-white-cards textarea,
+.portal-white-cards select {
+  background-color: white !important;
+  color: black !important;
+  border-color: #d1d5db !important;
+}
+
+.portal-white-cards input:-webkit-autofill,
+.portal-white-cards input:-webkit-autofill:hover,
+.portal-white-cards input:-webkit-autofill:focus,
+.portal-white-cards input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px white inset !important;
+  -webkit-text-fill-color: black !important;
+  background-color: white !important;
+}
+
 /* Dialog content specific override */
 [data-radix-dialog-content] input:-webkit-autofill,
 [data-radix-dialog-content] input:-webkit-autofill:hover,
