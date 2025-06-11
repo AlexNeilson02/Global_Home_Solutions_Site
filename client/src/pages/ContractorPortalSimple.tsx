@@ -38,19 +38,44 @@ const ContractorPortalSimple: React.FC = () => {
 
   // Fetch contractor data
   const { data: contractor } = useQuery({
-    queryKey: ['/api/contractors', (user as User)?.id],
+    queryKey: ['/api/contractors/by-user', (user as User)?.id],
     enabled: !!(user as User)?.id,
   });
 
   const { data: projects } = useQuery({
-    queryKey: ['/api/projects'],
-    enabled: !!(user as User)?.id,
+    queryKey: ['/api/contractors', (contractor as any)?.id, 'projects'],
+    enabled: !!(contractor as any)?.id,
   });
 
   const { data: bidRequests } = useQuery({
-    queryKey: ['/api/contractors', (user as User)?.id, 'bid-requests'],
-    enabled: !!(user as User)?.id,
+    queryKey: ['/api/contractors', (contractor as any)?.id, 'bid-requests'],
+    enabled: !!(contractor as any)?.id,
   });
+
+  // Status update functionality for bid requests
+  const updateBidStatus = useMutation({
+    mutationFn: async ({ bidId, status }: { bidId: number; status: string }) => {
+      const response = await fetch(`/api/bid-requests/${bidId}/status`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ status })
+      });
+      if (!response.ok) throw new Error('Failed to update status');
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/contractors', (contractor as any)?.id, 'bid-requests'] });
+    }
+  });
+
+  const handleContactCustomer = (bidId: number) => {
+    updateBidStatus.mutate({ bidId, status: 'contacted' });
+  };
+
+  const handleBidSent = (bidId: number) => {
+    updateBidStatus.mutate({ bidId, status: 'bid_sent' });
+  };
 
   if (!user) {
     navigate("/login");
