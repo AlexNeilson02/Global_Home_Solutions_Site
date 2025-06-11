@@ -65,16 +65,16 @@ const SalesPortal: React.FC = () => {
   const conversionRate = analytics ? (analytics.conversions / analytics.totalVisits * 100).toFixed(1) : '0';
 
   return (
-    <div className="min-h-screen bg-gray-50
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-7xl mx-auto">
           {/* Header */}
           <div className="flex justify-between items-center mb-8">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
                 Sales Portal
               </h1>
-              <p className="text-gray-600 mt-1">
+              <p className="text-gray-600 dark:text-gray-300 mt-1">
                 Welcome back, {salesperson?.name || 'Sales Representative'}
               </p>
             </div>
@@ -214,7 +214,7 @@ const SalesPortal: React.FC = () => {
                   <CardDescription>Generate QR codes for easy customer access to your profile</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                  <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
                     <div>
                       <p className="font-medium">Your Profile QR Code</p>
                       <p className="text-sm text-gray-500">
@@ -229,13 +229,13 @@ const SalesPortal: React.FC = () => {
                   <div className="grid md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <label className="text-sm font-medium">Profile URL</label>
-                      <p className="text-sm text-gray-500 p-3 bg-gray-100 rounded">
+                      <p className="text-sm text-gray-500 p-3 bg-gray-100 dark:bg-gray-800 rounded">
                         {salesperson?.profileUrl || 'Not configured'}
                       </p>
                     </div>
                     <div className="space-y-2">
                       <label className="text-sm font-medium">NFC ID</label>
-                      <p className="text-sm text-gray-500 p-3 bg-gray-100 rounded">
+                      <p className="text-sm text-gray-500 p-3 bg-gray-100 dark:bg-gray-800 rounded">
                         {salesperson?.nfcId || 'Not configured'}
                       </p>
                     </div>
@@ -255,25 +255,25 @@ const SalesPortal: React.FC = () => {
                   <div className="grid md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <label className="text-sm font-medium">Name</label>
-                      <p className="p-3 bg-gray-100 rounded">
+                      <p className="p-3 bg-gray-100 dark:bg-gray-800 rounded">
                         {salesperson?.name || 'Not set'}
                       </p>
                     </div>
                     <div className="space-y-2">
                       <label className="text-sm font-medium">Bio</label>
-                      <p className="p-3 bg-gray-100 rounded">
+                      <p className="p-3 bg-gray-100 dark:bg-gray-800 rounded">
                         {salesperson?.bio || 'No bio available'}
                       </p>
                     </div>
                     <div className="space-y-2">
                       <label className="text-sm font-medium">Phone</label>
-                      <p className="p-3 bg-gray-100 rounded">
+                      <p className="p-3 bg-gray-100 dark:bg-gray-800 rounded">
                         {salesperson?.phone || 'Not set'}
                       </p>
                     </div>
                     <div className="space-y-2">
                       <label className="text-sm font-medium">Email</label>
-                      <p className="p-3 bg-gray-100 rounded">
+                      <p className="p-3 bg-gray-100 dark:bg-gray-800 rounded">
                         {salesperson?.email || 'Not set'}
                       </p>
                     </div>

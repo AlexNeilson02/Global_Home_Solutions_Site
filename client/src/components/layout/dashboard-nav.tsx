@@ -5,7 +5,7 @@ export function DashboardNav() {
   const [location] = useLocation();
 
   return (
-    <div className="fixed top-20 right-6 bg-white p-4 rounded-lg shadow-lg z-50 border border-border">
+    <div className="fixed top-20 right-6 bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg z-50 border border-border">
       <h3 className="text-sm font-semibold mb-2">Test Navigation</h3>
       <div className="flex flex-col space-y-2">
         <Link href="/sales-dashboard">

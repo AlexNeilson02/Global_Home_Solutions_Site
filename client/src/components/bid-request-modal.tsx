@@ -230,7 +230,7 @@ export function BidRequestModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto dialog-white-bg">
+      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Request a Bid from {contractorName}</DialogTitle>
           <DialogDescription>

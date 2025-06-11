@@ -198,14 +198,14 @@ export default function AdminPortalEnhanced() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <div className="p-6">
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 Dashboard</h1>
-              <p className="text-gray-600 mt-2">
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Admin Dashboard</h1>
+              <p className="text-gray-600 dark:text-gray-300 mt-2">
                 Comprehensive management portal for sales representatives and contractors
               </p>
             </div>
@@ -226,8 +226,8 @@ export default function AdminPortalEnhanced() {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600 Reps</p>
-                  <p className="text-2xl font-bold text-gray-900
+                  <p className="text-sm font-medium text-gray-600 dark:text-gray-300">Sales Reps</p>
+                  <p className="text-2xl font-bold text-gray-900 dark:text-white">{stats.totalSalespersons}</p>
                   <p className="text-xs text-green-600">{stats.activeSalespersons} active</p>
                 </div>
                 <Users className="h-8 w-8 text-blue-600" />
@@ -239,8 +239,8 @@ export default function AdminPortalEnhanced() {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600
-                  <p className="text-2xl font-bold text-gray-900
+                  <p className="text-sm font-medium text-gray-600 dark:text-gray-300">Contractors</p>
+                  <p className="text-2xl font-bold text-gray-900 dark:text-white">{stats.totalContractors}</p>
                   <p className="text-xs text-green-600">{stats.activeContractors} verified</p>
                 </div>
                 <Building2 className="h-8 w-8 text-green-600" />
@@ -252,8 +252,8 @@ export default function AdminPortalEnhanced() {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600 Projects</p>
-                  <p className="text-2xl font-bold text-gray-900
+                  <p className="text-sm font-medium text-gray-600 dark:text-gray-300">Total Projects</p>
+                  <p className="text-2xl font-bold text-gray-900 dark:text-white">{stats.totalProjects}</p>
                   <p className="text-xs text-blue-600">Active projects</p>
                 </div>
                 <FileText className="h-8 w-8 text-purple-600" />
@@ -265,8 +265,8 @@ export default function AdminPortalEnhanced() {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600 Requests</p>
-                  <p className="text-2xl font-bold text-gray-900
+                  <p className="text-sm font-medium text-gray-600 dark:text-gray-300">Bid Requests</p>
+                  <p className="text-2xl font-bold text-gray-900 dark:text-white">{stats.totalBidRequests}</p>
                   <p className="text-xs text-orange-600">{stats.pendingBidRequests} pending</p>
                 </div>
                 <Target className="h-8 w-8 text-orange-600" />
@@ -418,7 +418,7 @@ export default function AdminPortalEnhanced() {
                       <div className="flex justify-between items-start mb-3">
                         <div className="flex-1">
                           <h4 className="font-semibold">{salesperson.fullName || 'Sales Rep'}</h4>
-                          <p className="text-sm text-gray-600
+                          <p className="text-sm text-gray-600 dark:text-gray-300">
                             Profile: {salesperson.profileUrl}
                           </p>
                           <div className="grid grid-cols-3 gap-4 mt-3">
@@ -471,7 +471,7 @@ export default function AdminPortalEnhanced() {
                       <div className="flex justify-between items-start mb-3">
                         <div className="flex-1">
                           <h4 className="font-semibold">{contractor.companyName}</h4>
-                          <p className="text-sm text-gray-600
+                          <p className="text-sm text-gray-600 dark:text-gray-300">{contractor.description}</p>
                           <div className="flex items-center gap-4 mt-2 text-sm text-gray-500">
                             <span>Rate: ${contractor.hourlyRate || 0}/hr</span>
                             <span>Specialties: {contractor.specialties?.length || 0}</span>

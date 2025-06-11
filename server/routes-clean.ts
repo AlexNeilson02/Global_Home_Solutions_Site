@@ -131,21 +131,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get contractor by user ID
-  apiRouter.get("/contractors/by-user/:userId", isAuthenticated, async (req: Request, res: Response) => {
-    try {
-      const userId = parseInt(req.params.userId);
-      const contractor = await storage.getContractorByUserId(userId);
-      if (!contractor) {
-        return res.status(404).json({ message: "Contractor not found" });
-      }
-      res.json({ contractor });
-    } catch (error) {
-      console.error("Error fetching contractor by user:", error);
-      res.status(500).json({ message: "Failed to fetch contractor" });
-    }
-  });
-
   apiRouter.get("/contractors/:id", async (req: Request, res: Response) => {
     try {
       const contractorId = parseInt(req.params.id);
@@ -204,21 +189,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching salespersons:", error);
       res.status(500).json({ message: "Failed to fetch salespersons" });
-    }
-  });
-
-  // Get salesperson by user ID
-  apiRouter.get("/salespersons/by-user/:userId", isAuthenticated, async (req: Request, res: Response) => {
-    try {
-      const userId = parseInt(req.params.userId);
-      const salesperson = await storage.getSalespersonByUserId(userId);
-      if (!salesperson) {
-        return res.status(404).json({ message: "Salesperson not found" });
-      }
-      res.json({ salesperson });
-    } catch (error) {
-      console.error("Error fetching salesperson by user:", error);
-      res.status(500).json({ message: "Failed to fetch salesperson" });
     }
   });
 
@@ -478,24 +448,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error creating bid request:", error);
       res.status(500).json({ message: "Internal server error" });
-    }
-  });
-
-  // Get bid requests for a specific salesperson by user ID
-  apiRouter.get("/bid-requests/sales/:userId", isAuthenticated, async (req: Request, res: Response) => {
-    try {
-      const userId = parseInt(req.params.userId);
-      const salesperson = await storage.getSalespersonByUserId(userId);
-      
-      if (!salesperson) {
-        return res.status(404).json({ message: "Salesperson not found" });
-      }
-      
-      const bidRequests = await storage.getBidRequestsBySalespersonId(salesperson.id);
-      res.json({ bidRequests });
-    } catch (error) {
-      console.error("Error fetching salesperson bid requests:", error);
-      res.status(500).json({ message: "Failed to fetch bid requests" });
     }
   });
 

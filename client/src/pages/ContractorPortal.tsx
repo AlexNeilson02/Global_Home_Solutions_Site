@@ -454,16 +454,16 @@ const ContractorPortal: React.FC = () => {
   const activeProjects = Array.isArray(projects) ? projects.filter((p: any) => p.status === 'in_progress')?.length || 0 : 0;
 
   return (
-    <div className="min-h-screen bg-gray-50
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-7xl mx-auto">
           {/* Header */}
           <div className="flex justify-between items-center mb-8">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
                 Contractor Portal
               </h1>
-              <p className="text-gray-600 mt-1">
+              <p className="text-gray-600 dark:text-gray-300 mt-1">
                 Welcome back, {contractor?.companyName || 'Contractor'}
               </p>
             </div>
@@ -660,7 +660,7 @@ const ContractorPortal: React.FC = () => {
                       bidRequests
                         .filter((request: any) => request.status === 'pending' || request.status === 'contacted')
                         .map((request: any) => (
-                        <div key={request.id} className="flex items-center justify-between p-4 border rounded-lg bg-white
+                        <div key={request.id} className="flex items-center justify-between p-4 border rounded-lg bg-white dark:bg-gray-800">
                           <div className="space-y-2 flex-1">
                             <div className="flex items-center gap-2">
                               <h4 className="font-medium text-lg">{request.fullName}</h4>
@@ -961,25 +961,25 @@ const ContractorPortal: React.FC = () => {
                       <div className="grid md:grid-cols-2 gap-4">
                         <div className="space-y-2">
                           <label className="text-sm font-medium">Company Name</label>
-                          <p className="p-3 bg-gray-100 rounded">
+                          <p className="p-3 bg-gray-100 dark:bg-gray-800 rounded">
                             {contractor?.companyName || 'Not set'}
                           </p>
                         </div>
                         <div className="space-y-2">
                           <label className="text-sm font-medium">License Number</label>
-                          <p className="p-3 bg-gray-100 rounded">
+                          <p className="p-3 bg-gray-100 dark:bg-gray-800 rounded">
                             {contractor?.licenseNumber || 'Not set'}
                           </p>
                         </div>
                         <div className="space-y-2">
                           <label className="text-sm font-medium">Phone</label>
-                          <p className="p-3 bg-gray-100 rounded">
+                          <p className="p-3 bg-gray-100 dark:bg-gray-800 rounded">
                             {contractor?.phone || 'Not set'}
                           </p>
                         </div>
                         <div className="space-y-2">
                           <label className="text-sm font-medium">Email</label>
-                          <p className="p-3 bg-gray-100 rounded">
+                          <p className="p-3 bg-gray-100 dark:bg-gray-800 rounded">
                             {contractor?.email || 'Not set'}
                           </p>
                         </div>
@@ -987,7 +987,7 @@ const ContractorPortal: React.FC = () => {
                       {contractor?.description && (
                         <div className="space-y-2">
                           <label className="text-sm font-medium">Company Description</label>
-                          <p className="p-3 bg-gray-100 rounded">
+                          <p className="p-3 bg-gray-100 dark:bg-gray-800 rounded">
                             {contractor.description}
                           </p>
                         </div>

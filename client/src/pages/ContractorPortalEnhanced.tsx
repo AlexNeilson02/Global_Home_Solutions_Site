@@ -445,16 +445,16 @@ const ContractorPortalEnhanced: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-7xl mx-auto">
           {/* Header */}
           <div className="flex justify-between items-center mb-8">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
                 Contractor Portal
               </h1>
-              <p className="text-gray-600 mt-1">
+              <p className="text-gray-600 dark:text-gray-300 mt-1">
                 Welcome back, {contractor?.companyName || 'Contractor'}
               </p>
             </div>
@@ -593,7 +593,7 @@ const ContractorPortalEnhanced: React.FC = () => {
                     <div className="space-y-6">
                       {/* Company Logo and Basic Info */}
                       <div className="flex items-start space-x-6">
-                        <div className="w-32 h-32 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden">
+                        <div className="w-32 h-32 bg-gray-100 dark:bg-gray-800 rounded-lg flex items-center justify-center overflow-hidden">
                           {contractor?.logoUrl ? (
                             <img src={contractor.logoUrl} alt="Company Logo" className="w-full h-full object-cover" />
                           ) : (
@@ -602,7 +602,7 @@ const ContractorPortalEnhanced: React.FC = () => {
                         </div>
                         <div className="flex-1">
                           <h3 className="text-xl font-semibold">{contractor?.companyName || 'Company Name'}</h3>
-                          <p className="text-gray-600 mt-2">{contractor?.description || 'No description available'}</p>
+                          <p className="text-gray-600 dark:text-gray-300 mt-2">{contractor?.description || 'No description available'}</p>
                           <div className="flex items-center space-x-4 mt-4">
                             <div className="flex items-center">
                               <Phone className="h-4 w-4 mr-2 text-gray-400" />
@@ -647,7 +647,7 @@ const ContractorPortalEnhanced: React.FC = () => {
                         <h4 className="font-medium mb-3">Portfolio Media</h4>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                           {contractor?.mediaFiles?.map((media: any, index: number) => (
-                            <div key={index} className="relative group rounded-lg overflow-hidden bg-gray-100 aspect-square">
+                            <div key={index} className="relative group rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800 aspect-square">
                               {media.type === 'image' ? (
                                 <img src={media.url} alt={media.name} className="w-full h-full object-cover" />
                               ) : (
@@ -668,7 +668,7 @@ const ContractorPortalEnhanced: React.FC = () => {
                       <div>
                         <label className="block text-sm font-medium mb-2">Company Logo</label>
                         <div className="flex items-start space-x-4">
-                          <div className="w-32 h-32 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden border-2 border-dashed border-gray-300">
+                          <div className="w-32 h-32 bg-gray-100 dark:bg-gray-800 rounded-lg flex items-center justify-center overflow-hidden border-2 border-dashed border-gray-300 dark:border-gray-600">
                             {logoPreview ? (
                               <img src={logoPreview} alt="Logo Preview" className="w-full h-full object-cover" />
                             ) : (
@@ -804,7 +804,7 @@ const ContractorPortalEnhanced: React.FC = () => {
                         <label className="block text-sm font-medium mb-2">Portfolio Media</label>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
                           {mediaFiles.map((media, index) => (
-                            <div key={index} className="relative group rounded-lg overflow-hidden bg-gray-100 aspect-square">
+                            <div key={index} className="relative group rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800 aspect-square">
                               {media.type === 'image' ? (
                                 <img src={media.url} alt={media.name} className="w-full h-full object-cover" />
                               ) : (
@@ -823,7 +823,7 @@ const ContractorPortalEnhanced: React.FC = () => {
                             </div>
                           ))}
                           <div 
-                            className="border-2 border-dashed border-gray-300 rounded-lg aspect-square flex items-center justify-center cursor-pointer hover:border-gray-400
+                            className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg aspect-square flex items-center justify-center cursor-pointer hover:border-gray-400 dark:hover:border-gray-500"
                             onClick={() => mediaInputRef.current?.click()}
                           >
                             <div className="text-center">
@@ -875,7 +875,7 @@ const ContractorPortalEnhanced: React.FC = () => {
                   <div className="space-y-4">
                     {bidRequests.filter((bid: any) => bid.status === 'bid_sent' || bid.status === 'won' || bid.status === 'lost').length > 0 ? (
                       bidRequests.filter((bid: any) => bid.status === 'bid_sent' || bid.status === 'won' || bid.status === 'lost').map((project: any) => (
-                        <div key={project.id} className="border rounded-lg p-4 bg-white
+                        <div key={project.id} className="border rounded-lg p-4 bg-white dark:bg-gray-800">
                           <div className="flex justify-between items-start mb-3">
                             <div className="flex-1">
                               <div className="flex items-center gap-2 mb-2">
@@ -909,10 +909,10 @@ const ContractorPortalEnhanced: React.FC = () => {
                             </div>
                           </div>
                           
-                          <div className="mb-4 p-3 bg-gray-50 rounded">
+                          <div className="mb-4 p-3 bg-gray-50 dark:bg-gray-700 rounded">
                             <p className="text-sm"><span className="font-medium">Project Description:</span></p>
                             <p className="text-sm mt-1">{project.description}</p>
-                            <div className="flex gap-4 mt-2 text-xs text-gray-600
+                            <div className="flex gap-4 mt-2 text-xs text-gray-600 dark:text-gray-300">
                               <span><strong>Timeline:</strong> {project.timeline}</span>
                               {project.budget && <span><strong>Budget:</strong> ${project.budget}</span>}
                               <span><strong>Bid Sent:</strong> {new Date(project.createdAt).toLocaleDateString()}</span>
@@ -987,7 +987,7 @@ const ContractorPortalEnhanced: React.FC = () => {
                   <div className="space-y-4">
                     {bidRequests.length > 0 ? (
                       bidRequests.filter((bid: any) => bid.status === 'pending' || bid.status === 'contacted').map((bid: any) => (
-                        <div key={bid.id} className="border rounded-lg p-4 bg-white
+                        <div key={bid.id} className="border rounded-lg p-4 bg-white dark:bg-gray-800">
                           <div className="flex justify-between items-start mb-3">
                             <div className="flex-1">
                               <div className="flex items-center gap-2 mb-2">
@@ -1020,10 +1020,10 @@ const ContractorPortalEnhanced: React.FC = () => {
                             </div>
                           </div>
                           
-                          <div className="mb-4 p-3 bg-gray-50 rounded">
+                          <div className="mb-4 p-3 bg-gray-50 dark:bg-gray-700 rounded">
                             <p className="text-sm"><span className="font-medium">Project Description:</span></p>
                             <p className="text-sm mt-1">{bid.description}</p>
-                            <div className="flex gap-4 mt-2 text-xs text-gray-600
+                            <div className="flex gap-4 mt-2 text-xs text-gray-600 dark:text-gray-300">
                               <span><strong>Timeline:</strong> {bid.timeline}</span>
                               {bid.budget && <span><strong>Budget:</strong> ${bid.budget}</span>}
                               <span><strong>Submitted:</strong> {new Date(bid.createdAt).toLocaleDateString()}</span>
@@ -1186,7 +1186,7 @@ const ContractorPortalEnhanced: React.FC = () => {
       {/* Bid Details Modal */}
       {viewingBidDetails && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+          <div className="bg-white dark:bg-gray-800 rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center p-6 border-b">
               <h3 className="text-xl font-semibold">Bid Request Details</h3>
               <Button
@@ -1272,7 +1272,7 @@ const ContractorPortalEnhanced: React.FC = () => {
               {/* Project Description */}
               <div className="space-y-3">
                 <h4 className="font-semibold text-lg border-b pb-2">Project Description</h4>
-                <p className="text-gray-700 leading-relaxed">
+                <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
                   {viewingBidDetails.description}
                 </p>
               </div>
@@ -1298,7 +1298,7 @@ const ContractorPortalEnhanced: React.FC = () => {
                 {viewingBidDetails.notes && (
                   <div className="space-y-3">
                     <h4 className="font-semibold border-b pb-2">Notes</h4>
-                    <p className="text-sm text-gray-600
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
                       {viewingBidDetails.notes}
                     </p>
                   </div>
@@ -1309,7 +1309,7 @@ const ContractorPortalEnhanced: React.FC = () => {
               {viewingBidDetails.additionalInformation && (
                 <div className="space-y-3">
                   <h4 className="font-semibold border-b pb-2">Additional Information</h4>
-                  <div className="bg-gray-50 p-3 rounded">
+                  <div className="bg-gray-50 dark:bg-gray-700 p-3 rounded">
                     <p className="text-sm">{viewingBidDetails.additionalInformation}</p>
                   </div>
                 </div>

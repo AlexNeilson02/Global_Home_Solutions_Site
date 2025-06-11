@@ -90,7 +90,7 @@ export default function Home() {
       </div>
       
       {/* How It Works Section */}
-      <div className="bg-white py-16">
+      <div className="bg-white dark:bg-card py-16">
         <div className="container-custom">
           <h2 className="text-2xl md:text-3xl font-semibold text-center mb-12">How Global Home Solutions Works</h2>
           
@@ -213,7 +213,7 @@ export default function Home() {
       </div>
       
       {/* Recently Completed Projects Section */}
-      <div className="py-16 bg-white
+      <div className="py-16 bg-white dark:bg-card">
         <div className="container-custom">
           <h2 className="text-2xl md:text-3xl font-semibold text-center mb-12">Recently Completed Projects</h2>
           
@@ -249,7 +249,7 @@ export default function Home() {
       </div>
       
       {/* Testimonials Section */}
-      <div className="py-16 bg-primary-50
+      <div className="py-16 bg-primary-50 dark:bg-primary-950">
         <div className="container-custom">
           <h2 className="text-2xl md:text-3xl font-semibold text-center mb-12">What Our Customers Say</h2>
           

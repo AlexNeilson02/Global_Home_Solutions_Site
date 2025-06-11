@@ -213,10 +213,10 @@ const RealTimeChat: React.FC<RealTimeChatProps> = ({
   const activeConv = conversations.find(c => c.id === activeConversation);
 
   return (
-    <div className="flex h-96 bg-white border rounded-lg overflow-hidden">
+    <div className="flex h-96 bg-white dark:bg-gray-800 border rounded-lg overflow-hidden">
       {/* Conversations List */}
-      <div className="w-1/3 border-r border-gray-200
-        <div className="p-4 border-b border-gray-200
+      <div className="w-1/3 border-r border-gray-200 dark:border-gray-700">
+        <div className="p-4 border-b border-gray-200 dark:border-gray-700">
           <h3 className="font-semibold flex items-center gap-2">
             <MessageCircle className="h-4 w-4" />
             Messages
@@ -226,8 +226,8 @@ const RealTimeChat: React.FC<RealTimeChatProps> = ({
           {conversations.map((conversation) => (
             <div
               key={conversation.id}
-              className={`p-3 border-b border-gray-100 cursor-pointer hover:bg-gray-50 ${
-                activeConversation === conversation.id ? 'bg-blue-50 : ''
+              className={`p-3 border-b border-gray-100 dark:border-gray-600 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 ${
+                activeConversation === conversation.id ? 'bg-blue-50 dark:bg-blue-900/20' : ''
               }`}
               onClick={() => setActiveConversation(conversation.id)}
             >
@@ -254,7 +254,7 @@ const RealTimeChat: React.FC<RealTimeChatProps> = ({
                     )}
                   </div>
                   {conversation.lastMessage && (
-                    <p className="text-xs text-gray-600 truncate">
+                    <p className="text-xs text-gray-600 dark:text-gray-400 truncate">
                       {conversation.lastMessage.content}
                     </p>
                   )}
@@ -280,7 +280,7 @@ const RealTimeChat: React.FC<RealTimeChatProps> = ({
         {activeConv ? (
           <>
             {/* Chat Header */}
-            <div className="p-4 border-b border-gray-200 flex items-center justify-between">
+            <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <Avatar className="h-8 w-8">
                   <AvatarFallback className="text-xs">
@@ -332,7 +332,7 @@ const RealTimeChat: React.FC<RealTimeChatProps> = ({
                     className={`max-w-xs lg:max-w-md px-3 py-2 rounded-lg ${
                       message.senderId === currentUserId
                         ? 'bg-blue-600 text-white'
-                        : 'bg-gray-100
+                        : 'bg-gray-100 dark:bg-gray-700'
                     }`}
                   >
                     <p className="text-sm">{message.content}</p>
@@ -357,7 +357,7 @@ const RealTimeChat: React.FC<RealTimeChatProps> = ({
             </div>
 
             {/* Message Input */}
-            <div className="p-4 border-t border-gray-200
+            <div className="p-4 border-t border-gray-200 dark:border-gray-700">
               <div className="flex items-center gap-2">
                 <Button variant="ghost" size="sm">
                   <Paperclip className="h-4 w-4" />
@@ -382,7 +382,7 @@ const RealTimeChat: React.FC<RealTimeChatProps> = ({
           <div className="flex-1 flex items-center justify-center">
             <div className="text-center">
               <MessageCircle className="h-12 w-12 text-gray-400 mx-auto mb-3" />
-              <h3 className="font-medium text-gray-900
+              <h3 className="font-medium text-gray-900 dark:text-gray-100">
                 Select a conversation
               </h3>
               <p className="text-sm text-gray-500 mt-1">

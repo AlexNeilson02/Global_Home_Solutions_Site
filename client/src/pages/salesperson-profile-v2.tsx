@@ -212,7 +212,7 @@ export default function SalespersonProfileV2() {
                     
                     <div className="flex items-center mt-2">
                       <NfcBadge size="sm" className="mr-2" />
-                      <Badge variant="secondary" className="bg-green-100 text-green-800
+                      <Badge variant="secondary" className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100">
                         Verified
                       </Badge>
                     </div>
@@ -307,7 +307,7 @@ export default function SalespersonProfileV2() {
                                 
                                 <div className="mt-3 flex flex-wrap gap-2">
                                   {contractor.specialties?.map((specialty, i) => (
-                                    <Badge key={i} variant="outline" className="bg-blue-50 text-blue-800
+                                    <Badge key={i} variant="outline" className="bg-blue-50 text-blue-800 dark:bg-blue-900 dark:text-blue-100">
                                       {specialty}
                                     </Badge>
                                   ))}
