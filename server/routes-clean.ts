@@ -131,6 +131,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get contractor by user ID
+  apiRouter.get("/contractors/by-user/:userId", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const userId = parseInt(req.params.userId);
+      const contractor = await storage.getContractorByUserId(userId);
+      if (!contractor) {
+        return res.status(404).json({ message: "Contractor not found" });
+      }
+      res.json({ contractor });
+    } catch (error) {
+      console.error("Error fetching contractor by user:", error);
+      res.status(500).json({ message: "Failed to fetch contractor" });
+    }
+  });
+
   apiRouter.get("/contractors/:id", async (req: Request, res: Response) => {
     try {
       const contractorId = parseInt(req.params.id);

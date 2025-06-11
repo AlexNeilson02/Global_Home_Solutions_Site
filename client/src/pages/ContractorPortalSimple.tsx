@@ -173,13 +173,23 @@ const ContractorPortalSimple: React.FC = () => {
                             <p className="text-xs text-gray-500">{new Date(bid.createdAt).toLocaleDateString()}</p>
                           </div>
                           <div className="flex gap-2">
-                            <Button size="sm" variant="outline">
+                            <Button 
+                              size="sm" 
+                              variant="outline"
+                              onClick={() => handleContactCustomer(bid.id)}
+                              disabled={updateBidStatus.isPending || bid.status === 'contacted' || bid.status === 'bid_sent'}
+                            >
                               <Phone className="h-4 w-4 mr-2" />
-                              Contact
+                              {bid.status === 'contacted' ? 'Contacted' : 'Contact'}
                             </Button>
-                            <Button size="sm" variant="outline">
+                            <Button 
+                              size="sm" 
+                              variant="outline"
+                              onClick={() => handleBidSent(bid.id)}
+                              disabled={updateBidStatus.isPending || bid.status === 'bid_sent'}
+                            >
                               <Mail className="h-4 w-4 mr-2" />
-                              Send Bid
+                              {bid.status === 'bid_sent' ? 'Bid Sent' : 'Send Bid'}
                             </Button>
                           </div>
                         </div>
@@ -276,8 +286,21 @@ const ContractorPortalSimple: React.FC = () => {
                             )}
                           </div>
                           <div className="flex flex-col gap-2">
-                            <Button size="sm">Submit Bid</Button>
-                            <Button size="sm" variant="outline">Contact Customer</Button>
+                            <Button 
+                              size="sm"
+                              onClick={() => handleBidSent(bid.id)}
+                              disabled={updateBidStatus.isPending || bid.status === 'bid_sent'}
+                            >
+                              {bid.status === 'bid_sent' ? 'Bid Submitted' : 'Submit Bid'}
+                            </Button>
+                            <Button 
+                              size="sm" 
+                              variant="outline"
+                              onClick={() => handleContactCustomer(bid.id)}
+                              disabled={updateBidStatus.isPending || bid.status === 'contacted' || bid.status === 'bid_sent'}
+                            >
+                              {bid.status === 'contacted' ? 'Customer Contacted' : 'Contact Customer'}
+                            </Button>
                           </div>
                         </div>
                       ))
