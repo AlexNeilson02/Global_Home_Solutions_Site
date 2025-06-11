@@ -359,7 +359,12 @@ export class DatabaseStorage implements IStorage {
   }
   
   async getBidRequestsBySalespersonId(salespersonId: number): Promise<BidRequest[]> {
-    return db.select().from(bidRequests).where(eq(bidRequests.salespersonId, salespersonId));
+    return db.select().from(bidRequests)
+      .where(and(
+        eq(bidRequests.salespersonId, salespersonId),
+        ne(bidRequests.status, 'deleted')
+      ))
+      .orderBy(desc(bidRequests.createdAt));
   }
   
   async getRecentBidRequests(limit: number): Promise<BidRequest[]> {

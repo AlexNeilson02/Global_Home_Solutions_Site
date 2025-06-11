@@ -369,8 +369,8 @@ const SalesPortalEnhanced: React.FC = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    {recentBidRequests.length > 0 ? (
-                      recentBidRequests.slice(0, 5).map((bid: any) => (
+                    {bidRequests.length > 0 ? (
+                      bidRequests.slice(0, 5).map((bid: any) => (
                         <div key={bid.id} className="flex items-center justify-between p-3 border rounded-lg">
                           <div>
                             <h4 className="font-medium">{bid.fullName}</h4>
