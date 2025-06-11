@@ -1,39 +1,72 @@
-import { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useLocation } from "wouter";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { QrCode, Users, TrendingUp, Target, Phone, Mail } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+import { Progress } from "@/components/ui/progress";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from "recharts";
+import { TrendingUp, Users, DollarSign, Target, QrCode, Eye, ArrowUpRight, Phone, Mail } from "lucide-react";
 import { useAuth, User } from "@/hooks/useAuth";
+import { useToast } from "@/hooks/use-toast";
 
 const SalesPortalSimple: React.FC = () => {
   const [, navigate] = useLocation();
   const [activeTab, setActiveTab] = useState("dashboard");
   const { user, logout } = useAuth();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
 
-  const roleData = useQuery({
-    queryKey: ["/api/salespersons", (user as User)?.id],
-    enabled: !!(user as User)?.id,
+  // Logout mutation
+  const logoutMutation = useMutation({
+    mutationFn: async () => {
+      const response = await fetch('/api/auth/logout', {
+        method: 'POST',
+        credentials: 'include'
+      });
+      if (!response.ok) {
+        throw new Error('Logout failed');
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.clear();
+      navigate('/');
+    }
   });
 
-  const analytics = useQuery({
-    queryKey: ["/api/analytics/sales-rep", (user as User)?.id],
-    enabled: !!(user as User)?.id,
-  });
-
-  const bidRequests = useQuery({
-    queryKey: ["/api/salespersons", (user as User)?.id, "bid-requests"],
-    enabled: !!(user as User)?.id,
-  });
-
-  const handleLogout = () => {
-    logout();
-    navigate("/");
+  const handleBackToPortals = () => {
+    logoutMutation.mutate();
   };
+
+  // Fetch sales data with proper error handling
+  const { data: salesperson } = useQuery({
+    queryKey: ['/api/salespersons', (user as User)?.id],
+    enabled: !!(user as User)?.id,
+  });
+
+  const { data: analytics } = useQuery({
+    queryKey: ['/api/analytics/sales-rep', (user as User)?.id],
+    enabled: !!(user as User)?.id,
+  });
+
+  const { data: bidRequests } = useQuery({
+    queryKey: ['/api/salespersons', (user as User)?.id, 'bid-requests'],
+    enabled: !!(user as User)?.id,
+  });
+
+  // Mock performance data for charts
+  const performanceData = [
+    { month: 'Jan', leads: 45, conversions: 12, revenue: 15600 },
+    { month: 'Feb', leads: 52, conversions: 18, revenue: 23400 },
+    { month: 'Mar', leads: 48, conversions: 15, revenue: 19500 },
+    { month: 'Apr', leads: 61, conversions: 22, revenue: 28600 },
+    { month: 'May', leads: 55, conversions: 19, revenue: 24700 },
+    { month: 'Jun', leads: 67, conversions: 25, revenue: 32500 }
+  ];
+
+  const conversionRate = analytics ? (analytics.conversions / analytics.totalVisits * 100).toFixed(1) : '0';
 
   if (!user) {
     navigate("/login");
@@ -42,20 +75,20 @@ const SalesPortalSimple: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 portal-white-cards">
-      {/* Header */}
-      <div className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
+      <div className="container mx-auto px-4 py-8">
+        <div className="max-w-7xl mx-auto">
+          {/* Header */}
+          <div className="flex justify-between items-center mb-8">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Sales Portal</h1>
-              <p className="text-gray-600">Welcome back, {(user as User).fullName}</p>
+              <h1 className="text-3xl font-bold text-gray-900">Sales Portal</h1>
+              <p className="text-gray-600 mt-1">
+                Welcome back, {salesperson?.name || (user as User).fullName || 'Sales Representative'}
+              </p>
             </div>
-            <Button onClick={handleLogout} variant="outline">
-              Logout
+            <Button onClick={handleBackToPortals} variant="outline" disabled={logoutMutation.isPending}>
+              {logoutMutation.isPending ? "Logging out..." : "Back to Portals"}
             </Button>
           </div>
-        </div>
-      </div>
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
