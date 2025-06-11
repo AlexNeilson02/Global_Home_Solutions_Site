@@ -43,7 +43,7 @@ const HomePage: React.FC = () => {
             Find the right contractor for your project
           </h2>
           
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 max-w-6xl mx-auto px-4 sm:px-0">
             <div className="bg-white rounded-lg shadow-lg overflow-hidden">
               <div className="aspect-video bg-gray-200 relative">
                 <div className="absolute top-4 right-4">
