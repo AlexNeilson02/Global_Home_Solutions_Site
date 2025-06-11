@@ -24,12 +24,12 @@ html, body {
   background: #ffffff;
 }
 
+/* Import consistent colors */
+@import './styles/consistent-colors.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-/* Import consistent colors */
-@import './styles/consistent-colors.css';
 
 :root {
   /* Consistent Color System - No responsive or dark mode variants */
@@ -461,38 +461,7 @@ html, body {
     animation: apple-fade-in 0.5s cubic-bezier(0.4, 0.0, 0.2, 1);
   }
 
-  /* Fix browser autocomplete yellow backgrounds globally */
-  input:-webkit-autofill,
-  input:-webkit-autofill:hover,
-  input:-webkit-autofill:focus,
-  input:-webkit-autofill:active,
-  textarea:-webkit-autofill,
-  textarea:-webkit-autofill:hover,
-  textarea:-webkit-autofill:focus,
-  textarea:-webkit-autofill:active,
-  select:-webkit-autofill,
-  select:-webkit-autofill:hover,
-  select:-webkit-autofill:focus,
-  select:-webkit-autofill:active {
-    -webkit-box-shadow: 0 0 0 1000px white inset !important;
-    -webkit-text-fill-color: black !important;
-    background-color: white !important;
-    border-color: #d1d5db !important;
-    transition: background-color 5000s ease-in-out 0s;
-  }
 
-  /* Firefox autocomplete styling */
-  input:-moz-autofill,
-  textarea:-moz-autofill {
-    background-color: white !important;
-    color: black !important;
-  }
-
-  /* Additional browser autocomplete prevention */
-  input[autocomplete]:not([autocomplete=""]) {
-    background-color: white !important;
-    color: black !important;
-  }
 
   /* Minimal mobile fixes - only target yellow form styling */  
   @media (max-width: 768px) {
@@ -512,4 +481,41 @@ html, body {
       border-color: #d1d5db !important;
     }
   }
+}
+
+/* ABSOLUTE PRIORITY: Fix browser autocomplete yellow backgrounds - must override everything */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active,
+textarea:-webkit-autofill,
+textarea:-webkit-autofill:hover,
+textarea:-webkit-autofill:focus,
+textarea:-webkit-autofill:active,
+select:-webkit-autofill,
+select:-webkit-autofill:hover,
+select:-webkit-autofill:focus,
+select:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px white inset !important;
+  -webkit-text-fill-color: black !important;
+  background-color: white !important;
+  border-color: #d1d5db !important;
+  transition: background-color 5000s ease-in-out 0s !important;
+}
+
+/* Firefox and other browsers */
+input:-moz-autofill,
+textarea:-moz-autofill {
+  background-color: white !important;
+  color: black !important;
+}
+
+/* Dialog content specific override */
+[data-radix-dialog-content] input:-webkit-autofill,
+[data-radix-dialog-content] input:-webkit-autofill:hover,
+[data-radix-dialog-content] input:-webkit-autofill:focus,
+[data-radix-dialog-content] input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px white inset !important;
+  -webkit-text-fill-color: black !important;
+  background-color: white !important;
 }
