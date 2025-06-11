@@ -587,6 +587,28 @@ textarea:-moz-autofill {
   background-color: white !important;
 }
 
+/* Remove yellow outline from header and all elements */
+.portal-white-cards *,
+.portal-white-cards *:focus,
+.portal-white-cards *:active,
+.portal-white-cards *:hover {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.portal-white-cards .bg-white {
+  background-color: white !important;
+  border-color: #d1d5db !important;
+}
+
+.portal-white-cards .shadow-sm {
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
+}
+
+.portal-white-cards .border-b {
+  border-bottom: 1px solid #d1d5db !important;
+}
+
 /* Dialog content specific override */
 [data-radix-dialog-content] input:-webkit-autofill,
 [data-radix-dialog-content] input:-webkit-autofill:hover,
