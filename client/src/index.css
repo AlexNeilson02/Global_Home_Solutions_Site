@@ -174,6 +174,9 @@ html, body {
     color: black !important;
     border: 2px solid #d1d5db !important;
     outline: none !important;
+    -webkit-appearance: none !important;
+    appearance: none !important;
+    box-shadow: none !important;
   }
   
   input[type="text"]:focus,
@@ -186,6 +189,9 @@ html, body {
   select:focus {
     border-color: #3b82f6 !important;
     box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1) !important;
+    outline: none !important;
+    -webkit-appearance: none !important;
+    appearance: none !important;
   }
   
   /* Enhanced placeholder visibility with grey color */
@@ -477,9 +483,8 @@ html, body {
     color: inherit !important;
   }
   
-  /* Portal Login Forms - Force white backgrounds */
+  /* Portal Login Forms - Only target the login modal forms */
   .login-portal,
-  .portal-access,
   [data-component="login-form"],
   .auth-form {
     background-color: white !important;
@@ -487,28 +492,8 @@ html, body {
   }
   
   .login-portal *,
-  .portal-access *,
   [data-component="login-form"] *,
   .auth-form * {
-    background-color: inherit !important;
-    color: inherit !important;
-  }
-  
-  /* Portal Cards and Internal Forms */
-  .portal-card,
-  .contractor-portal,
-  .sales-portal,
-  .admin-portal,
-  [data-component="portal-card"] {
-    background-color: white !important;
-    color: black !important;
-  }
-  
-  .portal-card *,
-  .contractor-portal *,
-  .sales-portal *,
-  .admin-portal *,
-  [data-component="portal-card"] * {
     background-color: inherit !important;
     color: inherit !important;
   }
