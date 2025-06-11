@@ -482,6 +482,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get bid requests for a specific salesperson
+  apiRouter.get("/salespersons/:id/bid-requests", async (req: Request, res: Response) => {
+    try {
+      const salespersonId = Number(req.params.id);
+      console.log("Fetching bid requests for salesperson:", salespersonId);
+      
+      const bidRequests = await storage.getBidRequestsBySalespersonId(salespersonId);
+      console.log("Found bid requests for salesperson", salespersonId, ":", bidRequests.length);
+      
+      res.status(200).json({ 
+        success: true,
+        bidRequests: bidRequests,
+        count: bidRequests.length 
+      });
+    } catch (error) {
+      console.error("Error fetching salesperson bid requests:", error);
+      res.status(500).json({ message: "Internal server error", success: false });
+    }
+  });
+
   // Update bid request status
   apiRouter.patch("/bid-requests/:id/status", async (req: Request, res: Response) => {
     try {
