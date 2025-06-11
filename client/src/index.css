@@ -247,7 +247,7 @@ html, body {
     appearance: none !important;
   }
 
-  /* Specific targeting for input elements to remove yellow outlines */
+  /* Component-specific targeting to remove yellow outlines - same strategy as yellow background fix */
   .bid-request-form input,
   .bid-request-form textarea,
   .bid-request-form select,
@@ -269,6 +269,9 @@ html, body {
     -webkit-appearance: none !important;
     -moz-appearance: none !important;
     appearance: none !important;
+    -webkit-box-shadow: none !important;
+    -moz-box-shadow: none !important;
+    box-shadow: none !important;
   }
 
   .bid-request-form input:focus,
@@ -288,10 +291,35 @@ html, body {
     outline-style: none !important;
     outline-color: transparent !important;
     border: 2px solid #3b82f6 !important;
+    -webkit-box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1) !important;
+    -moz-box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1) !important;
     box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1) !important;
     -webkit-appearance: none !important;
     -moz-appearance: none !important;
     appearance: none !important;
+  }
+
+  /* Autofill targeting for component-specific forms */
+  .bid-request-form input:-webkit-autofill,
+  .login-portal input:-webkit-autofill,
+  [data-component="bid-request-form"] input:-webkit-autofill,
+  [data-component="login-form"] input:-webkit-autofill {
+    -webkit-box-shadow: 0 0 0 1000px white inset !important;
+    -webkit-text-fill-color: black !important;
+    outline: none !important;
+    border: 2px solid #d1d5db !important;
+    background-color: white !important;
+  }
+
+  .bid-request-form input:-webkit-autofill:focus,
+  .login-portal input:-webkit-autofill:focus,
+  [data-component="bid-request-form"] input:-webkit-autofill:focus,
+  [data-component="login-form"] input:-webkit-autofill:focus {
+    -webkit-box-shadow: 0 0 0 1000px white inset, 0 0 0 2px rgba(59, 130, 246, 0.1) !important;
+    -webkit-text-fill-color: black !important;
+    outline: none !important;
+    border: 2px solid #3b82f6 !important;
+    background-color: white !important;
   }
 
   input,
