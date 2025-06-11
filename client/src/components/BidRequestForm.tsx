@@ -256,7 +256,7 @@ export default function BidRequestForm({ isOpen, onClose, contractor, trackedSal
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[425px] max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[425px] max-h-[90vh] overflow-y-auto bid-request-form" data-component="bid-request-form">
         <DialogHeader>
           <DialogTitle>Request Bid from {contractor.companyName}</DialogTitle>
           <DialogDescription>

@@ -458,22 +458,125 @@ html, body {
     animation: apple-fade-in 0.5s cubic-bezier(0.4, 0.0, 0.2, 1);
   }
 
-  /* Minimal mobile fixes - only target yellow form styling */
+  /* Targeted fixes for specific white components */
+  
+  /* Bid Request Forms - Lock white backgrounds */
+  .bid-request-form,
+  [data-component="bid-request-form"],
+  div[role="dialog"]:has(form),
+  .bid-request-modal {
+    background-color: white !important;
+    color: black !important;
+  }
+  
+  .bid-request-form *,
+  [data-component="bid-request-form"] *,
+  div[role="dialog"]:has(form) *,
+  .bid-request-modal * {
+    background-color: inherit !important;
+    color: inherit !important;
+  }
+  
+  /* Portal Login Forms - Force white backgrounds */
+  .login-portal,
+  .portal-access,
+  [data-component="login-form"],
+  .auth-form {
+    background-color: white !important;
+    color: black !important;
+  }
+  
+  .login-portal *,
+  .portal-access *,
+  [data-component="login-form"] *,
+  .auth-form * {
+    background-color: inherit !important;
+    color: inherit !important;
+  }
+  
+  /* Portal Cards and Internal Forms */
+  .portal-card,
+  .contractor-portal,
+  .sales-portal,
+  .admin-portal,
+  [data-component="portal-card"] {
+    background-color: white !important;
+    color: black !important;
+  }
+  
+  .portal-card *,
+  .contractor-portal *,
+  .sales-portal *,
+  .admin-portal *,
+  [data-component="portal-card"] * {
+    background-color: inherit !important;
+    color: inherit !important;
+  }
+  
+  /* Card components that should stay white */
+  [data-radix-dialog-content],
+  .card,
+  .apple-card,
+  .stat-card,
+  .feature-box {
+    background-color: white !important;
+    color: black !important;
+  }
+  
+  /* Media query overrides for large screens */
+  @media (min-width: 1440px) {
+    /* Large monitor fixes */
+    .bid-request-form,
+    .portal-access,
+    .portal-card,
+    [data-radix-dialog-content],
+    .card,
+    .apple-card {
+      background-color: white !important;
+      color: black !important;
+    }
+  }
+  
+  /* Media query overrides for mobile devices */
   @media (max-width: 768px) {
-    /* Fix mobile form input yellow backgrounds only */
+    /* Mobile form fixes */
     input[type="text"],
     input[type="email"], 
     input[type="password"] {
       -webkit-appearance: none !important;
       appearance: none !important;
+      background-color: white !important;
+      color: black !important;
     }
     
-    /* Only override if element has yellow styling */
+    /* Mobile portal fixes */
+    .bid-request-form,
+    .portal-access,
+    .portal-card,
+    .login-portal,
+    [data-radix-dialog-content] {
+      background-color: white !important;
+      color: black !important;
+    }
+    
+    /* Override any yellow/off-white backgrounds */
     *[style*="background-color: yellow"],
     *[style*="background: yellow"],
-    *[style*="border-color: yellow"] {
+    *[style*="background-color: #fff"],
+    *[style*="background-color: #fffef7"],
+    *[style*="background-color: #fefdf8"] {
       background-color: white !important;
-      border-color: #d1d5db !important;
+    }
+  }
+  
+  /* Viewport-specific overrides */
+  @media (min-width: 769px) and (max-width: 1439px) {
+    /* Tablet/medium screen fixes */
+    .bid-request-form,
+    .portal-access,
+    .portal-card {
+      background-color: white !important;
+      color: black !important;
     }
   }
 }
