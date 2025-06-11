@@ -1,6 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=SF+Pro+Display:wght@300;400;500;600;700&display=swap');
 
-/* Apple-inspired CSS Reset */
+/* Comprehensive CSS Reset - Remove ALL top spacing */
 html, body {
   margin: 0 !important;
   padding: 0 !important;
@@ -9,6 +9,8 @@ html, body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  position: relative;
+  top: 0 !important;
 }
 
 * {
@@ -18,10 +20,61 @@ html, body {
 }
 
 #root {
-  margin: 0;
-  padding: 0;
+  margin: 0 !important;
+  padding: 0 !important;
   height: 100%;
   background: #ffffff;
+  position: relative;
+  top: 0 !important;
+}
+
+/* Force remove any Replit development banners or overlays */
+body::before,
+body::after,
+html::before,
+html::after {
+  display: none !important;
+}
+
+/* Remove any potential iframe or embedded content spacing */
+iframe[src*="replit"],
+div[id*="replit"],
+div[class*="replit"],
+div[data-replit],
+.replit-banner,
+.replit-dev-banner {
+  display: none !important;
+  height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Ensure first child elements have no top margin */
+body > *:first-child,
+#root > *:first-child {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+}
+
+/* Additional viewport and container fixes */
+.min-h-screen {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+}
+
+/* Override any potential browser default margins */
+div, section, main, article, nav, header {
+  margin-block-start: 0 !important;
+  margin-block-end: 0 !important;
+}
+
+/* Force viewport to start at absolute top */
+html {
+  scroll-padding-top: 0 !important;
+}
+
+body {
+  scroll-padding-top: 0 !important;
 }
 
 @tailwind base;
@@ -88,6 +141,13 @@ html, body {
   body {
     @apply bg-background text-foreground antialiased;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  
+  html {
+    margin: 0 !important;
+    padding: 0 !important;
   }
   
   h1, h2, h3, h4, h5, h6 {

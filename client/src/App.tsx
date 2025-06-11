@@ -17,7 +17,7 @@ function App() {
   return (
     <Router>
       <TooltipProvider>
-        <div className="min-h-screen">
+        <div className="min-h-screen" style={{ marginTop: 0, paddingTop: 0, position: 'relative', top: 0 }}>
           <Toaster />
           <Route path="/" component={HomePage} />
           <Route path="/portals" component={PortalAccess} />
