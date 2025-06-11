@@ -427,7 +427,7 @@ export default function AdminPortalEnhanced() {
                               <div className="text-xs text-gray-500">Total Leads</div>
                             </div>
                             <div className="text-center">
-                              <div className="text-lg font-bold">{((salesperson.conversionRate || 0) * 100).toFixed(1)}%</div>
+                              <div className="text-lg font-bold">{salesperson.conversionRate && !isNaN(salesperson.conversionRate) ? ((salesperson.conversionRate) * 100).toFixed(1) : '0.0'}%</div>
                               <div className="text-xs text-gray-500">Conversion Rate</div>
                             </div>
                             <div className="text-center">

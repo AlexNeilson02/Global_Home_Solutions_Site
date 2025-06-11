@@ -62,7 +62,7 @@ const SalesPortal: React.FC = () => {
     { month: 'Jun', leads: 67, conversions: 25, revenue: 32500 }
   ];
 
-  const conversionRate = analytics ? (analytics.conversions / analytics.totalVisits * 100).toFixed(1) : '0';
+  const conversionRate = analytics && analytics.totalVisits > 0 && !isNaN(analytics.conversions) ? (analytics.conversions / analytics.totalVisits * 100).toFixed(1) : '0.0';
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">

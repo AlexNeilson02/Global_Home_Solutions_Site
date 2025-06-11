@@ -79,7 +79,7 @@ export default function SalesDashboardNew() {
           
           <StatsCard
             title="Conversion Rate"
-            value={`${analyticsData?.analytics?.conversionRate?.toFixed(1) || 0}%`}
+            value={`${analyticsData?.analytics?.conversionRate && !isNaN(analyticsData.analytics.conversionRate) ? analyticsData.analytics.conversionRate.toFixed(1) : '0.0'}%`}
             trend={{ value: "3.2% this month", positive: true }}
             icon={BarChart3}
             iconBgColor="bg-purple-50"
@@ -88,7 +88,7 @@ export default function SalesDashboardNew() {
           
           <StatsCard
             title="Commissions"
-            value={`$${salespersonData?.commissions?.toFixed(2) || 0}`}
+            value={`$${salespersonData?.commissions && !isNaN(salespersonData.commissions) ? salespersonData.commissions.toFixed(2) : '0.00'}`}
             trend={{ value: "5.1% this month", positive: true }}
             icon={DollarSign}
             iconBgColor="bg-green-50"
