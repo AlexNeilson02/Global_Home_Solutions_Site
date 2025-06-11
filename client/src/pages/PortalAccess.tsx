@@ -54,7 +54,7 @@ const PortalAccess: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-slate-900" style={{ backgroundColor: '#0f172a' }}>
-      <div className="container mx-auto px-4 py-16">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16">
         {/* Header with optional logout */}
         {isAuthenticated && user && (
           <div className="flex justify-between items-center mb-8">
