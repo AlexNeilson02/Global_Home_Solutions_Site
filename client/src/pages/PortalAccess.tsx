@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
 import logoPath from "@/assets/global-home-solutions-logo.png";
 import { LoginModal } from "@/components/LoginModal";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth, User } from "@/hooks/useAuth";
 
 const PortalAccess: React.FC = () => {
   const [, navigate] = useLocation();
@@ -21,7 +21,7 @@ const PortalAccess: React.FC = () => {
   const handlePortalAccess = (portalType: "admin" | "contractor" | "salesperson") => {
     if (isAuthenticated && user) {
       // If user is already authenticated, check if they can access this portal
-      if (user.role === portalType) {
+      if ((user as User).role === portalType) {
         // Navigate to their portal
         navigateToPortal(portalType);
       } else {
@@ -59,7 +59,7 @@ const PortalAccess: React.FC = () => {
         {isAuthenticated && user && (
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 sm:mb-8 gap-4 px-4">
             <div className="text-white text-sm sm:text-base">
-              Currently logged in as: <span className="font-semibold">{user.username}</span> ({user.role})
+              Currently logged in as: <span className="font-semibold">{(user as User).username}</span> ({(user as User).role})
             </div>
             <button
               onClick={() => logout()}
