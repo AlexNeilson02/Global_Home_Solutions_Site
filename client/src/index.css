@@ -63,7 +63,7 @@ html, body {
   
   /* Apple system colors */
   --success: 52 199 89; /* Apple's system green #34c759 */
-  --warning: 255 204 0; /* Apple's system yellow #ffcc00 */
+  --warning: 239 68 68; /* Changed from yellow to red #ef4444 */
   --info: 90 200 250; /* Apple's system cyan #5ac8fa */
   --error: 255 59 48; /* Apple's system red */
   
@@ -406,6 +406,49 @@ html, body {
     -webkit-tap-highlight-color: rgba(0,0,0,0) !important;
     -webkit-focus-ring-color: transparent !important;
     -webkit-highlight: transparent !important;
+  }
+
+  /* Comprehensive yellow outline elimination */
+  *:focus,
+  *:hover,
+  *:active {
+    outline-color: transparent !important;
+  }
+
+  /* Target elements that commonly get yellow outlines */
+  input:focus,
+  textarea:focus,
+  select:focus,
+  button:focus,
+  [role="combobox"]:focus,
+  [role="button"]:focus,
+  [role="textbox"]:focus {
+    outline: none !important;
+    outline-color: transparent !important;
+    outline-width: 0 !important;
+    outline-style: none !important;
+  }
+
+  /* Replace yellow focus with neutral blue outline for accessibility */
+  input:focus,
+  textarea:focus,
+  select:focus {
+    outline: none !important;
+    border-color: #3b82f6 !important;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1) !important;
+  }
+
+  /* Remove yellow from any remaining webkit styles */
+  *:-webkit-any-link:focus,
+  *:-webkit-any-link:hover {
+    outline-color: transparent !important;
+  }
+
+  /* Override browser default focus indicators */
+  *[tabindex]:focus,
+  *[role]:focus {
+    outline: none !important;
+    outline-color: transparent !important;
   }
 
   /* Nuclear option: Override all possible yellow styling */
@@ -808,13 +851,20 @@ html, body {
       color: black !important;
     }
     
-    /* Override any yellow/off-white backgrounds */
+    /* Override any yellow/off-white backgrounds and outlines */
     *[style*="background-color: yellow"],
     *[style*="background: yellow"],
     *[style*="background-color: #fff"],
     *[style*="background-color: #fffef7"],
-    *[style*="background-color: #fefdf8"] {
+    *[style*="background-color: #fefdf8"],
+    *[style*="outline: yellow"],
+    *[style*="outline-color: yellow"],
+    *[style*="border: yellow"],
+    *[style*="border-color: yellow"] {
       background-color: white !important;
+      outline: none !important;
+      outline-color: transparent !important;
+      border-color: #d1d5db !important;
     }
   }
   
