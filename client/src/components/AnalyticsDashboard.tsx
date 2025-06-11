@@ -256,7 +256,7 @@ const AnalyticsDashboard: React.FC<AnalyticsProps> = ({ userRole, userId }) => {
             <PhoneCall className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{(analytics?.averageResponseTime || 0).toFixed(1)}h</div>
+            <div className="text-2xl font-bold">{(analytics?.averageResponseTime && !isNaN(analytics.averageResponseTime) ? analytics.averageResponseTime.toFixed(1) : '0.0')}h</div>
             <p className="text-xs text-muted-foreground">
               Average response time
             </p>

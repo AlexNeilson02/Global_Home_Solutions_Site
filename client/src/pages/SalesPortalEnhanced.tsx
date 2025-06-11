@@ -240,7 +240,7 @@ const SalesPortalEnhanced: React.FC = () => {
   // Calculate key metrics
   const totalVisits = analytics?.totalVisits || 0;
   const totalConversions = analytics?.conversions || 0;
-  const conversionRate = totalVisits > 0 ? ((totalConversions / totalVisits) * 100).toFixed(1) : '0';
+  const conversionRate = totalVisits > 0 && !isNaN(totalConversions) ? ((totalConversions / totalVisits) * 100).toFixed(1) : '0.0';
   const totalLeads = salesperson?.totalLeads || 0;
   const commissionEarnings = salesperson?.commissions || 0;
 
