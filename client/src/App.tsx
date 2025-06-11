@@ -5,9 +5,9 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import HomePage from "@/pages/HomePageNew";
 import ContractorProfile from "@/pages/ContractorProfileDB";
-import ContractorPortalEnhanced from "@/pages/ContractorPortalEnhanced";
-import SalesPortalEnhanced from "@/pages/SalesPortalEnhanced";
-import AdminPortalEnhanced from "@/pages/AdminPortalEnhanced";
+import ContractorPortalSimple from "@/pages/ContractorPortalSimple";
+import SalesPortalSimple from "@/pages/SalesPortalSimple";
+import AdminPortalSimple from "@/pages/AdminPortalSimple";
 import PortalAccess from "@/pages/PortalAccess";
 import ContractorRegistration from "@/pages/ContractorRegistration";
 import SalespersonProfile from "@/pages/SalespersonProfile";
@@ -27,17 +27,17 @@ function App() {
           <Route path="/login" component={Login} />
           <Route path="/contractor-portal">
             <ProtectedRoute requiredRole="contractor">
-              <ContractorPortalEnhanced />
+              <ContractorPortalSimple />
             </ProtectedRoute>
           </Route>
           <Route path="/sales-portal">
             <ProtectedRoute requiredRole="salesperson">
-              <SalesPortalEnhanced />
+              <SalesPortalSimple />
             </ProtectedRoute>
           </Route>
           <Route path="/admin-portal">
             <ProtectedRoute requiredRole="admin">
-              <AdminPortalEnhanced />
+              <AdminPortalSimple />
             </ProtectedRoute>
           </Route>
         </div>

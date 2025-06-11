@@ -90,7 +90,7 @@ export default function SalespersonProfile() {
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
             Sales Representative Profile
           </h1>
-          <p className="text-lg text-gray-600
+          <p className="text-lg text-gray-600">
             Global Home Solutions
           </p>
         </div>
