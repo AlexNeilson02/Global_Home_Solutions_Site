@@ -508,6 +508,34 @@ textarea:-moz-autofill {
   color: black !important;
 }
 
+/* Solution 3: Component-Level Dialog Override */
+.dialog-white-bg {
+  background-color: white !important;
+  color: black !important;
+}
+
+.dialog-white-bg input,
+.dialog-white-bg textarea,
+.dialog-white-bg select {
+  background-color: white !important;
+  color: black !important;
+  border-color: #d1d5db !important;
+}
+
+.dialog-white-bg input:-webkit-autofill,
+.dialog-white-bg input:-webkit-autofill:hover,
+.dialog-white-bg input:-webkit-autofill:focus,
+.dialog-white-bg input:-webkit-autofill:active,
+.dialog-white-bg textarea:-webkit-autofill,
+.dialog-white-bg textarea:-webkit-autofill:hover,
+.dialog-white-bg textarea:-webkit-autofill:focus,
+.dialog-white-bg textarea:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px white inset !important;
+  -webkit-text-fill-color: black !important;
+  background-color: white !important;
+  border-color: #d1d5db !important;
+}
+
 /* Dialog content specific override */
 [data-radix-dialog-content] input:-webkit-autofill,
 [data-radix-dialog-content] input:-webkit-autofill:hover,
