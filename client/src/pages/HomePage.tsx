@@ -38,12 +38,12 @@ const HomePage: React.FC = () => {
         </div>
 
         {/* Contractor Categories */}
-        <div className="mb-12 sm:mb-16 lg:mb-20">
-          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white text-center mb-8 sm:mb-12 px-4">
+        <div className="mb-12 sm:mb-16 lg:mb-20 px-6 sm:px-8 lg:px-4">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white text-center mb-8 sm:mb-12">
             Find the right contractor for your project
           </h2>
           
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 max-w-6xl mx-auto px-8 sm:px-10 lg:px-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 max-w-6xl mx-auto">
             <div className="bg-white rounded-lg shadow-lg overflow-hidden">
               <div className="aspect-video bg-gray-200 relative">
                 <div className="absolute top-4 right-4">
