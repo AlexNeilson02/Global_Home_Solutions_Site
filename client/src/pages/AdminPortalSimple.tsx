@@ -75,7 +75,7 @@ const AdminPortalSimple: React.FC = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">
-                    {users.data?.length || 0}
+                    {Array.isArray(users.data?.users) ? users.data.users.length : 0}
                   </div>
                 </CardContent>
               </Card>
@@ -87,7 +87,7 @@ const AdminPortalSimple: React.FC = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">
-                    {users.data?.filter((u: any) => u.role === 'contractor').length || 0}
+                    {Array.isArray(users.data?.users) ? users.data.users.filter((u: any) => u.role === 'contractor').length : 0}
                   </div>
                 </CardContent>
               </Card>
@@ -99,7 +99,7 @@ const AdminPortalSimple: React.FC = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">
-                    {users.data?.filter((u: any) => u.role === 'salesperson').length || 0}
+                    {Array.isArray(users.data?.users) ? users.data.users.filter((u: any) => u.role === 'salesperson').length : 0}
                   </div>
                 </CardContent>
               </Card>
@@ -111,7 +111,7 @@ const AdminPortalSimple: React.FC = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">
-                    {bidRequests.data?.length || 0}
+                    {Array.isArray(bidRequests.data?.bidRequests) ? bidRequests.data.bidRequests.length : 0}
                   </div>
                 </CardContent>
               </Card>
@@ -125,8 +125,8 @@ const AdminPortalSimple: React.FC = () => {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {bidRequests.data && bidRequests.data.length > 0 ? (
-                    bidRequests.data.slice(0, 5).map((bid: any) => (
+                  {Array.isArray(bidRequests.data?.bidRequests) && bidRequests.data.bidRequests.length > 0 ? (
+                    bidRequests.data.bidRequests.slice(0, 5).map((bid: any) => (
                       <div key={bid.id} className="flex items-center justify-between p-3 border rounded-lg">
                         <div>
                           <h4 className="font-medium">New bid request from {bid.fullName}</h4>
