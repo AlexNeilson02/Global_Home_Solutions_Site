@@ -192,6 +192,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get salesperson by user ID
+  apiRouter.get("/salespersons/by-user/:userId", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const userId = parseInt(req.params.userId);
+      const salesperson = await storage.getSalespersonByUserId(userId);
+      if (!salesperson) {
+        return res.status(404).json({ message: "Salesperson not found" });
+      }
+      res.json({ salesperson });
+    } catch (error) {
+      console.error("Error fetching salesperson by user:", error);
+      res.status(500).json({ message: "Failed to fetch salesperson" });
+    }
+  });
+
   apiRouter.get("/salespersons/:id", isAuthenticated, async (req: Request, res: Response) => {
     try {
       const salespersonId = parseInt(req.params.id);
@@ -448,6 +463,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error creating bid request:", error);
       res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Get bid requests for a specific salesperson by user ID
+  apiRouter.get("/bid-requests/sales/:userId", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const userId = parseInt(req.params.userId);
+      const salesperson = await storage.getSalespersonByUserId(userId);
+      
+      if (!salesperson) {
+        return res.status(404).json({ message: "Salesperson not found" });
+      }
+      
+      const bidRequests = await storage.getBidRequestsBySalespersonId(salesperson.id);
+      res.json({ bidRequests });
+    } catch (error) {
+      console.error("Error fetching salesperson bid requests:", error);
+      res.status(500).json({ message: "Failed to fetch bid requests" });
     }
   });
 

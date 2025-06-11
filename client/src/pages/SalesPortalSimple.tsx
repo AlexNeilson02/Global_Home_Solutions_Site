@@ -36,9 +36,9 @@ const SalesPortalSimple: React.FC = () => {
     logoutMutation.mutate();
   };
 
-  // Fetch sales data
+  // Fetch sales data by finding the salesperson record for the current user
   const { data: salesperson } = useQuery({
-    queryKey: ['/api/salespersons', (user as User)?.id],
+    queryKey: ['/api/salespersons/by-user', (user as User)?.id],
     enabled: !!(user as User)?.id,
   });
 
@@ -48,7 +48,7 @@ const SalesPortalSimple: React.FC = () => {
   });
 
   const { data: bidRequests } = useQuery({
-    queryKey: ['/api/salespersons', (user as User)?.id, 'bid-requests'],
+    queryKey: ['/api/bid-requests/sales', (user as User)?.id],
     enabled: !!(user as User)?.id,
   });
 
