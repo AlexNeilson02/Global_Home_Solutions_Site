@@ -451,6 +451,30 @@ html, body {
     outline-color: transparent !important;
   }
 
+  /* Component-Level Class Override for yellow outline removal */
+  .dialog-no-yellow,
+  .dialog-no-yellow *,
+  .form-no-yellow,
+  .form-no-yellow *,
+  .input-no-yellow,
+  .input-no-yellow * {
+    outline: none !important;
+    outline-color: transparent !important;
+    outline-width: 0 !important;
+    outline-style: none !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    appearance: none !important;
+  }
+
+  .dialog-no-yellow input:focus,
+  .form-no-yellow input:focus,
+  .input-no-yellow:focus {
+    outline: none !important;
+    border-color: #3b82f6 !important;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1) !important;
+  }
+
   /* Nuclear option: Override all possible yellow styling */
   input[type="text"], 
   input[type="email"], 

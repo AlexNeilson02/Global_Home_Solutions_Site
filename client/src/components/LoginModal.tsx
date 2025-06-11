@@ -89,7 +89,7 @@ export function LoginModal({ isOpen, onClose, portalType, onLoginSuccess }: Logi
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[425px] login-portal" data-component="login-form">
+      <DialogContent className="sm:max-w-[425px] login-portal dialog-no-yellow" data-component="login-form">
         <DialogHeader>
           <DialogTitle className="text-center">{getPortalTitle()}</DialogTitle>
         </DialogHeader>
