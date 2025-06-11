@@ -76,16 +76,16 @@ const AdminPortal: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-gray-50
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-7xl mx-auto">
           {/* Header */}
           <div className="flex justify-between items-center mb-8">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+              <h1 className="text-3xl font-bold text-gray-900
                 Admin Portal
               </h1>
-              <p className="text-gray-600 dark:text-gray-300 mt-1">
+              <p className="text-gray-600 mt-1">
                 System overview and management dashboard
               </p>
             </div>
@@ -282,19 +282,19 @@ const AdminPortal: React.FC = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="grid md:grid-cols-3 gap-4 text-center">
-                    <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                    <div className="p-4 bg-blue-50 rounded-lg">
                       <p className="text-2xl font-bold text-blue-600">{projectsList.length || 0}</p>
-                      <p className="text-sm text-gray-600 dark:text-gray-300">Total Projects</p>
+                      <p className="text-sm text-gray-600 Projects</p>
                     </div>
-                    <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                    <div className="p-4 bg-green-50 rounded-lg">
                       <p className="text-2xl font-bold text-green-600">{bidRequestsList.length || 0}</p>
-                      <p className="text-sm text-gray-600 dark:text-gray-300">Total Bid Requests</p>
+                      <p className="text-sm text-gray-600 Bid Requests</p>
                     </div>
-                    <div className="p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
+                    <div className="p-4 bg-purple-50 rounded-lg">
                       <p className="text-2xl font-bold text-purple-600">
                         {bidRequestsList.filter((b: any) => b.status === 'converted')?.length || 0}
                       </p>
-                      <p className="text-sm text-gray-600 dark:text-gray-300">Conversions</p>
+                      <p className="text-sm text-gray-600
                     </div>
                   </div>
                 </CardContent>
@@ -315,25 +315,25 @@ const AdminPortal: React.FC = () => {
                   <div className="grid md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <label className="text-sm font-medium">Email Notifications</label>
-                      <p className="text-sm text-gray-500 p-3 bg-gray-100 dark:bg-gray-800 rounded">
+                      <p className="text-sm text-gray-500 p-3 bg-gray-100 rounded">
                         Enabled for all users
                       </p>
                     </div>
                     <div className="space-y-2">
                       <label className="text-sm font-medium">Data Retention</label>
-                      <p className="text-sm text-gray-500 p-3 bg-gray-100 dark:bg-gray-800 rounded">
+                      <p className="text-sm text-gray-500 p-3 bg-gray-100 rounded">
                         12 months
                       </p>
                     </div>
                     <div className="space-y-2">
                       <label className="text-sm font-medium">API Rate Limit</label>
-                      <p className="text-sm text-gray-500 p-3 bg-gray-100 dark:bg-gray-800 rounded">
+                      <p className="text-sm text-gray-500 p-3 bg-gray-100 rounded">
                         1000 requests/hour
                       </p>
                     </div>
                     <div className="space-y-2">
                       <label className="text-sm font-medium">Backup Schedule</label>
-                      <p className="text-sm text-gray-500 p-3 bg-gray-100 dark:bg-gray-800 rounded">
+                      <p className="text-sm text-gray-500 p-3 bg-gray-100 rounded">
                         Daily at 2:00 AM
                       </p>
                     </div>

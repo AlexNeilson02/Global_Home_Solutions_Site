@@ -264,16 +264,16 @@ const SalesPortalEnhanced: React.FC = () => {
     `${window.location.origin}/salesperson/${salesperson.profileUrl}` : '';
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-gray-50">
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-7xl mx-auto">
           {/* Header */}
           <div className="flex justify-between items-center mb-8">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+              <h1 className="text-3xl font-bold text-gray-900">
                 Sales Portal
               </h1>
-              <p className="text-gray-600 dark:text-gray-300 mt-1">
+              <p className="text-gray-600 mt-1">
                 Welcome back, {user?.fullName || 'Sales Representative'}
               </p>
             </div>
@@ -374,7 +374,7 @@ const SalesPortalEnhanced: React.FC = () => {
                         <div key={bid.id} className="flex items-center justify-between p-3 border rounded-lg">
                           <div>
                             <h4 className="font-medium">{bid.fullName}</h4>
-                            <p className="text-sm text-gray-600 dark:text-gray-300">{bid.serviceRequested}</p>
+                            <p className="text-sm text-gray-600
                             <p className="text-xs text-gray-500">{new Date(bid.createdAt).toLocaleDateString()}</p>
                           </div>
                           <Badge variant={
@@ -440,7 +440,7 @@ const SalesPortalEnhanced: React.FC = () => {
                       {/* Bio */}
                       <div>
                         <h4 className="font-medium mb-2">Professional Bio</h4>
-                        <p className="text-gray-600 dark:text-gray-300">
+                        <p className="text-gray-600
                           {salesperson?.bio || 'No bio available. Add a professional bio to help customers understand your expertise.'}
                         </p>
                       </div>
@@ -688,21 +688,21 @@ const SalesPortalEnhanced: React.FC = () => {
                     <div className="text-center">
                       <QrCode className="h-12 w-12 text-blue-500 mx-auto mb-3" />
                       <h4 className="font-medium mb-2">QR Code</h4>
-                      <p className="text-sm text-gray-600 dark:text-gray-300">
+                      <p className="text-sm text-gray-600
                         Print and display your QR code at events, on business cards, or marketing materials for instant access.
                       </p>
                     </div>
                     <div className="text-center">
                       <ExternalLink className="h-12 w-12 text-green-500 mx-auto mb-3" />
                       <h4 className="font-medium mb-2">Landing Page</h4>
-                      <p className="text-sm text-gray-600 dark:text-gray-300">
+                      <p className="text-sm text-gray-600
                         Share your personalized URL via text, email, or social media to direct prospects to your landing page.
                       </p>
                     </div>
                     <div className="text-center">
                       <Phone className="h-12 w-12 text-purple-500 mx-auto mb-3" />
                       <h4 className="font-medium mb-2">NFC Technology</h4>
-                      <p className="text-sm text-gray-600 dark:text-gray-300">
+                      <p className="text-sm text-gray-600
                         Use NFC-enabled devices to instantly share your profile with prospects by simply tapping their phone.
                       </p>
                     </div>
@@ -726,7 +726,7 @@ const SalesPortalEnhanced: React.FC = () => {
                           <div className="flex justify-between items-start mb-3">
                             <div className="flex-1">
                               <h4 className="font-semibold">{bid.fullName}</h4>
-                              <p className="text-sm text-gray-600 dark:text-gray-300">{bid.serviceRequested}</p>
+                              <p className="text-sm text-gray-600
                               <p className="text-xs text-gray-500 mt-1">{bid.description}</p>
                             </div>
                             <Badge variant={

@@ -103,13 +103,13 @@ const PerformanceMonitor: React.FC = () => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'good':
-        return 'text-green-600 bg-green-50 dark:bg-green-900/20';
+        return 'text-green-600 bg-green-50
       case 'fair':
-        return 'text-yellow-600 bg-yellow-50 dark:bg-yellow-900/20';
+        return 'text-yellow-600 bg-yellow-50
       case 'poor':
-        return 'text-red-600 bg-red-50 dark:bg-red-900/20';
+        return 'text-red-600 bg-red-50
       default:
-        return 'text-gray-600 bg-gray-50 dark:bg-gray-700';
+        return 'text-gray-600 bg-gray-50
     }
   };
 
@@ -271,7 +271,7 @@ const PerformanceMonitor: React.FC = () => {
         </div>
 
         {/* Performance Recommendations */}
-        <div className="mt-6 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+        <div className="mt-6 p-4 bg-gray-50 rounded-lg">
           <h4 className="font-medium mb-3 flex items-center gap-2">
             <Clock className="h-4 w-4" />
             Performance Recommendations

@@ -95,7 +95,7 @@ const MobileNavigation: React.FC<MobileNavigationProps> = ({
   return (
     <>
       {/* Mobile Header Bar */}
-      <div className="lg:hidden bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-3 flex items-center justify-between sticky top-0 z-40">
+      <div className="lg:hidden bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between sticky top-0 z-40">
         <div className="flex items-center gap-3">
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
             <SheetTrigger asChild>
@@ -130,7 +130,7 @@ const MobileNavigation: React.FC<MobileNavigationProps> = ({
         <SheetContent side="left" className="w-80 p-0">
           <div className="flex flex-col h-full">
             {/* Header */}
-            <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+            <div className="p-6 border-b border-gray-200
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-lg font-semibold">Navigation</h2>
                 <Button 
@@ -144,8 +144,8 @@ const MobileNavigation: React.FC<MobileNavigationProps> = ({
               </div>
               
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
-                  <User className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                  <User className="h-5 w-5 text-blue-600 />
                 </div>
                 <div>
                   <p className="font-medium">{userName}</p>
@@ -170,7 +170,7 @@ const MobileNavigation: React.FC<MobileNavigationProps> = ({
                       className={`w-full justify-start gap-3 ${
                         isActive 
                           ? 'bg-blue-600 text-white hover:bg-blue-700' 
-                          : 'hover:bg-gray-100 dark:hover:bg-gray-700'
+                          : 'hover:bg-gray-100
                       }`}
                       onClick={() => handleTabClick(item.id)}
                     >
@@ -183,7 +183,7 @@ const MobileNavigation: React.FC<MobileNavigationProps> = ({
             </div>
 
             {/* Footer */}
-            <div className="p-4 border-t border-gray-200 dark:border-gray-700">
+            <div className="p-4 border-t border-gray-200
               <Button
                 variant="outline"
                 className="w-full justify-start gap-3"
@@ -198,7 +198,7 @@ const MobileNavigation: React.FC<MobileNavigationProps> = ({
       </Sheet>
 
       {/* Mobile Bottom Navigation Bar (Alternative Design) */}
-      <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 z-30">
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-30">
         <div className="grid grid-cols-5 h-16">
           {navigationItems.slice(0, 5).map((item) => {
             const Icon = item.icon;
@@ -210,8 +210,8 @@ const MobileNavigation: React.FC<MobileNavigationProps> = ({
                 variant="ghost"
                 className={`h-full rounded-none flex flex-col gap-1 ${
                   isActive 
-                    ? 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20' 
-                    : 'text-gray-600 dark:text-gray-400'
+                    ? 'text-blue-600 bg-blue-50 
+                    : 'text-gray-600
                 }`}
                 onClick={() => handleTabClick(item.id)}
               >

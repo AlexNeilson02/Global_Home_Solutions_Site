@@ -78,7 +78,7 @@ export default function AdminDashboard() {
             value={120}
             trend={{ value: "10% this month", positive: true }}
             icon={Users}
-            iconBgColor="bg-primary-50 dark:bg-primary/10"
+            iconBgColor="bg-primary-50
             iconColor="text-primary"
             chart={
               <div className="h-10 flex items-end space-x-1">
@@ -97,10 +97,10 @@ export default function AdminDashboard() {
             value={contractorsData?.contractors?.length || 0}
             trend={{ value: "5 new this month", positive: true }}
             icon={Building}
-            iconBgColor="bg-secondary-50 dark:bg-secondary/10"
+            iconBgColor="bg-secondary-50
             iconColor="text-secondary"
             chart={
-              <div className="h-10 w-16 bg-secondary-50 dark:bg-secondary/10 rounded-md relative overflow-hidden">
+              <div className="h-10 w-16 bg-secondary-50 rounded-md relative overflow-hidden">
                 <div className="absolute bottom-0 left-0 w-full h-3/4 bg-secondary rounded-md"></div>
               </div>
             }
@@ -111,7 +111,7 @@ export default function AdminDashboard() {
             value={salespersonsData?.salespersons?.length || 0}
             trend={{ value: "3 new this month", positive: true }}
             icon={UserCheck}
-            iconBgColor="bg-accent-50 dark:bg-accent/10"
+            iconBgColor="bg-accent-50
             iconColor="text-accent"
             chart={
               <div className="h-10 flex items-end space-x-1">
@@ -130,7 +130,7 @@ export default function AdminDashboard() {
             value={formatCurrency(48750)}
             trend={{ value: "15% this month", positive: true }}
             icon={DollarSign}
-            iconBgColor="bg-success-50 dark:bg-success/10"
+            iconBgColor="bg-success-50
             iconColor="text-success"
             chart={
               <div className="grid grid-cols-4 gap-1 w-20">
@@ -241,7 +241,7 @@ export default function AdminDashboard() {
                               </div>
                             </td>
                             <td className="py-3 px-4">
-                              <Badge className={`${contractor.isActive ? "bg-success-50 text-success dark:bg-success/10" : "bg-destructive-50 text-destructive dark:bg-destructive/10"}`}>
+                              <Badge className={`${contractor.isActive ? "bg-success-50 text-success : "bg-destructive-50 text-destructive
                                 {contractor.isActive ? "Active" : "Inactive"}
                               </Badge>
                             </td>
@@ -315,7 +315,7 @@ export default function AdminDashboard() {
                             <td className="py-3 px-4">{salesperson.totalLeads}</td>
                             <td className="py-3 px-4">{salesperson.conversionRate}%</td>
                             <td className="py-3 px-4">
-                              <Badge className={`${salesperson.isActive ? "bg-success-50 text-success dark:bg-success/10" : "bg-destructive-50 text-destructive dark:bg-destructive/10"}`}>
+                              <Badge className={`${salesperson.isActive ? "bg-success-50 text-success : "bg-destructive-50 text-destructive
                                 {salesperson.isActive ? "Active" : "Inactive"}
                               </Badge>
                             </td>
