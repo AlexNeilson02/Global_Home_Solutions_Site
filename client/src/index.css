@@ -609,23 +609,29 @@ textarea:-moz-autofill {
   border-bottom: 1px solid #d1d5db !important;
 }
 
-/* Button Text Layering Fix */
+/* Button Text Layering Fix for Portals and Forms */
 .portal-white-cards button,
-.portal-white-cards [role="button"] {
+.portal-white-cards [role="button"],
+.dialog-white-bg button,
+.dialog-white-bg [role="button"] {
   position: relative !important;
   z-index: 10 !important;
   color: inherit !important;
 }
 
 .portal-white-cards button *,
-.portal-white-cards [role="button"] * {
+.portal-white-cards [role="button"] *,
+.dialog-white-bg button *,
+.dialog-white-bg [role="button"] * {
   position: relative !important;
   z-index: 11 !important;
   color: inherit !important;
 }
 
 .portal-white-cards button:before,
-.portal-white-cards [role="button"]:before {
+.portal-white-cards [role="button"]:before,
+.dialog-white-bg button:before,
+.dialog-white-bg [role="button"]:before {
   content: "" !important;
   position: absolute !important;
   top: 0 !important;
@@ -640,9 +646,35 @@ textarea:-moz-autofill {
 .portal-white-cards button svg,
 .portal-white-cards button span,
 .portal-white-cards [role="button"] svg,
-.portal-white-cards [role="button"] span {
+.portal-white-cards [role="button"] span,
+.dialog-white-bg button svg,
+.dialog-white-bg button span,
+.dialog-white-bg [role="button"] svg,
+.dialog-white-bg [role="button"] span {
   position: relative !important;
   z-index: 12 !important;
+}
+
+/* Ensure text content is always visible */
+.portal-white-cards button .lucide,
+.portal-white-cards button .icon,
+.dialog-white-bg button .lucide,
+.dialog-white-bg button .icon {
+  position: relative !important;
+  z-index: 12 !important;
+}
+
+/* Tab buttons specific styling */
+.portal-white-cards [data-radix-tabs-trigger],
+.dialog-white-bg [data-radix-tabs-trigger] {
+  position: relative !important;
+  z-index: 10 !important;
+}
+
+.portal-white-cards [data-radix-tabs-trigger] *,
+.dialog-white-bg [data-radix-tabs-trigger] * {
+  position: relative !important;
+  z-index: 11 !important;
 }
 
 /* Dialog content specific override */
