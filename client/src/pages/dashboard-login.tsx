@@ -14,7 +14,7 @@ export default function DashboardLogin() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
-      <Card className="w-full max-w-md">
+      <Card className="w-full max-w-md dialog-white-bg">
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl font-bold text-center">
             Dashboard Direct Access
