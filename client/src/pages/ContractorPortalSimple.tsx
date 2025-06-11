@@ -77,7 +77,7 @@ const ContractorPortalSimple: React.FC = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">
-                    {projects.data?.length || 0}
+                    {projects.data?.projects?.length || 0}
                   </div>
                 </CardContent>
               </Card>
@@ -89,7 +89,7 @@ const ContractorPortalSimple: React.FC = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">
-                    {bidRequests.data?.filter((bid: any) => bid.status === 'pending').length || 0}
+                    {bidRequests.data?.bidRequests?.filter((bid: any) => bid.status === 'pending').length || 0}
                   </div>
                 </CardContent>
               </Card>
@@ -101,7 +101,7 @@ const ContractorPortalSimple: React.FC = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">
-                    {bidRequests.data?.filter((bid: any) => bid.status === 'won').length || 0}
+                    {bidRequests.data?.bidRequests?.filter((bid: any) => bid.status === 'won').length || 0}
                   </div>
                 </CardContent>
               </Card>
@@ -125,8 +125,8 @@ const ContractorPortalSimple: React.FC = () => {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {bidRequests.data && bidRequests.data.length > 0 ? (
-                    bidRequests.data.slice(0, 5).map((bid: any) => (
+                  {bidRequests.data?.bidRequests && bidRequests.data.bidRequests.length > 0 ? (
+                    bidRequests.data.bidRequests.slice(0, 5).map((bid: any) => (
                       <div key={bid.id} className="flex items-center justify-between p-3 border rounded-lg">
                         <div>
                           <h4 className="font-medium">{bid.fullName}</h4>
@@ -158,8 +158,8 @@ const ContractorPortalSimple: React.FC = () => {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {bidRequests.data && bidRequests.data.length > 0 ? (
-                    bidRequests.data.map((bid: any) => (
+                  {bidRequests.data?.bidRequests && bidRequests.data.bidRequests.length > 0 ? (
+                    bidRequests.data.bidRequests.map((bid: any) => (
                       <div key={bid.id} className="border rounded-lg p-4">
                         <div className="flex justify-between items-start mb-2">
                           <div>
@@ -208,8 +208,8 @@ const ContractorPortalSimple: React.FC = () => {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {projects.data && projects.data.length > 0 ? (
-                    projects.data.map((project: any) => (
+                  {projects.data?.projects && projects.data.projects.length > 0 ? (
+                    projects.data.projects.map((project: any) => (
                       <div key={project.id} className="border rounded-lg p-4">
                         <div className="flex justify-between items-start mb-2">
                           <div>
