@@ -609,6 +609,42 @@ textarea:-moz-autofill {
   border-bottom: 1px solid #d1d5db !important;
 }
 
+/* Button Text Layering Fix */
+.portal-white-cards button,
+.portal-white-cards [role="button"] {
+  position: relative !important;
+  z-index: 10 !important;
+  color: inherit !important;
+}
+
+.portal-white-cards button *,
+.portal-white-cards [role="button"] * {
+  position: relative !important;
+  z-index: 11 !important;
+  color: inherit !important;
+}
+
+.portal-white-cards button:before,
+.portal-white-cards [role="button"]:before {
+  content: "" !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  background: inherit !important;
+  z-index: 1 !important;
+  border-radius: inherit !important;
+}
+
+.portal-white-cards button svg,
+.portal-white-cards button span,
+.portal-white-cards [role="button"] svg,
+.portal-white-cards [role="button"] span {
+  position: relative !important;
+  z-index: 12 !important;
+}
+
 /* Dialog content specific override */
 [data-radix-dialog-content] input:-webkit-autofill,
 [data-radix-dialog-content] input:-webkit-autofill:hover,
