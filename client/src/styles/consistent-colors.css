@@ -1,5 +1,32 @@
 /* Color Consistency Override - Applied to all screen sizes */
 
+/* CRITICAL: Fix browser autocomplete yellow backgrounds */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active,
+textarea:-webkit-autofill,
+textarea:-webkit-autofill:hover,
+textarea:-webkit-autofill:focus,
+textarea:-webkit-autofill:active,
+select:-webkit-autofill,
+select:-webkit-autofill:hover,
+select:-webkit-autofill:focus,
+select:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px white inset !important;
+  -webkit-text-fill-color: black !important;
+  background-color: white !important;
+  border-color: #d1d5db !important;
+  transition: background-color 5000s ease-in-out 0s !important;
+}
+
+/* Firefox and other browsers */
+input:-moz-autofill,
+textarea:-moz-autofill {
+  background-color: white !important;
+  color: black !important;
+}
+
 /* Force consistent colors regardless of responsive breakpoints */
 .consistent-colors {
   /* Ensure these colors never change with screen size */
