@@ -209,6 +209,38 @@ html, body {
     color: #9ca3af !important;
     opacity: 0.8 !important;
   }
+
+  /* Remove yellow webkit autofill and yellow outlines */
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus,
+  input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 30px white inset !important;
+    -webkit-text-fill-color: black !important;
+    background-color: white !important;
+    box-shadow: none !important;
+    outline: none !important;
+  }
+
+  /* Remove all yellow/orange outlines and focus rings */
+  *:focus {
+    outline: none !important;
+  }
+
+  input:focus,
+  textarea:focus,
+  select:focus,
+  button:focus {
+    outline: none !important;
+  }
+
+  /* Remove yellow highlighting from form elements */
+  input,
+  textarea,
+  select {
+    -webkit-highlight: none !important;
+    -webkit-tap-highlight-color: transparent !important;
+  }
   
   /* Checkbox styling with grey outline */
   input[type="checkbox"] {
