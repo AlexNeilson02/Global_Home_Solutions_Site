@@ -1,0 +1,61 @@
+/* Color Consistency Override - Applied to all screen sizes */
+
+/* Force consistent colors regardless of responsive breakpoints */
+.consistent-colors {
+  /* Ensure these colors never change with screen size */
+  --text-primary: #111827; /* Gray-900 */
+  --text-secondary: #6b7280; /* Gray-500 */
+  --bg-primary: #ffffff; /* White */
+  --bg-secondary: #f9fafb; /* Gray-50 */
+  --border-color: #e5e7eb; /* Gray-200 */
+  --accent-blue: #2563eb; /* Blue-600 */
+}
+
+/* Apply consistent text colors */
+.text-consistent-primary {
+  color: var(--text-primary) !important;
+}
+
+.text-consistent-secondary {
+  color: var(--text-secondary) !important;
+}
+
+.bg-consistent-primary {
+  background-color: var(--bg-primary) !important;
+}
+
+.bg-consistent-secondary {
+  background-color: var(--bg-secondary) !important;
+}
+
+.border-consistent {
+  border-color: var(--border-color) !important;
+}
+
+/* Override any responsive color variations */
+@media (min-width: 640px) {
+  .text-consistent-primary {
+    color: var(--text-primary) !important;
+  }
+  .text-consistent-secondary {
+    color: var(--text-secondary) !important;
+  }
+}
+
+@media (min-width: 768px) {
+  .text-consistent-primary {
+    color: var(--text-primary) !important;
+  }
+  .text-consistent-secondary {
+    color: var(--text-secondary) !important;
+  }
+}
+
+@media (min-width: 1024px) {
+  .text-consistent-primary {
+    color: var(--text-primary) !important;
+  }
+  .text-consistent-secondary {
+    color: var(--text-secondary) !important;
+  }
+}

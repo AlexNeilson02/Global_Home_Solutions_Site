@@ -28,25 +28,28 @@ html, body {
 @tailwind components;
 @tailwind utilities;
 
+/* Import consistent colors */
+@import './styles/consistent-colors.css';
+
 :root {
-  /* Apple-inspired Design System */
-  --background: 255 255 255; /* Pure white background */
-  --foreground: 0 0 0; /* Pure black text */
+  /* Consistent Color System - No responsive or dark mode variants */
+  --background: 255 255 255; /* Pure white background - consistent across all sizes */
+  --foreground: 0 0 0; /* Pure black text - consistent across all sizes */
   
-  /* Primary colors - Apple blue accent with more contrast */
-  --primary: 0 100 220; /* Slightly darker blue for better contrast #0064dc */
-  --primary-foreground: 255 255 255;
+  /* Primary colors - Fixed blue accent */
+  --primary: 37 99 235; /* Blue-600 for consistency #2563eb */
+  --primary-foreground: 255 255 255; /* Always white text on primary */
   
-  /* Secondary grays */
-  --secondary: 242 242 247; /* Light gray #f2f2f7 */
-  --secondary-foreground: 0 0 0; /* Black text */
+  /* Secondary grays - Fixed values */
+  --secondary: 243 244 246; /* Gray-100 #f3f4f6 */
+  --secondary-foreground: 17 24 39; /* Gray-900 #111827 */
   
-  --accent: 99 99 102; /* Medium gray #636366 */
-  --accent-foreground: 0 0 0; /* Black text */
+  --accent: 156 163 175; /* Gray-400 #9ca3af */
+  --accent-foreground: 17 24 39; /* Gray-900 #111827 */
   
-  /* UI elements with subtle Apple styling */
+  /* UI elements - Fixed colors */
   --card: 255 255 255; /* Pure white cards */
-  --card-foreground: 0 0 0; /* Black text */
+  --card-foreground: 17 24 39; /* Gray-900 text */
 
   --popover: 255 255 255;
   --popover-foreground: 0 0 0; /* Black text */
