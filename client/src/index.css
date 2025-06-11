@@ -220,26 +220,230 @@ html, body {
     background-color: white !important;
     box-shadow: none !important;
     outline: none !important;
+    border: 2px solid #d1d5db !important;
+    transition: none !important;
+    -webkit-transition: none !important;
   }
 
-  /* Remove all yellow/orange outlines and focus rings */
-  *:focus {
+  /* Force override of any yellow highlighting */
+  input:-webkit-autofill:focus {
+    -webkit-box-shadow: 0 0 0 30px white inset !important;
+    border: 2px solid #3b82f6 !important;
     outline: none !important;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1) !important;
   }
 
+  /* Comprehensive outline and focus ring removal */
+  *,
+  *:focus,
+  *:active,
+  *:hover {
+    outline: none !important;
+    outline-width: 0 !important;
+    outline-style: none !important;
+    outline-color: transparent !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    appearance: none !important;
+  }
+
+  /* Specific targeting for input elements to remove yellow outlines */
+  .bid-request-form input,
+  .bid-request-form textarea,
+  .bid-request-form select,
+  .login-portal input,
+  .login-portal textarea,
+  .login-portal select,
+  [data-component="bid-request-form"] input,
+  [data-component="bid-request-form"] textarea,
+  [data-component="bid-request-form"] select,
+  [data-component="login-form"] input,
+  [data-component="login-form"] textarea,
+  [data-component="login-form"] select {
+    outline: none !important;
+    outline-width: 0 !important;
+    outline-style: none !important;
+    outline-color: transparent !important;
+    border: 2px solid #d1d5db !important;
+    background-color: white !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    appearance: none !important;
+  }
+
+  .bid-request-form input:focus,
+  .bid-request-form textarea:focus,
+  .bid-request-form select:focus,
+  .login-portal input:focus,
+  .login-portal textarea:focus,
+  .login-portal select:focus,
+  [data-component="bid-request-form"] input:focus,
+  [data-component="bid-request-form"] textarea:focus,
+  [data-component="bid-request-form"] select:focus,
+  [data-component="login-form"] input:focus,
+  [data-component="login-form"] textarea:focus,
+  [data-component="login-form"] select:focus {
+    outline: none !important;
+    outline-width: 0 !important;
+    outline-style: none !important;
+    outline-color: transparent !important;
+    border: 2px solid #3b82f6 !important;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1) !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    appearance: none !important;
+  }
+
+  input,
   input:focus,
+  input:active,
+  input:hover,
+  textarea,
   textarea:focus,
+  textarea:active,
+  textarea:hover,
+  select,
   select:focus,
+  select:active,
+  select:hover,
   button:focus {
     outline: none !important;
-  }
-
-  /* Remove yellow highlighting from form elements */
-  input,
-  textarea,
-  select {
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    appearance: none !important;
     -webkit-highlight: none !important;
     -webkit-tap-highlight-color: transparent !important;
+    -webkit-user-select: text !important;
+    -moz-user-select: text !important;
+    user-select: text !important;
+  }
+
+  /* Force border styles to override browser defaults */
+  input[type="text"],
+  input[type="email"], 
+  input[type="password"],
+  input[type="number"],
+  input[type="tel"],
+  input[type="url"] {
+    border: 2px solid #d1d5db !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    appearance: none !important;
+  }
+
+  input[type="text"]:focus,
+  input[type="email"]:focus, 
+  input[type="password"]:focus,
+  input[type="number"]:focus,
+  input[type="tel"]:focus,
+  input[type="url"]:focus {
+    border: 2px solid #3b82f6 !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    appearance: none !important;
+    outline: none !important;
+    outline-width: 0 !important;
+    outline-style: none !important;
+    outline-color: transparent !important;
+    -webkit-box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1) !important;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1) !important;
+  }
+
+  /* Ultimate override for any remaining yellow styling */
+  input {
+    outline: 0 !important;
+    outline-width: 0 !important;
+    outline-style: none !important;
+    outline-color: transparent !important;
+    outline-offset: 0 !important;
+    -webkit-outline: 0 !important;
+    -moz-outline: 0 !important;
+  }
+
+  input:focus {
+    outline: 0 !important;
+    outline-width: 0 !important;
+    outline-style: none !important;
+    outline-color: transparent !important;
+    outline-offset: 0 !important;
+    -webkit-outline: 0 !important;
+    -moz-outline: 0 !important;
+  }
+
+  /* Remove any browser-default styling */
+  input, textarea, select, button {
+    -webkit-user-select: text !important;
+    -moz-user-select: text !important;
+    user-select: text !important;
+    -webkit-tap-highlight-color: rgba(0,0,0,0) !important;
+    -webkit-focus-ring-color: transparent !important;
+    -webkit-highlight: transparent !important;
+  }
+
+  /* Nuclear option: Override all possible yellow styling */
+  input[type="text"], 
+  input[type="email"], 
+  input[type="password"], 
+  input[type="number"], 
+  input[type="tel"], 
+  input[type="url"], 
+  textarea {
+    outline: none !important;
+    -webkit-box-shadow: none !important;
+    -moz-box-shadow: none !important;
+    box-shadow: none !important;
+    border: 2px solid #d1d5db !important;
+    background-color: white !important;
+    background-image: none !important;
+    background: white !important;
+  }
+
+  input[type="text"]:focus, 
+  input[type="email"]:focus, 
+  input[type="password"]:focus, 
+  input[type="number"]:focus, 
+  input[type="tel"]:focus, 
+  input[type="url"]:focus, 
+  textarea:focus {
+    outline: none !important;
+    -webkit-box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1) !important;
+    -moz-box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1) !important;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1) !important;
+    border: 2px solid #3b82f6 !important;
+    background-color: white !important;
+    background-image: none !important;
+    background: white !important;
+  }
+
+  /* Override any autofill styling with maximum specificity */
+  input[type="text"]:-webkit-autofill, 
+  input[type="email"]:-webkit-autofill, 
+  input[type="password"]:-webkit-autofill, 
+  input[type="number"]:-webkit-autofill, 
+  input[type="tel"]:-webkit-autofill, 
+  input[type="url"]:-webkit-autofill {
+    -webkit-box-shadow: 0 0 0 1000px white inset !important;
+    -webkit-text-fill-color: black !important;
+    outline: none !important;
+    border: 2px solid #d1d5db !important;
+    background-color: white !important;
+    background-image: none !important;
+    background: white !important;
+  }
+
+  input[type="text"]:-webkit-autofill:focus, 
+  input[type="email"]:-webkit-autofill:focus, 
+  input[type="password"]:-webkit-autofill:focus, 
+  input[type="number"]:-webkit-autofill:focus, 
+  input[type="tel"]:-webkit-autofill:focus, 
+  input[type="url"]:-webkit-autofill:focus {
+    -webkit-box-shadow: 0 0 0 1000px white inset, 0 0 0 2px rgba(59, 130, 246, 0.1) !important;
+    -webkit-text-fill-color: black !important;
+    outline: none !important;
+    border: 2px solid #3b82f6 !important;
+    background-color: white !important;
+    background-image: none !important;
+    background: white !important;
   }
   
   /* Checkbox styling with grey outline */
