@@ -56,10 +56,36 @@ export function getStatusColor(status: string): { bg: string, text: string } {
   }
 }
 
+// Safe numeric formatting utilities that handle any data type
+export const safeToFixed = (value: any, decimals: number = 1): string => {
+  if (value === null || value === undefined || value === '' || isNaN(Number(value))) {
+    return '0.' + '0'.repeat(decimals);
+  }
+  return Number(value).toFixed(decimals);
+};
+
+export const safeFormatPercentage = (value: any): string => {
+  if (value === null || value === undefined || value === '' || isNaN(Number(value))) {
+    return '0.0%';
+  }
+  return `${Number(value).toFixed(1)}%`;
+};
+
+export const safeFormatCurrency = (amount: any): string => {
+  if (amount === null || amount === undefined || amount === '' || isNaN(Number(amount))) {
+    return '$0';
+  }
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(Number(amount));
+};
+
 // Format percentage with % symbol
 export function formatPercentage(value: number | null | undefined): string {
-  if (value === null || value === undefined) return "0%";
-  return `${value.toFixed(1)}%`;
+  return safeFormatPercentage(value);
 }
 
 // Truncate text with ellipsis

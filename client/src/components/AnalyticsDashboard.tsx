@@ -68,22 +68,31 @@ const AnalyticsDashboard: React.FC<AnalyticsProps> = ({ userRole, userId }) => {
     );
   }
 
-  const formatCurrency = (amount: number | null | undefined) => {
-    if (amount === null || amount === undefined || isNaN(amount)) {
+  // Use safe formatting utilities
+  const formatCurrency = (amount: any) => {
+    if (amount === null || amount === undefined || amount === '' || isNaN(Number(amount))) {
       return '$0';
     }
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: 'USD',
-      minimumFractionDigits: 0
-    }).format(amount);
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(Number(amount));
   };
 
-  const formatPercentage = (value: number | null | undefined) => {
-    if (value === null || value === undefined || isNaN(value)) {
+  const formatPercentage = (value: any) => {
+    if (value === null || value === undefined || value === '' || isNaN(Number(value))) {
       return '0.0%';
     }
-    return `${value.toFixed(1)}%`;
+    return `${Number(value).toFixed(1)}%`;
+  };
+
+  const safeToFixed = (value: any, decimals: number = 1) => {
+    if (value === null || value === undefined || value === '' || isNaN(Number(value))) {
+      return '0.' + '0'.repeat(decimals);
+    }
+    return Number(value).toFixed(decimals);
   };
 
   const renderKPICards = () => {
@@ -256,7 +265,7 @@ const AnalyticsDashboard: React.FC<AnalyticsProps> = ({ userRole, userId }) => {
             <PhoneCall className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{(analytics?.averageResponseTime && !isNaN(analytics.averageResponseTime) ? analytics.averageResponseTime.toFixed(1) : '0.0')}h</div>
+            <div className="text-2xl font-bold">{safeToFixed(analytics?.averageResponseTime)}h</div>
             <p className="text-xs text-muted-foreground">
               Average response time
             </p>
