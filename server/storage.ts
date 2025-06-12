@@ -5,7 +5,11 @@ import {
   Project, InsertProject, 
   Testimonial, InsertTestimonial,
   ServiceCategory, InsertServiceCategory,
-  BidRequest, InsertBidRequest
+  BidRequest, InsertBidRequest,
+  PageVisit, InsertPageVisit,
+  CommissionRecord, InsertCommissionRecord,
+  CommissionAdjustment, InsertCommissionAdjustment,
+  CommissionPayment, InsertCommissionPayment
 } from "@shared/schema";
 
 // Extend this interface with all required storage methods
@@ -81,6 +85,40 @@ export interface IStorage {
     totalVisits: number, 
     uniqueVisitors: number, 
     conversionRate: number 
+  }>;
+
+  // Commission methods
+  createCommissionRecord(commission: InsertCommissionRecord): Promise<CommissionRecord>;
+  getCommissionRecord(id: number): Promise<CommissionRecord | undefined>;
+  getCommissionRecordsByBidRequest(bidRequestId: number): Promise<CommissionRecord[]>;
+  getCommissionRecordsBySalesperson(salespersonId: number): Promise<CommissionRecord[]>;
+  getCommissionRecordsByDateRange(startDate: Date, endDate: Date): Promise<CommissionRecord[]>;
+  updateCommissionRecordStatus(id: number, status: string): Promise<CommissionRecord | undefined>;
+  updateCommissionRecordPayment(id: number, paymentStatus: string, paidAt?: Date): Promise<CommissionRecord | undefined>;
+  
+  // Commission adjustments
+  createCommissionAdjustment(adjustment: InsertCommissionAdjustment): Promise<CommissionAdjustment>;
+  getCommissionAdjustmentsByRecord(commissionRecordId: number): Promise<CommissionAdjustment[]>;
+  
+  // Commission payments
+  createCommissionPayment(payment: InsertCommissionPayment): Promise<CommissionPayment>;
+  getCommissionPaymentsByRecipient(recipientId: number): Promise<CommissionPayment[]>;
+  updateCommissionPaymentStatus(id: number, status: string): Promise<CommissionPayment | undefined>;
+  
+  // Commission analytics
+  getCommissionSummaryBySalesperson(salespersonId: number, startDate?: Date, endDate?: Date): Promise<{
+    totalEarned: number;
+    pendingCommissions: number;
+    paidCommissions: number;
+    totalRecords: number;
+  }>;
+  getTopEarnersBySalesperson(limit: number, startDate?: Date, endDate?: Date): Promise<any[]>;
+  getCommissionAnalytics(startDate?: Date, endDate?: Date): Promise<{
+    totalCommissions: number;
+    salesmanTotal: number;
+    overrideTotal: number;
+    corpTotal: number;
+    totalRecords: number;
   }>;
 }
 

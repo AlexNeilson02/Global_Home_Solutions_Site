@@ -21,6 +21,11 @@ export const serviceCategories = pgTable("service_categories", {
   description: text("description"),
   icon: text("icon"),
   isActive: boolean("is_active").default(true),
+  // Commission structure
+  baseCost: real("base_cost").notNull().default(0),
+  salesmanCommission: real("salesman_commission").notNull().default(0),
+  overrideCommission: real("override_commission").notNull().default(0),
+  corpCommission: real("corp_commission").notNull().default(0),
 });
 
 // Base user table for authentication
@@ -185,6 +190,71 @@ export const projectStatusUpdates = pgTable("project_status_updates", {
   attachments: text("attachments").array(), // document IDs
 });
 
+// Commission records table
+export const commissionRecords = pgTable("commission_records", {
+  id: serial("id").primaryKey(),
+  bidRequestId: integer("bid_request_id").notNull().references(() => bidRequests.id),
+  salespersonId: integer("salesperson_id").notNull().references(() => salespersons.id),
+  overrideManagerId: integer("override_manager_id").references(() => users.id), // Manager who gets override commission
+  serviceCategory: text("service_category").notNull(),
+  
+  // Commission amounts
+  totalCommission: real("total_commission").notNull(), // Base cost from service
+  salesmanAmount: real("salesman_amount").notNull(),
+  overrideAmount: real("override_amount").notNull(),
+  corpAmount: real("corp_amount").notNull(),
+  
+  // Status and tracking
+  status: text("status").notNull().default("pending"), // pending, paid, cancelled, adjusted
+  paymentStatus: text("payment_status").notNull().default("unpaid"), // unpaid, paid, processing
+  paidAt: timestamp("paid_at"),
+  
+  // Metadata
+  createdAt: timestamp("created_at").defaultNow(),
+  notes: text("notes"),
+  adjustmentReason: text("adjustment_reason"),
+  originalAmount: real("original_amount"), // For tracking adjustments
+});
+
+// Commission adjustments table
+export const commissionAdjustments = pgTable("commission_adjustments", {
+  id: serial("id").primaryKey(),
+  commissionRecordId: integer("commission_record_id").notNull().references(() => commissionRecords.id),
+  adjustedBy: integer("adjusted_by").notNull().references(() => users.id),
+  
+  // Adjustment details
+  previousAmount: real("previous_amount").notNull(),
+  newAmount: real("new_amount").notNull(),
+  adjustmentAmount: real("adjustment_amount").notNull(), // Can be positive or negative
+  
+  reason: text("reason").notNull(),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Commission payments table
+export const commissionPayments = pgTable("commission_payments", {
+  id: serial("id").primaryKey(),
+  recipientId: integer("recipient_id").notNull().references(() => users.id),
+  recipientType: text("recipient_type").notNull(), // 'salesperson', 'override', 'corp'
+  
+  // Payment details
+  totalAmount: real("total_amount").notNull(),
+  commissionRecordIds: integer("commission_record_ids").array().notNull(),
+  
+  // Payment method and status
+  paymentMethod: text("payment_method").default("system"), // system, manual, external
+  paymentReference: text("payment_reference"), // External payment system reference
+  status: text("status").notNull().default("pending"), // pending, completed, failed
+  
+  // Dates
+  scheduledDate: timestamp("scheduled_date").defaultNow(),
+  processedAt: timestamp("processed_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+  
+  notes: text("notes"),
+});
+
 // Insert schemas
 export const insertServiceCategorySchema = createInsertSchema(serviceCategories).omit({
   id: true,
@@ -252,6 +322,23 @@ export const insertProjectMilestoneSchema = createInsertSchema(projectMilestones
 export const insertProjectStatusUpdateSchema = createInsertSchema(projectStatusUpdates).omit({
   id: true,
   createdAt: true,
+});
+
+export const insertCommissionRecordSchema = createInsertSchema(commissionRecords).omit({
+  id: true,
+  createdAt: true,
+  paidAt: true,
+});
+
+export const insertCommissionAdjustmentSchema = createInsertSchema(commissionAdjustments).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertCommissionPaymentSchema = createInsertSchema(commissionPayments).omit({
+  id: true,
+  createdAt: true,
+  processedAt: true,
 });
 
 // Relations - these are required for Drizzle ORM
@@ -370,6 +457,40 @@ export const projectStatusUpdatesRelations = relations(projectStatusUpdates, ({ 
   }),
 }));
 
+export const commissionRecordsRelations = relations(commissionRecords, ({ one, many }) => ({
+  bidRequest: one(bidRequests, {
+    fields: [commissionRecords.bidRequestId],
+    references: [bidRequests.id],
+  }),
+  salesperson: one(salespersons, {
+    fields: [commissionRecords.salespersonId],
+    references: [salespersons.id],
+  }),
+  overrideManager: one(users, {
+    fields: [commissionRecords.overrideManagerId],
+    references: [users.id],
+  }),
+  adjustments: many(commissionAdjustments),
+}));
+
+export const commissionAdjustmentsRelations = relations(commissionAdjustments, ({ one }) => ({
+  commissionRecord: one(commissionRecords, {
+    fields: [commissionAdjustments.commissionRecordId],
+    references: [commissionRecords.id],
+  }),
+  adjustedByUser: one(users, {
+    fields: [commissionAdjustments.adjustedBy],
+    references: [users.id],
+  }),
+}));
+
+export const commissionPaymentsRelations = relations(commissionPayments, ({ one }) => ({
+  recipient: one(users, {
+    fields: [commissionPayments.recipientId],
+    references: [users.id],
+  }),
+}));
+
 // Export types
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
@@ -403,6 +524,15 @@ export type InsertProjectMilestone = z.infer<typeof insertProjectMilestoneSchema
 
 export type ProjectStatusUpdate = typeof projectStatusUpdates.$inferSelect;
 export type InsertProjectStatusUpdate = z.infer<typeof insertProjectStatusUpdateSchema>;
+
+export type CommissionRecord = typeof commissionRecords.$inferSelect;
+export type InsertCommissionRecord = z.infer<typeof insertCommissionRecordSchema>;
+
+export type CommissionAdjustment = typeof commissionAdjustments.$inferSelect;
+export type InsertCommissionAdjustment = z.infer<typeof insertCommissionAdjustmentSchema>;
+
+export type CommissionPayment = typeof commissionPayments.$inferSelect;
+export type InsertCommissionPayment = z.infer<typeof insertCommissionPaymentSchema>;
 
 // Extended schemas for login
 export const loginSchema = z.object({
