@@ -30,10 +30,10 @@ const Portals: React.FC = () => {
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-12">
             <h1 className="text-4xl font-bold text-white mb-4">
-              Portal Access
+              Select Your Portal
             </h1>
             <p className="text-xl text-slate-300">
-              Select your portal to access your dedicated workspace
+              Choose your workspace to access your dedicated portal
             </p>
           </div>
 
