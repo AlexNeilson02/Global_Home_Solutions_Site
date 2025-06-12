@@ -90,9 +90,10 @@ const SalesPortal: React.FC = () => {
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
             {/* Desktop Navigation - Only show on desktop */}
             {!isMobile && (
-              <TabsList className="grid w-full grid-cols-4">
+              <TabsList className="grid w-full grid-cols-5">
                 <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
                 <TabsTrigger value="leads">Lead Management</TabsTrigger>
+                <TabsTrigger value="commissions">Commissions</TabsTrigger>
                 <TabsTrigger value="analytics">Analytics</TabsTrigger>
                 <TabsTrigger value="profile">Profile</TabsTrigger>
               </TabsList>
@@ -258,6 +259,11 @@ const SalesPortal: React.FC = () => {
                   </div>
                 </CardContent>
               </Card>
+            </TabsContent>
+
+            {/* Commission Dashboard Tab */}
+            <TabsContent value="commissions" className="space-y-6">
+              {salesperson?.id && <CommissionDashboard salespersonId={salesperson.id} />}
             </TabsContent>
 
             {/* Profile Tab */}

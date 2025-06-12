@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { format } from "date-fns";
 import { useState } from "react";
+import type { DateRange } from "react-day-picker";
 
 interface CommissionRecord {
   id: number;
@@ -51,10 +52,7 @@ interface CommissionDashboardProps {
 }
 
 export function CommissionDashboard({ salespersonId }: CommissionDashboardProps) {
-  const [dateRange, setDateRange] = useState<{
-    from: Date | undefined;
-    to: Date | undefined;
-  }>({
+  const [dateRange, setDateRange] = useState<DateRange | undefined>({
     from: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
     to: new Date()
   });
@@ -226,7 +224,7 @@ export function CommissionDashboard({ salespersonId }: CommissionDashboardProps)
                   mode="range"
                   defaultMonth={dateRange?.from}
                   selected={dateRange}
-                  onSelect={setDateRange}
+                  onSelect={(range) => setDateRange(range)}
                   numberOfMonths={2}
                 />
               </PopoverContent>
