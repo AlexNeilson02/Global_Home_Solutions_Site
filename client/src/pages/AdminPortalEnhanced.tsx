@@ -760,118 +760,118 @@ export default function AdminPortalEnhanced() {
                         Add Contractor
                       </Button>
                     </DialogTrigger>
-                    <DialogContent className="sm:max-w-[600px]">
+                    <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto">
                       <DialogHeader className="pb-6">
                         <DialogTitle className="text-2xl font-bold">Create New Contractor</DialogTitle>
                         <DialogDescription className="text-base">
                           Add a new contractor to the platform
                         </DialogDescription>
                       </DialogHeader>
-                      <div className="space-y-6">
+                      <div className="space-y-6 max-h-[60vh] overflow-y-auto pr-2">
                         <div className="grid grid-cols-2 gap-4">
                           <div>
-                            <label className="text-sm font-medium">Username</label>
-                            <input 
+                            <label className="text-sm font-medium mb-2 block">Username</label>
+                            <Input
                               type="text"
-                              className="w-full px-3 py-2 border rounded-md text-sm"
                               placeholder="Enter username"
                               value={contractorAddData.username}
                               onChange={(e) => setContractorAddData({...contractorAddData, username: e.target.value})}
+                              className="h-10"
                             />
                           </div>
                           <div>
-                            <label className="text-sm font-medium">Full Name</label>
-                            <input 
+                            <label className="text-sm font-medium mb-2 block">Full Name</label>
+                            <Input
                               type="text"
-                              className="w-full px-3 py-2 border rounded-md text-sm"
                               placeholder="Enter full name"
                               value={contractorAddData.fullName}
                               onChange={(e) => setContractorAddData({...contractorAddData, fullName: e.target.value})}
+                              className="h-10"
                             />
                           </div>
                         </div>
                         <div className="grid grid-cols-2 gap-4">
                           <div>
-                            <label className="text-sm font-medium">Email</label>
-                            <input 
+                            <label className="text-sm font-medium mb-2 block">Email</label>
+                            <Input
                               type="email"
-                              className="w-full px-3 py-2 border rounded-md text-sm"
                               placeholder="Enter email"
                               value={contractorAddData.email}
                               onChange={(e) => setContractorAddData({...contractorAddData, email: e.target.value})}
+                              className="h-10"
                             />
                           </div>
                           <div>
-                            <label className="text-sm font-medium">Phone</label>
-                            <input 
+                            <label className="text-sm font-medium mb-2 block">Phone</label>
+                            <Input
                               type="text"
-                              className="w-full px-3 py-2 border rounded-md text-sm"
                               placeholder="Enter phone number"
                               value={contractorAddData.phone}
                               onChange={(e) => setContractorAddData({...contractorAddData, phone: e.target.value})}
+                              className="h-10"
                             />
                           </div>
                         </div>
                         <div>
-                          <label className="text-sm font-medium">Company Name</label>
-                          <input 
+                          <label className="text-sm font-medium mb-2 block">Company Name</label>
+                          <Input
                             type="text"
-                            className="w-full px-3 py-2 border rounded-md text-sm"
                             placeholder="Enter company name"
                             value={contractorAddData.companyName}
                             onChange={(e) => setContractorAddData({...contractorAddData, companyName: e.target.value})}
+                            className="h-10"
                           />
                         </div>
                         <div>
-                          <label className="text-sm font-medium">Company Description</label>
-                          <textarea 
-                            className="w-full px-3 py-2 border rounded-md text-sm min-h-[80px]"
+                          <label className="text-sm font-medium mb-2 block">Company Description</label>
+                          <Textarea
                             placeholder="Enter company description"
                             value={contractorAddData.description}
                             onChange={(e) => setContractorAddData({...contractorAddData, description: e.target.value})}
+                            className="min-h-[80px] resize-none"
                           />
                         </div>
                         <div className="grid grid-cols-2 gap-4">
                           <div>
-                            <label className="text-sm font-medium">Hourly Rate ($)</label>
-                            <input 
+                            <label className="text-sm font-medium mb-2 block">Hourly Rate ($)</label>
+                            <Input
                               type="number"
-                              className="w-full px-3 py-2 border rounded-md text-sm"
                               placeholder="Enter hourly rate"
                               value={contractorAddData.hourlyRate}
                               onChange={(e) => setContractorAddData({...contractorAddData, hourlyRate: e.target.value})}
+                              className="h-10"
                             />
                           </div>
                           <div>
-                            <label className="text-sm font-medium">Service Areas</label>
-                            <input 
+                            <label className="text-sm font-medium mb-2 block">Service Areas</label>
+                            <Input
                               type="text"
-                              className="w-full px-3 py-2 border rounded-md text-sm"
                               placeholder="Enter service areas (comma-separated)"
                               value={contractorAddData.serviceAreas}
                               onChange={(e) => setContractorAddData({...contractorAddData, serviceAreas: e.target.value})}
+                              className="h-10"
                             />
                           </div>
                         </div>
                         <div className="grid grid-cols-2 gap-4">
                           <div>
-                            <label className="text-sm font-medium">Password</label>
-                            <input 
+                            <label className="text-sm font-medium mb-2 block">Password</label>
+                            <Input
                               type="password"
-                              className="w-full px-3 py-2 border rounded-md text-sm"
                               placeholder="Enter password"
                               value={contractorAddData.password}
                               onChange={(e) => setContractorAddData({...contractorAddData, password: e.target.value})}
+                              className="h-10"
                             />
                           </div>
                           <div>
-                            <label className="text-sm font-medium">Confirm Password</label>
-                            <input 
+                            <label className="text-sm font-medium mb-2 block">Confirm Password</label>
+                            <Input
                               type="password"
-                              className="w-full px-3 py-2 border rounded-md text-sm"
                               placeholder="Confirm password"
                               value={contractorAddData.confirmPassword}
                               onChange={(e) => setContractorAddData({...contractorAddData, confirmPassword: e.target.value})}
+                              className="h-10"
                             />
                           </div>
                         </div>
