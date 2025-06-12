@@ -976,7 +976,7 @@ export class DatabaseStorage implements IStorage {
     
     return {
       totalEarned: records.reduce((sum, r) => sum + (r.salesmanAmount || 0), 0),
-      pendingCommissions: records.filter(r => r.paymentStatus === 'unpaid').reduce((sum, r) => sum + (r.salesmanAmount || 0), 0),
+      pendingCommissions: records.filter(r => r.paymentStatus === 'pending').reduce((sum, r) => sum + (r.salesmanAmount || 0), 0),
       paidCommissions: records.filter(r => r.paymentStatus === 'paid').reduce((sum, r) => sum + (r.salesmanAmount || 0), 0),
       totalRecords: records.length
     };
