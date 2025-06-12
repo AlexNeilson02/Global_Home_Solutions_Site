@@ -295,8 +295,8 @@ export default function AdminPortalEnhanced() {
                   </div>
                   <Dialog>
                     <DialogTrigger asChild>
-                      <Button>
-                        <Plus className="h-4 w-4 mr-2" />
+                      <Button className="bg-white text-black border-2 border-black hover:bg-gray-100 font-semibold">
+                        <Plus className="h-4 w-4 mr-2 text-black" />
                         Add Salesperson
                       </Button>
                     </DialogTrigger>
