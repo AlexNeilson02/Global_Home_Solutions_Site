@@ -79,8 +79,8 @@ const AdminPortal: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pb-16 sm:pb-0">
-      <div className="container mx-auto px-4 py-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="container mx-auto px-4 py-8 pb-20 sm:pb-8">
         <div className="max-w-7xl mx-auto">
           {/* Header */}
           <div className="flex justify-between items-center mb-8">
@@ -107,15 +107,6 @@ const AdminPortal: React.FC = () => {
                 <TabsTrigger value="analytics">Analytics</TabsTrigger>
                 <TabsTrigger value="settings">Settings</TabsTrigger>
               </TabsList>
-            )}
-
-            {/* Mobile Bottom Navigation - Only show on mobile */}
-            {isMobile && (
-              <MobileBottomNav
-                activeTab={activeTab}
-                onTabChange={setActiveTab}
-                portalType="admin"
-              />
             )}
 
             {/* Dashboard Tab */}
@@ -362,6 +353,15 @@ const AdminPortal: React.FC = () => {
           </Tabs>
         </div>
       </div>
+
+      {/* Mobile Bottom Navigation - Fixed at bottom */}
+      {isMobile && (
+        <MobileBottomNav
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
+          portalType="admin"
+        />
+      )}
     </div>
   );
 };
