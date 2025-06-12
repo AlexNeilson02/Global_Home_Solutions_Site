@@ -25,11 +25,13 @@ import {
   Eye,
   MapPin,
   Calendar,
-  BarChart3
+  BarChart3,
+  DollarSign
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
 import AnalyticsDashboard from "@/components/AnalyticsDashboard";
+import { CommissionDashboard } from "@/components/CommissionDashboard";
 
 const SalesPortalEnhanced: React.FC = () => {
   const [, navigate] = useLocation();
@@ -283,11 +285,12 @@ const SalesPortalEnhanced: React.FC = () => {
           </div>
 
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-            <TabsList className="grid w-full grid-cols-5">
+            <TabsList className="grid w-full grid-cols-6">
               <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
               <TabsTrigger value="profile">Profile</TabsTrigger>
               <TabsTrigger value="qr-tools">QR & Tools</TabsTrigger>
               <TabsTrigger value="leads">My Leads</TabsTrigger>
+              <TabsTrigger value="commissions">Commissions</TabsTrigger>
               <TabsTrigger value="analytics">Analytics</TabsTrigger>
             </TabsList>
 
@@ -773,6 +776,11 @@ const SalesPortalEnhanced: React.FC = () => {
                   </div>
                 </CardContent>
               </Card>
+            </TabsContent>
+
+            {/* Commissions Tab */}
+            <TabsContent value="commissions" className="space-y-6">
+              <CommissionDashboard salespersonId={salesperson?.id} />
             </TabsContent>
 
             {/* Analytics Tab */}
