@@ -163,7 +163,33 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getAllSalespersons(): Promise<Salesperson[]> {
-    return db.select().from(salespersons);
+    const results = await db
+      .select({
+        id: salespersons.id,
+        userId: salespersons.userId,
+        nfcId: salespersons.nfcId,
+        profileUrl: salespersons.profileUrl,
+        qrCodeUrl: salespersons.qrCodeUrl,
+        lastScanned: salespersons.lastScanned,
+        isActive: salespersons.isActive,
+        bio: salespersons.bio,
+        specialties: salespersons.specialties,
+        certifications: salespersons.certifications,
+        yearsExperience: salespersons.yearsExperience,
+        totalLeads: salespersons.totalLeads,
+        conversionRate: salespersons.conversionRate,
+        commissions: salespersons.commissions,
+        activeProjects: salespersons.activeProjects,
+        totalVisits: salespersons.totalVisits,
+        successfulConversions: salespersons.successfulConversions,
+        fullName: users.fullName,
+        email: users.email,
+        phone: users.phone,
+      })
+      .from(salespersons)
+      .leftJoin(users, eq(salespersons.userId, users.id));
+    
+    return results as any[];
   }
   
   async incrementSalespersonStats(id: number, field: 'totalVisits' | 'successfulConversions'): Promise<Salesperson | undefined> {
