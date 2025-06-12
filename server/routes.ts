@@ -269,11 +269,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Contractor endpoints
   apiRouter.get("/contractors", async (req: Request, res: Response) => {
     try {
-      const contractors = await storage.getAllContractors();
+      const allContractors = await storage.getAllContractors();
       
-      // Fetch user data for each contractor
+      // Filter out archived contractors (where isActive is false)
+      const activeContractors = allContractors.filter(contractor => contractor.isActive !== false);
+      
+      // Fetch user data for each active contractor
       const contractorsWithUserData = await Promise.all(
-        contractors.map(async (contractor) => {
+        activeContractors.map(async (contractor) => {
           const user = await storage.getUser(contractor.userId);
           return {
             ...contractor,
@@ -294,11 +297,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
   apiRouter.get("/contractors/featured", async (req: Request, res: Response) => {
     try {
       const limit = Number(req.query.limit) || 3;
-      const contractors = await storage.getFeaturedContractors(limit);
+      const allFeaturedContractors = await storage.getFeaturedContractors(limit * 2); // Get more to account for filtering
       
-      // Fetch user data for each contractor
+      // Filter out archived contractors
+      const activeFeaturedContractors = allFeaturedContractors
+        .filter(contractor => contractor.isActive !== false)
+        .slice(0, limit); // Take only the requested number after filtering
+      
+      // Fetch user data for each active contractor
       const contractorsWithUserData = await Promise.all(
-        contractors.map(async (contractor) => {
+        activeFeaturedContractors.map(async (contractor) => {
           const user = await storage.getUser(contractor.userId);
           return {
             ...contractor,
