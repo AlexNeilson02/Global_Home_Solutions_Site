@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Spacing Debug Tool</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f0f0f0;
+        }
+        .debug-section {
+            background: white;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .debug-code {
+            background: #f8f8f8;
+            padding: 10px;
+            border-radius: 3px;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        .copy-btn {
+            background: #007cba;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Website Top Spacing Debugger</h1>
+    
+    <div class="debug-section">
+        <h2>Step 1: Browser Console Investigation</h2>
+        <p>Copy and paste this code into your browser's console (F12) while on your website:</p>
+        <div class="debug-code">// Find all elements with top margins or padding
+function findTopSpacing() {
+    const elements = document.querySelectorAll('*');
+    const spacingElements = [];
+    
+    elements.forEach(el => {
+        const computed = window.getComputedStyle(el);
+        const marginTop = parseFloat(computed.marginTop);
+        const paddingTop = parseFloat(computed.paddingTop);
+        const top = parseFloat(computed.top);
+        
+        if (marginTop > 0 || paddingTop > 0 || (top > 0 && computed.position !== 'static')) {
+            spacingElements.push({
+                element: el,
+                tagName: el.tagName,
+                className: el.className,
+                id: el.id,
+                marginTop: marginTop,
+                paddingTop: paddingTop,
+                top: top,
+                position: computed.position
+            });
+        }
+    });
+    
+    // Sort by vertical position
+    spacingElements.sort((a, b) => {
+        const aRect = a.element.getBoundingClientRect();
+        const bRect = b.element.getBoundingClientRect();
+        return aRect.top - bRect.top;
+    });
+    
+    console.log('Elements with top spacing:', spacingElements);
+    return spacingElements;
+}
+
+// Highlight elements with spacing
+function highlightSpacingElements() {
+    const spacingElements = findTopSpacing();
+    spacingElements.slice(0, 10).forEach((item, index) => {
+        item.element.style.outline = `2px solid hsl(${index * 36}, 70%, 50%)`;
+        item.element.style.outlineOffset = '2px';
+    });
+}
+
+// Run the investigation
+console.log('=== TOP SPACING DEBUG ===');
+findTopSpacing();
+highlightSpacingElements();
+console.log('Elements are now highlighted with colored outlines');
+        </div>
+        <button class="copy-btn" onclick="navigator.clipboard.writeText(document.querySelector('.debug-code').textContent)">Copy Code</button>
+    </div>
+
+    <div class="debug-section">
+        <h2>Step 2: Check for Hidden Elements</h2>
+        <p>Run this to find invisible elements that might be taking up space:</p>
+        <div class="debug-code">// Find invisible elements taking up space
+function findInvisibleSpacers() {
+    const elements = document.querySelectorAll('*');
+    const invisibleSpacers = [];
+    
+    elements.forEach(el => {
+        const computed = window.getComputedStyle(el);
+        const rect = el.getBoundingClientRect();
+        
+        if (rect.height > 0 && (
+            computed.visibility === 'hidden' ||
+            computed.opacity === '0' ||
+            computed.color === computed.backgroundColor ||
+            el.textContent.trim() === ''
+        )) {
+            invisibleSpacers.push({
+                element: el,
+                tagName: el.tagName,
+                className: el.className,
+                height: rect.height,
+                top: rect.top
+            });
+        }
+    });
+    
+    console.log('Invisible elements taking space:', invisibleSpacers);
+    return invisibleSpacers;
+}
+
+findInvisibleSpacers();
+        </div>
+    </div>
+
+    <div class="debug-section">
+        <h2>Step 3: Measure from Viewport Top</h2>
+        <p>Check the exact distance from viewport top to your first visible content:</p>
+        <div class="debug-code">// Measure distance from top
+function measureFromTop() {
+    const body = document.body;
+    const html = document.documentElement;
+    const root = document.getElementById('root');
+    const firstChild = root ? root.firstElementChild : body.firstElementChild;
+    
+    console.log('Body top:', body.getBoundingClientRect().top);
+    console.log('HTML top:', html.getBoundingClientRect().top);
+    console.log('Root top:', root ? root.getBoundingClientRect().top : 'No root element');
+    console.log('First child top:', firstChild ? firstChild.getBoundingClientRect().top : 'No first child');
+    
+    // Check computed styles
+    console.log('Body margin-top:', window.getComputedStyle(body).marginTop);
+    console.log('Body padding-top:', window.getComputedStyle(body).paddingTop);
+    console.log('HTML margin-top:', window.getComputedStyle(html).marginTop);
+}
+
+measureFromTop();
+        </div>
+    </div>
+</body>
+</html>
