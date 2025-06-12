@@ -58,10 +58,10 @@ const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
 
   return (
     <>
-      {/* Bottom Navigation - Only visible on small screens (640px and below) */}
-      <div className="sm:hidden fixed bottom-0 left-0 right-0 z-50">
-        <div className="mx-4 mb-4 bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700">
-          <div className="flex items-center justify-around px-4 py-3">
+      {/* Bottom Navigation - Only visible on screens 640px and below */}
+      <div className="block sm:hidden fixed bottom-0 left-0 right-0 z-50 p-4">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 backdrop-blur-sm">
+          <div className="flex items-center justify-around px-2 py-3">
             {tabs.map((tab) => {
               const Icon = tab.icon;
               const isActive = activeTab === tab.id;
@@ -70,25 +70,31 @@ const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
                 <button
                   key={tab.id}
                   onClick={() => onTabChange(tab.id)}
-                  className={`flex flex-col items-center justify-center px-3 py-2 rounded-xl min-w-0 relative flex-1 transition-all duration-200 ${
+                  className={`flex flex-col items-center justify-center px-3 py-2 rounded-xl min-w-0 relative flex-1 transition-all duration-200 group ${
                     isActive 
-                      ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400' 
-                      : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50'
+                      ? 'bg-blue-50 dark:bg-blue-900/20' 
+                      : 'hover:bg-gray-50 dark:hover:bg-gray-700/50'
                   }`}
                 >
                   <div className="relative mb-1">
-                    <Icon className="w-5 h-5" />
+                    <Icon className={`w-6 h-6 ${
+                      isActive 
+                        ? 'text-blue-600 dark:text-blue-400' 
+                        : 'text-gray-500 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-300'
+                    }`} />
                     {tab.hasNotification && notificationCount > 0 && (
                       <Badge 
                         variant="destructive" 
-                        className="absolute -top-2 -right-2 h-4 w-4 text-xs flex items-center justify-center animate-pulse p-0 min-w-4"
+                        className="absolute -top-1 -right-1 h-4 w-4 text-xs flex items-center justify-center animate-pulse p-0 min-w-4"
                       >
                         {notificationCount > 9 ? '9+' : notificationCount}
                       </Badge>
                     )}
                   </div>
                   <span className={`text-xs font-medium truncate max-w-full ${
-                    isActive ? 'text-blue-600 dark:text-blue-400' : ''
+                    isActive 
+                      ? 'text-blue-600 dark:text-blue-400' 
+                      : 'text-gray-500 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-300'
                   }`}>
                     {tab.label}
                   </span>
@@ -100,7 +106,7 @@ const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
       </div>
 
       {/* Spacer for bottom navigation - Only on small screens */}
-      <div className="sm:hidden h-20" />
+      <div className="block sm:hidden h-24" />
     </>
   );
 };
