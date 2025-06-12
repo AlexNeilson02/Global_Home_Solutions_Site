@@ -415,7 +415,7 @@ export default function AdminPortalEnhanced() {
                     <div key={salesperson.id} className="border rounded-lg p-4">
                       <div className="flex justify-between items-start mb-3">
                         <div className="flex-1">
-                          <h4 className="font-semibold">{salesperson.fullName || 'Sales Rep'}</h4>
+                          <h4 className="font-semibold">{salesperson.fullName || salesperson.profileUrl || 'Sales Rep'}</h4>
                           <p className="text-sm text-gray-600 dark:text-gray-300">
                             Profile: {salesperson.profileUrl}
                           </p>
