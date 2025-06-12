@@ -81,7 +81,7 @@ export default function AdminPortalEnhanced() {
     }
   });
 
-  const salespersons = Array.isArray(salespersonsData) ? salespersonsData : [];
+  const salespersons = Array.isArray(salespersonsData) ? salespersonsData.filter(s => s.isActive !== false) : [];
 
   // Edit salesperson mutation
   const editSalespersonMutation = useMutation({
@@ -796,34 +796,38 @@ export default function AdminPortalEnhanced() {
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-4">
-              <div>
-                <label className="text-sm font-medium">Full Name</label>
+              <div className="w-full">
+                <label className="text-sm font-medium block mb-1">Full Name</label>
                 <Input
+                  className="w-full"
                   value={editFormData.fullName}
                   onChange={(e) => setEditFormData({...editFormData, fullName: e.target.value})}
                   placeholder="Enter full name"
                 />
               </div>
-              <div>
-                <label className="text-sm font-medium">Profile URL</label>
+              <div className="w-full">
+                <label className="text-sm font-medium block mb-1">Profile URL</label>
                 <Input
+                  className="w-full"
                   value={editFormData.profileUrl}
                   onChange={(e) => setEditFormData({...editFormData, profileUrl: e.target.value})}
                   placeholder="Enter profile URL"
                 />
               </div>
-              <div>
-                <label className="text-sm font-medium">New Password (leave empty to keep current)</label>
+              <div className="w-full">
+                <label className="text-sm font-medium block mb-1">New Password (leave empty to keep current)</label>
                 <Input
+                  className="w-full"
                   type="password"
                   value={editFormData.password}
                   onChange={(e) => setEditFormData({...editFormData, password: e.target.value})}
                   placeholder="Enter new password"
                 />
               </div>
-              <div>
-                <label className="text-sm font-medium">Confirm New Password</label>
+              <div className="w-full">
+                <label className="text-sm font-medium block mb-1">Confirm New Password</label>
                 <Input
+                  className="w-full"
                   type="password"
                   value={editFormData.confirmPassword}
                   onChange={(e) => setEditFormData({...editFormData, confirmPassword: e.target.value})}
