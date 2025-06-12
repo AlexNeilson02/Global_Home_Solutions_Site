@@ -141,7 +141,7 @@ export function CommissionDashboard({ salespersonId }: CommissionDashboardProps)
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-green-600">
-              {formatCurrency(summary?.totalEarnings || 0)}
+              {formatCurrency(summary?.totalEarned || 0)}
             </div>
             <p className="text-xs text-muted-foreground">
               All time commission earnings
@@ -156,7 +156,7 @@ export function CommissionDashboard({ salespersonId }: CommissionDashboardProps)
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-yellow-600">
-              {formatCurrency(summary?.pendingEarnings || 0)}
+              {formatCurrency(summary?.pendingCommissions || 0)}
             </div>
             <p className="text-xs text-muted-foreground">
               Awaiting payment processing
@@ -166,30 +166,30 @@ export function CommissionDashboard({ salespersonId }: CommissionDashboardProps)
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Leads</CardTitle>
+            <CardTitle className="text-sm font-medium">Commission Records</CardTitle>
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {summary?.totalLeads || 0}
+              {summary?.totalRecords || 0}
             </div>
             <p className="text-xs text-muted-foreground">
-              Leads generated this month
+              Total commission records
             </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Avg Commission</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium">Paid Commissions</CardTitle>
+            <CheckCircle className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
-              {formatCurrency(summary?.averageCommission || 0)}
+            <div className="text-2xl font-bold text-green-600">
+              {formatCurrency(summary?.paidCommissions || 0)}
             </div>
             <p className="text-xs text-muted-foreground">
-              Per successful lead
+              Successfully processed
             </p>
           </CardContent>
         </Card>
