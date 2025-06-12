@@ -761,10 +761,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Create bid request - public endpoint for customers with optional file upload support
   apiRouter.post("/bid-requests", upload.array('media', 10), async (req: Request, res: Response) => {
+    res.setHeader('Content-Type', 'application/json');
+    let client;
+    
     try {
-      console.log('Received bid request data:', req.body);
-      console.log('Received files:', req.files);
-      console.log('Content-Type:', req.headers['content-type']);
+      console.log('Processing bid request submission...');
+      console.log('Request body:', JSON.stringify(req.body, null, 2));
       
       const {
         fullName,
@@ -798,7 +800,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Validate required fields
       if (!finalFullName || !finalEmail || !finalPhone || !finalDescription || !finalAddress || !finalTimeline || !contractorId) {
-        console.log('Missing required fields:', {
+        console.log('Validation failed - missing required fields:', {
           fullName: !!finalFullName,
           email: !!finalEmail,
           phone: !!finalPhone,
@@ -807,71 +809,156 @@ export async function registerRoutes(app: Express): Promise<Server> {
           timeline: !!finalTimeline,
           contractorId: !!contractorId
         });
-        return res.status(400).json({ message: "All required fields must be provided" });
-      }
-
-      // Process uploaded files
-      const files = req.files as Express.Multer.File[];
-      let mediaUrls: string[] = [];
-      
-      if (files && files.length > 0) {
-        // In a production environment, you would upload these to cloud storage (AWS S3, etc.)
-        // For now, we'll convert files to base64 and store them temporarily
-        // This is not recommended for production but works for demonstration
-        mediaUrls = files.map((file, index) => {
-          const base64Data = file.buffer.toString('base64');
-          const dataUrl = `data:${file.mimetype};base64,${base64Data}`;
-          return dataUrl;
+        return res.status(400).json({ 
+          success: false,
+          message: "All required fields must be provided",
+          missingFields: {
+            fullName: !finalFullName,
+            email: !finalEmail,
+            phone: !finalPhone,
+            description: !finalDescription,
+            address: !finalAddress,
+            timeline: !finalTimeline,
+            contractorId: !contractorId
+          }
         });
       }
 
-      // Create bid request with correct field names for database schema
+      // Process uploaded files with error handling
+      let mediaUrls: string[] = [];
+      try {
+        const files = req.files as Express.Multer.File[];
+        if (files && files.length > 0) {
+          console.log(`Processing ${files.length} uploaded files`);
+          mediaUrls = files.map((file, index) => {
+            const base64Data = file.buffer.toString('base64');
+            const dataUrl = `data:${file.mimetype};base64,${base64Data}`;
+            return dataUrl;
+          });
+          console.log('Files processed successfully');
+        }
+      } catch (fileError) {
+        console.error('Error processing files:', fileError);
+        // Continue without files rather than failing the entire request
+      }
+
+      // Create bid request with proper data validation
       const bidRequestData = {
         contractorId: Number(contractorId),
         salespersonId: salespersonId ? Number(salespersonId) : null,
-        fullName: finalFullName,
-        email: finalEmail,
-        phone: finalPhone,
-        address: finalAddress,
-        serviceRequested: serviceRequested || "General Services",
-        description: finalDescription,
-        timeline: finalTimeline,
-        budget: budget || null,
-        preferredContactMethod: preferredContactMethod || "email",
-        // Add media URLs and additional information
+        fullName: String(finalFullName).trim(),
+        email: String(finalEmail).trim().toLowerCase(),
+        phone: String(finalPhone).trim(),
+        address: String(finalAddress).trim(),
+        serviceRequested: String(serviceRequested || "General Services").trim(),
+        description: String(finalDescription).trim(),
+        timeline: String(finalTimeline).trim(),
+        budget: budget ? String(budget).trim() : null,
+        preferredContactMethod: String(preferredContactMethod || "email").trim(),
         additionalInformation: additionalInformation || (mediaUrls.length > 0 ? JSON.stringify({ mediaUrls }) : null)
       };
 
-      const bidRequest = await storage.createBidRequest(bidRequestData);
+      console.log('Creating bid request with data:', JSON.stringify(bidRequestData, null, 2));
 
-      // Send real-time notification to contractor if connected
-      const contractorWSConnections = contractorConnections.get(Number(contractorId)) || [];
-      const notification = {
-        type: 'NEW_BID_REQUEST',
-        data: {
-          id: bidRequest.id,
-          customerName: bidRequest.fullName,
-          projectDescription: bidRequest.description,
-          timeline: bidRequest.timeline,
-          budget: bidRequest.budget,
-          email: bidRequest.email,
-          phone: bidRequest.phone,
-          address: bidRequest.address,
-          createdAt: bidRequest.createdAt
-        }
-      };
+      // Create the bid request with timeout handling
+      const bidRequest = await Promise.race([
+        storage.createBidRequest(bidRequestData),
+        new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Database operation timeout')), 25000)
+        )
+      ]) as any;
 
-      contractorWSConnections.forEach(ws => {
-        if (ws.readyState === WebSocket.OPEN) {
-          ws.send(JSON.stringify(notification));
-          console.log('Sent real-time notification to contractor:', contractorId);
+      console.log('Bid request created successfully:', bidRequest.id);
+
+      // Create commission record if salesperson is involved
+      if (bidRequest.salespersonId) {
+        try {
+          console.log('Creating commission record for salesperson:', bidRequest.salespersonId);
+          const { CommissionService } = await import('./commission-service');
+          await CommissionService.createCommissionForBidRequest(bidRequest, bidRequest.serviceRequested || 'General Services');
+          console.log('Commission record created successfully');
+        } catch (commissionError) {
+          console.error('Error creating commission record:', commissionError);
+          // Don't fail the entire request for commission errors
         }
+      }
+
+      // Send WebSocket notification with error handling
+      try {
+        const contractorWSConnections = contractorConnections.get(Number(contractorId)) || [];
+        if (contractorWSConnections.length > 0) {
+          const notification = {
+            type: 'NEW_BID_REQUEST',
+            data: {
+              id: bidRequest.id,
+              customerName: bidRequest.fullName,
+              projectDescription: bidRequest.description,
+              timeline: bidRequest.timeline,
+              budget: bidRequest.budget,
+              email: bidRequest.email,
+              phone: bidRequest.phone,
+              address: bidRequest.address,
+              createdAt: bidRequest.createdAt
+            }
+          };
+
+          contractorWSConnections.forEach(ws => {
+            if (ws.readyState === WebSocket.OPEN) {
+              ws.send(JSON.stringify(notification));
+            }
+          });
+          console.log('Real-time notification sent to contractor:', contractorId);
+        }
+      } catch (wsError) {
+        console.error('WebSocket notification error:', wsError);
+        // Continue without failing the request
+      }
+
+      res.status(201).json({ 
+        success: true,
+        bidRequest,
+        message: 'Bid request submitted successfully'
       });
 
-      res.status(201).json({ bidRequest });
     } catch (error) {
-      console.error("Error creating bid request:", error);
-      res.status(500).json({ message: "Internal server error" });
+      console.error("Critical error creating bid request:", error);
+      
+      // Provide detailed error information
+      let errorMessage = "Failed to submit bid request";
+      let statusCode = 500;
+      
+      if (error instanceof Error) {
+        if (error.message.includes('timeout')) {
+          errorMessage = "Request timed out. Please try again.";
+          statusCode = 408;
+        } else if (error.message.includes('connection')) {
+          errorMessage = "Database connection issue. Please try again.";
+          statusCode = 503;
+        } else if (error.message.includes('validation')) {
+          errorMessage = "Invalid data provided";
+          statusCode = 400;
+        }
+        
+        console.error('Error details:', {
+          name: error.name,
+          message: error.message,
+          stack: error.stack
+        });
+      }
+
+      res.status(statusCode).json({ 
+        success: false,
+        message: errorMessage,
+        error: process.env.NODE_ENV === 'development' ? error?.message : undefined
+      });
+    } finally {
+      if (client) {
+        try {
+          client.release();
+        } catch (releaseError) {
+          console.error('Error releasing database client:', releaseError);
+        }
+      }
     }
   });
   
