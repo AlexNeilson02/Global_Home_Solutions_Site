@@ -35,14 +35,62 @@ export class CommissionService {
     try {
       // Get service category to determine commission amounts
       const serviceCategories = await storage.getAllServiceCategories();
-      const serviceCategory = serviceCategories.find(
+      
+      // First try exact match
+      let serviceCategory = serviceCategories.find(
         cat => cat.name.toLowerCase() === bidRequest.serviceRequested.toLowerCase()
       );
 
+      // If no exact match, try partial matches for common variations
       if (!serviceCategory) {
-        console.warn(`No commission rates found for service: ${bidRequest.serviceRequested}`);
+        const requestedService = bidRequest.serviceRequested.toLowerCase();
+        serviceCategory = serviceCategories.find(cat => {
+          const categoryName = cat.name.toLowerCase();
+          // Check if the requested service is contained in the category name or vice versa
+          return categoryName.includes(requestedService) || requestedService.includes(categoryName.split('&')[0].trim());
+        });
+      }
+
+      // If still no match, try keyword matching for common service types
+      if (!serviceCategory) {
+        const requestedService = bidRequest.serviceRequested.toLowerCase();
+        const serviceKeywords = {
+          'flooring': ['flooring & hardwood', 'epoxy flooring'],
+          'electrical': ['electrical'],
+          'plumbing': ['plumbing'],
+          'roofing': ['roofing'],
+          'painting': ['painting interior & exterior'],
+          'hvac': ['heating & cooling', 'hvac'],
+          'kitchen': ['kitchen remodeling'],
+          'bathroom': ['reglazing (bath & countertop)', 'walk-in tubs'],
+          'concrete': ['concrete patio/drive walk', 'concrete polishing'],
+          'pool': ['swimming pools', 'pool service'],
+          'handyman': ['handyman', 'handy man service'],
+          'windows': ['windows & doors', 'window and door install'],
+          'siding': ['siding'],
+          'fence': ['fencing', 'block wall/ fence'],
+          'landscaping': ['landscaping', 'landscape design'],
+          'solar': ['solar'],
+          'foundation': ['foundation repair']
+        };
+
+        for (const [keyword, categories] of Object.entries(serviceKeywords)) {
+          if (requestedService.includes(keyword)) {
+            serviceCategory = serviceCategories.find(cat => 
+              categories.some(catName => cat.name.toLowerCase().includes(catName))
+            );
+            if (serviceCategory) break;
+          }
+        }
+      }
+
+      if (!serviceCategory) {
+        console.warn(`No commission rates found for service: ${bidRequest.serviceRequested}. Available categories:`, 
+          serviceCategories.map(cat => cat.name).join(', '));
         return;
       }
+
+      console.log(`Matched service "${bidRequest.serviceRequested}" to category "${serviceCategory.name}"`)
 
       const commissionAmounts = this.calculateCommissionAmounts(serviceCategory);
 
