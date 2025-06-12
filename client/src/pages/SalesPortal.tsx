@@ -8,6 +8,7 @@ import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from "recharts";
 import { TrendingUp, Users, DollarSign, Target, QrCode, Eye, ArrowUpRight } from "lucide-react";
+import MobileBottomNav from "@/components/layout/MobileBottomNav";
 
 const SalesPortal: React.FC = () => {
   const [, navigate] = useLocation();
@@ -62,10 +63,10 @@ const SalesPortal: React.FC = () => {
     { month: 'Jun', leads: 67, conversions: 25, revenue: 32500 }
   ];
 
-  const conversionRate = analytics && analytics.totalVisits > 0 && !isNaN(analytics.conversions) ? (analytics.conversions / analytics.totalVisits * 100).toFixed(1) : '0.0';
+  const conversionRate = analytics && (analytics as any).totalVisits > 0 && !isNaN((analytics as any).conversions) ? ((analytics as any).conversions / (analytics as any).totalVisits * 100).toFixed(1) : '0.0';
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pb-16 sm:pb-0">
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-7xl mx-auto">
           {/* Header */}
@@ -84,24 +85,32 @@ const SalesPortal: React.FC = () => {
           </div>
 
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-            <TabsList className="grid w-full grid-cols-4">
+            {/* Desktop Navigation - Hidden on mobile */}
+            <TabsList className="hidden sm:grid w-full grid-cols-4">
               <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
               <TabsTrigger value="leads">Lead Management</TabsTrigger>
-              <TabsTrigger value="qr-tools">QR Tools</TabsTrigger>
+              <TabsTrigger value="analytics">Analytics</TabsTrigger>
               <TabsTrigger value="profile">Profile</TabsTrigger>
             </TabsList>
 
+            {/* Mobile Bottom Navigation */}
+            <MobileBottomNav
+              activeTab={activeTab}
+              onTabChange={setActiveTab}
+              portalType="sales"
+            />
+
             {/* Dashboard Tab */}
             <TabsContent value="dashboard" className="space-y-6">
-              {/* Key Metrics Cards */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {/* Key Metrics Cards - Mobile: 2 columns, Desktop: 4 columns */}
+              <div className="grid grid-cols-2 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">Total Visits</CardTitle>
                     <Eye className="h-4 w-4 text-muted-foreground" />
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">{analytics?.totalVisits || 0}</div>
+                    <div className="text-2xl font-bold">{(analytics as any)?.totalVisits || 0}</div>
                     <p className="text-xs text-muted-foreground">
                       <span className="text-green-600">+12.5%</span> from last month
                     </p>
