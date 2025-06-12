@@ -357,7 +357,7 @@ export default function AdminPortalEnhanced() {
                         </div>
                         <Button 
                           type="button" 
-                          className="w-full"
+                          className="w-full bg-white text-black border-2 border-black hover:bg-gray-100 font-semibold"
                           onClick={async () => {
                             const username = (document.getElementById('username') as HTMLInputElement)?.value;
                             const fullName = (document.getElementById('fullName') as HTMLInputElement)?.value;
