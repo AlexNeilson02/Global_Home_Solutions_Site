@@ -60,7 +60,7 @@ const ContractorPortal: React.FC = () => {
     enabled: true
   });
 
-  const contractor = contractorData?.contractor ?? null;
+  const contractor = contractorData && typeof contractorData === 'object' && contractorData !== null && 'contractor' in contractorData ? (contractorData as any).contractor : null;
   const contractorId = contractor?.id;
 
   // Real-time notifications for new bid requests
@@ -513,8 +513,8 @@ const ContractorPortal: React.FC = () => {
 
             {/* Dashboard Tab */}
             <TabsContent value="dashboard" className="space-y-6">
-              {/* Key Metrics Cards */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {/* Key Metrics Cards - Mobile: 2 columns, Desktop: 4 columns */}
+              <div className="grid grid-cols-2 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">Active Projects</CardTitle>

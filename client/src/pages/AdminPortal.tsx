@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 import { Users, Building, TrendingUp, Shield, Settings, AlertTriangle } from "lucide-react";
+import MobileBottomNav from "@/components/layout/MobileBottomNav";
 
 const AdminPortal: React.FC = () => {
   const [, navigate] = useLocation();
@@ -57,10 +58,10 @@ const AdminPortal: React.FC = () => {
   });
 
   // Extract arrays from API responses
-  const salespersonsList = salespersons?.salespersons || [];
-  const contractorsList = contractors?.contractors || [];
-  const projectsList = projects?.projects || [];
-  const bidRequestsList = bidRequests?.bidRequests || [];
+  const salespersonsList = (salespersons as any)?.salespersons || [];
+  const contractorsList = (contractors as any)?.contractors || [];
+  const projectsList = (projects as any)?.projects || [];
+  const bidRequestsList = (bidRequests as any)?.bidRequests || [];
 
   // Mock data for charts
   const systemMetrics = [
@@ -76,7 +77,7 @@ const AdminPortal: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pb-16 sm:pb-0">
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-7xl mx-auto">
           {/* Header */}
@@ -95,7 +96,8 @@ const AdminPortal: React.FC = () => {
           </div>
 
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-            <TabsList className="grid w-full grid-cols-5">
+            {/* Desktop Navigation - Hidden on mobile */}
+            <TabsList className="hidden sm:grid w-full grid-cols-5">
               <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
               <TabsTrigger value="users">User Management</TabsTrigger>
               <TabsTrigger value="contractors">Contractors</TabsTrigger>
@@ -103,10 +105,17 @@ const AdminPortal: React.FC = () => {
               <TabsTrigger value="settings">Settings</TabsTrigger>
             </TabsList>
 
+            {/* Mobile Bottom Navigation */}
+            <MobileBottomNav
+              activeTab={activeTab}
+              onTabChange={setActiveTab}
+              portalType="admin"
+            />
+
             {/* Dashboard Tab */}
             <TabsContent value="dashboard" className="space-y-6">
-              {/* Key Metrics Cards */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {/* Key Metrics Cards - Mobile: 2 columns, Desktop: 4 columns */}
+              <div className="grid grid-cols-2 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">Total Users</CardTitle>
