@@ -97,61 +97,122 @@ const AnalyticsDashboard: React.FC<AnalyticsProps> = ({ userRole, userId }) => {
 
   const renderKPICards = () => {
     if (userRole === 'admin') {
-      const { overview, conversions, revenue } = analyticsData;
+      const { overview, conversions, revenue, commissions } = analyticsData;
       
       return (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Requests</CardTitle>
-              <Target className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{overview?.totalBidRequests || 0}</div>
-              <p className="text-xs text-muted-foreground">
-                <span className="text-green-600">+{conversions?.conversionRate || 0}%</span> conversion rate
-              </p>
-            </CardContent>
-          </Card>
+        <div className="space-y-6">
+          {/* Primary Metrics */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Total Requests</CardTitle>
+                <Target className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{overview?.totalBidRequests || 0}</div>
+                <p className="text-xs text-muted-foreground">
+                  <span className="text-green-600">+{conversions?.conversionRate || 0}%</span> conversion rate
+                </p>
+              </CardContent>
+            </Card>
 
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
-              <DollarSign className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{formatCurrency(revenue?.totalRevenue || 0)}</div>
-              <p className="text-xs text-muted-foreground">
-                Avg: {formatCurrency(revenue?.averageProjectValue || 0)} per project
-              </p>
-            </CardContent>
-          </Card>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
+                <DollarSign className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{formatCurrency(revenue?.totalRevenue || 0)}</div>
+                <p className="text-xs text-muted-foreground">
+                  Avg: {formatCurrency(revenue?.averageProjectValue || 0)} per project
+                </p>
+              </CardContent>
+            </Card>
 
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Active Users</CardTitle>
-              <Users className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{overview?.activeContractors + overview?.activeSalespersons || 0}</div>
-              <p className="text-xs text-muted-foreground">
-                {overview?.activeContractors || 0} contractors, {overview?.activeSalespersons || 0} sales reps
-              </p>
-            </CardContent>
-          </Card>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Active Users</CardTitle>
+                <Users className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{overview?.activeContractors + overview?.activeSalespersons || 0}</div>
+                <p className="text-xs text-muted-foreground">
+                  {overview?.activeContractors || 0} contractors, {overview?.activeSalespersons || 0} sales reps
+                </p>
+              </CardContent>
+            </Card>
 
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Page Visits</CardTitle>
-              <Eye className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{overview?.totalPageVisits || 0}</div>
-              <p className="text-xs text-muted-foreground">
-                QR code scans and profile visits
-              </p>
-            </CardContent>
-          </Card>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Page Visits</CardTitle>
+                <Eye className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{overview?.totalPageVisits || 0}</div>
+                <p className="text-xs text-muted-foreground">
+                  QR code scans and profile visits
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Commission Analytics */}
+          <div>
+            <h3 className="text-lg font-semibold mb-4">Commission Analytics</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Total Commissions</CardTitle>
+                  <DollarSign className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-green-600">{formatCurrency(commissions?.totalCommissions || 0)}</div>
+                  <p className="text-xs text-muted-foreground">
+                    All commission earnings
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Pending Commissions</CardTitle>
+                  <Target className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-yellow-600">{formatCurrency(commissions?.pendingCommissions || 0)}</div>
+                  <p className="text-xs text-muted-foreground">
+                    Awaiting payment
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Commission Records</CardTitle>
+                  <Building className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{commissions?.totalRecords || 0}</div>
+                  <p className="text-xs text-muted-foreground">
+                    Total commission transactions
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Top Earner</CardTitle>
+                  <TrendingUp className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{formatCurrency(commissions?.topEarner?.earnings || 0)}</div>
+                  <p className="text-xs text-muted-foreground">
+                    {commissions?.topEarner?.name || 'No data'}
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
         </div>
       );
     }

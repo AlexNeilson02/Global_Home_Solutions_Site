@@ -635,6 +635,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const comprehensiveAnalytics = await storage.getComprehensiveAnalytics({ startDate, endDate });
       const revenueAnalytics = await storage.getRevenueAnalytics({ startDate, endDate });
+      const commissionAnalytics = await storage.getCommissionAnalytics(startDate, endDate);
 
       res.json({
         timeRange: timeRange || '30d',
@@ -642,7 +643,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         conversions: comprehensiveAnalytics.conversions,
         performance: comprehensiveAnalytics.performance,
         trends: comprehensiveAnalytics.trends,
-        revenue: revenueAnalytics
+        revenue: revenueAnalytics,
+        commissions: commissionAnalytics
       });
     } catch (error) {
       console.error("Error fetching admin analytics:", error);
