@@ -482,8 +482,8 @@ const ContractorPortal: React.FC = () => {
               notifications.markAsRead();
             }
           }} className="space-y-6">
-            {/* Desktop Navigation - Hidden on mobile */}
-            <div className="hidden sm:block">
+            {/* Desktop Navigation - Only show on desktop */}
+            {!isMobile && (
               <TabsList className="grid w-full grid-cols-4">
                 <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
                 <TabsTrigger value="projects">Projects</TabsTrigger>
@@ -500,20 +500,22 @@ const ContractorPortal: React.FC = () => {
                 </TabsTrigger>
                 <TabsTrigger value="profile">Company Profile</TabsTrigger>
               </TabsList>
-            </div>
+            )}
 
-            {/* Mobile Bottom Navigation */}
-            <MobileBottomNav
-              activeTab={activeTab}
-              onTabChange={(value) => {
-                setActiveTab(value);
-                if (value === 'leads') {
-                  notifications.markAsRead();
-                }
-              }}
-              portalType="contractor"
-              notificationCount={notifications.unreadCount}
-            />
+            {/* Mobile Bottom Navigation - Only show on mobile */}
+            {isMobile && (
+              <MobileBottomNav
+                activeTab={activeTab}
+                onTabChange={(value) => {
+                  setActiveTab(value);
+                  if (value === 'leads') {
+                    notifications.markAsRead();
+                  }
+                }}
+                portalType="contractor"
+                notificationCount={notifications.unreadCount}
+              />
+            )}
 
             {/* Dashboard Tab */}
             <TabsContent value="dashboard" className="space-y-6">

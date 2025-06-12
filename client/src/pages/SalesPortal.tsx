@@ -9,11 +9,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from "recharts";
 import { TrendingUp, Users, DollarSign, Target, QrCode, Eye, ArrowUpRight } from "lucide-react";
 import MobileBottomNav from "@/components/layout/MobileBottomNav";
+import { useIsMobile } from "@/hooks/useIsMobile";
 
 const SalesPortal: React.FC = () => {
   const [, navigate] = useLocation();
   const [activeTab, setActiveTab] = useState("dashboard");
   const queryClient = useQueryClient();
+  const isMobile = useIsMobile();
 
   // Logout mutation
   const logoutMutation = useMutation({
@@ -85,22 +87,24 @@ const SalesPortal: React.FC = () => {
           </div>
 
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-            {/* Desktop Navigation - Hidden on mobile */}
-            <div className="hidden sm:block">
+            {/* Desktop Navigation - Only show on desktop */}
+            {!isMobile && (
               <TabsList className="grid w-full grid-cols-4">
                 <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
                 <TabsTrigger value="leads">Lead Management</TabsTrigger>
                 <TabsTrigger value="analytics">Analytics</TabsTrigger>
                 <TabsTrigger value="profile">Profile</TabsTrigger>
               </TabsList>
-            </div>
+            )}
 
-            {/* Mobile Bottom Navigation */}
-            <MobileBottomNav
-              activeTab={activeTab}
-              onTabChange={setActiveTab}
-              portalType="sales"
-            />
+            {/* Mobile Bottom Navigation - Only show on mobile */}
+            {isMobile && (
+              <MobileBottomNav
+                activeTab={activeTab}
+                onTabChange={setActiveTab}
+                portalType="sales"
+              />
+            )}
 
             {/* Dashboard Tab */}
             <TabsContent value="dashboard" className="space-y-6">
