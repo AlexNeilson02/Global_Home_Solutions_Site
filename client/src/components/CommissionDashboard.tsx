@@ -329,19 +329,23 @@ export function CommissionDashboard({ salespersonId }: CommissionDashboardProps)
                 {Array.isArray(rates) && rates.length > 0 && (
                   <div className="space-y-2">
                     <h4 className="font-medium mb-3">Service Categories & Your Commission</h4>
-                    {rates.map((rate: any) => (
-                      <div key={rate.id} className="flex justify-between items-center p-3 bg-gray-50 rounded">
-                        <span className="font-medium">{rate.serviceCategory || rate.service}</span>
-                        <div className="text-right">
-                          <div className="font-bold text-green-600">
-                            {formatCurrency(rate.salesmanAmount)}
-                          </div>
-                          <div className="text-xs text-muted-foreground">
-                            of {formatCurrency(rate.totalAmount)} total
+                    {rates.map((rate: any) => {
+                      const salesmanAmount = rate.salesmanCommission || 0;
+                      const totalAmount = (rate.salesmanCommission || 0) + (rate.overrideCommission || 0) + (rate.corpCommission || 0);
+                      return (
+                        <div key={rate.id} className="flex justify-between items-center p-3 bg-gray-50 rounded">
+                          <span className="font-medium">{rate.service}</span>
+                          <div className="text-right">
+                            <div className="font-bold text-green-600">
+                              {formatCurrency(salesmanAmount)}
+                            </div>
+                            <div className="text-xs text-muted-foreground">
+                              of {formatCurrency(totalAmount)} total
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 )}
               </div>
