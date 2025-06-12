@@ -1098,7 +1098,6 @@ html {
   @media (min-width: 1440px) {
     /* Large monitor fixes */
     .bid-request-form,
-    .portal-access,
     .portal-card,
     [data-radix-dialog-content],
     .card,
@@ -1122,7 +1121,6 @@ html {
     
     /* Mobile portal fixes */
     .bid-request-form,
-    .portal-access,
     .portal-card,
     .login-portal,
     [data-radix-dialog-content] {
@@ -1151,7 +1149,6 @@ html {
   @media (min-width: 769px) and (max-width: 1439px) {
     /* Tablet/medium screen fixes */
     .bid-request-form,
-    .portal-access,
     .portal-card {
       background-color: white !important;
       color: black !important;
