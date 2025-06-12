@@ -1,25 +1,24 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link, useLocation } from "wouter";
 import logoPath from "@/assets/global-home-solutions-logo.png";
+import { LoginModal } from "@/components/LoginModal";
 
 const Portals: React.FC = () => {
   const [, navigate] = useLocation();
+  const [loginModal, setLoginModal] = useState<{
+    isOpen: boolean;
+    portalType: "admin" | "contractor" | "salesperson";
+  }>({
+    isOpen: false,
+    portalType: "contractor",
+  });
 
-  const handlePortalAccess = (portalType: string) => {
-    switch (portalType) {
-      case "admin":
-        navigate("/admin-portal");
-        break;
-      case "contractor":
-        navigate("/contractor-portal");
-        break;
-      case "salesperson":
-        navigate("/sales-portal");
-        break;
-      default:
-        navigate("/");
-        break;
-    }
+  const handlePortalAccess = (portalType: "admin" | "contractor" | "salesperson") => {
+    setLoginModal({ isOpen: true, portalType });
+  };
+
+  const handleLoginSuccess = (redirectTo: string) => {
+    navigate(redirectTo);
   };
 
   return (
@@ -110,6 +109,13 @@ const Portals: React.FC = () => {
           </Link>
         </div>
       </div>
+
+      <LoginModal
+        isOpen={loginModal.isOpen}
+        onClose={() => setLoginModal({ ...loginModal, isOpen: false })}
+        portalType={loginModal.portalType}
+        onLoginSuccess={handleLoginSuccess}
+      />
     </div>
   );
 };
