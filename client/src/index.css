@@ -77,6 +77,33 @@ body {
   scroll-padding-top: 0 !important;
 }
 
+/* Targeted fixes based on debug results */
+* {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+}
+
+/* Reset all top positioning */
+body * {
+  margin-block-start: 0 !important;
+  -webkit-margin-before: 0 !important;
+}
+
+/* Force homepage container to absolute top */
+.homepage-container {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+  position: relative;
+  top: 0 !important;
+}
+
+/* Remove any default margins from common elements */
+h1, h2, h3, h4, h5, h6, p, div, section, header, main, article {
+  margin-top: 0 !important;
+  margin-block-start: 0 !important;
+  -webkit-margin-before: 0 !important;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

@@ -23,12 +23,16 @@ html, body {
   min-height: 100vh;
   font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
   padding-bottom: 80px;
-  padding-top: 0;
-  margin-top: 0;
+  padding-top: 0 !important;
+  margin-top: 0 !important;
+  position: relative;
+  top: 0 !important;
 }
 .logo {
   display: block;
-  margin: 30px auto 12px auto;
+  margin: 0 auto 12px auto !important;
+  margin-top: 0 !important;
+  padding-top: 15px;
   max-width: 130px;
 }
 header h1 {
