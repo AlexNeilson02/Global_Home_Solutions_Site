@@ -237,6 +237,72 @@ enhancedRouter.get('/contractors/:id/analytics', isAuthenticated, async (req: Re
   }
 });
 
+// Contractor management routes
+enhancedRouter.patch('/admin/contractors/:id', isAuthenticated, requireRole(['admin']), async (req: Request, res: Response) => {
+  try {
+    const contractorId = parseInt(req.params.id);
+    const updateData = req.body;
+
+    // Get the contractor to access the associated user
+    const contractor = await storage.getContractor(contractorId);
+    if (!contractor) {
+      return res.status(404).json({ error: 'Contractor not found' });
+    }
+
+    // Update contractor profile
+    const contractorUpdateData: any = {};
+    if (updateData.companyName) contractorUpdateData.companyName = updateData.companyName;
+    if (updateData.description) contractorUpdateData.description = updateData.description;
+    if (updateData.hourlyRate) contractorUpdateData.hourlyRate = parseFloat(updateData.hourlyRate);
+    if (updateData.specialties) contractorUpdateData.specialties = updateData.specialties;
+    if (updateData.serviceAreas) {
+      contractorUpdateData.serviceAreas = updateData.serviceAreas.split(',').map((area: string) => area.trim());
+    }
+
+    const updatedContractor = await storage.updateContractor(contractorId, contractorUpdateData);
+
+    // Update user data if provided
+    if (updateData.fullName || updateData.email || updateData.phone || updateData.password) {
+      const userUpdateData: any = {};
+      if (updateData.fullName) userUpdateData.fullName = updateData.fullName;
+      if (updateData.email) userUpdateData.email = updateData.email;
+      if (updateData.phone) userUpdateData.phone = updateData.phone;
+      if (updateData.password) userUpdateData.password = updateData.password;
+
+      await storage.updateUser(contractor.userId, userUpdateData);
+    }
+
+    res.json({ 
+      message: 'Contractor updated successfully',
+      contractor: updatedContractor 
+    });
+  } catch (error) {
+    console.error('Error updating contractor:', error);
+    res.status(500).json({ error: 'Failed to update contractor' });
+  }
+});
+
+enhancedRouter.delete('/admin/contractors/:id', isAuthenticated, requireRole(['admin']), async (req: Request, res: Response) => {
+  try {
+    const contractorId = parseInt(req.params.id);
+    
+    // Archive the contractor by setting isActive to false
+    const updatedContractor = await storage.updateContractor(contractorId, { isActive: false });
+    
+    if (!updatedContractor) {
+      return res.status(404).json({ error: 'Contractor not found' });
+    }
+
+    res.json({ 
+      message: 'Contractor archived successfully',
+      contractor: updatedContractor 
+    });
+  } catch (error) {
+    console.error('Error archiving contractor:', error);
+    res.status(500).json({ error: 'Failed to archive contractor' });
+  }
+});
+
 // Enhanced salesperson analytics with detailed metrics
 enhancedRouter.get('/salespersons/:id/detailed-analytics', isAuthenticated, async (req: Request, res: Response) => {
   try {
