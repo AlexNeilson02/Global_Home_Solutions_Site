@@ -8,11 +8,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 import { Users, Building, TrendingUp, Shield, Settings, AlertTriangle } from "lucide-react";
 import MobileBottomNav from "@/components/layout/MobileBottomNav";
+import { useIsMobile } from "@/hooks/useIsMobile";
 
 const AdminPortal: React.FC = () => {
   const [, navigate] = useLocation();
   const [activeTab, setActiveTab] = useState("dashboard");
   const queryClient = useQueryClient();
+  const isMobile = useIsMobile();
 
   // Logout mutation
   const logoutMutation = useMutation({
@@ -96,8 +98,8 @@ const AdminPortal: React.FC = () => {
           </div>
 
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-            {/* Desktop Navigation - Hidden on mobile */}
-            <div className="hidden sm:block">
+            {/* Desktop Navigation - Only show on desktop */}
+            {!isMobile && (
               <TabsList className="grid w-full grid-cols-5">
                 <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
                 <TabsTrigger value="users">User Management</TabsTrigger>
@@ -105,14 +107,16 @@ const AdminPortal: React.FC = () => {
                 <TabsTrigger value="analytics">Analytics</TabsTrigger>
                 <TabsTrigger value="settings">Settings</TabsTrigger>
               </TabsList>
-            </div>
+            )}
 
-            {/* Mobile Bottom Navigation */}
-            <MobileBottomNav
-              activeTab={activeTab}
-              onTabChange={setActiveTab}
-              portalType="admin"
-            />
+            {/* Mobile Bottom Navigation - Only show on mobile */}
+            {isMobile && (
+              <MobileBottomNav
+                activeTab={activeTab}
+                onTabChange={setActiveTab}
+                portalType="admin"
+              />
+            )}
 
             {/* Dashboard Tab */}
             <TabsContent value="dashboard" className="space-y-6">

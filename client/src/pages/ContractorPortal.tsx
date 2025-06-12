@@ -12,11 +12,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { useNotifications } from "@/hooks/useNotifications";
 import MobileBottomNav from "@/components/layout/MobileBottomNav";
+import { useIsMobile } from "@/hooks/useIsMobile";
 
 const ContractorPortal: React.FC = () => {
   const [, navigate] = useLocation();
   const [activeTab, setActiveTab] = useState("dashboard");
   const [isEditingProfile, setIsEditingProfile] = useState(false);
+  const isMobile = useIsMobile();
   const [editForm, setEditForm] = useState({
     companyName: '',
     description: '',
