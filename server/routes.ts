@@ -35,6 +35,27 @@ const upload = multer({
   },
 });
 
+// Database retry utility function
+async function retryDatabaseOperation<T>(operation: () => Promise<T>, maxRetries: number = 3): Promise<T> {
+  let lastError: Error;
+  
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      return await operation();
+    } catch (error) {
+      lastError = error as Error;
+      console.warn(`Database operation attempt ${attempt}/${maxRetries} failed:`, error);
+      
+      if (attempt < maxRetries) {
+        // Wait before retrying (exponential backoff)
+        await new Promise(resolve => setTimeout(resolve, attempt * 1000));
+      }
+    }
+  }
+  
+  throw lastError!;
+}
+
 export async function registerRoutes(app: Express): Promise<Server> {
   // Setup authentication first
   await setupAuth(app);
@@ -860,11 +881,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       console.log('Creating bid request with data:', JSON.stringify(bidRequestData, null, 2));
 
-      // Create the bid request with timeout handling
+      // Create the bid request with retry logic and timeout handling
       const bidRequest = await Promise.race([
-        storage.createBidRequest(bidRequestData),
+        retryDatabaseOperation(() => storage.createBidRequest(bidRequestData), 3),
         new Promise((_, reject) => 
-          setTimeout(() => reject(new Error('Database operation timeout')), 25000)
+          setTimeout(() => reject(new Error('Database operation timeout')), 20000)
         )
       ]) as any;
 
