@@ -50,6 +50,37 @@ export default function AdminPortalEnhanced() {
     confirmPassword: ''
   });
 
+  // Contractor management state
+  const [contractorViewOpen, setContractorViewOpen] = useState(false);
+  const [contractorEditOpen, setContractorEditOpen] = useState(false);
+  const [contractorAddOpen, setContractorAddOpen] = useState(false);
+  const [selectedContractor, setSelectedContractor] = useState<any>(null);
+  const [contractorEditData, setContractorEditData] = useState({
+    companyName: '',
+    description: '',
+    hourlyRate: '',
+    specialties: [] as string[],
+    serviceAreas: '',
+    fullName: '',
+    email: '',
+    phone: '',
+    password: '',
+    confirmPassword: ''
+  });
+  const [contractorAddData, setContractorAddData] = useState({
+    username: '',
+    password: '',
+    confirmPassword: '',
+    fullName: '',
+    email: '',
+    phone: '',
+    companyName: '',
+    description: '',
+    hourlyRate: '',
+    specialties: [] as string[],
+    serviceAreas: ''
+  });
+
   // Fetch analytics data
   const { data: analyticsData = {}, isLoading: isLoadingAnalytics } = useQuery({
     queryKey: ['/api/admin/analytics'],
@@ -82,6 +113,8 @@ export default function AdminPortalEnhanced() {
   });
 
   const salespersons = Array.isArray(salespersonsData) ? salespersonsData.filter(s => s.isActive !== false) : [];
+
+  // Contractors are already fetched below, using the existing data
 
   // Edit salesperson mutation
   const editSalespersonMutation = useMutation({
