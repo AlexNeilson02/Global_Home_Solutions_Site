@@ -56,27 +56,6 @@ body > *:first-child,
   padding-top: 0 !important;
 }
 
-/* Additional viewport and container fixes */
-.min-h-screen {
-  margin-top: 0 !important;
-  padding-top: 0 !important;
-}
-
-/* Override any potential browser default margins */
-div, section, main, article, nav, header {
-  margin-block-start: 0 !important;
-  margin-block-end: 0 !important;
-}
-
-/* Force viewport to start at absolute top */
-html {
-  scroll-padding-top: 0 !important;
-}
-
-body {
-  scroll-padding-top: 0 !important;
-}
-
 /* Targeted fixes - Only target root level spacing */
 body {
   margin-top: 0 !important;
@@ -182,6 +161,185 @@ html {
 @layer components {
   .container-custom {
     @apply max-w-[var(--content-width)] mx-auto px-6 md:px-8;
+  }
+  
+  /* Comprehensive spacing restoration for all components */
+  .portal-container {
+    padding: 4rem 1rem !important;
+  }
+  
+  .portal-container .container {
+    padding-top: 0 !important;
+  }
+  
+  .card-header {
+    padding: 1.5rem !important;
+  }
+  
+  .card-content {
+    padding: 1.5rem !important;
+  }
+  
+  /* Form spacing restoration */
+  .form-item {
+    margin-bottom: 1rem !important;
+  }
+  
+  .form-label {
+    margin-bottom: 0.5rem !important;
+  }
+  
+  /* Dialog and modal spacing */
+  .dialog-content {
+    padding: 1.5rem !important;
+  }
+  
+  .dialog-header {
+    margin-bottom: 1.5rem !important;
+  }
+  
+  /* Button spacing */
+  .button {
+    margin-top: 1rem !important;
+  }
+  
+  /* Tab content spacing */
+  .tabs-content {
+    margin-top: 1.5rem !important;
+  }
+  
+  /* Statistics card spacing */
+  .stats-grid {
+    gap: 1.5rem !important;
+    margin-bottom: 2rem !important;
+  }
+  
+  /* Chart container spacing */
+  .chart-container {
+    margin-top: 2rem !important;
+    margin-bottom: 2rem !important;
+  }
+  
+  /* Restore shadcn UI component spacing */
+  .space-y-2 > * + * {
+    margin-top: 0.5rem !important;
+  }
+  
+  .space-y-3 > * + * {
+    margin-top: 0.75rem !important;
+  }
+  
+  .space-y-4 > * + * {
+    margin-top: 1rem !important;
+  }
+  
+  .space-y-6 > * + * {
+    margin-top: 1.5rem !important;
+  }
+  
+  .space-y-8 > * + * {
+    margin-top: 2rem !important;
+  }
+  
+  /* Form field spacing */
+  [data-radix-form-item] {
+    margin-bottom: 1.5rem !important;
+  }
+  
+  /* Portal access page specific */
+  .min-h-screen.bg-slate-900 {
+    padding-top: 4rem !important;
+  }
+  
+  /* Contractor portal grid spacing */
+  .grid {
+    gap: 1.5rem !important;
+  }
+  
+  .grid-cols-1 > *,
+  .grid-cols-2 > *,
+  .grid-cols-3 > *,
+  .grid-cols-4 > * {
+    margin-bottom: 1.5rem !important;
+  }
+  
+  /* React Hook Form component spacing */
+  .form-control {
+    margin-top: 0.5rem !important;
+  }
+  
+  .form-message {
+    margin-top: 0.25rem !important;
+  }
+  
+  /* Login modal and authentication forms */
+  .auth-form .space-y-4 > * + * {
+    margin-top: 1rem !important;
+  }
+  
+  /* Bid request form spacing */
+  .bid-request-form .form-item {
+    margin-bottom: 1.5rem !important;
+  }
+  
+  .bid-request-form .form-label {
+    margin-bottom: 0.5rem !important;
+    display: block !important;
+  }
+  
+  /* Portal navigation and headers */
+  .portal-header {
+    margin-bottom: 2rem !important;
+    padding: 1rem 0 !important;
+  }
+  
+  /* Tab navigation spacing */
+  .tabs-list {
+    margin-bottom: 1.5rem !important;
+  }
+  
+  /* Card components in portals */
+  .card {
+    margin-bottom: 1.5rem !important;
+  }
+  
+  /* Analytics dashboard spacing */
+  .analytics-section {
+    margin-bottom: 3rem !important;
+  }
+  
+  .stat-card {
+    padding: 1.5rem !important;
+  }
+  
+  /* Form buttons */
+  .form-submit-button {
+    margin-top: 2rem !important;
+  }
+  
+  /* Modal content padding */
+  [data-radix-dialog-content] {
+    padding: 2rem !important;
+  }
+  
+  /* Text and heading spacing */
+  h1, h2, h3, h4, h5, h6 {
+    margin-top: 1.5rem !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  h1:first-child,
+  h2:first-child,
+  h3:first-child {
+    margin-top: 0 !important;
+  }
+  
+  p {
+    margin-bottom: 1rem !important;
+  }
+  
+  p:last-child {
+    margin-bottom: 0 !important;
   }
   
   /* Apple-inspired animations */
