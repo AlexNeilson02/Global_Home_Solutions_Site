@@ -1,8 +1,10 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes-clean";
 import { enhancedRouter } from "./enhanced-routes.js";
+import { commissionRouter } from "./commission-routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { seedDatabase } from "./seed-data";
+import { seedCommissionData } from "./seed-commission-data";
 
 const app = express();
 app.use(express.json());
@@ -45,8 +47,14 @@ app.use((req, res, next) => {
   // Register enhanced routes for portal functionality
   app.use('/api', enhancedRouter);
   
+  // Register commission system routes
+  app.use('/api/commissions', commissionRouter);
+  
   // Seed the database with initial data
   await seedDatabase();
+  
+  // Seed commission data
+  await seedCommissionData();
   
   // Fix authentication credentials
   const { fixAuthCredentials } = await import("./fix-auth");

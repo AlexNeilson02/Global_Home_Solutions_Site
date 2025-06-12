@@ -2,7 +2,7 @@ import { eq, and, desc, sql, asc, count, avg, max, lt, gt, between, ne } from "d
 import { db } from "./db";
 import { 
   users, contractors, salespersons, projects, testimonials, serviceCategories, bidRequests, pageVisits,
-  documents, projectMilestones, projectStatusUpdates,
+  documents, projectMilestones, projectStatusUpdates, commissionRecords, commissionAdjustments, commissionPayments,
   type User, type InsertUser,
   type Contractor, type InsertContractor,
   type Salesperson, type InsertSalesperson,
@@ -13,7 +13,10 @@ import {
   type PageVisit, type InsertPageVisit,
   type Document, type InsertDocument,
   type ProjectMilestone, type InsertProjectMilestone,
-  type ProjectStatusUpdate, type InsertProjectStatusUpdate
+  type ProjectStatusUpdate, type InsertProjectStatusUpdate,
+  type CommissionRecord, type InsertCommissionRecord,
+  type CommissionAdjustment, type InsertCommissionAdjustment,
+  type CommissionPayment, type InsertCommissionPayment
 } from "@shared/schema";
 import { IStorage } from "./storage";
 import { QRCodeService } from "./qr-service";
@@ -874,6 +877,162 @@ export class DatabaseStorage implements IStorage {
 
     return Object.values(contractorRevenue)
       .sort((a, b) => b.revenue - a.revenue);
+  }
+
+  // Commission system methods
+  async createCommissionRecord(commission: InsertCommissionRecord): Promise<CommissionRecord> {
+    const [record] = await db.insert(commissionRecords).values(commission).returning();
+    return record;
+  }
+
+  async getCommissionRecord(id: number): Promise<CommissionRecord | undefined> {
+    const [record] = await db.select().from(commissionRecords).where(eq(commissionRecords.id, id));
+    return record;
+  }
+
+  async getCommissionRecordsByBidRequest(bidRequestId: number): Promise<CommissionRecord[]> {
+    return await db.select().from(commissionRecords).where(eq(commissionRecords.bidRequestId, bidRequestId));
+  }
+
+  async getCommissionRecordsBySalesperson(salespersonId: number): Promise<CommissionRecord[]> {
+    return await db.select().from(commissionRecords)
+      .where(eq(commissionRecords.salespersonId, salespersonId))
+      .orderBy(desc(commissionRecords.createdAt));
+  }
+
+  async getCommissionRecordsByDateRange(startDate: Date, endDate: Date): Promise<CommissionRecord[]> {
+    return await db.select().from(commissionRecords)
+      .where(between(commissionRecords.createdAt, startDate, endDate))
+      .orderBy(desc(commissionRecords.createdAt));
+  }
+
+  async updateCommissionRecordStatus(id: number, status: string): Promise<CommissionRecord | undefined> {
+    const [record] = await db.update(commissionRecords)
+      .set({ status })
+      .where(eq(commissionRecords.id, id))
+      .returning();
+    return record;
+  }
+
+  async updateCommissionRecordPayment(id: number, paymentStatus: string, paidAt?: Date): Promise<CommissionRecord | undefined> {
+    const updateData: any = { paymentStatus };
+    if (paidAt) updateData.paidAt = paidAt;
+    
+    const [record] = await db.update(commissionRecords)
+      .set(updateData)
+      .where(eq(commissionRecords.id, id))
+      .returning();
+    return record;
+  }
+
+  async createCommissionAdjustment(adjustment: InsertCommissionAdjustment): Promise<CommissionAdjustment> {
+    const [record] = await db.insert(commissionAdjustments).values(adjustment).returning();
+    return record;
+  }
+
+  async getCommissionAdjustmentsByRecord(commissionRecordId: number): Promise<CommissionAdjustment[]> {
+    return await db.select().from(commissionAdjustments)
+      .where(eq(commissionAdjustments.commissionRecordId, commissionRecordId))
+      .orderBy(desc(commissionAdjustments.createdAt));
+  }
+
+  async createCommissionPayment(payment: InsertCommissionPayment): Promise<CommissionPayment> {
+    const [record] = await db.insert(commissionPayments).values(payment).returning();
+    return record;
+  }
+
+  async getCommissionPaymentsByRecipient(recipientId: number): Promise<CommissionPayment[]> {
+    return await db.select().from(commissionPayments)
+      .where(eq(commissionPayments.recipientId, recipientId))
+      .orderBy(desc(commissionPayments.createdAt));
+  }
+
+  async updateCommissionPaymentStatus(id: number, status: string): Promise<CommissionPayment | undefined> {
+    const updateData: any = { status };
+    if (status === 'completed') {
+      updateData.processedAt = new Date();
+    }
+    
+    const [payment] = await db.update(commissionPayments)
+      .set(updateData)
+      .where(eq(commissionPayments.id, id))
+      .returning();
+    return payment;
+  }
+
+  async getCommissionSummaryBySalesperson(salespersonId: number, startDate?: Date, endDate?: Date): Promise<{
+    totalEarned: number;
+    pendingCommissions: number;
+    paidCommissions: number;
+    totalRecords: number;
+  }> {
+    let query = db.select().from(commissionRecords).where(eq(commissionRecords.salespersonId, salespersonId));
+    
+    if (startDate && endDate) {
+      query = query.where(between(commissionRecords.createdAt, startDate, endDate));
+    }
+    
+    const records = await query;
+    
+    return {
+      totalEarned: records.reduce((sum, r) => sum + (r.salesmanAmount || 0), 0),
+      pendingCommissions: records.filter(r => r.paymentStatus === 'unpaid').reduce((sum, r) => sum + (r.salesmanAmount || 0), 0),
+      paidCommissions: records.filter(r => r.paymentStatus === 'paid').reduce((sum, r) => sum + (r.salesmanAmount || 0), 0),
+      totalRecords: records.length
+    };
+  }
+
+  async getTopEarnersBySalesperson(limit: number, startDate?: Date, endDate?: Date): Promise<any[]> {
+    let query = db.select({
+      salespersonId: commissionRecords.salespersonId,
+      totalEarnings: sql<number>`SUM(${commissionRecords.salesmanAmount})`,
+      totalCommissions: sql<number>`COUNT(${commissionRecords.id})`
+    })
+    .from(commissionRecords)
+    .groupBy(commissionRecords.salespersonId);
+    
+    if (startDate && endDate) {
+      query = query.where(between(commissionRecords.createdAt, startDate, endDate));
+    }
+    
+    const results = await query.orderBy(sql`SUM(${commissionRecords.salesmanAmount}) DESC`).limit(limit);
+    
+    // Get salesperson details
+    return await Promise.all(results.map(async (result) => {
+      const salesperson = await this.getSalesperson(result.salespersonId);
+      const user = salesperson ? await this.getUser(salesperson.userId) : null;
+      
+      return {
+        salespersonId: result.salespersonId,
+        name: user?.fullName || 'Unknown',
+        totalEarnings: result.totalEarnings,
+        totalCommissions: result.totalCommissions
+      };
+    }));
+  }
+
+  async getCommissionAnalytics(startDate?: Date, endDate?: Date): Promise<{
+    totalCommissions: number;
+    salesmanTotal: number;
+    overrideTotal: number;
+    corpTotal: number;
+    totalRecords: number;
+  }> {
+    let query = db.select().from(commissionRecords);
+    
+    if (startDate && endDate) {
+      query = query.where(between(commissionRecords.createdAt, startDate, endDate));
+    }
+    
+    const records = await query;
+    
+    return {
+      totalCommissions: records.reduce((sum, r) => sum + (r.totalCommission || 0), 0),
+      salesmanTotal: records.reduce((sum, r) => sum + (r.salesmanAmount || 0), 0),
+      overrideTotal: records.reduce((sum, r) => sum + (r.overrideAmount || 0), 0),
+      corpTotal: records.reduce((sum, r) => sum + (r.corpAmount || 0), 0),
+      totalRecords: records.length
+    };
   }
 }
 
