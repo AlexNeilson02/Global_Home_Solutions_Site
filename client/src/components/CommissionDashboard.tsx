@@ -70,9 +70,11 @@ export function CommissionDashboard({ salespersonId }: CommissionDashboardProps)
   });
 
   // Fetch commission rates
-  const { data: rates } = useQuery({
+  const { data: ratesResponse } = useQuery({
     queryKey: ['/api/commissions/rates']
   });
+  
+  const rates = ratesResponse?.rates || [];
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-US', {
@@ -324,12 +326,12 @@ export function CommissionDashboard({ salespersonId }: CommissionDashboardProps)
                   </div>
                 </div>
                 
-                {rates && (
+                {Array.isArray(rates) && rates.length > 0 && (
                   <div className="space-y-2">
                     <h4 className="font-medium mb-3">Service Categories & Your Commission</h4>
                     {rates.map((rate: any) => (
                       <div key={rate.id} className="flex justify-between items-center p-3 bg-gray-50 rounded">
-                        <span className="font-medium">{rate.serviceCategory}</span>
+                        <span className="font-medium">{rate.serviceCategory || rate.service}</span>
                         <div className="text-right">
                           <div className="font-bold text-green-600">
                             {formatCurrency(rate.salesmanAmount)}
