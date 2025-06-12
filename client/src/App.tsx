@@ -8,7 +8,7 @@ import ContractorProfile from "@/pages/ContractorProfileDB";
 import ContractorPortalEnhanced from "@/pages/ContractorPortalEnhanced";
 import SalesPortalEnhanced from "@/pages/SalesPortalEnhanced";
 import AdminPortalEnhanced from "@/pages/AdminPortalEnhanced";
-import PortalAccess from "@/pages/PortalAccess";
+
 import ContractorRegistration from "@/pages/ContractorRegistration";
 import SalespersonProfile from "@/pages/SalespersonProfile";
 import Login from "@/pages/Login";
@@ -20,7 +20,7 @@ function App() {
         <div className="min-h-screen" style={{ marginTop: 0, paddingTop: 0, position: 'relative', top: 0 }}>
           <Toaster />
           <Route path="/" component={HomePage} />
-          <Route path="/portals" component={PortalAccess} />
+
           <Route path="/contractor/:id" component={ContractorProfile} />
           <Route path="/contractor-registration" component={ContractorRegistration} />
           <Route path="/sales/:profileUrl" component={SalespersonProfile} />

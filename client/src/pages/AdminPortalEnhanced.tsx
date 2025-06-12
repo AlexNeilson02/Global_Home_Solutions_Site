@@ -40,6 +40,28 @@ export default function AdminPortalEnhanced() {
   const [, navigate] = useLocation();
   const queryClient = useQueryClient();
   const { toast } = useToast();
+
+  // Logout mutation
+  const logoutMutation = useMutation({
+    mutationFn: async () => {
+      const response = await fetch('/api/auth/logout', {
+        method: 'POST',
+        credentials: 'include'
+      });
+      if (!response.ok) {
+        throw new Error('Logout failed');
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.clear();
+      navigate('/portals');
+    }
+  });
+
+  const handleBackToPortals = () => {
+    logoutMutation.mutate();
+  };
   const [selectedSalesperson, setSelectedSalesperson] = useState<any>(null);
   const [viewDetailsOpen, setViewDetailsOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
@@ -500,11 +522,12 @@ export default function AdminPortalEnhanced() {
             </div>
             <Button
               variant="outline"
-              onClick={() => navigate('/portal-access')}
+              onClick={handleBackToPortals}
+              disabled={logoutMutation.isPending}
               className="flex items-center gap-2"
             >
               <Users className="h-4 w-4" />
-              Back to Portals
+              {logoutMutation.isPending ? "Logging out..." : "Back to Portals"}
             </Button>
           </div>
         </div>
