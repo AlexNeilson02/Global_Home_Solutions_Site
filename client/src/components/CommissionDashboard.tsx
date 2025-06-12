@@ -59,15 +59,17 @@ export function CommissionDashboard({ salespersonId }: CommissionDashboardProps)
 
   // Fetch commission summary
   const { data: summary, isLoading: summaryLoading } = useQuery<CommissionSummary>({
-    queryKey: ['/api/commissions/salesperson', salespersonId, 'summary'],
+    queryKey: [`/api/commissions/salesperson/${salespersonId}/commissions`],
     enabled: !!salespersonId
   });
 
   // Fetch commission records
-  const { data: records, isLoading: recordsLoading } = useQuery<CommissionRecord[]>({
-    queryKey: ['/api/commissions/salesperson', salespersonId, 'commissions'],
+  const { data: recordsResponse, isLoading: recordsLoading } = useQuery({
+    queryKey: [`/api/commissions/records?salespersonId=${salespersonId}`],
     enabled: !!salespersonId
   });
+  
+  const records = recordsResponse?.records || [];
 
   // Fetch commission rates
   const { data: ratesResponse } = useQuery({
