@@ -40,8 +40,6 @@ export default function AdminPortalEnhanced() {
   const [, navigate] = useLocation();
   const queryClient = useQueryClient();
   const { toast } = useToast();
-  
-  // Salesperson modal states
   const [selectedSalesperson, setSelectedSalesperson] = useState<any>(null);
   const [viewDetailsOpen, setViewDetailsOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
@@ -52,11 +50,11 @@ export default function AdminPortalEnhanced() {
     confirmPassword: ''
   });
 
-  // Contractor modal states
-  const [selectedContractor, setSelectedContractor] = useState<any>(null);
+  // Contractor management state
   const [contractorViewOpen, setContractorViewOpen] = useState(false);
   const [contractorEditOpen, setContractorEditOpen] = useState(false);
   const [contractorAddOpen, setContractorAddOpen] = useState(false);
+  const [selectedContractor, setSelectedContractor] = useState<any>(null);
   const [contractorEditData, setContractorEditData] = useState({
     companyName: '',
     description: '',
@@ -116,6 +114,119 @@ export default function AdminPortalEnhanced() {
 
   const salespersons = Array.isArray(salespersonsData) ? salespersonsData.filter(s => s.isActive !== false) : [];
 
+  // Contractors are already fetched below, using the existing data
+
+  // Edit salesperson mutation
+  const editSalespersonMutation = useMutation({
+    mutationFn: async (data: { id: number; fullName?: string; profileUrl?: string; password?: string }) => {
+      const response = await fetch(`/api/admin/salespersons/${data.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      if (!response.ok) throw new Error('Failed to update salesperson');
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/salespersons'] });
+      setEditModalOpen(false);
+      toast({
+        title: "Success",
+        description: "Salesperson updated successfully"
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: `Failed to update salesperson: ${error.message}`,
+        variant: "destructive"
+      });
+    }
+  });
+
+  // Delete salesperson mutation
+  const deleteSalespersonMutation = useMutation({
+    mutationFn: async (id: number) => {
+      const response = await fetch(`/api/admin/salespersons/${id}`, {
+        method: 'DELETE'
+      });
+      if (!response.ok) throw new Error('Failed to delete salesperson');
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/salespersons'] });
+      setEditModalOpen(false);
+      toast({
+        title: "Success",
+        description: "Salesperson archived successfully"
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: `Failed to archive salesperson: ${error.message}`,
+        variant: "destructive"
+      });
+    }
+  });
+
+  const handleViewDetails = (salesperson: any) => {
+    setSelectedSalesperson(salesperson);
+    setViewDetailsOpen(true);
+  };
+
+  const handleEdit = (salesperson: any) => {
+    setSelectedSalesperson(salesperson);
+    setEditFormData({
+      fullName: salesperson.fullName || '',
+      profileUrl: salesperson.profileUrl || '',
+      password: '',
+      confirmPassword: ''
+    });
+    setEditModalOpen(true);
+  };
+
+  const handleEditSubmit = () => {
+    if (editFormData.password && editFormData.password !== editFormData.confirmPassword) {
+      toast({
+        title: "Error",
+        description: "Passwords do not match",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    const updateData: any = {};
+    if (editFormData.fullName !== selectedSalesperson?.fullName) {
+      updateData.fullName = editFormData.fullName;
+    }
+    if (editFormData.profileUrl !== selectedSalesperson?.profileUrl) {
+      updateData.profileUrl = editFormData.profileUrl;
+    }
+    if (editFormData.password) {
+      updateData.password = editFormData.password;
+    }
+
+    if (Object.keys(updateData).length === 0) {
+      toast({
+        title: "Info",
+        description: "No changes to save",
+      });
+      return;
+    }
+
+    editSalespersonMutation.mutate({
+      id: selectedSalesperson.id,
+      ...updateData
+    });
+  };
+
+  const handleDelete = () => {
+    if (window.confirm('Are you sure you want to archive this salesperson? This action will move them to archive and they will be permanently deleted after 60 days.')) {
+      deleteSalespersonMutation.mutate(selectedSalesperson.id);
+    }
+  };
+
   // Fetch contractors
   const { data: contractorsData = [], isLoading: isLoadingContractors } = useQuery({
     queryKey: ['/api/contractors'],
@@ -127,343 +238,577 @@ export default function AdminPortalEnhanced() {
     }
   });
 
-  const contractors = Array.isArray(contractorsData) ? contractorsData.filter(c => c.isActive !== false) : [];
+  const contractors = Array.isArray(contractorsData) ? contractorsData : [];
 
-  // Contractor management handlers
-  const handleContractorView = (contractor: any) => {
-    setSelectedContractor(contractor);
-    setContractorViewOpen(true);
-  };
-
-  const handleContractorEdit = (contractor: any) => {
-    setSelectedContractor(contractor);
-    setContractorEditData({
-      companyName: contractor.companyName || '',
-      description: contractor.description || '',
-      hourlyRate: contractor.hourlyRate?.toString() || '',
-      specialties: contractor.specialties || [],
-      serviceAreas: (contractor.serviceAreas || []).join(', '),
-      fullName: contractor.fullName || '',
-      email: contractor.email || '',
-      phone: contractor.phone || '',
-      password: '',
-      confirmPassword: ''
-    });
-    setContractorEditOpen(true);
-  };
-
-  // Contractor mutations
-  const addContractorMutation = useMutation({
-    mutationFn: async (data: any) => {
-      const response = await fetch('/api/contractors/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
-      });
-      if (!response.ok) throw new Error('Failed to create contractor');
-      return response.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/contractors'] });
-      setContractorAddOpen(false);
-      setContractorAddData({
-        username: '',
-        password: '',
-        confirmPassword: '',
-        fullName: '',
-        email: '',
-        phone: '',
-        companyName: '',
-        description: '',
-        hourlyRate: '',
-        specialties: [],
-        serviceAreas: ''
-      });
-      toast({
-        title: "Success",
-        description: "Contractor created successfully"
-      });
-    },
-    onError: (error) => {
-      toast({
-        title: "Error",
-        description: `Failed to create contractor: ${error.message}`,
-        variant: "destructive"
-      });
+  // Fetch projects
+  const { data: projectsData = [], isLoading: isLoadingProjects } = useQuery({
+    queryKey: ['/api/projects'],
+    queryFn: async () => {
+      const response = await fetch('/api/projects');
+      if (!response.ok) throw new Error('Failed to fetch projects');
+      const data = await response.json();
+      return data.projects || [];
     }
   });
 
-  const editContractorMutation = useMutation({
-    mutationFn: async (data: { id: number; [key: string]: any }) => {
-      const response = await fetch(`/api/admin/contractors/${data.id}`, {
+  const projects = Array.isArray(projectsData) ? projectsData : [];
+
+  // Fetch bid requests
+  const { data: bidRequestsData = [], isLoading: isLoadingBidRequests } = useQuery({
+    queryKey: ['/api/bid-requests/recent'],
+    queryFn: async () => {
+      const response = await fetch('/api/bid-requests/recent');
+      if (!response.ok) throw new Error('Failed to fetch bid requests');
+      const data = await response.json();
+      return data.bidRequests || [];
+    }
+  });
+
+  const bidRequests = Array.isArray(bidRequestsData) ? bidRequestsData : [];
+
+  const updateUserStatus = useMutation({
+    mutationFn: async ({ userId, status }: { userId: number; status: string }) => {
+      const response = await fetch(`/api/admin/users/${userId}/status`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
+        body: JSON.stringify({ status })
       });
-      if (!response.ok) throw new Error('Failed to update contractor');
+      if (!response.ok) throw new Error('Failed to update user status');
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/contractors'] });
-      setContractorEditOpen(false);
-      toast({
-        title: "Success",
-        description: "Contractor updated successfully"
-      });
-    },
-    onError: (error) => {
-      toast({
-        title: "Error",
-        description: `Failed to update contractor: ${error.message}`,
-        variant: "destructive"
-      });
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/users'] });
+      toast({ title: "Success", description: "User status updated successfully" });
     }
   });
 
-  const deleteContractorMutation = useMutation({
-    mutationFn: async (id: number) => {
-      const response = await fetch(`/api/admin/contractors/${id}`, {
+  const updateBidRequestStatus = useMutation({
+    mutationFn: async ({ bidRequestId, status }: { bidRequestId: number; status: string }) => {
+      const response = await fetch(`/api/admin/bid-requests/${bidRequestId}/status`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status })
+      });
+      if (!response.ok) throw new Error('Failed to update bid request status');
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/bid-requests/recent'] });
+      toast({ title: "Success", description: "Bid request status updated successfully" });
+    }
+  });
+
+  const deleteBidRequest = useMutation({
+    mutationFn: async (bidRequestId: number) => {
+      const response = await fetch(`/api/admin/bid-requests/${bidRequestId}`, {
         method: 'DELETE'
       });
-      if (!response.ok) throw new Error('Failed to archive contractor');
+      if (!response.ok) throw new Error('Failed to delete bid request');
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/contractors'] });
-      setContractorEditOpen(false);
-      toast({
-        title: "Success",
-        description: "Contractor archived successfully"
-      });
-    },
-    onError: (error) => {
-      toast({
-        title: "Error",
-        description: `Failed to archive contractor: ${error.message}`,
-        variant: "destructive"
-      });
+      queryClient.invalidateQueries({ queryKey: ['/api/bid-requests/recent'] });
+      toast({ title: "Success", description: "Bid request deleted successfully" });
     }
   });
 
-  const handleContractorAddSubmit = () => {
-    if (contractorAddData.password !== contractorAddData.confirmPassword) {
-      toast({
-        title: "Error",
-        description: "Passwords do not match",
-        variant: "destructive"
-      });
-      return;
-    }
+  // Chart data
+  const monthlyData = [
+    { name: 'Jan', leads: 65, conversions: 45 },
+    { name: 'Feb', leads: 78, conversions: 52 },
+    { name: 'Mar', leads: 90, conversions: 61 },
+    { name: 'Apr', leads: 81, conversions: 58 },
+    { name: 'May', leads: 95, conversions: 67 },
+    { name: 'Jun', leads: 102, conversions: 73 }
+  ];
 
-    const submitData = {
-      ...contractorAddData,
-      specialties: contractorAddData.specialties,
-      serviceAreas: contractorAddData.serviceAreas,
-      hourlyRate: parseFloat(contractorAddData.hourlyRate) || 0,
-      yearsInBusiness: "1",
-      employeeCount: "1-5",
-      licenseNumber: "AUTO-" + Date.now(),
-      insuranceProvider: "General Insurance Co.",
-      businessAddress: "123 Business St, City, State",
-      portfolioDescription: "Professional contractor services",
-      agreeToTerms: true
-    };
+  const pieData = [
+    { name: 'Active Sales Reps', value: salespersons?.filter((s: any) => s.isActive)?.length || 0, color: '#10b981' },
+    { name: 'Inactive Sales Reps', value: salespersons?.filter((s: any) => !s.isActive)?.length || 0, color: '#ef4444' }
+  ];
 
-    addContractorMutation.mutate(submitData);
+  const COLORS = ['#10b981', '#ef4444', '#f59e0b', '#8b5cf6'];
+
+  if (isLoadingAnalytics || isLoadingUsers || isLoadingSalespersons || isLoadingContractors) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading admin dashboard...</p>
+        </div>
+      </div>
+    );
+  }
+
+  const stats = {
+    totalSalespersons: salespersons?.length || 0,
+    activeSalespersons: salespersons?.filter((s: any) => s.isActive)?.length || 0,
+    totalContractors: contractors?.length || 0,
+    activeContractors: contractors?.filter((c: any) => c.isActive)?.length || 0,
+    totalProjects: projects?.length || 0,
+    totalBidRequests: bidRequests?.length || 0,
+    pendingBidRequests: bidRequests?.filter((br: any) => br.status === 'pending')?.length || 0
   };
 
-  const handleContractorEditSubmit = () => {
-    if (contractorEditData.password && contractorEditData.password !== contractorEditData.confirmPassword) {
-      toast({
-        title: "Error",
-        description: "Passwords do not match",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    const updateData: any = { id: selectedContractor?.id };
-    
-    if (contractorEditData.companyName !== selectedContractor?.companyName) {
-      updateData.companyName = contractorEditData.companyName;
-    }
-    if (contractorEditData.description !== selectedContractor?.description) {
-      updateData.description = contractorEditData.description;
-    }
-    if (contractorEditData.hourlyRate !== selectedContractor?.hourlyRate?.toString()) {
-      updateData.hourlyRate = parseFloat(contractorEditData.hourlyRate) || 0;
-    }
-    if (contractorEditData.fullName !== selectedContractor?.fullName) {
-      updateData.fullName = contractorEditData.fullName;
-    }
-    if (contractorEditData.email !== selectedContractor?.email) {
-      updateData.email = contractorEditData.email;
-    }
-    if (contractorEditData.phone !== selectedContractor?.phone) {
-      updateData.phone = contractorEditData.phone;
-    }
-    if (contractorEditData.password) {
-      updateData.password = contractorEditData.password;
-    }
-
-    editContractorMutation.mutate(updateData);
-  };
-
-  const handleContractorDelete = () => {
-    if (selectedContractor?.id) {
-      deleteContractorMutation.mutate(selectedContractor.id);
-    }
-  };
-
-  // Rest of the component stays the same - just need to update the contractors tab
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <div className="container mx-auto p-6">
-        <div className="flex justify-between items-center mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Admin Portal</h1>
-            <p className="text-gray-600 dark:text-gray-300 mt-2">Comprehensive management dashboard</p>
+      <div className="p-6">
+        {/* Header */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Admin Dashboard</h1>
+              <p className="text-gray-600 dark:text-gray-300 mt-2">
+                Comprehensive management portal for sales representatives and contractors
+              </p>
+            </div>
+            <Button
+              variant="outline"
+              onClick={() => navigate('/portal-access')}
+              className="flex items-center gap-2"
+            >
+              <Users className="h-4 w-4" />
+              Back to Portals
+            </Button>
           </div>
-          <Button 
-            onClick={() => navigate('/portal-access')}
-            variant="outline"
-            className="bg-white text-black border-2 border-black hover:bg-gray-100 font-semibold"
-          >
-            Back to Portal
-          </Button>
         </div>
 
-        <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-6">
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="users">Users</TabsTrigger>
-            <TabsTrigger value="salespersons">Sales Reps</TabsTrigger>
+        {/* Quick Stats */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600 dark:text-gray-300">Sales Reps</p>
+                  <p className="text-2xl font-bold text-gray-900 dark:text-white">{stats.totalSalespersons}</p>
+                  <p className="text-xs text-green-600">{stats.activeSalespersons} active</p>
+                </div>
+                <Users className="h-8 w-8 text-blue-600" />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600 dark:text-gray-300">Contractors</p>
+                  <p className="text-2xl font-bold text-gray-900 dark:text-white">{stats.totalContractors}</p>
+                  <p className="text-xs text-green-600">{stats.activeContractors} verified</p>
+                </div>
+                <Building2 className="h-8 w-8 text-green-600" />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600 dark:text-gray-300">Total Projects</p>
+                  <p className="text-2xl font-bold text-gray-900 dark:text-white">{stats.totalProjects}</p>
+                  <p className="text-xs text-blue-600">Active projects</p>
+                </div>
+                <FileText className="h-8 w-8 text-purple-600" />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600 dark:text-gray-300">Bid Requests</p>
+                  <p className="text-2xl font-bold text-gray-900 dark:text-white">{stats.totalBidRequests}</p>
+                  <p className="text-xs text-orange-600">{stats.pendingBidRequests} pending</p>
+                </div>
+                <Target className="h-8 w-8 text-orange-600" />
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Main Content */}
+        <Tabs defaultValue="salespersons" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-4">
+            <TabsTrigger value="salespersons">Sales Representatives</TabsTrigger>
             <TabsTrigger value="contractors">Contractors</TabsTrigger>
-            <TabsTrigger value="projects">Projects</TabsTrigger>
+            <TabsTrigger value="bid-requests">Bid Requests</TabsTrigger>
             <TabsTrigger value="analytics">Analytics</TabsTrigger>
           </TabsList>
 
-          {/* Contractors Tab */}
-          <TabsContent value="contractors">
+          {/* Sales Representatives Tab */}
+          <TabsContent value="salespersons">
             <Card>
               <CardHeader>
                 <div className="flex justify-between items-center">
                   <div>
-                    <CardTitle>Contractors Management</CardTitle>
-                    <CardDescription>Manage contractor profiles and verification status</CardDescription>
+                    <CardTitle>Sales Representatives Management</CardTitle>
+                    <CardDescription>Monitor sales performance and manage team members</CardDescription>
                   </div>
-                  <Button
-                    onClick={() => setContractorAddOpen(true)}
-                    className="bg-white text-black border-2 border-black hover:bg-gray-100 font-semibold"
-                  >
-                    <Plus className="h-4 w-4 mr-2" />
-                    Add Contractor
-                  </Button>
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button className="bg-white text-black border-2 border-black hover:bg-gray-100 font-semibold">
+                        <Plus className="h-4 w-4 mr-2 text-black" />
+                        Add Salesperson
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-[600px]">
+                      <DialogHeader className="pb-6">
+                        <DialogTitle className="text-2xl font-bold">Create New Salesperson</DialogTitle>
+                        <DialogDescription className="text-base">
+                          Add a new sales representative to the team
+                        </DialogDescription>
+                      </DialogHeader>
+                      <div className="space-y-6">
+                        <div>
+                          <label className="text-sm font-medium">Username</label>
+                          <input 
+                            type="text" 
+                            className="w-full p-3 border rounded-lg" 
+                            placeholder="Enter username"
+                            id="username"
+                          />
+                        </div>
+                        <div>
+                          <label className="text-sm font-medium">Full Name</label>
+                          <input 
+                            type="text" 
+                            className="w-full p-3 border rounded-lg" 
+                            placeholder="Enter full name"
+                            id="fullName"
+                          />
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <label className="text-sm font-medium">Email</label>
+                            <input 
+                              type="email" 
+                              className="w-full p-3 border rounded-lg" 
+                              placeholder="Enter email"
+                              id="email"
+                            />
+                          </div>
+                          <div>
+                            <label className="text-sm font-medium">Phone</label>
+                            <input 
+                              type="tel" 
+                              className="w-full p-3 border rounded-lg" 
+                              placeholder="Enter phone number"
+                              id="phone"
+                            />
+                          </div>
+                        </div>
+                        <div>
+                          <label className="text-sm font-medium">Password</label>
+                          <input 
+                            type="password" 
+                            className="w-full p-3 border rounded-lg" 
+                            placeholder="Enter password"
+                            id="password"
+                          />
+                        </div>
+                        <Button 
+                          type="button" 
+                          className="w-full bg-white text-black border-2 border-black hover:bg-gray-100 font-semibold"
+                          onClick={async () => {
+                            const username = (document.getElementById('username') as HTMLInputElement)?.value;
+                            const fullName = (document.getElementById('fullName') as HTMLInputElement)?.value;
+                            const email = (document.getElementById('email') as HTMLInputElement)?.value;
+                            const phone = (document.getElementById('phone') as HTMLInputElement)?.value;
+                            const password = (document.getElementById('password') as HTMLInputElement)?.value;
+                            
+                            if (!username || !fullName || !email || !password) {
+                              alert('Please fill in all required fields');
+                              return;
+                            }
+                            
+                            try {
+                              const response = await fetch('/api/auth/register', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                  username,
+                                  fullName,
+                                  email,
+                                  phone: phone || null,
+                                  password,
+                                  role: 'salesperson'
+                                })
+                              });
+                              
+                              if (response.ok) {
+                                queryClient.invalidateQueries({ queryKey: ['/api/salespersons'] });
+                                // Clear form
+                                (document.getElementById('username') as HTMLInputElement).value = '';
+                                (document.getElementById('fullName') as HTMLInputElement).value = '';
+                                (document.getElementById('email') as HTMLInputElement).value = '';
+                                (document.getElementById('phone') as HTMLInputElement).value = '';
+                                (document.getElementById('password') as HTMLInputElement).value = '';
+                                alert('Salesperson created successfully!');
+                              } else {
+                                const error = await response.text();
+                                alert(`Error: ${error}`);
+                              }
+                            } catch (error) {
+                              alert(`Error: ${error}`);
+                            }
+                          }}
+                        >
+                          Create Salesperson
+                        </Button>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
                 </div>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {isLoadingContractors ? (
-                    <div className="py-8 text-center">
-                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
-                    </div>
-                  ) : contractors.length === 0 ? (
-                    <div className="py-8 text-center text-gray-500">
-                      No contractors found.
-                    </div>
-                  ) : (
-                    contractors.map((contractor: any) => (
-                      <div key={contractor.id} className="border rounded-lg p-4">
-                        <div className="flex justify-between items-start mb-3">
-                          <div className="flex-1">
-                            <h4 className="font-semibold">{contractor.companyName}</h4>
-                            <p className="text-sm text-gray-600 dark:text-gray-300">{contractor.description}</p>
-                            <div className="flex items-center gap-4 mt-2 text-sm text-gray-500">
-                              <span>Rate: ${contractor.hourlyRate || 0}/hr</span>
-                              <span>Specialties: {contractor.specialties?.length || 0}</span>
-                              <span>Owner: {contractor.fullName || 'Unknown'}</span>
+                  {salespersons.map((salesperson: any) => (
+                    <div key={salesperson.id} className="border rounded-lg p-4">
+                      <div className="flex justify-between items-start mb-3">
+                        <div className="flex-1">
+                          <h4 className="font-semibold">{salesperson.fullName || 'No Name Provided'}</h4>
+                          <p className="text-sm text-gray-600 dark:text-gray-300">
+                            Profile: {salesperson.profileUrl}
+                          </p>
+                          <div className="grid grid-cols-3 gap-4 mt-3">
+                            <div className="text-center">
+                              <div className="text-lg font-bold">{salesperson.totalLeads || 0}</div>
+                              <div className="text-xs text-gray-500">Total Leads</div>
+                            </div>
+                            <div className="text-center">
+                              <div className="text-lg font-bold">{salesperson.conversionRate && !isNaN(salesperson.conversionRate) ? ((salesperson.conversionRate) * 100).toFixed(1) : '0.0'}%</div>
+                              <div className="text-xs text-gray-500">Conversion Rate</div>
+                            </div>
+                            <div className="text-center">
+                              <div className="text-lg font-bold">${(salesperson.commissions || 0).toLocaleString()}</div>
+                              <div className="text-xs text-gray-500">Commissions</div>
                             </div>
                           </div>
-                          <div className="flex gap-2">
-                            <Badge variant={contractor.isVerified ? "default" : "outline"}>
-                              {contractor.isVerified ? "Verified" : "Unverified"}
-                            </Badge>
-                            <Badge variant={contractor.isActive ? "default" : "destructive"}>
-                              {contractor.isActive ? "Active" : "Inactive"}
-                            </Badge>
-                          </div>
                         </div>
-                        <div className="flex gap-2">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleContractorView(contractor)}
-                            className="bg-white text-black border-2 border-black hover:bg-gray-100 font-semibold"
-                          >
-                            <Eye className="h-4 w-4 mr-2" />
-                            View Details
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleContractorEdit(contractor)}
-                            className="bg-white text-black border-2 border-black hover:bg-gray-100 font-semibold"
-                          >
-                            <Edit3 className="h-4 w-4 mr-2" />
-                            Edit
-                          </Button>
-                        </div>
+                        <Badge variant={salesperson.isActive ? "default" : "destructive"}>
+                          {salesperson.isActive ? "Active" : "Inactive"}
+                        </Badge>
                       </div>
-                    ))
-                  )}
+                      <div className="flex justify-end gap-2">
+                        <Button size="sm" variant="outline" onClick={() => handleViewDetails(salesperson)}>
+                          <Eye className="h-4 w-4 mr-1" />
+                          View Details
+                        </Button>
+                        <Button size="sm" variant="outline" onClick={() => handleEdit(salesperson)}>
+                          <Edit3 className="h-4 w-4 mr-1" />
+                          Edit
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </CardContent>
             </Card>
           </TabsContent>
 
-          {/* Other tabs content would continue here... */}
+          {/* Contractors Tab */}
+          <TabsContent value="contractors">
+            <Card>
+              <CardHeader>
+                <CardTitle>Contractors Management</CardTitle>
+                <CardDescription>Manage contractor profiles and verification status</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {contractors.map((contractor: any) => (
+                    <div key={contractor.id} className="border rounded-lg p-4">
+                      <div className="flex justify-between items-start mb-3">
+                        <div className="flex-1">
+                          <h4 className="font-semibold">{contractor.companyName}</h4>
+                          <p className="text-sm text-gray-600 dark:text-gray-300">{contractor.description}</p>
+                          <div className="flex items-center gap-4 mt-2 text-sm text-gray-500">
+                            <span>Rate: ${contractor.hourlyRate || 0}/hr</span>
+                            <span>Specialties: {contractor.specialties?.length || 0}</span>
+                          </div>
+                        </div>
+                        <div className="flex gap-2">
+                          <Badge variant={contractor.isVerified ? "default" : "outline"}>
+                            {contractor.isVerified ? "Verified" : "Unverified"}
+                          </Badge>
+                          <Badge variant={contractor.isActive ? "default" : "destructive"}>
+                            {contractor.isActive ? "Active" : "Inactive"}
+                          </Badge>
+                        </div>
+                      </div>
+                      <div className="flex justify-end gap-2">
+                        <Button size="sm" variant="outline">
+                          <Eye className="h-4 w-4 mr-1" />
+                          View Profile
+                        </Button>
+                        <Button size="sm" variant="outline">
+                          <Edit3 className="h-4 w-4 mr-1" />
+                          Edit
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Bid Requests Tab */}
+          <TabsContent value="bid-requests">
+            <Card>
+              <CardHeader>
+                <CardTitle>Bid Requests Management</CardTitle>
+                <CardDescription>Monitor and manage incoming bid requests</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Customer</TableHead>
+                      <TableHead>Service</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Date</TableHead>
+                      <TableHead>Salesperson</TableHead>
+                      <TableHead>Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {bidRequests.map((request: any) => (
+                      <TableRow key={request.id}>
+                        <TableCell>
+                          <div>
+                            <p className="font-medium">{request.fullName}</p>
+                            <p className="text-sm text-gray-500">{request.email}</p>
+                          </div>
+                        </TableCell>
+                        <TableCell>{request.serviceRequested}</TableCell>
+                        <TableCell>
+                          <Badge variant={
+                            request.status === 'pending' ? "outline" :
+                            request.status === 'approved' ? "default" : "destructive"
+                          }>
+                            {request.status}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>{new Date(request.createdAt).toLocaleDateString()}</TableCell>
+                        <TableCell>{request.salesperson?.fullName || 'Unassigned'}</TableCell>
+                        <TableCell>
+                          <div className="flex gap-1">
+                            <Select
+                              value={request.status}
+                              onValueChange={(value) => 
+                                updateBidRequestStatus.mutate({ 
+                                  bidRequestId: request.id, 
+                                  status: value 
+                                })
+                              }
+                            >
+                              <SelectTrigger className="w-32">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="pending">Pending</SelectItem>
+                                <SelectItem value="approved">Approved</SelectItem>
+                                <SelectItem value="rejected">Rejected</SelectItem>
+                              </SelectContent>
+                            </Select>
+                            <Button
+                              size="sm"
+                              variant="destructive"
+                              onClick={() => deleteBidRequest.mutate(request.id)}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Analytics Tab */}
+          <TabsContent value="analytics">
+            <AnalyticsDashboard userRole="admin" />
+          </TabsContent>
         </Tabs>
 
-        {/* Contractor View Modal */}
-        <Dialog open={contractorViewOpen} onOpenChange={setContractorViewOpen}>
-          <DialogContent className="sm:max-w-[500px] max-w-[95vw]">
+        {/* View Details Modal */}
+        <Dialog open={viewDetailsOpen} onOpenChange={setViewDetailsOpen}>
+          <DialogContent className="sm:max-w-[600px]">
             <DialogHeader>
-              <DialogTitle className="text-lg">Contractor Details</DialogTitle>
-              <DialogDescription className="text-sm">
-                View information for {selectedContractor?.companyName || 'Contractor'}
+              <DialogTitle>Sales Representative Details</DialogTitle>
+              <DialogDescription>
+                Complete information for {selectedSalesperson?.fullName || 'Sales Rep'}
               </DialogDescription>
             </DialogHeader>
-            {selectedContractor && (
-              <div className="space-y-4 px-1">
+            {selectedSalesperson && (
+              <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="text-sm font-medium">Company Name</label>
-                    <p className="text-sm text-gray-600">{selectedContractor.companyName}</p>
+                    <label className="text-sm font-medium text-gray-600">Full Name</label>
+                    <p className="text-base">{selectedSalesperson.fullName || 'No name provided'}</p>
                   </div>
                   <div>
-                    <label className="text-sm font-medium">Owner</label>
-                    <p className="text-sm text-gray-600">{selectedContractor.fullName}</p>
+                    <label className="text-sm font-medium text-gray-600">Profile URL</label>
+                    <p className="text-base">{selectedSalesperson.profileUrl}</p>
                   </div>
-                </div>
-                <div>
-                  <label className="text-sm font-medium">Description</label>
-                  <p className="text-sm text-gray-600">{selectedContractor.description}</p>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="text-sm font-medium">Hourly Rate</label>
-                    <p className="text-sm text-gray-600">${selectedContractor.hourlyRate}/hr</p>
+                    <label className="text-sm font-medium text-gray-600">Email</label>
+                    <p className="text-base">{selectedSalesperson.email}</p>
                   </div>
                   <div>
-                    <label className="text-sm font-medium">Email</label>
-                    <p className="text-sm text-gray-600">{selectedContractor.email}</p>
+                    <label className="text-sm font-medium text-gray-600">Phone</label>
+                    <p className="text-base">{selectedSalesperson.phone || 'Not provided'}</p>
                   </div>
                 </div>
-                {selectedContractor.specialties && selectedContractor.specialties.length > 0 && (
+                <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="text-sm font-medium">Specialties</label>
+                    <label className="text-sm font-medium text-gray-600">NFC ID</label>
+                    <p className="text-base">{selectedSalesperson.nfcId}</p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-gray-600">Status</label>
+                    <Badge variant={selectedSalesperson.isActive ? "default" : "destructive"}>
+                      {selectedSalesperson.isActive ? "Active" : "Inactive"}
+                    </Badge>
+                  </div>
+                </div>
+                <div className="grid grid-cols-3 gap-4 mt-4">
+                  <div className="text-center p-3 bg-gray-50 rounded-lg">
+                    <div className="text-2xl font-bold text-blue-600">{selectedSalesperson.totalLeads || 0}</div>
+                    <div className="text-sm text-gray-600">Total Leads</div>
+                  </div>
+                  <div className="text-center p-3 bg-gray-50 rounded-lg">
+                    <div className="text-2xl font-bold text-green-600">
+                      {selectedSalesperson.conversionRate && !isNaN(selectedSalesperson.conversionRate) 
+                        ? ((selectedSalesperson.conversionRate) * 100).toFixed(1) : '0.0'}%
+                    </div>
+                    <div className="text-sm text-gray-600">Conversion Rate</div>
+                  </div>
+                  <div className="text-center p-3 bg-gray-50 rounded-lg">
+                    <div className="text-2xl font-bold text-green-600">
+                      ${(selectedSalesperson.commissions || 0).toLocaleString()}
+                    </div>
+                    <div className="text-sm text-gray-600">Commissions</div>
+                  </div>
+                </div>
+                {selectedSalesperson.bio && (
+                  <div>
+                    <label className="text-sm font-medium text-gray-600">Bio</label>
+                    <p className="text-base">{selectedSalesperson.bio}</p>
+                  </div>
+                )}
+                {selectedSalesperson.specialties && selectedSalesperson.specialties.length > 0 && (
+                  <div>
+                    <label className="text-sm font-medium text-gray-600">Specialties</label>
                     <div className="flex flex-wrap gap-2 mt-1">
-                      {selectedContractor.specialties.map((specialty: string, index: number) => (
+                      {selectedSalesperson.specialties.map((specialty: string, index: number) => (
                         <Badge key={index} variant="outline">{specialty}</Badge>
                       ))}
                     </div>
@@ -474,59 +819,32 @@ export default function AdminPortalEnhanced() {
           </DialogContent>
         </Dialog>
 
-        {/* Contractor Edit Modal */}
-        <Dialog open={contractorEditOpen} onOpenChange={setContractorEditOpen}>
+        {/* Edit Modal */}
+        <Dialog open={editModalOpen} onOpenChange={setEditModalOpen}>
           <DialogContent className="sm:max-w-[450px] max-w-[90vw]">
             <DialogHeader>
-              <DialogTitle className="text-lg">Edit Contractor</DialogTitle>
+              <DialogTitle className="text-lg">Edit Sales Representative</DialogTitle>
               <DialogDescription className="text-sm">
-                Update information for {selectedContractor?.companyName || 'Contractor'}
+                Update information for {selectedSalesperson?.fullName || 'Sales Rep'}
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-4 px-1">
               <div>
-                <label className="text-sm font-medium block mb-2">Company Name</label>
+                <label className="text-sm font-medium block mb-2">Full Name</label>
                 <Input
                   className="w-full max-w-full"
-                  value={contractorEditData.companyName}
-                  onChange={(e) => setContractorEditData({...contractorEditData, companyName: e.target.value})}
-                  placeholder="Enter company name"
+                  value={editFormData.fullName}
+                  onChange={(e) => setEditFormData({...editFormData, fullName: e.target.value})}
+                  placeholder="Enter full name"
                 />
               </div>
               <div>
-                <label className="text-sm font-medium block mb-2">Description</label>
-                <Textarea
-                  className="w-full max-w-full"
-                  value={contractorEditData.description}
-                  onChange={(e) => setContractorEditData({...contractorEditData, description: e.target.value})}
-                  placeholder="Enter description"
-                />
-              </div>
-              <div>
-                <label className="text-sm font-medium block mb-2">Owner Full Name</label>
+                <label className="text-sm font-medium block mb-2">Profile URL</label>
                 <Input
-                  className="w-full max-w-full"
-                  value={contractorEditData.fullName}
-                  onChange={(e) => setContractorEditData({...contractorEditData, fullName: e.target.value})}
-                  placeholder="Enter owner name"
-                />
-              </div>
-              <div>
-                <label className="text-sm font-medium block mb-2">Email</label>
-                <Input
-                  className="w-full max-w-full"
-                  value={contractorEditData.email}
-                  onChange={(e) => setContractorEditData({...contractorEditData, email: e.target.value})}
-                  placeholder="Enter email"
-                />
-              </div>
-              <div>
-                <label className="text-sm font-medium block mb-2">Phone</label>
-                <Input
-                  className="w-full max-w-full"
-                  value={contractorEditData.phone}
-                  onChange={(e) => setContractorEditData({...contractorEditData, phone: e.target.value})}
-                  placeholder="Enter phone"
+                  className="w-full max-w-full text-sm"
+                  value={editFormData.profileUrl}
+                  onChange={(e) => setEditFormData({...editFormData, profileUrl: e.target.value})}
+                  placeholder="Enter profile URL"
                 />
               </div>
               <div>
@@ -534,8 +852,8 @@ export default function AdminPortalEnhanced() {
                 <Input
                   className="w-full max-w-full"
                   type="password"
-                  value={contractorEditData.password}
-                  onChange={(e) => setContractorEditData({...contractorEditData, password: e.target.value})}
+                  value={editFormData.password}
+                  onChange={(e) => setEditFormData({...editFormData, password: e.target.value})}
                   placeholder="Enter new password"
                 />
               </div>
@@ -544,8 +862,8 @@ export default function AdminPortalEnhanced() {
                 <Input
                   className="w-full max-w-full"
                   type="password"
-                  value={contractorEditData.confirmPassword}
-                  onChange={(e) => setContractorEditData({...contractorEditData, confirmPassword: e.target.value})}
+                  value={editFormData.confirmPassword}
+                  onChange={(e) => setEditFormData({...editFormData, confirmPassword: e.target.value})}
                   placeholder="Confirm new password"
                 />
               </div>
@@ -553,14 +871,14 @@ export default function AdminPortalEnhanced() {
                 <div className="flex justify-end gap-2">
                   <Button 
                     variant="outline" 
-                    onClick={() => setContractorEditOpen(false)}
+                    onClick={() => setEditModalOpen(false)}
                     className="px-4 py-2 text-sm"
                   >
                     Cancel
                   </Button>
                   <Button
-                    onClick={handleContractorEditSubmit}
-                    disabled={editContractorMutation.isPending}
+                    onClick={handleEditSubmit}
+                    disabled={editSalespersonMutation.isPending}
                     className="bg-white text-black border-2 border-black hover:bg-gray-100 font-semibold px-4 py-2 text-sm"
                   >
                     Save Changes
@@ -568,126 +886,12 @@ export default function AdminPortalEnhanced() {
                 </div>
                 <Button
                   variant="destructive"
-                  onClick={handleContractorDelete}
-                  disabled={deleteContractorMutation.isPending}
+                  onClick={handleDelete}
+                  disabled={deleteSalespersonMutation.isPending}
                   className="w-full text-sm"
                 >
                   <Trash2 className="h-4 w-4 mr-2" />
-                  Archive Contractor
-                </Button>
-              </div>
-            </div>
-          </DialogContent>
-        </Dialog>
-
-        {/* Contractor Add Modal */}
-        <Dialog open={contractorAddOpen} onOpenChange={setContractorAddOpen}>
-          <DialogContent className="sm:max-w-[500px] max-w-[90vw]">
-            <DialogHeader>
-              <DialogTitle className="text-lg">Add New Contractor</DialogTitle>
-              <DialogDescription className="text-sm">
-                Create a new contractor account
-              </DialogDescription>
-            </DialogHeader>
-            <div className="space-y-4 px-1 max-h-[60vh] overflow-y-auto">
-              <div>
-                <label className="text-sm font-medium block mb-2">Username</label>
-                <Input
-                  className="w-full max-w-full"
-                  value={contractorAddData.username}
-                  onChange={(e) => setContractorAddData({...contractorAddData, username: e.target.value})}
-                  placeholder="Enter username"
-                />
-              </div>
-              <div>
-                <label className="text-sm font-medium block mb-2">Password</label>
-                <Input
-                  className="w-full max-w-full"
-                  type="password"
-                  value={contractorAddData.password}
-                  onChange={(e) => setContractorAddData({...contractorAddData, password: e.target.value})}
-                  placeholder="Enter password"
-                />
-              </div>
-              <div>
-                <label className="text-sm font-medium block mb-2">Confirm Password</label>
-                <Input
-                  className="w-full max-w-full"
-                  type="password"
-                  value={contractorAddData.confirmPassword}
-                  onChange={(e) => setContractorAddData({...contractorAddData, confirmPassword: e.target.value})}
-                  placeholder="Confirm password"
-                />
-              </div>
-              <div>
-                <label className="text-sm font-medium block mb-2">Full Name</label>
-                <Input
-                  className="w-full max-w-full"
-                  value={contractorAddData.fullName}
-                  onChange={(e) => setContractorAddData({...contractorAddData, fullName: e.target.value})}
-                  placeholder="Enter full name"
-                />
-              </div>
-              <div>
-                <label className="text-sm font-medium block mb-2">Email</label>
-                <Input
-                  className="w-full max-w-full"
-                  value={contractorAddData.email}
-                  onChange={(e) => setContractorAddData({...contractorAddData, email: e.target.value})}
-                  placeholder="Enter email"
-                />
-              </div>
-              <div>
-                <label className="text-sm font-medium block mb-2">Phone</label>
-                <Input
-                  className="w-full max-w-full"
-                  value={contractorAddData.phone}
-                  onChange={(e) => setContractorAddData({...contractorAddData, phone: e.target.value})}
-                  placeholder="Enter phone"
-                />
-              </div>
-              <div>
-                <label className="text-sm font-medium block mb-2">Company Name</label>
-                <Input
-                  className="w-full max-w-full"
-                  value={contractorAddData.companyName}
-                  onChange={(e) => setContractorAddData({...contractorAddData, companyName: e.target.value})}
-                  placeholder="Enter company name"
-                />
-              </div>
-              <div>
-                <label className="text-sm font-medium block mb-2">Description</label>
-                <Textarea
-                  className="w-full max-w-full"
-                  value={contractorAddData.description}
-                  onChange={(e) => setContractorAddData({...contractorAddData, description: e.target.value})}
-                  placeholder="Enter company description"
-                />
-              </div>
-              <div>
-                <label className="text-sm font-medium block mb-2">Hourly Rate</label>
-                <Input
-                  className="w-full max-w-full"
-                  type="number"
-                  value={contractorAddData.hourlyRate}
-                  onChange={(e) => setContractorAddData({...contractorAddData, hourlyRate: e.target.value})}
-                  placeholder="Enter hourly rate"
-                />
-              </div>
-              <div className="flex justify-end gap-2 pt-4">
-                <Button 
-                  variant="outline" 
-                  onClick={() => setContractorAddOpen(false)}
-                  className="px-4 py-2 text-sm"
-                >
-                  Cancel
-                </Button>
-                <Button
-                  onClick={handleContractorAddSubmit}
-                  disabled={addContractorMutation.isPending}
-                  className="bg-white text-black border-2 border-black hover:bg-gray-100 font-semibold px-4 py-2 text-sm"
-                >
-                  Create Contractor
+                  Archive Salesperson
                 </Button>
               </div>
             </div>
