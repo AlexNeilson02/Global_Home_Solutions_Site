@@ -170,6 +170,60 @@ export default function AdminPortalEnhanced() {
     }
   });
 
+  // Contractor edit mutation
+  const editContractorMutation = useMutation({
+    mutationFn: async (data: { id: number; companyName?: string; description?: string; hourlyRate?: string; specialties?: string[]; serviceAreas?: string; fullName?: string; email?: string; phone?: string; password?: string }) => {
+      const response = await fetch(`/api/admin/contractors/${data.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      if (!response.ok) throw new Error('Failed to update contractor');
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/contractors'] });
+      setContractorEditOpen(false);
+      toast({
+        title: "Success",
+        description: "Contractor updated successfully"
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: `Failed to update contractor: ${error.message}`,
+        variant: "destructive"
+      });
+    }
+  });
+
+  // Contractor delete/archive mutation
+  const deleteContractorMutation = useMutation({
+    mutationFn: async (contractorId: number) => {
+      const response = await fetch(`/api/admin/contractors/${contractorId}`, {
+        method: 'DELETE'
+      });
+      if (!response.ok) throw new Error('Failed to archive contractor');
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/contractors'] });
+      setContractorViewOpen(false);
+      toast({
+        title: "Success",
+        description: "Contractor archived successfully"
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: `Failed to archive contractor: ${error.message}`,
+        variant: "destructive"
+      });
+    }
+  });
+
   const handleViewDetails = (salesperson: any) => {
     setSelectedSalesperson(salesperson);
     setViewDetailsOpen(true);
@@ -224,6 +278,88 @@ export default function AdminPortalEnhanced() {
   const handleDelete = () => {
     if (window.confirm('Are you sure you want to archive this salesperson? This action will move them to archive and they will be permanently deleted after 60 days.')) {
       deleteSalespersonMutation.mutate(selectedSalesperson.id);
+    }
+  };
+
+  // Contractor handlers
+  const handleContractorView = (contractor: any) => {
+    setSelectedContractor(contractor);
+    setContractorViewOpen(true);
+  };
+
+  const handleContractorEdit = (contractor: any) => {
+    setSelectedContractor(contractor);
+    setContractorEditData({
+      companyName: contractor.companyName || '',
+      description: contractor.description || '',
+      hourlyRate: contractor.hourlyRate?.toString() || '',
+      specialties: contractor.specialties || [],
+      serviceAreas: contractor.serviceAreas?.join(', ') || '',
+      fullName: contractor.fullName || '',
+      email: contractor.email || '',
+      phone: contractor.phone || '',
+      password: '',
+      confirmPassword: ''
+    });
+    setContractorEditOpen(true);
+  };
+
+  const handleContractorEditSubmit = () => {
+    if (contractorEditData.password && contractorEditData.password !== contractorEditData.confirmPassword) {
+      toast({
+        title: "Error",
+        description: "Passwords do not match",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    const updateData: any = {};
+    if (contractorEditData.companyName !== selectedContractor?.companyName) {
+      updateData.companyName = contractorEditData.companyName;
+    }
+    if (contractorEditData.description !== selectedContractor?.description) {
+      updateData.description = contractorEditData.description;
+    }
+    if (contractorEditData.hourlyRate !== selectedContractor?.hourlyRate?.toString()) {
+      updateData.hourlyRate = contractorEditData.hourlyRate;
+    }
+    if (JSON.stringify(contractorEditData.specialties) !== JSON.stringify(selectedContractor?.specialties || [])) {
+      updateData.specialties = contractorEditData.specialties;
+    }
+    if (contractorEditData.serviceAreas !== selectedContractor?.serviceAreas?.join(', ')) {
+      updateData.serviceAreas = contractorEditData.serviceAreas;
+    }
+    if (contractorEditData.fullName !== selectedContractor?.fullName) {
+      updateData.fullName = contractorEditData.fullName;
+    }
+    if (contractorEditData.email !== selectedContractor?.email) {
+      updateData.email = contractorEditData.email;
+    }
+    if (contractorEditData.phone !== selectedContractor?.phone) {
+      updateData.phone = contractorEditData.phone;
+    }
+    if (contractorEditData.password) {
+      updateData.password = contractorEditData.password;
+    }
+
+    if (Object.keys(updateData).length === 0) {
+      toast({
+        title: "Info",
+        description: "No changes to save",
+      });
+      return;
+    }
+
+    editContractorMutation.mutate({
+      id: selectedContractor.id,
+      ...updateData
+    });
+  };
+
+  const handleContractorDelete = () => {
+    if (window.confirm('Are you sure you want to archive this contractor? This action will move them to archive and they will be permanently deleted after 60 days.')) {
+      deleteContractorMutation.mutate(selectedContractor.id);
     }
   };
 
@@ -638,11 +774,11 @@ export default function AdminPortalEnhanced() {
                         </div>
                       </div>
                       <div className="flex justify-end gap-2">
-                        <Button size="sm" variant="outline">
+                        <Button size="sm" variant="outline" onClick={() => handleContractorView(contractor)} className="border-black text-black hover:bg-gray-100 dark:border-white dark:text-white dark:hover:bg-gray-800">
                           <Eye className="h-4 w-4 mr-1" />
                           View Profile
                         </Button>
-                        <Button size="sm" variant="outline">
+                        <Button size="sm" variant="outline" onClick={() => handleContractorEdit(contractor)} className="border-black text-black hover:bg-gray-100 dark:border-white dark:text-white dark:hover:bg-gray-800">
                           <Edit3 className="h-4 w-4 mr-1" />
                           Edit
                         </Button>
@@ -892,6 +1028,202 @@ export default function AdminPortalEnhanced() {
                 >
                   <Trash2 className="h-4 w-4 mr-2" />
                   Archive Salesperson
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Contractor View Modal */}
+        <Dialog open={contractorViewOpen} onOpenChange={setContractorViewOpen}>
+          <DialogContent className="sm:max-w-[600px] max-w-[90vw]">
+            <DialogHeader>
+              <DialogTitle className="text-lg">Contractor Details</DialogTitle>
+              <DialogDescription className="text-sm">
+                Complete information for {selectedContractor?.companyName || 'Contractor'}
+              </DialogDescription>
+            </DialogHeader>
+            {selectedContractor && (
+              <div className="space-y-4 px-1 max-h-[70vh] overflow-y-auto">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <strong className="text-sm">Company Name:</strong>
+                    <p className="text-sm text-gray-600 dark:text-gray-300">{selectedContractor.companyName}</p>
+                  </div>
+                  <div>
+                    <strong className="text-sm">Contact Name:</strong>
+                    <p className="text-sm text-gray-600 dark:text-gray-300">{selectedContractor.fullName}</p>
+                  </div>
+                  <div>
+                    <strong className="text-sm">Email:</strong>
+                    <p className="text-sm text-gray-600 dark:text-gray-300">{selectedContractor.email}</p>
+                  </div>
+                  <div>
+                    <strong className="text-sm">Phone:</strong>
+                    <p className="text-sm text-gray-600 dark:text-gray-300">{selectedContractor.phone}</p>
+                  </div>
+                  <div>
+                    <strong className="text-sm">Hourly Rate:</strong>
+                    <p className="text-sm text-gray-600 dark:text-gray-300">${selectedContractor.hourlyRate || 0}/hr</p>
+                  </div>
+                  <div>
+                    <strong className="text-sm">Status:</strong>
+                    <Badge variant={selectedContractor.isActive ? "default" : "destructive"}>
+                      {selectedContractor.isActive ? "Active" : "Inactive"}
+                    </Badge>
+                  </div>
+                </div>
+                <div>
+                  <strong className="text-sm">Description:</strong>
+                  <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">{selectedContractor.description}</p>
+                </div>
+                {selectedContractor.specialties && selectedContractor.specialties.length > 0 && (
+                  <div>
+                    <strong className="text-sm">Specialties:</strong>
+                    <div className="flex flex-wrap gap-1 mt-1">
+                      {selectedContractor.specialties.map((specialty: string, index: number) => (
+                        <Badge key={index} variant="outline" className="text-xs">
+                          {specialty}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {selectedContractor.serviceAreas && selectedContractor.serviceAreas.length > 0 && (
+                  <div>
+                    <strong className="text-sm">Service Areas:</strong>
+                    <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">
+                      {selectedContractor.serviceAreas.join(', ')}
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
+
+        {/* Contractor Edit Modal */}
+        <Dialog open={contractorEditOpen} onOpenChange={setContractorEditOpen}>
+          <DialogContent className="sm:max-w-[500px] max-w-[90vw]">
+            <DialogHeader>
+              <DialogTitle className="text-lg">Edit Contractor</DialogTitle>
+              <DialogDescription className="text-sm">
+                Update information for {selectedContractor?.companyName || 'Contractor'}
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4 px-1 max-h-[60vh] overflow-y-auto">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-sm font-medium block mb-2">Company Name</label>
+                  <Input
+                    className="w-full"
+                    value={contractorEditData.companyName}
+                    onChange={(e) => setContractorEditData({...contractorEditData, companyName: e.target.value})}
+                    placeholder="Enter company name"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium block mb-2">Contact Name</label>
+                  <Input
+                    className="w-full"
+                    value={contractorEditData.fullName}
+                    onChange={(e) => setContractorEditData({...contractorEditData, fullName: e.target.value})}
+                    placeholder="Enter contact name"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium block mb-2">Email</label>
+                  <Input
+                    className="w-full"
+                    type="email"
+                    value={contractorEditData.email}
+                    onChange={(e) => setContractorEditData({...contractorEditData, email: e.target.value})}
+                    placeholder="Enter email"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium block mb-2">Phone</label>
+                  <Input
+                    className="w-full"
+                    value={contractorEditData.phone}
+                    onChange={(e) => setContractorEditData({...contractorEditData, phone: e.target.value})}
+                    placeholder="Enter phone number"
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="text-sm font-medium block mb-2">Description</label>
+                <textarea
+                  className="w-full min-h-[80px] px-3 py-2 border rounded-md text-sm"
+                  value={contractorEditData.description}
+                  onChange={(e) => setContractorEditData({...contractorEditData, description: e.target.value})}
+                  placeholder="Enter company description"
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium block mb-2">Hourly Rate ($)</label>
+                <Input
+                  className="w-full"
+                  type="number"
+                  value={contractorEditData.hourlyRate}
+                  onChange={(e) => setContractorEditData({...contractorEditData, hourlyRate: e.target.value})}
+                  placeholder="Enter hourly rate"
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium block mb-2">Service Areas (comma-separated)</label>
+                <Input
+                  className="w-full"
+                  value={contractorEditData.serviceAreas}
+                  onChange={(e) => setContractorEditData({...contractorEditData, serviceAreas: e.target.value})}
+                  placeholder="Enter service areas"
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium block mb-2">New Password (leave empty to keep current)</label>
+                <Input
+                  className="w-full"
+                  type="password"
+                  value={contractorEditData.password}
+                  onChange={(e) => setContractorEditData({...contractorEditData, password: e.target.value})}
+                  placeholder="Enter new password"
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium block mb-2">Confirm New Password</label>
+                <Input
+                  className="w-full"
+                  type="password"
+                  value={contractorEditData.confirmPassword}
+                  onChange={(e) => setContractorEditData({...contractorEditData, confirmPassword: e.target.value})}
+                  placeholder="Confirm new password"
+                />
+              </div>
+              <div className="flex flex-col gap-3 pt-4">
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    onClick={() => setContractorEditOpen(false)}
+                    className="flex-1 text-sm border-black text-black hover:bg-gray-100 dark:border-white dark:text-white dark:hover:bg-gray-800"
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    onClick={handleContractorEditSubmit}
+                    disabled={editContractorMutation.isPending}
+                    className="flex-1 text-sm bg-black text-white hover:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-gray-200"
+                  >
+                    Save Changes
+                  </Button>
+                </div>
+                <Button
+                  variant="destructive"
+                  onClick={handleContractorDelete}
+                  disabled={deleteContractorMutation.isPending}
+                  className="w-full text-sm"
+                >
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Archive Contractor
                 </Button>
               </div>
             </div>
