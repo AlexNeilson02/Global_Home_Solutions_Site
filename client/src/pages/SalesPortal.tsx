@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from "recharts";
 import { TrendingUp, Users, DollarSign, Target, QrCode, Eye, ArrowUpRight } from "lucide-react";
 import MobileBottomNav from "@/components/layout/MobileBottomNav";
+import { CommissionDashboard } from "@/components/CommissionDashboard";
 import { useIsMobile } from "@/hooks/useIsMobile";
 
 const SalesPortal: React.FC = () => {

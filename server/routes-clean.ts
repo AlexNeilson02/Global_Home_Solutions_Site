@@ -4,6 +4,7 @@ import { WebSocketServer, WebSocket } from "ws";
 import multer from "multer";
 import { storage } from "./database-storage";
 import { setupAuth, isAuthenticated, requireRole } from "./auth";
+import { CommissionService } from "./commission-service";
 import { z } from "zod";
 import QRCode from "qrcode";
 import { 
@@ -409,7 +410,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log('Creating bid request with data:', bidRequestData);
       const bidRequest = await storage.createBidRequest(bidRequestData);
 
-      // If there's a sales rep attribution, update their stats and notify them
+      // If there's a sales rep attribution, update their stats, create commission, and notify them
       if (salespersonId) {
         try {
           // Increment the salesperson's successful conversions
@@ -420,6 +421,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
           if (salesperson) {
             const salesUser = await storage.getUser(salesperson.userId);
             console.log(`Bid request attributed to sales rep: ${salesUser?.fullName} (ID: ${salespersonId})`);
+            
+            // Create commission record for this bid request
+            try {
+              await CommissionService.createCommissionForBidRequest(bidRequest, salesperson.id);
+              console.log(`Commission created for bid request ${bidRequest.id}, salesperson ${salespersonId}`);
+            } catch (commissionError) {
+              console.error('Error creating commission:', commissionError);
+              // Log but don't fail the bid request creation
+            }
             
             // Here you could send email notification to sales rep
             // await sendSalesRepNotification(salesUser, bidRequest);
