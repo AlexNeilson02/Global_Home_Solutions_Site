@@ -308,32 +308,30 @@ export default function AdminPortalEnhanced() {
                         </DialogDescription>
                       </DialogHeader>
                       <div className="space-y-6">
-                        <div className="grid grid-cols-2 gap-4">
-                          <div>
-                            <label className="text-sm font-medium">Username</label>
-                            <input 
-                              type="text" 
-                              className="w-full p-2 border rounded-md" 
-                              placeholder="Enter username"
-                              id="username"
-                            />
-                          </div>
-                          <div>
-                            <label className="text-sm font-medium">Full Name</label>
-                            <input 
-                              type="text" 
-                              className="w-full p-2 border rounded-md" 
-                              placeholder="Enter full name"
-                              id="fullName"
-                            />
-                          </div>
+                        <div>
+                          <label className="text-sm font-medium">Username</label>
+                          <input 
+                            type="text" 
+                            className="w-full p-3 border rounded-lg" 
+                            placeholder="Enter username"
+                            id="username"
+                          />
+                        </div>
+                        <div>
+                          <label className="text-sm font-medium">Full Name</label>
+                          <input 
+                            type="text" 
+                            className="w-full p-3 border rounded-lg" 
+                            placeholder="Enter full name"
+                            id="fullName"
+                          />
                         </div>
                         <div className="grid grid-cols-2 gap-4">
                           <div>
                             <label className="text-sm font-medium">Email</label>
                             <input 
                               type="email" 
-                              className="w-full p-2 border rounded-md" 
+                              className="w-full p-3 border rounded-lg" 
                               placeholder="Enter email"
                               id="email"
                             />
@@ -342,7 +340,7 @@ export default function AdminPortalEnhanced() {
                             <label className="text-sm font-medium">Phone</label>
                             <input 
                               type="tel" 
-                              className="w-full p-2 border rounded-md" 
+                              className="w-full p-3 border rounded-lg" 
                               placeholder="Enter phone number"
                               id="phone"
                             />
@@ -352,7 +350,7 @@ export default function AdminPortalEnhanced() {
                           <label className="text-sm font-medium">Password</label>
                           <input 
                             type="password" 
-                            className="w-full p-2 border rounded-md" 
+                            className="w-full p-3 border rounded-lg" 
                             placeholder="Enter password"
                             id="password"
                           />
