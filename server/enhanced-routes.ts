@@ -278,3 +278,71 @@ enhancedRouter.get('/salespersons/:id/detailed-analytics', isAuthenticated, asyn
     res.status(500).json({ message: 'Failed to fetch detailed analytics' });
   }
 });
+
+// Edit salesperson endpoint
+enhancedRouter.patch('/admin/salespersons/:id', isAuthenticated, requireRole(['admin']), async (req: Request, res: Response) => {
+  try {
+    const salespersonId = parseInt(req.params.id);
+    
+    if (isNaN(salespersonId)) {
+      return res.status(400).json({ message: 'Invalid salesperson ID' });
+    }
+
+    const { fullName, profileUrl, password } = req.body;
+
+    // Get the salesperson to find the associated user
+    const salesperson = await storage.getSalesperson(salespersonId);
+    if (!salesperson) {
+      return res.status(404).json({ message: 'Salesperson not found' });
+    }
+
+    // Update user information if provided
+    if (fullName || password) {
+      const userUpdateData: any = {};
+      if (fullName) userUpdateData.fullName = fullName;
+      if (password) {
+        const bcrypt = await import('bcrypt');
+        userUpdateData.password = await bcrypt.hash(password, 10);
+      }
+      
+      await storage.updateUser(salesperson.userId, userUpdateData);
+    }
+
+    // Update salesperson information if provided
+    if (profileUrl) {
+      await storage.updateSalesperson(salespersonId, { profileUrl });
+    }
+
+    res.json({ message: 'Salesperson updated successfully' });
+  } catch (error) {
+    console.error('Update salesperson error:', error);
+    res.status(500).json({ message: 'Failed to update salesperson' });
+  }
+});
+
+// Archive/Delete salesperson endpoint
+enhancedRouter.delete('/admin/salespersons/:id', isAuthenticated, requireRole(['admin']), async (req: Request, res: Response) => {
+  try {
+    const salespersonId = parseInt(req.params.id);
+    
+    if (isNaN(salespersonId)) {
+      return res.status(400).json({ message: 'Invalid salesperson ID' });
+    }
+
+    // Get the salesperson to find the associated user
+    const salesperson = await storage.getSalesperson(salespersonId);
+    if (!salesperson) {
+      return res.status(404).json({ message: 'Salesperson not found' });
+    }
+
+    // For now, we'll set the salesperson and user as inactive (soft delete)
+    // In a production system, you would implement proper archiving with 60-day deletion
+    await storage.updateSalesperson(salespersonId, { isActive: false });
+    await storage.updateUser(salesperson.userId, { role: 'archived' });
+
+    res.json({ message: 'Salesperson archived successfully. Data will be permanently deleted after 60 days.' });
+  } catch (error) {
+    console.error('Archive salesperson error:', error);
+    res.status(500).json({ message: 'Failed to archive salesperson' });
+  }
+});

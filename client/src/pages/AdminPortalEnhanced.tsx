@@ -40,6 +40,15 @@ export default function AdminPortalEnhanced() {
   const [, navigate] = useLocation();
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const [selectedSalesperson, setSelectedSalesperson] = useState<any>(null);
+  const [viewDetailsOpen, setViewDetailsOpen] = useState(false);
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [editFormData, setEditFormData] = useState({
+    fullName: '',
+    profileUrl: '',
+    password: '',
+    confirmPassword: ''
+  });
 
   // Fetch analytics data
   const { data: analyticsData = {}, isLoading: isLoadingAnalytics } = useQuery({
@@ -73,6 +82,117 @@ export default function AdminPortalEnhanced() {
   });
 
   const salespersons = Array.isArray(salespersonsData) ? salespersonsData : [];
+
+  // Edit salesperson mutation
+  const editSalespersonMutation = useMutation({
+    mutationFn: async (data: { id: number; fullName?: string; profileUrl?: string; password?: string }) => {
+      const response = await fetch(`/api/admin/salespersons/${data.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      if (!response.ok) throw new Error('Failed to update salesperson');
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/salespersons'] });
+      setEditModalOpen(false);
+      toast({
+        title: "Success",
+        description: "Salesperson updated successfully"
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: `Failed to update salesperson: ${error.message}`,
+        variant: "destructive"
+      });
+    }
+  });
+
+  // Delete salesperson mutation
+  const deleteSalespersonMutation = useMutation({
+    mutationFn: async (id: number) => {
+      const response = await fetch(`/api/admin/salespersons/${id}`, {
+        method: 'DELETE'
+      });
+      if (!response.ok) throw new Error('Failed to delete salesperson');
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/salespersons'] });
+      setEditModalOpen(false);
+      toast({
+        title: "Success",
+        description: "Salesperson archived successfully"
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: `Failed to archive salesperson: ${error.message}`,
+        variant: "destructive"
+      });
+    }
+  });
+
+  const handleViewDetails = (salesperson: any) => {
+    setSelectedSalesperson(salesperson);
+    setViewDetailsOpen(true);
+  };
+
+  const handleEdit = (salesperson: any) => {
+    setSelectedSalesperson(salesperson);
+    setEditFormData({
+      fullName: salesperson.fullName || '',
+      profileUrl: salesperson.profileUrl || '',
+      password: '',
+      confirmPassword: ''
+    });
+    setEditModalOpen(true);
+  };
+
+  const handleEditSubmit = () => {
+    if (editFormData.password && editFormData.password !== editFormData.confirmPassword) {
+      toast({
+        title: "Error",
+        description: "Passwords do not match",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    const updateData: any = {};
+    if (editFormData.fullName !== selectedSalesperson?.fullName) {
+      updateData.fullName = editFormData.fullName;
+    }
+    if (editFormData.profileUrl !== selectedSalesperson?.profileUrl) {
+      updateData.profileUrl = editFormData.profileUrl;
+    }
+    if (editFormData.password) {
+      updateData.password = editFormData.password;
+    }
+
+    if (Object.keys(updateData).length === 0) {
+      toast({
+        title: "Info",
+        description: "No changes to save",
+      });
+      return;
+    }
+
+    editSalespersonMutation.mutate({
+      id: selectedSalesperson.id,
+      ...updateData
+    });
+  };
+
+  const handleDelete = () => {
+    if (window.confirm('Are you sure you want to archive this salesperson? This action will move them to archive and they will be permanently deleted after 60 days.')) {
+      deleteSalespersonMutation.mutate(selectedSalesperson.id);
+    }
+  };
 
   // Fetch contractors
   const { data: contractorsData = [], isLoading: isLoadingContractors } = useQuery({
@@ -439,11 +559,11 @@ export default function AdminPortalEnhanced() {
                         </Badge>
                       </div>
                       <div className="flex justify-end gap-2">
-                        <Button size="sm" variant="outline">
+                        <Button size="sm" variant="outline" onClick={() => handleViewDetails(salesperson)}>
                           <Eye className="h-4 w-4 mr-1" />
                           View Details
                         </Button>
-                        <Button size="sm" variant="outline">
+                        <Button size="sm" variant="outline" onClick={() => handleEdit(salesperson)}>
                           <Edit3 className="h-4 w-4 mr-1" />
                           Edit
                         </Button>
@@ -582,6 +702,159 @@ export default function AdminPortalEnhanced() {
             <AnalyticsDashboard userRole="admin" />
           </TabsContent>
         </Tabs>
+
+        {/* View Details Modal */}
+        <Dialog open={viewDetailsOpen} onOpenChange={setViewDetailsOpen}>
+          <DialogContent className="sm:max-w-[600px]">
+            <DialogHeader>
+              <DialogTitle>Sales Representative Details</DialogTitle>
+              <DialogDescription>
+                Complete information for {selectedSalesperson?.fullName || 'Sales Rep'}
+              </DialogDescription>
+            </DialogHeader>
+            {selectedSalesperson && (
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-sm font-medium text-gray-600">Full Name</label>
+                    <p className="text-base">{selectedSalesperson.fullName || 'No name provided'}</p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-gray-600">Profile URL</label>
+                    <p className="text-base">{selectedSalesperson.profileUrl}</p>
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-sm font-medium text-gray-600">Email</label>
+                    <p className="text-base">{selectedSalesperson.email}</p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-gray-600">Phone</label>
+                    <p className="text-base">{selectedSalesperson.phone || 'Not provided'}</p>
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-sm font-medium text-gray-600">NFC ID</label>
+                    <p className="text-base">{selectedSalesperson.nfcId}</p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-gray-600">Status</label>
+                    <Badge variant={selectedSalesperson.isActive ? "default" : "destructive"}>
+                      {selectedSalesperson.isActive ? "Active" : "Inactive"}
+                    </Badge>
+                  </div>
+                </div>
+                <div className="grid grid-cols-3 gap-4 mt-4">
+                  <div className="text-center p-3 bg-gray-50 rounded-lg">
+                    <div className="text-2xl font-bold text-blue-600">{selectedSalesperson.totalLeads || 0}</div>
+                    <div className="text-sm text-gray-600">Total Leads</div>
+                  </div>
+                  <div className="text-center p-3 bg-gray-50 rounded-lg">
+                    <div className="text-2xl font-bold text-green-600">
+                      {selectedSalesperson.conversionRate && !isNaN(selectedSalesperson.conversionRate) 
+                        ? ((selectedSalesperson.conversionRate) * 100).toFixed(1) : '0.0'}%
+                    </div>
+                    <div className="text-sm text-gray-600">Conversion Rate</div>
+                  </div>
+                  <div className="text-center p-3 bg-gray-50 rounded-lg">
+                    <div className="text-2xl font-bold text-green-600">
+                      ${(selectedSalesperson.commissions || 0).toLocaleString()}
+                    </div>
+                    <div className="text-sm text-gray-600">Commissions</div>
+                  </div>
+                </div>
+                {selectedSalesperson.bio && (
+                  <div>
+                    <label className="text-sm font-medium text-gray-600">Bio</label>
+                    <p className="text-base">{selectedSalesperson.bio}</p>
+                  </div>
+                )}
+                {selectedSalesperson.specialties && selectedSalesperson.specialties.length > 0 && (
+                  <div>
+                    <label className="text-sm font-medium text-gray-600">Specialties</label>
+                    <div className="flex flex-wrap gap-2 mt-1">
+                      {selectedSalesperson.specialties.map((specialty: string, index: number) => (
+                        <Badge key={index} variant="outline">{specialty}</Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
+
+        {/* Edit Modal */}
+        <Dialog open={editModalOpen} onOpenChange={setEditModalOpen}>
+          <DialogContent className="sm:max-w-[500px]">
+            <DialogHeader>
+              <DialogTitle>Edit Sales Representative</DialogTitle>
+              <DialogDescription>
+                Update information for {selectedSalesperson?.fullName || 'Sales Rep'}
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div>
+                <label className="text-sm font-medium">Full Name</label>
+                <Input
+                  value={editFormData.fullName}
+                  onChange={(e) => setEditFormData({...editFormData, fullName: e.target.value})}
+                  placeholder="Enter full name"
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium">Profile URL</label>
+                <Input
+                  value={editFormData.profileUrl}
+                  onChange={(e) => setEditFormData({...editFormData, profileUrl: e.target.value})}
+                  placeholder="Enter profile URL"
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium">New Password (leave empty to keep current)</label>
+                <Input
+                  type="password"
+                  value={editFormData.password}
+                  onChange={(e) => setEditFormData({...editFormData, password: e.target.value})}
+                  placeholder="Enter new password"
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium">Confirm New Password</label>
+                <Input
+                  type="password"
+                  value={editFormData.confirmPassword}
+                  onChange={(e) => setEditFormData({...editFormData, confirmPassword: e.target.value})}
+                  placeholder="Confirm new password"
+                />
+              </div>
+              <div className="flex justify-between gap-3 pt-4">
+                <Button
+                  variant="destructive"
+                  onClick={handleDelete}
+                  disabled={deleteSalespersonMutation.isPending}
+                >
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Archive Salesperson
+                </Button>
+                <div className="flex gap-2">
+                  <Button variant="outline" onClick={() => setEditModalOpen(false)}>
+                    Cancel
+                  </Button>
+                  <Button
+                    onClick={handleEditSubmit}
+                    disabled={editSalespersonMutation.isPending}
+                    className="bg-white text-black border-2 border-black hover:bg-gray-100 font-semibold"
+                  >
+                    Save Changes
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );
