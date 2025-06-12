@@ -12,6 +12,7 @@ import AdminPortalEnhanced from "@/pages/AdminPortalEnhanced";
 import ContractorRegistration from "@/pages/ContractorRegistration";
 import SalespersonProfile from "@/pages/SalespersonProfile";
 import Login from "@/pages/Login";
+import Portals from "@/pages/Portals";
 
 function App() {
   return (
@@ -20,7 +21,7 @@ function App() {
         <div className="min-h-screen" style={{ marginTop: 0, paddingTop: 0, position: 'relative', top: 0 }}>
           <Toaster />
           <Route path="/" component={HomePage} />
-
+          <Route path="/portals" component={Portals} />
           <Route path="/contractor/:id" component={ContractorProfile} />
           <Route path="/contractor-registration" component={ContractorRegistration} />
           <Route path="/sales/:profileUrl" component={SalespersonProfile} />
