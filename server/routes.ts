@@ -267,6 +267,78 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Contractor endpoints
+  // Create contractor endpoint (admin only)
+  apiRouter.post("/contractors", isAuthenticated, requireRole(['admin']), async (req: Request, res: Response) => {
+    try {
+      const {
+        username,
+        password,
+        fullName,
+        email,
+        phone,
+        companyName,
+        description,
+        hourlyRate,
+        serviceAreas
+      } = req.body;
+
+      // Validate required fields
+      if (!username || !password || !fullName || !email || !companyName) {
+        return res.status(400).json({ message: "Username, password, full name, email, and company name are required" });
+      }
+
+      // Check if username already exists
+      const existingUser = await storage.getUserByUsername(username);
+      if (existingUser) {
+        return res.status(400).json({ message: "Username already exists" });
+      }
+
+      // Check if email already exists
+      const existingUserByEmail = await storage.getUserByEmail(email);
+      if (existingUserByEmail) {
+        return res.status(400).json({ message: "Email already exists" });
+      }
+
+      // Hash password
+      const hashedPassword = await hashPassword(password);
+
+      // Create user account
+      const newUser = await storage.createUser({
+        username,
+        password: hashedPassword,
+        fullName,
+        email,
+        phone: phone || null,
+        role: 'contractor'
+      });
+
+      // Create contractor profile
+      const newContractor = await storage.createContractor({
+        userId: newUser.id,
+        companyName,
+        description: description || '',
+        hourlyRate: hourlyRate ? parseFloat(hourlyRate) : null,
+        serviceAreas: serviceAreas || [],
+        isActive: true
+      });
+
+      res.status(201).json({ 
+        message: "Contractor created successfully",
+        contractor: newContractor,
+        user: {
+          id: newUser.id,
+          username: newUser.username,
+          fullName: newUser.fullName,
+          email: newUser.email,
+          phone: newUser.phone
+        }
+      });
+    } catch (error) {
+      console.error('Error creating contractor:', error);
+      res.status(500).json({ message: "Failed to create contractor" });
+    }
+  });
+
   apiRouter.get("/contractors", async (req: Request, res: Response) => {
     try {
       const allContractors = await storage.getAllContractors();

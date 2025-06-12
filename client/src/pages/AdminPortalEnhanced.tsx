@@ -748,8 +748,199 @@ export default function AdminPortalEnhanced() {
           <TabsContent value="contractors">
             <Card>
               <CardHeader>
-                <CardTitle>Contractors Management</CardTitle>
-                <CardDescription>Manage contractor profiles and verification status</CardDescription>
+                <div className="flex justify-between items-center">
+                  <div>
+                    <CardTitle>Contractors Management</CardTitle>
+                    <CardDescription>Manage contractor profiles and verification status</CardDescription>
+                  </div>
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button className="bg-white text-black border-2 border-black hover:bg-gray-100 font-semibold">
+                        <Plus className="h-4 w-4 mr-2 text-black" />
+                        Add Contractor
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-[600px]">
+                      <DialogHeader className="pb-6">
+                        <DialogTitle className="text-2xl font-bold">Create New Contractor</DialogTitle>
+                        <DialogDescription className="text-base">
+                          Add a new contractor to the platform
+                        </DialogDescription>
+                      </DialogHeader>
+                      <div className="space-y-6">
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <label className="text-sm font-medium">Username</label>
+                            <input 
+                              type="text"
+                              className="w-full px-3 py-2 border rounded-md text-sm"
+                              placeholder="Enter username"
+                              value={contractorAddData.username}
+                              onChange={(e) => setContractorAddData({...contractorAddData, username: e.target.value})}
+                            />
+                          </div>
+                          <div>
+                            <label className="text-sm font-medium">Full Name</label>
+                            <input 
+                              type="text"
+                              className="w-full px-3 py-2 border rounded-md text-sm"
+                              placeholder="Enter full name"
+                              value={contractorAddData.fullName}
+                              onChange={(e) => setContractorAddData({...contractorAddData, fullName: e.target.value})}
+                            />
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <label className="text-sm font-medium">Email</label>
+                            <input 
+                              type="email"
+                              className="w-full px-3 py-2 border rounded-md text-sm"
+                              placeholder="Enter email"
+                              value={contractorAddData.email}
+                              onChange={(e) => setContractorAddData({...contractorAddData, email: e.target.value})}
+                            />
+                          </div>
+                          <div>
+                            <label className="text-sm font-medium">Phone</label>
+                            <input 
+                              type="text"
+                              className="w-full px-3 py-2 border rounded-md text-sm"
+                              placeholder="Enter phone number"
+                              value={contractorAddData.phone}
+                              onChange={(e) => setContractorAddData({...contractorAddData, phone: e.target.value})}
+                            />
+                          </div>
+                        </div>
+                        <div>
+                          <label className="text-sm font-medium">Company Name</label>
+                          <input 
+                            type="text"
+                            className="w-full px-3 py-2 border rounded-md text-sm"
+                            placeholder="Enter company name"
+                            value={contractorAddData.companyName}
+                            onChange={(e) => setContractorAddData({...contractorAddData, companyName: e.target.value})}
+                          />
+                        </div>
+                        <div>
+                          <label className="text-sm font-medium">Company Description</label>
+                          <textarea 
+                            className="w-full px-3 py-2 border rounded-md text-sm min-h-[80px]"
+                            placeholder="Enter company description"
+                            value={contractorAddData.description}
+                            onChange={(e) => setContractorAddData({...contractorAddData, description: e.target.value})}
+                          />
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <label className="text-sm font-medium">Hourly Rate ($)</label>
+                            <input 
+                              type="number"
+                              className="w-full px-3 py-2 border rounded-md text-sm"
+                              placeholder="Enter hourly rate"
+                              value={contractorAddData.hourlyRate}
+                              onChange={(e) => setContractorAddData({...contractorAddData, hourlyRate: e.target.value})}
+                            />
+                          </div>
+                          <div>
+                            <label className="text-sm font-medium">Service Areas</label>
+                            <input 
+                              type="text"
+                              className="w-full px-3 py-2 border rounded-md text-sm"
+                              placeholder="Enter service areas (comma-separated)"
+                              value={contractorAddData.serviceAreas}
+                              onChange={(e) => setContractorAddData({...contractorAddData, serviceAreas: e.target.value})}
+                            />
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <label className="text-sm font-medium">Password</label>
+                            <input 
+                              type="password"
+                              className="w-full px-3 py-2 border rounded-md text-sm"
+                              placeholder="Enter password"
+                              value={contractorAddData.password}
+                              onChange={(e) => setContractorAddData({...contractorAddData, password: e.target.value})}
+                            />
+                          </div>
+                          <div>
+                            <label className="text-sm font-medium">Confirm Password</label>
+                            <input 
+                              type="password"
+                              className="w-full px-3 py-2 border rounded-md text-sm"
+                              placeholder="Confirm password"
+                              value={contractorAddData.confirmPassword}
+                              onChange={(e) => setContractorAddData({...contractorAddData, confirmPassword: e.target.value})}
+                            />
+                          </div>
+                        </div>
+                        <Button 
+                          className="w-full bg-black text-white hover:bg-gray-800"
+                          onClick={async () => {
+                            try {
+                              // Validate passwords match
+                              if (contractorAddData.password !== contractorAddData.confirmPassword) {
+                                alert('Passwords do not match');
+                                return;
+                              }
+
+                              // Validate required fields
+                              if (!contractorAddData.username || !contractorAddData.fullName || !contractorAddData.email || 
+                                  !contractorAddData.companyName || !contractorAddData.password) {
+                                alert('Please fill in all required fields');
+                                return;
+                              }
+
+                              const response = await fetch('/api/contractors', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                  username: contractorAddData.username,
+                                  password: contractorAddData.password,
+                                  fullName: contractorAddData.fullName,
+                                  email: contractorAddData.email,
+                                  phone: contractorAddData.phone,
+                                  companyName: contractorAddData.companyName,
+                                  description: contractorAddData.description,
+                                  hourlyRate: contractorAddData.hourlyRate ? parseFloat(contractorAddData.hourlyRate) : null,
+                                  serviceAreas: contractorAddData.serviceAreas ? contractorAddData.serviceAreas.split(',').map(area => area.trim()) : []
+                                })
+                              });
+                              
+                              if (response.ok) {
+                                alert('Contractor created successfully!');
+                                // Reset form
+                                setContractorAddData({
+                                  username: '',
+                                  password: '',
+                                  confirmPassword: '',
+                                  fullName: '',
+                                  email: '',
+                                  phone: '',
+                                  companyName: '',
+                                  description: '',
+                                  hourlyRate: '',
+                                  specialties: [],
+                                  serviceAreas: ''
+                                });
+                                // Refresh data
+                                window.location.reload();
+                              } else {
+                                const error = await response.text();
+                                alert(`Error: ${error}`);
+                              }
+                            } catch (error) {
+                              alert(`Error: ${error}`);
+                            }
+                          }}
+                        >
+                          Create Contractor
+                        </Button>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+                </div>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
