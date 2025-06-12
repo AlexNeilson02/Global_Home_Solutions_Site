@@ -96,8 +96,8 @@ const AdminPortal: React.FC = () => {
           </div>
 
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-            {/* Desktop Navigation - Hidden on mobile with CSS override */}
-            <div className="mobile-nav-hide block sm:block">
+            {/* Desktop Navigation - Hidden on mobile */}
+            <div className="hidden sm:block">
               <TabsList className="grid w-full grid-cols-5">
                 <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
                 <TabsTrigger value="users">User Management</TabsTrigger>
@@ -117,7 +117,7 @@ const AdminPortal: React.FC = () => {
             {/* Dashboard Tab */}
             <TabsContent value="dashboard" className="space-y-6">
               {/* Key Metrics Cards - Mobile: 2 columns, Desktop: 4 columns */}
-              <div className="grid mobile-grid-2-cols grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+              <div className="grid grid-cols-2 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">Total Users</CardTitle>
