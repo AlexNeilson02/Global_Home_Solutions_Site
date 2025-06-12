@@ -788,73 +788,78 @@ export default function AdminPortalEnhanced() {
 
         {/* Edit Modal */}
         <Dialog open={editModalOpen} onOpenChange={setEditModalOpen}>
-          <DialogContent className="sm:max-w-[500px]">
+          <DialogContent className="sm:max-w-[450px] max-w-[90vw]">
             <DialogHeader>
-              <DialogTitle>Edit Sales Representative</DialogTitle>
-              <DialogDescription>
+              <DialogTitle className="text-lg">Edit Sales Representative</DialogTitle>
+              <DialogDescription className="text-sm">
                 Update information for {selectedSalesperson?.fullName || 'Sales Rep'}
               </DialogDescription>
             </DialogHeader>
-            <div className="space-y-4">
-              <div className="w-full">
-                <label className="text-sm font-medium block mb-1">Full Name</label>
+            <div className="space-y-4 px-1">
+              <div>
+                <label className="text-sm font-medium block mb-2">Full Name</label>
                 <Input
-                  className="w-full"
+                  className="w-full max-w-full"
                   value={editFormData.fullName}
                   onChange={(e) => setEditFormData({...editFormData, fullName: e.target.value})}
                   placeholder="Enter full name"
                 />
               </div>
-              <div className="w-full">
-                <label className="text-sm font-medium block mb-1">Profile URL</label>
+              <div>
+                <label className="text-sm font-medium block mb-2">Profile URL</label>
                 <Input
-                  className="w-full"
+                  className="w-full max-w-full text-sm"
                   value={editFormData.profileUrl}
                   onChange={(e) => setEditFormData({...editFormData, profileUrl: e.target.value})}
                   placeholder="Enter profile URL"
                 />
               </div>
-              <div className="w-full">
-                <label className="text-sm font-medium block mb-1">New Password (leave empty to keep current)</label>
+              <div>
+                <label className="text-sm font-medium block mb-2">New Password (leave empty to keep current)</label>
                 <Input
-                  className="w-full"
+                  className="w-full max-w-full"
                   type="password"
                   value={editFormData.password}
                   onChange={(e) => setEditFormData({...editFormData, password: e.target.value})}
                   placeholder="Enter new password"
                 />
               </div>
-              <div className="w-full">
-                <label className="text-sm font-medium block mb-1">Confirm New Password</label>
+              <div>
+                <label className="text-sm font-medium block mb-2">Confirm New Password</label>
                 <Input
-                  className="w-full"
+                  className="w-full max-w-full"
                   type="password"
                   value={editFormData.confirmPassword}
                   onChange={(e) => setEditFormData({...editFormData, confirmPassword: e.target.value})}
                   placeholder="Confirm new password"
                 />
               </div>
-              <div className="flex justify-between gap-3 pt-4">
-                <Button
-                  variant="destructive"
-                  onClick={handleDelete}
-                  disabled={deleteSalespersonMutation.isPending}
-                >
-                  <Trash2 className="h-4 w-4 mr-2" />
-                  Archive Salesperson
-                </Button>
-                <div className="flex gap-2">
-                  <Button variant="outline" onClick={() => setEditModalOpen(false)}>
+              <div className="flex flex-col gap-3 pt-4">
+                <div className="flex justify-end gap-2">
+                  <Button 
+                    variant="outline" 
+                    onClick={() => setEditModalOpen(false)}
+                    className="px-4 py-2 text-sm"
+                  >
                     Cancel
                   </Button>
                   <Button
                     onClick={handleEditSubmit}
                     disabled={editSalespersonMutation.isPending}
-                    className="bg-white text-black border-2 border-black hover:bg-gray-100 font-semibold"
+                    className="bg-white text-black border-2 border-black hover:bg-gray-100 font-semibold px-4 py-2 text-sm"
                   >
                     Save Changes
                   </Button>
                 </div>
+                <Button
+                  variant="destructive"
+                  onClick={handleDelete}
+                  disabled={deleteSalespersonMutation.isPending}
+                  className="w-full text-sm"
+                >
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Archive Salesperson
+                </Button>
               </div>
             </div>
           </DialogContent>
