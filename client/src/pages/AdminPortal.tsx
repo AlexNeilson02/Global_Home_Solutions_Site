@@ -99,15 +99,13 @@ const AdminPortal: React.FC = () => {
 
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
             {/* Desktop Navigation - Only show on desktop */}
-            {!isMobile && (
-              <TabsList className="grid w-full grid-cols-5">
-                <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
-                <TabsTrigger value="users">User Management</TabsTrigger>
-                <TabsTrigger value="contractors">Contractors</TabsTrigger>
-                <TabsTrigger value="analytics">Analytics</TabsTrigger>
-                <TabsTrigger value="settings">Settings</TabsTrigger>
-              </TabsList>
-            )}
+            <TabsList className="hidden sm:grid w-full grid-cols-5">
+              <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
+              <TabsTrigger value="users">User Management</TabsTrigger>
+              <TabsTrigger value="contractors">Contractors</TabsTrigger>
+              <TabsTrigger value="analytics">Analytics</TabsTrigger>
+              <TabsTrigger value="settings">Settings</TabsTrigger>
+            </TabsList>
 
             {/* Dashboard Tab */}
             <TabsContent value="dashboard" className="space-y-6">
@@ -355,13 +353,13 @@ const AdminPortal: React.FC = () => {
       </div>
 
       {/* Mobile Bottom Navigation - Fixed at bottom */}
-      {isMobile && (
+      <div className="block sm:hidden">
         <MobileBottomNav
           activeTab={activeTab}
           onTabChange={setActiveTab}
           portalType="admin"
         />
-      )}
+      </div>
     </div>
   );
 };
