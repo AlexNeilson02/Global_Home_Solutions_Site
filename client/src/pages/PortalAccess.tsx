@@ -54,7 +54,7 @@ const PortalAccess: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-slate-900" style={{ backgroundColor: '#0f172a' }}>
-      <div className="container mx-auto px-4 py-16">
+      <div className="container mx-auto px-4 py-4">
         {/* Header with optional logout */}
         {isAuthenticated && user && (
           <div className="flex justify-between items-center mb-8">
@@ -70,7 +70,7 @@ const PortalAccess: React.FC = () => {
           </div>
         )}
         
-        <div className="text-center mb-16">
+        <div className="text-center mb-8">
           <div className="flex justify-center mb-8">
             <img 
               src={logoPath} 
