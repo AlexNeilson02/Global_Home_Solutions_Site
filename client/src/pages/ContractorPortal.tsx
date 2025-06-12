@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { useNotifications } from "@/hooks/useNotifications";
+import MobileBottomNav from "@/components/layout/MobileBottomNav";
 
 const ContractorPortal: React.FC = () => {
   const [, navigate] = useLocation();
@@ -59,7 +60,7 @@ const ContractorPortal: React.FC = () => {
     enabled: true
   });
 
-  const contractor = contractorData?.contractor;
+  const contractor = contractorData?.contractor ?? null;
   const contractorId = contractor?.id;
 
   // Real-time notifications for new bid requests
@@ -68,11 +69,11 @@ const ContractorPortal: React.FC = () => {
 
 
   // Simple state-based approach for bid requests
-  const [bidRequests, setBidRequests] = useState([]);
+  const [bidRequests, setBidRequests] = useState<any[]>([]);
   const [loadingBids, setLoadingBids] = useState(false);
   
   // State for projects (sent bids)
-  const [projects, setProjects] = useState([]);
+  const [projects, setProjects] = useState<any[]>([]);
   const [loadingProjects, setLoadingProjects] = useState(false);
   
   // Media viewer modal state
@@ -454,7 +455,7 @@ const ContractorPortal: React.FC = () => {
   const activeProjects = Array.isArray(projects) ? projects.filter((p: any) => p.status === 'in_progress')?.length || 0 : 0;
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pb-16 sm:pb-0">
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-7xl mx-auto">
           {/* Header */}
@@ -479,7 +480,8 @@ const ContractorPortal: React.FC = () => {
               notifications.markAsRead();
             }
           }} className="space-y-6">
-            <TabsList className="grid w-full grid-cols-4">
+            {/* Desktop Navigation - Hidden on mobile */}
+            <TabsList className="hidden sm:grid w-full grid-cols-4">
               <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
               <TabsTrigger value="projects">Projects</TabsTrigger>
               <TabsTrigger value="leads" className="relative">
@@ -495,6 +497,19 @@ const ContractorPortal: React.FC = () => {
               </TabsTrigger>
               <TabsTrigger value="profile">Company Profile</TabsTrigger>
             </TabsList>
+
+            {/* Mobile Bottom Navigation */}
+            <MobileBottomNav
+              activeTab={activeTab}
+              onTabChange={(value) => {
+                setActiveTab(value);
+                if (value === 'leads') {
+                  notifications.markAsRead();
+                }
+              }}
+              portalType="contractor"
+              notificationCount={notifications.unreadCount}
+            />
 
             {/* Dashboard Tab */}
             <TabsContent value="dashboard" className="space-y-6">
