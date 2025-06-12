@@ -58,41 +58,44 @@ const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
   const tabs = getTabConfig();
 
   return (
-    <div className="sm:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 z-50">
-      <div className="flex items-center justify-around py-2">
-        {tabs.map((tab) => {
-          const Icon = tab.icon;
-          const isActive = activeTab === tab.id;
-          
-          return (
-            <button
-              key={tab.id}
-              onClick={() => onTabChange(tab.id)}
-              className={`flex flex-col items-center justify-center px-3 py-2 min-w-0 relative ${
-                isActive 
-                  ? 'text-blue-600 dark:text-blue-400' 
-                  : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
-              }`}
-            >
-              <div className="relative">
-                <Icon className="w-5 h-5 mb-1" />
-                {tab.hasNotification && notificationCount > 0 && (
-                  <Badge 
-                    variant="destructive" 
-                    className="absolute -top-2 -right-2 h-4 w-4 text-xs flex items-center justify-center animate-pulse p-0 min-w-4"
-                  >
-                    {notificationCount > 9 ? '9+' : notificationCount}
-                  </Badge>
-                )}
-              </div>
-              <span className="text-xs font-medium truncate max-w-full">
-                {tab.label}
-              </span>
-            </button>
-          );
-        })}
+    <>
+      {/* Mobile Bottom Navigation - Force visible on mobile with CSS override */}
+      <div className="mobile-nav-show fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 z-50 hidden sm:hidden">
+        <div className="flex items-center justify-around py-3 px-2">
+          {tabs.map((tab) => {
+            const Icon = tab.icon;
+            const isActive = activeTab === tab.id;
+            
+            return (
+              <button
+                key={tab.id}
+                onClick={() => onTabChange(tab.id)}
+                className={`flex flex-col items-center justify-center px-2 py-1 min-w-0 relative flex-1 transition-colors ${
+                  isActive 
+                    ? 'text-blue-600 dark:text-blue-400' 
+                    : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+                }`}
+              >
+                <div className="relative">
+                  <Icon className="w-5 h-5 mb-1" />
+                  {tab.hasNotification && notificationCount > 0 && (
+                    <Badge 
+                      variant="destructive" 
+                      className="absolute -top-2 -right-2 h-4 w-4 text-xs flex items-center justify-center animate-pulse p-0 min-w-4"
+                    >
+                      {notificationCount > 9 ? '9+' : notificationCount}
+                    </Badge>
+                  )}
+                </div>
+                <span className="text-xs font-medium truncate max-w-full">
+                  {tab.label}
+                </span>
+              </button>
+            );
+          })}
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

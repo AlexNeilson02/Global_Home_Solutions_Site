@@ -480,23 +480,25 @@ const ContractorPortal: React.FC = () => {
               notifications.markAsRead();
             }
           }} className="space-y-6">
-            {/* Desktop Navigation - Hidden on mobile */}
-            <TabsList className="hidden sm:grid w-full grid-cols-4">
-              <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
-              <TabsTrigger value="projects">Projects</TabsTrigger>
-              <TabsTrigger value="leads" className="relative">
-                Lead Requests
-                {notifications.unreadCount > 0 && (
-                  <Badge 
-                    variant="destructive" 
-                    className="absolute -top-2 -right-2 h-5 w-5 text-xs flex items-center justify-center animate-pulse"
-                  >
-                    {notifications.unreadCount}
-                  </Badge>
-                )}
-              </TabsTrigger>
-              <TabsTrigger value="profile">Company Profile</TabsTrigger>
-            </TabsList>
+            {/* Desktop Navigation - Only visible on larger screens */}
+            <div className="hidden sm:block">
+              <TabsList className="grid w-full grid-cols-4">
+                <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
+                <TabsTrigger value="projects">Projects</TabsTrigger>
+                <TabsTrigger value="leads" className="relative">
+                  Lead Requests
+                  {notifications.unreadCount > 0 && (
+                    <Badge 
+                      variant="destructive" 
+                      className="absolute -top-2 -right-2 h-5 w-5 text-xs flex items-center justify-center animate-pulse"
+                    >
+                      {notifications.unreadCount}
+                    </Badge>
+                  )}
+                </TabsTrigger>
+                <TabsTrigger value="profile">Company Profile</TabsTrigger>
+              </TabsList>
+            </div>
 
             {/* Mobile Bottom Navigation */}
             <MobileBottomNav

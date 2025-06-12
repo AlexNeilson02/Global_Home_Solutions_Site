@@ -85,13 +85,15 @@ const SalesPortal: React.FC = () => {
           </div>
 
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-            {/* Desktop Navigation - Hidden on mobile */}
-            <TabsList className="hidden sm:grid w-full grid-cols-4">
-              <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
-              <TabsTrigger value="leads">Lead Management</TabsTrigger>
-              <TabsTrigger value="analytics">Analytics</TabsTrigger>
-              <TabsTrigger value="profile">Profile</TabsTrigger>
-            </TabsList>
+            {/* Desktop Navigation - Only visible on larger screens */}
+            <div className="hidden sm:block">
+              <TabsList className="grid w-full grid-cols-4">
+                <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
+                <TabsTrigger value="leads">Lead Management</TabsTrigger>
+                <TabsTrigger value="analytics">Analytics</TabsTrigger>
+                <TabsTrigger value="profile">Profile</TabsTrigger>
+              </TabsList>
+            </div>
 
             {/* Mobile Bottom Navigation */}
             <MobileBottomNav

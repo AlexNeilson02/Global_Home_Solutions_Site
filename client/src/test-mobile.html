@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mobile Navigation Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50">
+    <div class="min-h-screen pb-16 sm:pb-0">
+        <div class="container mx-auto px-4 py-8">
+            <h1 class="text-2xl font-bold mb-8">Mobile Navigation Test</h1>
+            
+            <!-- Desktop Navigation - Hidden on mobile -->
+            <div class="hidden sm:block mb-6">
+                <div class="grid grid-cols-4 gap-2 bg-white p-2 rounded">
+                    <button class="p-2 bg-blue-500 text-white rounded">Dashboard</button>
+                    <button class="p-2 bg-gray-200 rounded">Projects</button>
+                    <button class="p-2 bg-gray-200 rounded">Leads</button>
+                    <button class="p-2 bg-gray-200 rounded">Profile</button>
+                </div>
+            </div>
+            
+            <!-- Content Area -->
+            <div class="grid grid-cols-2 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+                <div class="bg-white p-4 rounded shadow">
+                    <h3 class="font-bold">Card 1</h3>
+                    <p class="text-2xl">123</p>
+                </div>
+                <div class="bg-white p-4 rounded shadow">
+                    <h3 class="font-bold">Card 2</h3>
+                    <p class="text-2xl">456</p>
+                </div>
+                <div class="bg-white p-4 rounded shadow">
+                    <h3 class="font-bold">Card 3</h3>
+                    <p class="text-2xl">789</p>
+                </div>
+                <div class="bg-white p-4 rounded shadow">
+                    <h3 class="font-bold">Card 4</h3>
+                    <p class="text-2xl">012</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Mobile Bottom Navigation - Only visible on small screens -->
+        <div class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50 block sm:hidden">
+            <div class="flex items-center justify-around py-2 px-2">
+                <button class="flex flex-col items-center justify-center px-2 py-2 text-blue-600 flex-1">
+                    <div class="w-5 h-5 mb-1 bg-blue-600 rounded"></div>
+                    <span class="text-xs font-medium">Dashboard</span>
+                </button>
+                <button class="flex flex-col items-center justify-center px-2 py-2 text-gray-500 flex-1">
+                    <div class="w-5 h-5 mb-1 bg-gray-500 rounded"></div>
+                    <span class="text-xs font-medium">Projects</span>
+                </button>
+                <button class="flex flex-col items-center justify-center px-2 py-2 text-gray-500 flex-1">
+                    <div class="w-5 h-5 mb-1 bg-gray-500 rounded"></div>
+                    <span class="text-xs font-medium">Leads</span>
+                </button>
+                <button class="flex flex-col items-center justify-center px-2 py-2 text-gray-500 flex-1">
+                    <div class="w-5 h-5 mb-1 bg-gray-500 rounded"></div>
+                    <span class="text-xs font-medium">Profile</span>
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Test responsive behavior
+        function testResponsive() {
+            const desktop = document.querySelector('.hidden.sm\\:block');
+            const mobile = document.querySelector('.block.sm\\:hidden');
+            const width = window.innerWidth;
+            
+            console.log('Window width:', width);
+            console.log('Desktop nav display:', getComputedStyle(desktop).display);
+            console.log('Mobile nav display:', getComputedStyle(mobile).display);
+        }
+        
+        window.addEventListener('resize', testResponsive);
+        testResponsive();
+    </script>
+</body>
+</html>

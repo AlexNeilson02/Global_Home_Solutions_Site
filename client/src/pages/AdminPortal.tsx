@@ -96,14 +96,16 @@ const AdminPortal: React.FC = () => {
           </div>
 
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-            {/* Desktop Navigation - Hidden on mobile */}
-            <TabsList className="hidden sm:grid w-full grid-cols-5">
-              <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
-              <TabsTrigger value="users">User Management</TabsTrigger>
-              <TabsTrigger value="contractors">Contractors</TabsTrigger>
-              <TabsTrigger value="analytics">Analytics</TabsTrigger>
-              <TabsTrigger value="settings">Settings</TabsTrigger>
-            </TabsList>
+            {/* Desktop Navigation - Only visible on larger screens */}
+            <div className="hidden sm:block">
+              <TabsList className="grid w-full grid-cols-5">
+                <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
+                <TabsTrigger value="users">User Management</TabsTrigger>
+                <TabsTrigger value="contractors">Contractors</TabsTrigger>
+                <TabsTrigger value="analytics">Analytics</TabsTrigger>
+                <TabsTrigger value="settings">Settings</TabsTrigger>
+              </TabsList>
+            </div>
 
             {/* Mobile Bottom Navigation */}
             <MobileBottomNav
