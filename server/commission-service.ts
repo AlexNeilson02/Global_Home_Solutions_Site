@@ -95,29 +95,16 @@ export class CommissionService {
       const commissionAmounts = this.calculateCommissionAmounts(serviceCategory);
 
       // Commission rule: If no salesperson reference, assign commission to admin
-      let effectiveRecipientId = salespersonId;
       let isAdminCommission = false;
       
       if (!salespersonId) {
-        // Find admin user
-        const allUsers = await storage.getAllUsers();
-        const adminUser = allUsers.find(user => user.role === 'admin');
-        if (adminUser) {
-          effectiveRecipientId = adminUser.id;
-          isAdminCommission = true;
-          console.log(`No salesperson reference - assigning commission to admin (ID: ${adminUser.id})`);
-        }
-      }
-
-      // Create commission record (only if we have a valid recipient)
-      if (!effectiveRecipientId) {
-        console.log('No valid recipient found for commission - skipping commission creation');
-        return;
+        isAdminCommission = true;
+        console.log(`No salesperson reference - commission will be assigned to admin`);
       }
 
       const commissionRecord: InsertCommissionRecord = {
         bidRequestId: bidRequest.id,
-        salespersonId: effectiveRecipientId,
+        salespersonId: salespersonId || null, // null for admin commissions
         overrideManagerId: overrideManagerId || null,
         serviceCategory: bidRequest.serviceRequested,
         totalCommission: commissionAmounts.totalCommission,
