@@ -313,33 +313,78 @@ const ContractorPortalEnhanced: React.FC = () => {
         return;
       }
 
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const result = e.target?.result as string;
-        const fileType = file.type.startsWith('image/') ? 'image' : 'video';
+      // For videos, check duration before processing
+      if (file.type.startsWith('video/')) {
+        const videoElement = document.createElement('video');
+        const videoUrl = URL.createObjectURL(file);
         
-        setMediaFiles(prev => [...prev, {
-          url: result,
-          type: fileType,
-          name: file.name
-        }]);
-      };
-      
-      reader.onerror = () => {
-        toast({
-          title: "Upload failed",
-          description: `Failed to process ${file.name}. Please try again.`,
-          variant: "destructive"
-        });
-      };
-      
-      reader.readAsDataURL(file);
+        videoElement.onloadedmetadata = () => {
+          const duration = videoElement.duration;
+          URL.revokeObjectURL(videoUrl);
+          
+          if (duration > 30) {
+            toast({
+              title: "Video too long",
+              description: `${file.name} is ${Math.round(duration)} seconds long. Please upload videos up to 30 seconds only.`,
+              variant: "destructive"
+            });
+            return;
+          }
+          
+          // Process the video if duration is valid
+          processMediaFile(file);
+        };
+        
+        videoElement.onerror = () => {
+          URL.revokeObjectURL(videoUrl);
+          toast({
+            title: "Invalid video",
+            description: `${file.name} could not be processed. Please ensure it's a valid video file.`,
+            variant: "destructive"
+          });
+        };
+        
+        videoElement.src = videoUrl;
+      } else {
+        // Process images immediately
+        processMediaFile(file);
+      }
     });
     
     // Reset input
     if (mediaInputRef.current) {
       mediaInputRef.current.value = '';
     }
+  };
+
+  // Process media file (images and validated videos)
+  const processMediaFile = (file: File) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const result = e.target?.result as string;
+      const fileType = file.type.startsWith('image/') ? 'image' : 'video';
+      
+      setMediaFiles(prev => [...prev, {
+        url: result,
+        type: fileType,
+        name: file.name
+      }]);
+      
+      toast({
+        title: "Media uploaded",
+        description: `${file.name} has been added to your portfolio.`,
+      });
+    };
+    
+    reader.onerror = () => {
+      toast({
+        title: "Upload failed",
+        description: `Failed to process ${file.name}. Please try again.`,
+        variant: "destructive"
+      });
+    };
+    
+    reader.readAsDataURL(file);
   };
 
   // Remove media file
@@ -746,11 +791,26 @@ const ContractorPortalEnhanced: React.FC = () => {
                         <h4 className="font-medium mb-3">Portfolio Media</h4>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                           {contractor?.mediaFiles?.map((media: any, index: number) => (
-                            <div key={index} className="relative group rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800 aspect-square">
+                            <div key={index} className="relative group rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800 aspect-square cursor-pointer"
+                                 onClick={() => setViewingMedia({url: media.url, type: media.type, index, allMedia: contractor.mediaFiles})}>
                               {media.type === 'image' ? (
                                 <img src={media.url} alt={media.name} className="w-full h-full object-cover" />
                               ) : (
-                                <video src={media.url} className="w-full h-full object-cover" />
+                                <div className="relative w-full h-full">
+                                  <video 
+                                    src={media.url} 
+                                    className="w-full h-full object-cover"
+                                    muted
+                                    preload="metadata"
+                                  />
+                                  <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
+                                    <div className="bg-white/90 rounded-full p-2">
+                                      <svg className="w-6 h-6 text-gray-800" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M8 5v14l11-7z"/>
+                                      </svg>
+                                    </div>
+                                  </div>
+                                </div>
                               )}
                               <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                                 <Eye className="h-6 w-6 text-white" />
@@ -1502,6 +1562,94 @@ const ContractorPortalEnhanced: React.FC = () => {
                   Close
                 </Button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Media Viewer Modal */}
+      {viewingMedia && (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
+          <div className="relative max-w-4xl max-h-[90vh] w-full">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="absolute top-2 right-2 z-10 bg-black/50 text-white hover:bg-black/70"
+              onClick={() => setViewingMedia(null)}
+            >
+              <X className="h-4 w-4" />
+            </Button>
+            
+            <div className="bg-white dark:bg-gray-900 rounded-lg overflow-hidden">
+              {viewingMedia.type === 'image' ? (
+                <img 
+                  src={viewingMedia.url} 
+                  alt="Portfolio item" 
+                  className="w-full h-auto max-h-[80vh] object-contain"
+                />
+              ) : (
+                <div className="relative">
+                  <video 
+                    src={viewingMedia.url} 
+                    controls
+                    autoPlay
+                    className="w-full h-auto max-h-[80vh] object-contain"
+                    style={{ maxHeight: '80vh' }}
+                  >
+                    Your browser does not support the video tag.
+                  </video>
+                  <div className="p-4 bg-gray-50 dark:bg-gray-800">
+                    <p className="text-sm text-gray-600 dark:text-gray-300">
+                      <strong>Tip:</strong> This video is limited to 30 seconds to showcase the contractor's work efficiently.
+                    </p>
+                  </div>
+                </div>
+              )}
+              
+              {/* Navigation for multiple media */}
+              {viewingMedia.allMedia && viewingMedia.allMedia.length > 1 && (
+                <div className="flex justify-between items-center p-4 bg-gray-50 dark:bg-gray-800">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      const prevIndex = viewingMedia.index > 0 ? viewingMedia.index - 1 : viewingMedia.allMedia.length - 1;
+                      const prevMedia = viewingMedia.allMedia[prevIndex];
+                      setViewingMedia({
+                        url: prevMedia.url,
+                        type: prevMedia.type,
+                        index: prevIndex,
+                        allMedia: viewingMedia.allMedia
+                      });
+                    }}
+                    disabled={viewingMedia.allMedia.length <= 1}
+                  >
+                    Previous
+                  </Button>
+                  
+                  <span className="text-sm text-gray-600 dark:text-gray-300">
+                    {viewingMedia.index + 1} of {viewingMedia.allMedia.length}
+                  </span>
+                  
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      const nextIndex = viewingMedia.index < viewingMedia.allMedia.length - 1 ? viewingMedia.index + 1 : 0;
+                      const nextMedia = viewingMedia.allMedia[nextIndex];
+                      setViewingMedia({
+                        url: nextMedia.url,
+                        type: nextMedia.type,
+                        index: nextIndex,
+                        allMedia: viewingMedia.allMedia
+                      });
+                    }}
+                    disabled={viewingMedia.allMedia.length <= 1}
+                  >
+                    Next
+                  </Button>
+                </div>
+              )}
             </div>
           </div>
         </div>

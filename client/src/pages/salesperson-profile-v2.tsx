@@ -49,6 +49,7 @@ interface Contractor {
   logoUrl: string | null;
   videoUrl: string | null;
   serviceCategoryIds: number[];
+  mediaFiles?: {url: string, type: 'image' | 'video', name: string}[];
 }
 
 interface ServiceCategory {
