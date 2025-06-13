@@ -37,19 +37,19 @@ export default function HomePage() {
     
     if (refParam && !trackedSalesperson) {
       // Track the visit for commission attribution
-      apiRequest('/api/track-visit', {
-        method: 'POST',
-        body: {
-          salespersonProfileUrl: refParam,
-          userAgent: navigator.userAgent,
-          referrer: document.referrer
-        }
+      apiRequest('POST', '/api/track-visit', {
+        salespersonProfileUrl: refParam,
+        userAgent: navigator.userAgent,
+        referrer: document.referrer
       })
-      .then((response) => {
-        if (response.success) {
-          setTrackedSalesperson(response.salesperson);
+      .then((response) => response.json())
+      .then((data) => {
+        console.log('Visit tracking response:', data);
+        if (data.success) {
+          setTrackedSalesperson(data.salesperson);
           // Store in sessionStorage to persist during the session
-          sessionStorage.setItem('trackedSalesperson', JSON.stringify(response.salesperson));
+          sessionStorage.setItem('trackedSalesperson', JSON.stringify(data.salesperson));
+          console.log('Tracked salesperson set:', data.salesperson);
         }
       })
       .catch((error) => {
