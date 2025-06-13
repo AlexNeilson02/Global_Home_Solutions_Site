@@ -394,7 +394,7 @@ const SalesPortalEnhanced: React.FC = () => {
             {/* Dashboard Tab */}
             <TabsContent value="dashboard" className="space-y-6">
               {/* Key Metrics */}
-              <div className="grid grid-cols-2 sm:grid-cols-1 md:grid-cols-4 gap-4 sm:gap-6">
+              <div className="grid grid-cols-2 sm:grid-cols-1 md:grid-cols-4 gap-3 sm:gap-6">
                 <Card style={antiYellowStyles}>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3 sm:p-4">
                     <CardTitle className="text-xs sm:text-sm font-medium truncate">Total Visits</CardTitle>
