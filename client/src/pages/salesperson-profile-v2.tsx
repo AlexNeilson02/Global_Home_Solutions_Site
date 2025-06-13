@@ -315,14 +315,14 @@ export default function SalespersonProfileV2() {
                                 </div>
                                 
                                 <div className="mt-4 flex flex-col md:flex-row gap-2">
-                                  {contractor.videoUrl && (
+                                  {(contractor.videoUrl || contractor.mediaFiles?.some(m => m.type === 'video')) && (
                                     <Button 
                                       variant="outline" 
                                       size="sm"
                                       onClick={() => toggleVideo(contractor.id)}
                                     >
                                       <VideoIcon className="mr-2 h-4 w-4" />
-                                      {contractor.showVideo ? "Hide Video" : "Watch Video"}
+                                      {contractor.showVideo ? "Hide Portfolio" : "View Portfolio"}
                                     </Button>
                                   )}
                                   
@@ -337,20 +337,73 @@ export default function SalespersonProfileV2() {
                             </div>
                           </div>
                           
-                          {/* Video Area */}
-                          {contractor.videoUrl && contractor.showVideo && (
+                          {/* Portfolio Media Gallery */}
+                          {contractor.showVideo && (
                             <div className="border-t">
                               <div className="p-4 bg-muted/30">
-                                <div className="aspect-video w-full">
-                                  <video 
-                                    className="w-full h-full object-cover rounded-md" 
-                                    controls
-                                    poster="https://placehold.co/600x400/png?text=Video+Preview"
-                                  >
-                                    <source src={contractor.videoUrl} type="video/mp4" />
-                                    Your browser does not support the video tag.
-                                  </video>
-                                </div>
+                                <h4 className="font-medium mb-3">Portfolio Gallery</h4>
+                                
+                                {/* Legacy Video Support */}
+                                {contractor.videoUrl && (
+                                  <div className="mb-4">
+                                    <div className="aspect-video w-full">
+                                      <video 
+                                        className="w-full h-full object-cover rounded-md" 
+                                        controls
+                                        poster="https://placehold.co/600x400/png?text=Video+Preview"
+                                      >
+                                        <source src={contractor.videoUrl} type="video/mp4" />
+                                        Your browser does not support the video tag.
+                                      </video>
+                                    </div>
+                                    <p className="text-xs text-gray-600 mt-2">
+                                      <strong>Note:</strong> Videos are limited to 30 seconds to showcase work efficiently.
+                                    </p>
+                                  </div>
+                                )}
+                                
+                                {/* Media Files Gallery */}
+                                {contractor.mediaFiles && contractor.mediaFiles.length > 0 && (
+                                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                                    {contractor.mediaFiles.map((media, index) => (
+                                      <div key={index} className="relative group rounded-lg overflow-hidden bg-gray-100 aspect-square">
+                                        {media.type === 'image' ? (
+                                          <img 
+                                            src={media.url} 
+                                            alt={media.name} 
+                                            className="w-full h-full object-cover cursor-pointer hover:scale-105 transition-transform"
+                                          />
+                                        ) : (
+                                          <div className="relative w-full h-full">
+                                            <video 
+                                              src={media.url} 
+                                              className="w-full h-full object-cover"
+                                              muted
+                                              preload="metadata"
+                                            />
+                                            <div className="absolute inset-0 bg-black/30 flex items-center justify-center cursor-pointer group-hover:bg-black/40 transition-colors">
+                                              <div className="bg-white/90 rounded-full p-3 group-hover:scale-110 transition-transform">
+                                                <svg className="w-8 h-8 text-gray-800" fill="currentColor" viewBox="0 0 24 24">
+                                                  <path d="M8 5v14l11-7z"/>
+                                                </svg>
+                                              </div>
+                                            </div>
+                                            <div className="absolute bottom-2 left-2 bg-black/70 text-white text-xs px-2 py-1 rounded">
+                                              Video (≤30s)
+                                            </div>
+                                          </div>
+                                        )}
+                                      </div>
+                                    ))}
+                                  </div>
+                                )}
+                                
+                                {!contractor.videoUrl && (!contractor.mediaFiles || contractor.mediaFiles.length === 0) && (
+                                  <div className="text-center py-8">
+                                    <VideoIcon className="h-12 w-12 text-gray-400 mx-auto mb-2" />
+                                    <p className="text-gray-500">No portfolio media available</p>
+                                  </div>
+                                )}
                               </div>
                             </div>
                           )}
