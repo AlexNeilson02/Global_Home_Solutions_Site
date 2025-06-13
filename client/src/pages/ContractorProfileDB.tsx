@@ -1,12 +1,12 @@
 import React, { useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import BidRequestForm from "@/components/BidRequestForm";
 import "../styles/ContractorProfile.css";
 
 export default function ContractorProfileDB() {
   const { id } = useParams();
-  const navigate = useNavigate();
+  const [, setLocation] = useLocation();
   const [showBidForm, setShowBidForm] = useState(false);
 
   const { data: contractorData, isLoading, error } = useQuery({
@@ -27,7 +27,7 @@ export default function ContractorProfileDB() {
   if (error || !contractor) return <div>Contractor not found.</div>;
 
   const handleBack = () => {
-    navigate('/');
+    setLocation('/');
   };
 
   return (
