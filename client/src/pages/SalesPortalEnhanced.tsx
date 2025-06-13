@@ -441,6 +441,7 @@ const SalesPortalEnhanced: React.FC = () => {
                   <Button
                     onClick={() => setIsEditingProfile(!isEditingProfile)}
                     variant={isEditingProfile ? "outline" : "default"}
+                    style={antiYellowInputStyles}
                   >
                     <Edit3 className="h-4 w-4 mr-2" />
                     {isEditingProfile ? "Cancel" : "Edit Profile"}
@@ -562,7 +563,7 @@ const SalesPortalEnhanced: React.FC = () => {
                             placeholder="Add specialty (e.g., Roofing, HVAC)"
                             onKeyPress={(e) => e.key === 'Enter' && addSpecialty()}
                           />
-                          <Button type="button" onClick={addSpecialty} size="sm">
+                          <Button type="button" onClick={addSpecialty} size="sm" style={antiYellowInputStyles}>
                             <Plus className="h-4 w-4" />
                           </Button>
                         </div>
@@ -590,7 +591,7 @@ const SalesPortalEnhanced: React.FC = () => {
                             placeholder="Add certification"
                             onKeyPress={(e) => e.key === 'Enter' && addCertification()}
                           />
-                          <Button type="button" onClick={addCertification} size="sm">
+                          <Button type="button" onClick={addCertification} size="sm" style={antiYellowInputStyles}>
                             <Plus className="h-4 w-4" />
                           </Button>
                         </div>
@@ -598,12 +599,13 @@ const SalesPortalEnhanced: React.FC = () => {
 
                       {/* Action Buttons */}
                       <div className="flex justify-end space-x-3">
-                        <Button variant="outline" onClick={handleCancelEdit}>
+                        <Button variant="outline" onClick={handleCancelEdit} style={antiYellowInputStyles}>
                           Cancel
                         </Button>
                         <Button 
                           onClick={handleSaveProfile} 
                           disabled={updateProfileMutation.isPending}
+                          style={antiYellowInputStyles}
                         >
                           {updateProfileMutation.isPending ? "Saving..." : "Save Changes"}
                         </Button>
@@ -637,13 +639,14 @@ const SalesPortalEnhanced: React.FC = () => {
                           />
                         </div>
                         <div className="flex gap-2">
-                          <Button onClick={downloadQRCode} variant="outline">
+                          <Button onClick={downloadQRCode} variant="outline" style={antiYellowInputStyles}>
                             <Download className="h-4 w-4 mr-2" />
                             Download
                           </Button>
                           <Button 
                             onClick={() => copyToClipboard(qrCodeData, 'QR Code URL')}
                             variant="outline"
+                            style={antiYellowInputStyles}
                           >
                             <Copy className="h-4 w-4 mr-2" />
                             Copy
@@ -676,11 +679,13 @@ const SalesPortalEnhanced: React.FC = () => {
                           value={profileUrl} 
                           readOnly 
                           className="flex-1"
+                          style={antiYellowInputStyles}
                         />
                         <Button 
                           onClick={() => copyToClipboard(profileUrl, 'Profile URL')}
                           variant="outline"
                           size="sm"
+                          style={antiYellowInputStyles}
                         >
                           <Copy className="h-4 w-4" />
                         </Button>
@@ -694,11 +699,13 @@ const SalesPortalEnhanced: React.FC = () => {
                           value={salesperson?.nfcId || ''} 
                           readOnly 
                           className="flex-1"
+                          style={antiYellowInputStyles}
                         />
                         <Button 
                           onClick={() => copyToClipboard(salesperson?.nfcId || '', 'NFC ID')}
                           variant="outline"
                           size="sm"
+                          style={antiYellowInputStyles}
                         >
                           <Copy className="h-4 w-4" />
                         </Button>

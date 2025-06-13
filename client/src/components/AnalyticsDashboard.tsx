@@ -28,7 +28,25 @@ const AnalyticsDashboard: React.FC<AnalyticsProps> = ({ userRole, userId }) => {
     color: 'black',
     outline: 'none',
     outlineColor: 'transparent',
-    border: '1px solid #d1d5db'
+    outlineWidth: '0',
+    outlineStyle: 'none',
+    border: '1px solid #d1d5db',
+    boxShadow: 'none'
+  } as const;
+
+  // Enhanced style for inputs and interactive elements
+  const antiYellowInputStyles = {
+    backgroundColor: 'white',
+    color: 'black',
+    outline: 'none',
+    outlineColor: 'transparent',
+    outlineWidth: '0',
+    outlineStyle: 'none',
+    border: '2px solid #d1d5db',
+    boxShadow: 'none',
+    WebkitAppearance: 'none',
+    MozAppearance: 'none',
+    appearance: 'none'
   } as const;
 
   // Fetch comprehensive analytics data
