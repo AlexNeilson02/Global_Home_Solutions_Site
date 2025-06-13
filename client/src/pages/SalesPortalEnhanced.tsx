@@ -37,6 +37,15 @@ const SalesPortalEnhanced: React.FC = () => {
   const [, navigate] = useLocation();
   const [activeTab, setActiveTab] = useState("dashboard");
   const [isEditingProfile, setIsEditingProfile] = useState(false);
+  
+  // Style object to remove yellow coloring - Solution #2
+  const antiYellowStyles = {
+    backgroundColor: 'white',
+    color: 'black',
+    outline: 'none',
+    outlineColor: 'transparent',
+    border: '1px solid #d1d5db'
+  } as const;
   const [profileForm, setProfileForm] = useState({
     bio: '',
     specialties: [] as string[],
@@ -266,7 +275,14 @@ const SalesPortalEnhanced: React.FC = () => {
     `${window.location.origin}/salesperson/${salesperson.profileUrl}` : '';
 
   return (
-    <div data-sales-portal="true" className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div 
+      className="min-h-screen bg-gray-50 dark:bg-gray-900"
+      style={{ 
+        backgroundColor: 'rgb(249 250 251)', 
+        outline: 'none',
+        outlineColor: 'transparent'
+      }}
+    >
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-7xl mx-auto">
           {/* Header */}
@@ -298,7 +314,7 @@ const SalesPortalEnhanced: React.FC = () => {
             <TabsContent value="dashboard" className="space-y-6">
               {/* Key Metrics */}
               <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                <Card>
+                <Card style={antiYellowStyles}>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">Total Visits</CardTitle>
                     <Eye className="h-4 w-4 text-muted-foreground" />
@@ -309,7 +325,7 @@ const SalesPortalEnhanced: React.FC = () => {
                   </CardContent>
                 </Card>
 
-                <Card>
+                <Card style={antiYellowStyles}>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">Conversions</CardTitle>
                     <Target className="h-4 w-4 text-muted-foreground" />
@@ -320,7 +336,7 @@ const SalesPortalEnhanced: React.FC = () => {
                   </CardContent>
                 </Card>
 
-                <Card>
+                <Card style={antiYellowStyles}>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">Total Leads</CardTitle>
                     <Users className="h-4 w-4 text-muted-foreground" />
@@ -331,7 +347,7 @@ const SalesPortalEnhanced: React.FC = () => {
                   </CardContent>
                 </Card>
 
-                <Card>
+                <Card style={antiYellowStyles}>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">Commissions</CardTitle>
                     <TrendingUp className="h-4 w-4 text-muted-foreground" />
@@ -344,7 +360,7 @@ const SalesPortalEnhanced: React.FC = () => {
               </div>
 
               {/* Performance Chart */}
-              <Card>
+              <Card style={antiYellowStyles}>
                 <CardHeader>
                   <CardTitle>Performance Overview</CardTitle>
                   <CardDescription>Your monthly performance metrics</CardDescription>
@@ -365,7 +381,7 @@ const SalesPortalEnhanced: React.FC = () => {
               </Card>
 
               {/* Recent Activity */}
-              <Card>
+              <Card style={antiYellowStyles}>
                 <CardHeader>
                   <CardTitle>Recent Bid Requests</CardTitle>
                   <CardDescription>Latest potential leads from your referrals</CardDescription>
