@@ -129,14 +129,14 @@ const AnalyticsDashboard: React.FC<AnalyticsProps> = ({ userRole, userId }) => {
       return (
         <div className="space-y-6">
           {/* Primary Metrics */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
             <Card style={antiYellowStyles}>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total Requests</CardTitle>
-                <Target className="h-4 w-4 text-muted-foreground" />
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3 sm:p-4">
+                <CardTitle className="text-xs sm:text-sm font-medium truncate">Total Requests</CardTitle>
+                <Target className="h-4 w-4 text-muted-foreground flex-shrink-0" />
               </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{overview?.totalBidRequests || 0}</div>
+              <CardContent className="p-3 pt-0 sm:p-4 sm:pt-0">
+                <div className="text-lg sm:text-2xl font-bold">{overview?.totalBidRequests || 0}</div>
                 <p className="text-xs text-muted-foreground">
                   <span className="text-green-600">+{conversions?.conversionRate || 0}%</span> conversion rate
                 </p>
@@ -144,12 +144,12 @@ const AnalyticsDashboard: React.FC<AnalyticsProps> = ({ userRole, userId }) => {
             </Card>
 
             <Card style={antiYellowStyles}>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
-                <DollarSign className="h-4 w-4 text-muted-foreground" />
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3 sm:p-4">
+                <CardTitle className="text-xs sm:text-sm font-medium truncate">Total Revenue</CardTitle>
+                <DollarSign className="h-4 w-4 text-muted-foreground flex-shrink-0" />
               </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{formatCurrency(revenue?.totalRevenue || 0)}</div>
+              <CardContent className="p-3 pt-0 sm:p-4 sm:pt-0">
+                <div className="text-lg sm:text-2xl font-bold">{formatCurrency(revenue?.totalRevenue || 0)}</div>
                 <p className="text-xs text-muted-foreground">
                   Avg: {formatCurrency(revenue?.averageProjectValue || 0)} per project
                 </p>
@@ -157,12 +157,12 @@ const AnalyticsDashboard: React.FC<AnalyticsProps> = ({ userRole, userId }) => {
             </Card>
 
             <Card style={antiYellowStyles}>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Active Users</CardTitle>
-                <Users className="h-4 w-4 text-muted-foreground" />
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3 sm:p-4">
+                <CardTitle className="text-xs sm:text-sm font-medium truncate">Active Users</CardTitle>
+                <Users className="h-4 w-4 text-muted-foreground flex-shrink-0" />
               </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{overview?.activeContractors + overview?.activeSalespersons || 0}</div>
+              <CardContent className="p-3 pt-0 sm:p-4 sm:pt-0">
+                <div className="text-lg sm:text-2xl font-bold">{overview?.activeContractors + overview?.activeSalespersons || 0}</div>
                 <p className="text-xs text-muted-foreground">
                   {overview?.activeContractors || 0} contractors, {overview?.activeSalespersons || 0} sales reps
                 </p>
@@ -170,12 +170,12 @@ const AnalyticsDashboard: React.FC<AnalyticsProps> = ({ userRole, userId }) => {
             </Card>
 
             <Card style={antiYellowStyles}>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Page Visits</CardTitle>
-                <Eye className="h-4 w-4 text-muted-foreground" />
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3 sm:p-4">
+                <CardTitle className="text-xs sm:text-sm font-medium truncate">Page Visits</CardTitle>
+                <Eye className="h-4 w-4 text-muted-foreground flex-shrink-0" />
               </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{overview?.totalPageVisits || 0}</div>
+              <CardContent className="p-3 pt-0 sm:p-4 sm:pt-0">
+                <div className="text-lg sm:text-2xl font-bold">{overview?.totalPageVisits || 0}</div>
                 <p className="text-xs text-muted-foreground">
                   QR code scans and profile visits
                 </p>
@@ -248,14 +248,14 @@ const AnalyticsDashboard: React.FC<AnalyticsProps> = ({ userRole, userId }) => {
       const { personalMetrics, commissionData } = analyticsData;
       
       return (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
           <Card style={antiYellowStyles}>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">QR Scans</CardTitle>
-              <Eye className="h-4 w-4 text-muted-foreground" />
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3 sm:p-4">
+              <CardTitle className="text-xs sm:text-sm font-medium truncate">QR Scans</CardTitle>
+              <Eye className="h-4 w-4 text-muted-foreground flex-shrink-0" />
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{personalMetrics?.totalQrScans || 0}</div>
+            <CardContent className="p-3 pt-0 sm:p-4 sm:pt-0">
+              <div className="text-lg sm:text-2xl font-bold">{personalMetrics?.totalQrScans || 0}</div>
               <p className="text-xs text-muted-foreground">
                 {formatPercentage(personalMetrics?.scanToLeadRate || 0)} to lead rate
               </p>
@@ -263,12 +263,12 @@ const AnalyticsDashboard: React.FC<AnalyticsProps> = ({ userRole, userId }) => {
           </Card>
 
           <Card style={antiYellowStyles}>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Leads</CardTitle>
-              <Target className="h-4 w-4 text-muted-foreground" />
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3 sm:p-4">
+              <CardTitle className="text-xs sm:text-sm font-medium truncate">Total Leads</CardTitle>
+              <Target className="h-4 w-4 text-muted-foreground flex-shrink-0" />
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{personalMetrics?.totalLeads || 0}</div>
+            <CardContent className="p-3 pt-0 sm:p-4 sm:pt-0">
+              <div className="text-lg sm:text-2xl font-bold">{personalMetrics?.totalLeads || 0}</div>
               <p className="text-xs text-muted-foreground">
                 {personalMetrics?.contactedLeads || 0} contacted
               </p>
@@ -276,12 +276,12 @@ const AnalyticsDashboard: React.FC<AnalyticsProps> = ({ userRole, userId }) => {
           </Card>
 
           <Card style={antiYellowStyles}>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Won Projects</CardTitle>
-              <TrendingUp className="h-4 w-4 text-muted-foreground" />
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3 sm:p-4">
+              <CardTitle className="text-xs sm:text-sm font-medium truncate">Won Projects</CardTitle>
+              <TrendingUp className="h-4 w-4 text-muted-foreground flex-shrink-0" />
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{personalMetrics?.wonProjects || 0}</div>
+            <CardContent className="p-3 pt-0 sm:p-4 sm:pt-0">
+              <div className="text-lg sm:text-2xl font-bold">{personalMetrics?.wonProjects || 0}</div>
               <p className="text-xs text-muted-foreground">
                 {formatPercentage(personalMetrics?.conversionRate || 0)} conversion rate
               </p>
@@ -289,12 +289,12 @@ const AnalyticsDashboard: React.FC<AnalyticsProps> = ({ userRole, userId }) => {
           </Card>
 
           <Card style={antiYellowStyles}>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Commission Value</CardTitle>
-              <DollarSign className="h-4 w-4 text-muted-foreground" />
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3 sm:p-4">
+              <CardTitle className="text-xs sm:text-sm font-medium truncate">Commission Value</CardTitle>
+              <DollarSign className="h-4 w-4 text-muted-foreground flex-shrink-0" />
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{formatCurrency(commissionData?.totalCommissionValue || 0)}</div>
+            <CardContent className="p-3 pt-0 sm:p-4 sm:pt-0">
+              <div className="text-lg sm:text-2xl font-bold">{formatCurrency(commissionData?.totalCommissionValue || 0)}</div>
               <p className="text-xs text-muted-foreground">
                 {commissionData?.eligibleProjects || 0} eligible projects
               </p>
@@ -307,14 +307,14 @@ const AnalyticsDashboard: React.FC<AnalyticsProps> = ({ userRole, userId }) => {
     // Contractor KPIs
     const analytics = analyticsData;
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-2 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
         <Card style={antiYellowStyles}>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Requests</CardTitle>
-            <Target className="h-4 w-4 text-muted-foreground" />
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3 sm:p-4">
+            <CardTitle className="text-xs sm:text-sm font-medium truncate">Total Requests</CardTitle>
+            <Target className="h-4 w-4 text-muted-foreground flex-shrink-0" />
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{analytics?.totalRequests || 0}</div>
+          <CardContent className="p-3 pt-0 sm:p-4 sm:pt-0">
+            <div className="text-lg sm:text-2xl font-bold">{analytics?.totalRequests || 0}</div>
             <p className="text-xs text-muted-foreground">
               {analytics?.responded || 0} responded to
             </p>
@@ -322,12 +322,12 @@ const AnalyticsDashboard: React.FC<AnalyticsProps> = ({ userRole, userId }) => {
         </Card>
 
         <Card style={antiYellowStyles}>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Projects Won</CardTitle>
-            <TrendingUp className="h-4 w-4 text-muted-foreground" />
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3 sm:p-4">
+            <CardTitle className="text-xs sm:text-sm font-medium truncate">Projects Won</CardTitle>
+            <TrendingUp className="h-4 w-4 text-muted-foreground flex-shrink-0" />
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{analytics?.won || 0}</div>
+          <CardContent className="p-3 pt-0 sm:p-4 sm:pt-0">
+            <div className="text-lg sm:text-2xl font-bold">{analytics?.won || 0}</div>
             <p className="text-xs text-muted-foreground">
               {analytics?.lost || 0} lost
             </p>
@@ -335,12 +335,12 @@ const AnalyticsDashboard: React.FC<AnalyticsProps> = ({ userRole, userId }) => {
         </Card>
 
         <Card style={antiYellowStyles}>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Revenue</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3 sm:p-4">
+            <CardTitle className="text-xs sm:text-sm font-medium truncate">Revenue</CardTitle>
+            <DollarSign className="h-4 w-4 text-muted-foreground flex-shrink-0" />
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{formatCurrency(analytics?.revenue || 0)}</div>
+          <CardContent className="p-3 pt-0 sm:p-4 sm:pt-0">
+            <div className="text-lg sm:text-2xl font-bold">{formatCurrency(analytics?.revenue || 0)}</div>
             <p className="text-xs text-muted-foreground">
               From won projects
             </p>
@@ -348,12 +348,12 @@ const AnalyticsDashboard: React.FC<AnalyticsProps> = ({ userRole, userId }) => {
         </Card>
 
         <Card style={antiYellowStyles}>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Response Time</CardTitle>
-            <PhoneCall className="h-4 w-4 text-muted-foreground" />
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3 sm:p-4">
+            <CardTitle className="text-xs sm:text-sm font-medium truncate">Response Time</CardTitle>
+            <PhoneCall className="h-4 w-4 text-muted-foreground flex-shrink-0" />
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{safeToFixed(analytics?.averageResponseTime)}h</div>
+          <CardContent className="p-3 pt-0 sm:p-4 sm:pt-0">
+            <div className="text-lg sm:text-2xl font-bold">{safeToFixed(analytics?.averageResponseTime)}h</div>
             <p className="text-xs text-muted-foreground">
               Average response time
             </p>

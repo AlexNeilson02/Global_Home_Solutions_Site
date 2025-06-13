@@ -1090,7 +1090,7 @@ export default function AdminPortalEnhanced() {
                 {/* Mobile view - Cards layout for smaller screens */}
                 <div className="block sm:hidden space-y-4">
                   {bidRequests.map((request: any) => (
-                    <Card key={request.id} className="p-4">
+                    <Card key={request.id} className="p-4" style={antiYellowStyles}>
                       <div className="space-y-3">
                         <div className="flex justify-between items-start">
                           <div>
