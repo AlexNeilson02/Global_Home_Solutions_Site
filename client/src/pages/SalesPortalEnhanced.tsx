@@ -44,7 +44,25 @@ const SalesPortalEnhanced: React.FC = () => {
     color: 'black',
     outline: 'none',
     outlineColor: 'transparent',
-    border: '1px solid #d1d5db'
+    outlineWidth: '0',
+    outlineStyle: 'none',
+    border: '1px solid #d1d5db',
+    boxShadow: 'none'
+  } as const;
+
+  // Enhanced style for inputs and interactive elements
+  const antiYellowInputStyles = {
+    backgroundColor: 'white',
+    color: 'black',
+    outline: 'none',
+    outlineColor: 'transparent',
+    outlineWidth: '0',
+    outlineStyle: 'none',
+    border: '2px solid #d1d5db',
+    boxShadow: 'none',
+    WebkitAppearance: 'none',
+    MozAppearance: 'none',
+    appearance: 'none'
   } as const;
   const [profileForm, setProfileForm] = useState({
     bio: '',
@@ -492,7 +510,7 @@ const SalesPortalEnhanced: React.FC = () => {
                         <div>
                           <label className="block text-sm font-medium mb-2">Phone Number</label>
                           <Input
-                            style={antiYellowStyles}
+                            style={antiYellowInputStyles}
                             value={profileForm.phone}
                             onChange={(e) => setProfileForm({...profileForm, phone: e.target.value})}
                             placeholder="Enter phone number"
@@ -501,7 +519,7 @@ const SalesPortalEnhanced: React.FC = () => {
                         <div>
                           <label className="block text-sm font-medium mb-2">Years of Experience</label>
                           <Input
-                            style={antiYellowStyles}
+                            style={antiYellowInputStyles}
                             type="number"
                             value={profileForm.yearsExperience}
                             onChange={(e) => setProfileForm({...profileForm, yearsExperience: parseInt(e.target.value) || 0})}
@@ -514,7 +532,7 @@ const SalesPortalEnhanced: React.FC = () => {
                       <div>
                         <label className="block text-sm font-medium mb-2">Professional Bio</label>
                         <Textarea
-                          style={antiYellowStyles}
+                          style={antiYellowInputStyles}
                           value={profileForm.bio}
                           onChange={(e) => setProfileForm({...profileForm, bio: e.target.value})}
                           placeholder="Describe your experience, approach, and what makes you a great sales representative..."
@@ -538,7 +556,7 @@ const SalesPortalEnhanced: React.FC = () => {
                         </div>
                         <div className="flex gap-2">
                           <Input
-                            style={antiYellowStyles}
+                            style={antiYellowInputStyles}
                             value={newSpecialty}
                             onChange={(e) => setNewSpecialty(e.target.value)}
                             placeholder="Add specialty (e.g., Roofing, HVAC)"
@@ -566,7 +584,7 @@ const SalesPortalEnhanced: React.FC = () => {
                         </div>
                         <div className="flex gap-2">
                           <Input
-                            style={antiYellowStyles}
+                            style={antiYellowInputStyles}
                             value={newCertification}
                             onChange={(e) => setNewCertification(e.target.value)}
                             placeholder="Add certification"
