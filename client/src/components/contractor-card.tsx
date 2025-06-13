@@ -49,9 +49,9 @@ export function ContractorCard({
                   key={i}
                   className={`h-4 w-4 ${
                     i < Math.floor(roundedRating)
-                      ? "text-yellow-400 fill-yellow-400"
+                      ? "text-amber-600 fill-amber-600"
                       : i < roundedRating
-                      ? "text-yellow-400 fill-yellow-400" // For half stars we could use a different icon, but for simplicity using the same
+                      ? "text-amber-600 fill-amber-600" // For half stars we could use a different icon, but for simplicity using the same
                       : "text-gray-300"
                   }`}
                 />

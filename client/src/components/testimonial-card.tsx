@@ -32,7 +32,7 @@ export function TestimonialCard({
                   key={i}
                   className={`h-4 w-4 ${
                     i < rating
-                      ? "text-yellow-400 fill-yellow-400"
+                      ? "text-amber-600 fill-amber-600"
                       : "text-gray-300"
                   }`}
                 />

@@ -110,7 +110,7 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ userId, userRol
       case 'success':
         return <CheckCircle className="h-4 w-4 text-green-500" />;
       case 'warning':
-        return <AlertCircle className="h-4 w-4 text-yellow-500" />;
+        return <AlertCircle className="h-4 w-4 text-orange-500" />;
       case 'error':
         return <AlertCircle className="h-4 w-4 text-red-500" />;
       default:

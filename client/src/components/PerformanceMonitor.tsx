@@ -257,7 +257,7 @@ const PerformanceMonitor: React.FC = () => {
                       value={item.value} 
                       className={`h-2 ${
                         status === 'good' ? '[&>div]:bg-green-500' :
-                        status === 'fair' ? '[&>div]:bg-yellow-500' :
+                        status === 'fair' ? '[&>div]:bg-orange-500' :
                         '[&>div]:bg-red-500'
                       }`}
                     />
