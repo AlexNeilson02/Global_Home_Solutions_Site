@@ -149,10 +149,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
   apiRouter.patch("/contractors/:id", isAuthenticated, async (req: Request, res: Response) => {
     try {
       const contractorId = parseInt(req.params.id);
-      const contractor = await storage.updateContractor(contractorId, req.body);
-      if (!contractor) {
+      
+      // Log the update request for debugging
+      console.log(`Updating contractor ${contractorId} with data:`, req.body);
+      
+      // Get current contractor data first to ensure we preserve existing fields
+      const currentContractor = await storage.getContractor(contractorId);
+      if (!currentContractor) {
         return res.status(404).json({ message: "Contractor not found" });
       }
+      
+      console.log("Current contractor data:", currentContractor);
+      
+      // Only update the fields that are provided in the request body
+      const updateData = { ...req.body };
+      
+      // Remove any undefined or null fields except when explicitly setting videoUrl to null
+      Object.keys(updateData).forEach(key => {
+        if (updateData[key] === undefined) {
+          delete updateData[key];
+        }
+      });
+      
+      console.log("Sanitized update data:", updateData);
+      
+      const contractor = await storage.updateContractor(contractorId, updateData);
+      if (!contractor) {
+        return res.status(404).json({ message: "Contractor not found after update" });
+      }
+      
+      console.log("Updated contractor:", contractor);
       res.json({ contractor });
     } catch (error) {
       console.error("Error updating contractor:", error);

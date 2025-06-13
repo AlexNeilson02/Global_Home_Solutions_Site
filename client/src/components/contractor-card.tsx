@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { formatCurrency } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { ContractorVideoDisplay } from "./ContractorVideoDisplay";
 import { Star } from "lucide-react";
 
 interface ContractorCardProps {
@@ -14,6 +15,7 @@ interface ContractorCardProps {
   reviewCount: number;
   hourlyRate: number | null;
   logoUrl: string | null;
+  videoUrl?: string | null;
   onGetQuote?: (id: number) => void;
 }
 
@@ -26,6 +28,7 @@ export function ContractorCard({
   reviewCount,
   hourlyRate,
   logoUrl,
+  videoUrl,
   onGetQuote
 }: ContractorCardProps) {
   // Round rating to nearest half
@@ -67,6 +70,19 @@ export function ContractorCard({
             </div>
           </div>
         </div>
+        
+        {/* Video Section */}
+        {videoUrl && (
+          <div className="mb-4">
+            <ContractorVideoDisplay
+              videoUrl={videoUrl}
+              contractorName={companyName}
+              className="w-full"
+              showControls={true}
+            />
+          </div>
+        )}
+        
         <p className="text-sm text-muted-foreground mb-4">{description}</p>
         <div className="flex justify-between items-center">
           <span className="text-sm font-medium">
