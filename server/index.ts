@@ -2,6 +2,7 @@ import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes-clean";
 import { enhancedRouter } from "./enhanced-routes.js";
 import { commissionRouter } from "./commission-routes";
+import { videoUploadRouter } from "./video-upload";
 import { setupVite, serveStatic, log } from "./vite";
 import { seedDatabase } from "./seed-data";
 import { seedCommissionData } from "./seed-commission-data";
@@ -64,6 +65,12 @@ app.use((req, res, next) => {
   
   // Register commission system routes
   app.use('/api/commissions', commissionRouter);
+  
+  // Register video upload routes
+  app.use('/api/video', videoUploadRouter);
+  
+  // Serve uploaded files statically
+  app.use('/uploads', express.static('uploads'));
   
   // Seed the database with initial data
   await seedDatabase();
