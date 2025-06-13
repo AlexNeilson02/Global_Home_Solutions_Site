@@ -35,6 +35,33 @@ const ContractorPortalEnhanced: React.FC = () => {
   const [, navigate] = useLocation();
   const [activeTab, setActiveTab] = useState("dashboard");
   const [isEditingProfile, setIsEditingProfile] = useState(false);
+  
+  // Style object to remove yellow coloring with subtle borders - Solution #2
+  const antiYellowStyles = {
+    backgroundColor: 'white',
+    color: 'black',
+    outline: 'none',
+    outlineColor: 'transparent',
+    outlineWidth: '0',
+    outlineStyle: 'none',
+    border: '1px solid #e5e7eb',
+    boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)'
+  } as const;
+
+  // Enhanced style for inputs and interactive elements with subtle borders
+  const antiYellowInputStyles = {
+    backgroundColor: 'white',
+    color: 'black',
+    outline: 'none',
+    outlineColor: 'transparent',
+    outlineWidth: '0',
+    outlineStyle: 'none',
+    border: '1px solid #e5e7eb',
+    boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
+    WebkitAppearance: 'none',
+    MozAppearance: 'none',
+    appearance: 'none'
+  } as const;
   const [editForm, setEditForm] = useState({
     companyName: '',
     description: '',
@@ -478,7 +505,7 @@ const ContractorPortalEnhanced: React.FC = () => {
             <TabsContent value="dashboard" className="space-y-6">
               {/* Key Metrics */}
               <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                <Card>
+                <Card style={antiYellowStyles}>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">Completed Projects</CardTitle>
                     <Building2 className="h-4 w-4 text-muted-foreground" />
@@ -489,7 +516,7 @@ const ContractorPortalEnhanced: React.FC = () => {
                   </CardContent>
                 </Card>
 
-                <Card>
+                <Card style={antiYellowStyles}>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">Active Projects</CardTitle>
                     <FileText className="h-4 w-4 text-muted-foreground" />
@@ -500,7 +527,7 @@ const ContractorPortalEnhanced: React.FC = () => {
                   </CardContent>
                 </Card>
 
-                <Card>
+                <Card style={antiYellowStyles}>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">Pending Bids</CardTitle>
                     <Mail className="h-4 w-4 text-muted-foreground" />
@@ -511,7 +538,7 @@ const ContractorPortalEnhanced: React.FC = () => {
                   </CardContent>
                 </Card>
 
-                <Card>
+                <Card style={antiYellowStyles}>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
                     <DollarSign className="h-4 w-4 text-muted-foreground" />
@@ -525,7 +552,7 @@ const ContractorPortalEnhanced: React.FC = () => {
 
               {/* Charts */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <Card>
+                <Card style={antiYellowStyles}>
                   <CardHeader>
                     <CardTitle>Project Performance Overview</CardTitle>
                   </CardHeader>
@@ -543,7 +570,7 @@ const ContractorPortalEnhanced: React.FC = () => {
                   </CardContent>
                 </Card>
 
-                <Card>
+                <Card style={antiYellowStyles}>
                   <CardHeader>
                     <CardTitle>Project Status Distribution</CardTitle>
                   </CardHeader>
@@ -573,7 +600,7 @@ const ContractorPortalEnhanced: React.FC = () => {
 
             {/* Profile Tab */}
             <TabsContent value="profile" className="space-y-6">
-              <Card>
+              <Card style={antiYellowStyles}>
                 <CardHeader className="flex flex-row items-center justify-between">
                   <div>
                     <CardTitle>Company Profile</CardTitle>
@@ -582,6 +609,7 @@ const ContractorPortalEnhanced: React.FC = () => {
                   <Button
                     onClick={() => setIsEditingProfile(!isEditingProfile)}
                     variant={isEditingProfile ? "outline" : "default"}
+                    style={antiYellowInputStyles}
                   >
                     <Edit3 className="h-4 w-4 mr-2" />
                     {isEditingProfile ? "Cancel" : "Edit Profile"}
@@ -680,6 +708,7 @@ const ContractorPortalEnhanced: React.FC = () => {
                               type="button"
                               variant="outline"
                               onClick={() => logoInputRef.current?.click()}
+                              style={antiYellowInputStyles}
                             >
                               <Upload className="h-4 w-4 mr-2" />
                               Upload Logo
@@ -704,6 +733,7 @@ const ContractorPortalEnhanced: React.FC = () => {
                             value={editForm.companyName}
                             onChange={(e) => setEditForm({...editForm, companyName: e.target.value})}
                             placeholder="Enter company name"
+                            style={antiYellowInputStyles}
                           />
                         </div>
                         <div>
@@ -713,6 +743,7 @@ const ContractorPortalEnhanced: React.FC = () => {
                             value={editForm.hourlyRate}
                             onChange={(e) => setEditForm({...editForm, hourlyRate: parseFloat(e.target.value)})}
                             placeholder="0"
+                            style={antiYellowInputStyles}
                           />
                         </div>
                         <div>
@@ -721,6 +752,7 @@ const ContractorPortalEnhanced: React.FC = () => {
                             value={editForm.phone}
                             onChange={(e) => setEditForm({...editForm, phone: e.target.value})}
                             placeholder="Enter phone number"
+                            style={antiYellowInputStyles}
                           />
                         </div>
                         <div>
@@ -730,6 +762,7 @@ const ContractorPortalEnhanced: React.FC = () => {
                             value={editForm.email}
                             onChange={(e) => setEditForm({...editForm, email: e.target.value})}
                             placeholder="Enter email address"
+                            style={antiYellowInputStyles}
                           />
                         </div>
                       </div>
@@ -742,6 +775,7 @@ const ContractorPortalEnhanced: React.FC = () => {
                           onChange={(e) => setEditForm({...editForm, description: e.target.value})}
                           placeholder="Describe your company and services..."
                           rows={4}
+                          style={antiYellowInputStyles}
                         />
                       </div>
 
