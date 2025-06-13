@@ -22,6 +22,15 @@ interface AnalyticsProps {
 const AnalyticsDashboard: React.FC<AnalyticsProps> = ({ userRole, userId }) => {
   const [timeRange, setTimeRange] = useState('30d');
 
+  // Style object to remove yellow coloring - Solution #2
+  const antiYellowStyles = {
+    backgroundColor: 'white',
+    color: 'black',
+    outline: 'none',
+    outlineColor: 'transparent',
+    border: '1px solid #d1d5db'
+  } as const;
+
   // Fetch comprehensive analytics data
   const { data: analyticsData, isLoading, error } = useQuery({
     queryKey: [`/api/analytics/${userRole}/overview`, timeRange, userId],
@@ -57,7 +66,7 @@ const AnalyticsDashboard: React.FC<AnalyticsProps> = ({ userRole, userId }) => {
 
   if (error || !analyticsData) {
     return (
-      <Card>
+      <Card style={antiYellowStyles}>
         <CardContent className="p-6">
           <div className="text-center">
             <h3 className="text-lg font-medium text-gray-900 mb-2">Analytics Unavailable</h3>
@@ -103,7 +112,7 @@ const AnalyticsDashboard: React.FC<AnalyticsProps> = ({ userRole, userId }) => {
         <div className="space-y-6">
           {/* Primary Metrics */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <Card>
+            <Card style={antiYellowStyles}>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Total Requests</CardTitle>
                 <Target className="h-4 w-4 text-muted-foreground" />
@@ -116,7 +125,7 @@ const AnalyticsDashboard: React.FC<AnalyticsProps> = ({ userRole, userId }) => {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card style={antiYellowStyles}>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
                 <DollarSign className="h-4 w-4 text-muted-foreground" />
@@ -129,7 +138,7 @@ const AnalyticsDashboard: React.FC<AnalyticsProps> = ({ userRole, userId }) => {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card style={antiYellowStyles}>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Active Users</CardTitle>
                 <Users className="h-4 w-4 text-muted-foreground" />
@@ -142,7 +151,7 @@ const AnalyticsDashboard: React.FC<AnalyticsProps> = ({ userRole, userId }) => {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card style={antiYellowStyles}>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Page Visits</CardTitle>
                 <Eye className="h-4 w-4 text-muted-foreground" />
@@ -160,7 +169,7 @@ const AnalyticsDashboard: React.FC<AnalyticsProps> = ({ userRole, userId }) => {
           <div>
             <h3 className="text-lg font-semibold mb-4">Commission Analytics</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              <Card>
+              <Card style={antiYellowStyles}>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium">Total Commissions</CardTitle>
                   <DollarSign className="h-4 w-4 text-muted-foreground" />
@@ -173,7 +182,7 @@ const AnalyticsDashboard: React.FC<AnalyticsProps> = ({ userRole, userId }) => {
                 </CardContent>
               </Card>
 
-              <Card>
+              <Card style={antiYellowStyles}>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium">Pending Commissions</CardTitle>
                   <Target className="h-4 w-4 text-muted-foreground" />
@@ -186,7 +195,7 @@ const AnalyticsDashboard: React.FC<AnalyticsProps> = ({ userRole, userId }) => {
                 </CardContent>
               </Card>
 
-              <Card>
+              <Card style={antiYellowStyles}>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium">Commission Records</CardTitle>
                   <Building className="h-4 w-4 text-muted-foreground" />
@@ -199,7 +208,7 @@ const AnalyticsDashboard: React.FC<AnalyticsProps> = ({ userRole, userId }) => {
                 </CardContent>
               </Card>
 
-              <Card>
+              <Card style={antiYellowStyles}>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium">Top Earner</CardTitle>
                   <TrendingUp className="h-4 w-4 text-muted-foreground" />
@@ -222,7 +231,7 @@ const AnalyticsDashboard: React.FC<AnalyticsProps> = ({ userRole, userId }) => {
       
       return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <Card>
+          <Card style={antiYellowStyles}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">QR Scans</CardTitle>
               <Eye className="h-4 w-4 text-muted-foreground" />
@@ -235,7 +244,7 @@ const AnalyticsDashboard: React.FC<AnalyticsProps> = ({ userRole, userId }) => {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card style={antiYellowStyles}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Total Leads</CardTitle>
               <Target className="h-4 w-4 text-muted-foreground" />
@@ -248,7 +257,7 @@ const AnalyticsDashboard: React.FC<AnalyticsProps> = ({ userRole, userId }) => {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card style={antiYellowStyles}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Won Projects</CardTitle>
               <TrendingUp className="h-4 w-4 text-muted-foreground" />
@@ -261,7 +270,7 @@ const AnalyticsDashboard: React.FC<AnalyticsProps> = ({ userRole, userId }) => {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card style={antiYellowStyles}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Commission Value</CardTitle>
               <DollarSign className="h-4 w-4 text-muted-foreground" />
@@ -281,7 +290,7 @@ const AnalyticsDashboard: React.FC<AnalyticsProps> = ({ userRole, userId }) => {
     const analytics = analyticsData;
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Card>
+        <Card style={antiYellowStyles}>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Requests</CardTitle>
             <Target className="h-4 w-4 text-muted-foreground" />
