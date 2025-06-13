@@ -414,7 +414,7 @@ const SalesPortalEnhanced: React.FC = () => {
 
             {/* Profile Tab */}
             <TabsContent value="profile" className="space-y-6">
-              <Card>
+              <Card style={antiYellowStyles}>
                 <CardHeader className="flex flex-row items-center justify-between">
                   <div>
                     <CardTitle>Sales Profile</CardTitle>
@@ -492,6 +492,7 @@ const SalesPortalEnhanced: React.FC = () => {
                         <div>
                           <label className="block text-sm font-medium mb-2">Phone Number</label>
                           <Input
+                            style={antiYellowStyles}
                             value={profileForm.phone}
                             onChange={(e) => setProfileForm({...profileForm, phone: e.target.value})}
                             placeholder="Enter phone number"
@@ -500,6 +501,7 @@ const SalesPortalEnhanced: React.FC = () => {
                         <div>
                           <label className="block text-sm font-medium mb-2">Years of Experience</label>
                           <Input
+                            style={antiYellowStyles}
                             type="number"
                             value={profileForm.yearsExperience}
                             onChange={(e) => setProfileForm({...profileForm, yearsExperience: parseInt(e.target.value) || 0})}
@@ -512,6 +514,7 @@ const SalesPortalEnhanced: React.FC = () => {
                       <div>
                         <label className="block text-sm font-medium mb-2">Professional Bio</label>
                         <Textarea
+                          style={antiYellowStyles}
                           value={profileForm.bio}
                           onChange={(e) => setProfileForm({...profileForm, bio: e.target.value})}
                           placeholder="Describe your experience, approach, and what makes you a great sales representative..."
@@ -535,6 +538,7 @@ const SalesPortalEnhanced: React.FC = () => {
                         </div>
                         <div className="flex gap-2">
                           <Input
+                            style={antiYellowStyles}
                             value={newSpecialty}
                             onChange={(e) => setNewSpecialty(e.target.value)}
                             placeholder="Add specialty (e.g., Roofing, HVAC)"
@@ -562,6 +566,7 @@ const SalesPortalEnhanced: React.FC = () => {
                         </div>
                         <div className="flex gap-2">
                           <Input
+                            style={antiYellowStyles}
                             value={newCertification}
                             onChange={(e) => setNewCertification(e.target.value)}
                             placeholder="Add certification"
@@ -595,7 +600,7 @@ const SalesPortalEnhanced: React.FC = () => {
             <TabsContent value="qr-tools" className="space-y-6">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* QR Code Card */}
-                <Card>
+                <Card style={antiYellowStyles}>
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <QrCode className="h-5 w-5" />
@@ -637,7 +642,7 @@ const SalesPortalEnhanced: React.FC = () => {
                 </Card>
 
                 {/* Profile URL Card */}
-                <Card>
+                <Card style={antiYellowStyles}>
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <ExternalLink className="h-5 w-5" />
@@ -698,7 +703,7 @@ const SalesPortalEnhanced: React.FC = () => {
               </div>
 
               {/* Usage Instructions */}
-              <Card>
+              <Card style={antiYellowStyles}>
                 <CardHeader>
                   <CardTitle>How to Use Your Sales Tools</CardTitle>
                 </CardHeader>
@@ -732,7 +737,7 @@ const SalesPortalEnhanced: React.FC = () => {
 
             {/* Leads Tab */}
             <TabsContent value="leads" className="space-y-6">
-              <Card>
+              <Card style={antiYellowStyles}>
                 <CardHeader>
                   <CardTitle>My Generated Leads</CardTitle>
                   <CardDescription>Track all leads generated through your sales activities</CardDescription>

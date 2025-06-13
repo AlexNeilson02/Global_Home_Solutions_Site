@@ -57,6 +57,15 @@ export function CommissionDashboard({ salespersonId }: CommissionDashboardProps)
     to: new Date()
   });
 
+  // Style object to remove yellow coloring - Solution #2
+  const antiYellowStyles = {
+    backgroundColor: 'white',
+    color: 'black',
+    outline: 'none',
+    outlineColor: 'transparent',
+    border: '1px solid #d1d5db'
+  } as const;
+
   // Fetch commission summary
   const { data: summary, isLoading: summaryLoading } = useQuery<CommissionSummary>({
     queryKey: [`/api/commissions/salesperson/${salespersonId}/commissions`],
