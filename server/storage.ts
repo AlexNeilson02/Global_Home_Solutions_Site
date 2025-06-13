@@ -23,6 +23,8 @@ export interface IStorage {
   getAllUsers(): Promise<User[]>;
   updateUserLastLogin(id: number): Promise<User | undefined>;
   getUsersByRole(role: string): Promise<User[]>;
+  updateStripeCustomerId(userId: number, stripeCustomerId: string): Promise<User | undefined>;
+  updateUserStripeInfo(userId: number, stripeInfo: { customerId: string; subscriptionId: string }): Promise<User | undefined>;
 
   // Contractor methods
   getContractor(id: number): Promise<Contractor | undefined>;

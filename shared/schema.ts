@@ -40,6 +40,8 @@ export const users = pgTable("users", {
   createdAt: timestamp("created_at").defaultNow(),
   avatarUrl: text("avatar_url"),
   lastLogin: timestamp("last_login"),
+  stripeCustomerId: text("stripe_customer_id"),
+  stripeSubscriptionId: text("stripe_subscription_id"),
 });
 
 // Contractors table

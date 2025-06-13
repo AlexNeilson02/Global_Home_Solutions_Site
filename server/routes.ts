@@ -4,6 +4,7 @@ import { WebSocketServer, WebSocket } from "ws";
 import multer from "multer";
 import path from "path";
 import passport from "passport";
+import Stripe from "stripe";
 import { storage } from "./database-storage";
 import { setupAuth, isAuthenticated, requireRole, hashPassword } from "./auth";
 import { z } from "zod";
@@ -18,6 +19,14 @@ import {
   insertBidRequestSchema,
   type User
 } from "@shared/schema";
+
+// Initialize Stripe
+if (!process.env.STRIPE_SECRET_KEY_GHS) {
+  throw new Error('Missing required Stripe secret: STRIPE_SECRET_KEY_GHS');
+}
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY_GHS, {
+  apiVersion: "2023-10-16",
+});
 
 // Configure multer for file uploads
 const upload = multer({
@@ -1481,6 +1490,108 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: error.errors });
       }
       res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Stripe payment routes
+  apiRouter.post("/create-payment-intent", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const { amount } = req.body;
+      const paymentIntent = await stripe.paymentIntents.create({
+        amount: Math.round(amount * 100), // Convert to cents
+        currency: "usd",
+      });
+      res.json({ clientSecret: paymentIntent.client_secret });
+    } catch (error: any) {
+      res
+        .status(500)
+        .json({ message: "Error creating payment intent: " + error.message });
+    }
+  });
+
+  // Subscription management endpoint
+  apiRouter.post('/get-or-create-subscription', isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const user = req.user as User;
+
+      if (user.stripeSubscriptionId) {
+        const subscription = await stripe.subscriptions.retrieve(user.stripeSubscriptionId);
+        const invoice = await stripe.invoices.retrieve(subscription.latest_invoice as string);
+        const paymentIntent = await stripe.paymentIntents.retrieve(invoice.payment_intent as string);
+
+        res.json({
+          subscriptionId: subscription.id,
+          clientSecret: paymentIntent.client_secret,
+        });
+        return;
+      }
+      
+      if (!user.email) {
+        throw new Error('No user email on file');
+      }
+
+      const customer = await stripe.customers.create({
+        email: user.email,
+        name: user.fullName,
+      });
+
+      await storage.updateStripeCustomerId(user.id, customer.id);
+
+      // Create a basic subscription - in production you'd get price_id from environment
+      const subscription = await stripe.subscriptions.create({
+        customer: customer.id,
+        items: [{
+          price_data: {
+            currency: 'usd',
+            product_data: {
+              name: 'Premium Access',
+            },
+            unit_amount: 2999, // $29.99
+            recurring: {
+              interval: 'month',
+            },
+          },
+        }],
+        payment_behavior: 'default_incomplete',
+        expand: ['latest_invoice.payment_intent'],
+      });
+
+      await storage.updateUserStripeInfo(user.id, {
+        customerId: customer.id, 
+        subscriptionId: subscription.id
+      });
+  
+      const invoice = subscription.latest_invoice as any;
+      res.json({
+        subscriptionId: subscription.id,
+        clientSecret: invoice.payment_intent.client_secret,
+      });
+    } catch (error: any) {
+      return res.status(400).json({ error: { message: error.message } });
+    }
+  });
+
+  // Add payment method endpoint
+  apiRouter.post("/add-payment-method", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const user = req.user as User;
+      
+      if (!user.stripeCustomerId) {
+        const customer = await stripe.customers.create({
+          email: user.email,
+          name: user.fullName,
+        });
+        await storage.updateStripeCustomerId(user.id, customer.id);
+        user.stripeCustomerId = customer.id;
+      }
+
+      const setupIntent = await stripe.setupIntents.create({
+        customer: user.stripeCustomerId,
+      });
+
+      res.json({ clientSecret: setupIntent.client_secret });
+    } catch (error: any) {
+      res.status(500).json({ message: "Error creating setup intent: " + error.message });
     }
   });
 
