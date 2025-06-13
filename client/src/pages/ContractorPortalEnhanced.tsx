@@ -505,10 +505,10 @@ const ContractorPortalEnhanced: React.FC = () => {
 
             {/* Mobile Navigation - Fixed bottom bar, shown only on mobile */}
             <div className="sm:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 z-50">
-              <div className="grid grid-cols-4 h-16">
+              <div className="flex h-16 overflow-x-auto scrollbar-hide">
                 <button
                   onClick={() => setActiveTab("dashboard")}
-                  className={`flex flex-col items-center justify-center gap-1 text-xs hover:bg-gray-100 dark:hover:bg-gray-800 ${
+                  className={`flex flex-col items-center justify-center gap-1 text-xs hover:bg-gray-100 dark:hover:bg-gray-800 px-4 min-w-[80px] flex-shrink-0 ${
                     activeTab === "dashboard" ? "text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950" : ""
                   }`}
                 >
@@ -517,7 +517,7 @@ const ContractorPortalEnhanced: React.FC = () => {
                 </button>
                 <button
                   onClick={() => setActiveTab("profile")}
-                  className={`flex flex-col items-center justify-center gap-1 text-xs hover:bg-gray-100 dark:hover:bg-gray-800 ${
+                  className={`flex flex-col items-center justify-center gap-1 text-xs hover:bg-gray-100 dark:hover:bg-gray-800 px-4 min-w-[80px] flex-shrink-0 ${
                     activeTab === "profile" ? "text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950" : ""
                   }`}
                 >
@@ -526,7 +526,7 @@ const ContractorPortalEnhanced: React.FC = () => {
                 </button>
                 <button
                   onClick={() => setActiveTab("projects")}
-                  className={`flex flex-col items-center justify-center gap-1 text-xs hover:bg-gray-100 dark:hover:bg-gray-800 ${
+                  className={`flex flex-col items-center justify-center gap-1 text-xs hover:bg-gray-100 dark:hover:bg-gray-800 px-4 min-w-[80px] flex-shrink-0 ${
                     activeTab === "projects" ? "text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950" : ""
                   }`}
                 >
@@ -535,18 +535,16 @@ const ContractorPortalEnhanced: React.FC = () => {
                 </button>
                 <button
                   onClick={() => setActiveTab("bids")}
-                  className={`flex flex-col items-center justify-center gap-1 text-xs hover:bg-gray-100 dark:hover:bg-gray-800 ${
+                  className={`flex flex-col items-center justify-center gap-1 text-xs hover:bg-gray-100 dark:hover:bg-gray-800 px-4 min-w-[80px] flex-shrink-0 ${
                     activeTab === "bids" ? "text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950" : ""
                   }`}
                 >
                   <Mail className="h-5 w-5" />
                   <span>Bids</span>
                 </button>
-              </div>
-              <div className="grid grid-cols-3 h-16 border-t border-gray-200 dark:border-gray-700">
                 <button
                   onClick={() => setActiveTab("documents")}
-                  className={`flex flex-col items-center justify-center gap-1 text-xs hover:bg-gray-100 dark:hover:bg-gray-800 ${
+                  className={`flex flex-col items-center justify-center gap-1 text-xs hover:bg-gray-100 dark:hover:bg-gray-800 px-4 min-w-[80px] flex-shrink-0 ${
                     activeTab === "documents" ? "text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950" : ""
                   }`}
                 >
@@ -555,7 +553,7 @@ const ContractorPortalEnhanced: React.FC = () => {
                 </button>
                 <button
                   onClick={() => setActiveTab("tracking")}
-                  className={`flex flex-col items-center justify-center gap-1 text-xs hover:bg-gray-100 dark:hover:bg-gray-800 ${
+                  className={`flex flex-col items-center justify-center gap-1 text-xs hover:bg-gray-100 dark:hover:bg-gray-800 px-4 min-w-[80px] flex-shrink-0 ${
                     activeTab === "tracking" ? "text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950" : ""
                   }`}
                 >
@@ -564,7 +562,7 @@ const ContractorPortalEnhanced: React.FC = () => {
                 </button>
                 <button
                   onClick={() => setActiveTab("analytics")}
-                  className={`flex flex-col items-center justify-center gap-1 text-xs hover:bg-gray-100 dark:hover:bg-gray-800 ${
+                  className={`flex flex-col items-center justify-center gap-1 text-xs hover:bg-gray-100 dark:hover:bg-gray-800 px-4 min-w-[80px] flex-shrink-0 ${
                     activeTab === "analytics" ? "text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950" : ""
                   }`}
                 >

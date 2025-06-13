@@ -357,6 +357,16 @@ html {
     margin-bottom: 0 !important;
   }
   
+  /* Hide scrollbars for horizontal scrolling navigation */
+  .scrollbar-hide {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+  }
+  
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;  /* Chrome, Safari, Opera */
+  }
+
   /* Apple-inspired animations */
   @keyframes apple-fade-in {
     from { 
