@@ -890,19 +890,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
       ]) as any;
 
       console.log('Bid request created successfully:', bidRequest.id);
+      console.log('About to create commission record...');
 
       // Create commission record (either for salesperson or admin if no salesperson)
       try {
+        console.log('Entering commission creation block');
         if (bidRequest.salespersonId) {
           console.log('Creating commission record for salesperson:', bidRequest.salespersonId);
         } else {
           console.log('No salesperson reference - commission will be assigned to admin');
         }
+        console.log('Importing CommissionService...');
         const { CommissionService } = await import('./commission-service');
+        console.log('Calling createCommissionForBidRequest...');
         await CommissionService.createCommissionForBidRequest(bidRequest, bidRequest.salespersonId);
         console.log('Commission record created successfully');
       } catch (commissionError) {
         console.error('Error creating commission record:', commissionError);
+        console.error('Commission error stack:', commissionError.stack);
         // Don't fail the entire request for commission errors
       }
 
@@ -938,9 +943,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       res.status(201).json({ 
-        success: true,
+        message: 'Bid request created successfully',
         bidRequest,
-        message: 'Bid request submitted successfully'
+        salesRepAttributed: !!bidRequest.salespersonId
       });
 
     } catch (error) {
