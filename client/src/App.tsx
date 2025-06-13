@@ -13,6 +13,8 @@ import ContractorRegistration from "@/pages/ContractorRegistration";
 import SalespersonProfile from "@/pages/SalespersonProfile";
 import Login from "@/pages/Login";
 import Portals from "@/pages/Portals";
+import Checkout from "@/pages/checkout";
+import Subscribe from "@/pages/subscribe";
 
 function App() {
   return (

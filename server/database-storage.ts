@@ -69,6 +69,27 @@ export class DatabaseStorage implements IStorage {
     return db.select().from(users).where(eq(users.role, role));
   }
 
+  async updateStripeCustomerId(userId: number, stripeCustomerId: string): Promise<User | undefined> {
+    const [user] = await db
+      .update(users)
+      .set({ stripeCustomerId })
+      .where(eq(users.id, userId))
+      .returning();
+    return user;
+  }
+
+  async updateUserStripeInfo(userId: number, stripeInfo: { customerId: string; subscriptionId: string }): Promise<User | undefined> {
+    const [user] = await db
+      .update(users)
+      .set({ 
+        stripeCustomerId: stripeInfo.customerId,
+        stripeSubscriptionId: stripeInfo.subscriptionId 
+      })
+      .where(eq(users.id, userId))
+      .returning();
+    return user;
+  }
+
   // Contractor methods
   async getContractor(id: number): Promise<Contractor | undefined> {
     const [contractor] = await db.select().from(contractors).where(eq(contractors.id, id));
