@@ -717,6 +717,7 @@ const SalesPortalEnhanced: React.FC = () => {
                         <Button 
                           onClick={() => window.open(profileUrl, '_blank')}
                           className="w-full"
+                          style={antiYellowInputStyles}
                         >
                           <ExternalLink className="h-4 w-4 mr-2" />
                           Preview Landing Page
