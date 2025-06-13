@@ -1167,6 +1167,11 @@ html {
     .bid-request-form,
     .portal-card,
     .login-portal,
+    .sales-portal,
+    .sales-portal-form,
+    .sales-dashboard,
+    .sales-portal-card,
+    .sales-dashboard-card,
     [data-radix-dialog-content] {
       background-color: white !important;
       color: black !important;
@@ -1193,7 +1198,12 @@ html {
   @media (min-width: 769px) and (max-width: 1439px) {
     /* Tablet/medium screen fixes */
     .bid-request-form,
-    .portal-card {
+    .portal-card,
+    .sales-portal,
+    .sales-portal-form,
+    .sales-dashboard,
+    .sales-portal-card,
+    .sales-dashboard-card {
       background-color: white !important;
       color: black !important;
     }
