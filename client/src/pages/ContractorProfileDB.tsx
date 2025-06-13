@@ -58,17 +58,14 @@ export default function ContractorProfileDB() {
 
         {/* Display intro video if available */}
         {contractor.videoUrl && (
-          <>
-            <h4>Intro Video</h4>
-            <div className="intro-video-section">
-              <ContractorVideoDisplay
-                videoUrl={contractor.videoUrl}
-                contractorName={contractor.companyName}
-                className="w-full max-w-md"
-                showControls={true}
-              />
-            </div>
-          </>
+          <div className="intro-video-section">
+            <ContractorVideoDisplay
+              videoUrl={contractor.videoUrl}
+              contractorName={contractor.companyName}
+              className="w-full max-w-md cursor-pointer"
+              showControls={true}
+            />
+          </div>
         )}
 
         {contractor.mediaFiles && contractor.mediaFiles.length > 0 && (
