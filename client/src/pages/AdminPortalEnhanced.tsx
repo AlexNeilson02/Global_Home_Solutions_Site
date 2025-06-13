@@ -552,6 +552,7 @@ export default function AdminPortalEnhanced() {
               onClick={handleBackToPortals}
               disabled={logoutMutation.isPending}
               className="flex items-center gap-2"
+              style={antiYellowInputStyles}
             >
               <Users className="h-4 w-4" />
               {logoutMutation.isPending ? "Logging out..." : "Back to Portals"}
@@ -561,7 +562,7 @@ export default function AdminPortalEnhanced() {
 
         {/* Quick Stats */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <Card>
+          <Card style={antiYellowStyles}>
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
@@ -574,7 +575,7 @@ export default function AdminPortalEnhanced() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card style={antiYellowStyles}>
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
@@ -587,7 +588,7 @@ export default function AdminPortalEnhanced() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card style={antiYellowStyles}>
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
@@ -600,7 +601,7 @@ export default function AdminPortalEnhanced() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card style={antiYellowStyles}>
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
@@ -625,7 +626,7 @@ export default function AdminPortalEnhanced() {
 
           {/* Sales Representatives Tab */}
           <TabsContent value="salespersons">
-            <Card>
+            <Card style={antiYellowStyles}>
               <CardHeader>
                 <div className="flex justify-between items-center">
                   <div>
@@ -634,7 +635,7 @@ export default function AdminPortalEnhanced() {
                   </div>
                   <Dialog>
                     <DialogTrigger asChild>
-                      <Button className="bg-white text-black border-2 border-black hover:bg-gray-100 font-semibold">
+                      <Button className="bg-white text-black border-2 border-black hover:bg-gray-100 font-semibold" style={antiYellowInputStyles}>
                         <Plus className="h-4 w-4 mr-2 text-black" />
                         Add Salesperson
                       </Button>
