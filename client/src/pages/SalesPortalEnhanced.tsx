@@ -266,9 +266,9 @@ const SalesPortalEnhanced: React.FC = () => {
     `${window.location.origin}/salesperson/${salesperson.profileUrl}` : '';
 
   return (
-    <div className="sales-portal-container min-h-screen bg-gray-50 dark:bg-gray-900">
-      <div className="sales-portal-content container mx-auto px-4 py-8">
-        <div className="sales-portal-wrapper max-w-7xl mx-auto">
+    <div data-sales-portal="true" className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="container mx-auto px-4 py-8">
+        <div className="max-w-7xl mx-auto">
           {/* Header */}
           <div className="flex justify-between items-center mb-8">
             <div>
