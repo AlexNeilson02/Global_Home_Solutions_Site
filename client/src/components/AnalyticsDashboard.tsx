@@ -303,7 +303,7 @@ const AnalyticsDashboard: React.FC<AnalyticsProps> = ({ userRole, userId }) => {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card style={antiYellowStyles}>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Projects Won</CardTitle>
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
@@ -316,7 +316,7 @@ const AnalyticsDashboard: React.FC<AnalyticsProps> = ({ userRole, userId }) => {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card style={antiYellowStyles}>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Revenue</CardTitle>
             <DollarSign className="h-4 w-4 text-muted-foreground" />
@@ -329,7 +329,7 @@ const AnalyticsDashboard: React.FC<AnalyticsProps> = ({ userRole, userId }) => {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card style={antiYellowStyles}>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Response Time</CardTitle>
             <PhoneCall className="h-4 w-4 text-muted-foreground" />
@@ -352,7 +352,7 @@ const AnalyticsDashboard: React.FC<AnalyticsProps> = ({ userRole, userId }) => {
       return (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Trends Chart */}
-          <Card>
+          <Card style={antiYellowStyles}>
             <CardHeader>
               <CardTitle>Performance Trends</CardTitle>
               <CardDescription>Requests and conversions over time</CardDescription>
@@ -372,7 +372,7 @@ const AnalyticsDashboard: React.FC<AnalyticsProps> = ({ userRole, userId }) => {
           </Card>
 
           {/* Revenue Chart */}
-          <Card>
+          <Card style={antiYellowStyles}>
             <CardHeader>
               <CardTitle>Revenue by Service</CardTitle>
               <CardDescription>Revenue breakdown by service type</CardDescription>
@@ -391,7 +391,7 @@ const AnalyticsDashboard: React.FC<AnalyticsProps> = ({ userRole, userId }) => {
           </Card>
 
           {/* Conversion Funnel */}
-          <Card>
+          <Card style={antiYellowStyles}>
             <CardHeader>
               <CardTitle>Conversion Funnel</CardTitle>
               <CardDescription>Lead progression through stages</CardDescription>
@@ -419,7 +419,7 @@ const AnalyticsDashboard: React.FC<AnalyticsProps> = ({ userRole, userId }) => {
           </Card>
 
           {/* Top Performers */}
-          <Card>
+          <Card style={antiYellowStyles}>
             <CardHeader>
               <CardTitle>Top Performers</CardTitle>
               <CardDescription>Sales representatives by revenue</CardDescription>
@@ -452,7 +452,7 @@ const AnalyticsDashboard: React.FC<AnalyticsProps> = ({ userRole, userId }) => {
 
     // Charts for salesperson and contractor roles would be similar but with role-specific data
     return (
-      <Card>
+      <Card style={antiYellowStyles}>
         <CardContent className="p-6">
           <div className="text-center">
             <h3 className="text-lg font-medium mb-2">Detailed Charts</h3>
