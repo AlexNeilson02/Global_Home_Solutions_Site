@@ -224,29 +224,32 @@ export function CommissionDashboard({ salespersonId }: CommissionDashboardProps)
 
       {/* Commission Records */}
       <Tabs defaultValue="recent" className="w-full">
-        <div className="flex justify-between items-center">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
           <TabsList>
             <TabsTrigger value="recent">Recent Commissions</TabsTrigger>
             <TabsTrigger value="rates">Commission Rates</TabsTrigger>
           </TabsList>
           
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-shrink-0">
             <Popover>
               <PopoverTrigger asChild>
-                <Button variant="outline" size="sm">
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {dateRange?.from ? (
-                    dateRange.to ? (
-                      <>
-                        {format(dateRange.from, "LLL dd, y")} -{" "}
-                        {format(dateRange.to, "LLL dd, y")}
-                      </>
+                <Button variant="outline" size="sm" className="text-xs sm:text-sm">
+                  <CalendarIcon className="mr-1 sm:mr-2 h-4 w-4" />
+                  <span className="hidden sm:inline">
+                    {dateRange?.from ? (
+                      dateRange.to ? (
+                        <>
+                          {format(dateRange.from, "LLL dd, y")} -{" "}
+                          {format(dateRange.to, "LLL dd, y")}
+                        </>
+                      ) : (
+                        format(dateRange.from, "LLL dd, y")
+                      )
                     ) : (
-                      format(dateRange.from, "LLL dd, y")
-                    )
-                  ) : (
-                    <span>Pick a date range</span>
-                  )}
+                      "Pick a date range"
+                    )}
+                  </span>
+                  <span className="sm:hidden">Date</span>
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0" align="start">
@@ -261,8 +264,8 @@ export function CommissionDashboard({ salespersonId }: CommissionDashboardProps)
               </PopoverContent>
             </Popover>
             
-            <Button variant="outline" size="sm">
-              <Download className="mr-2 h-4 w-4" />
+            <Button variant="outline" size="sm" className="flex-shrink-0">
+              <Download className="mr-1 sm:mr-2 h-4 w-4" />
               Export
             </Button>
           </div>
