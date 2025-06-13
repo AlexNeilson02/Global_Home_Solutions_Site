@@ -498,22 +498,44 @@ export default function AdminPortalEnhanced() {
     }
   });
 
-  // Chart data
-  const monthlyData = [
-    { name: 'Jan', leads: 65, conversions: 45 },
-    { name: 'Feb', leads: 78, conversions: 52 },
-    { name: 'Mar', leads: 90, conversions: 61 },
-    { name: 'Apr', leads: 81, conversions: 58 },
-    { name: 'May', leads: 95, conversions: 67 },
-    { name: 'Jun', leads: 102, conversions: 73 }
+  // Calculate real metrics from data
+  const totalSalespersons = salespersons?.length || 0;
+  const activeSalespersons = salespersons?.filter((s: any) => s.isActive !== false)?.length || 0;
+  const totalContractors = contractors?.length || 0;
+  const activeContractors = contractors?.filter((c: any) => c.isActive !== false)?.length || 0;
+  const totalProjects = projects?.length || 0;
+  const completedProjects = projects?.filter((p: any) => p.status === 'completed')?.length || 0;
+  const totalBidRequests = bidRequests?.length || 0;
+  const pendingBidRequests = bidRequests?.filter((b: any) => b.status === 'pending')?.length || 0;
+  const totalRevenue = projects?.filter((p: any) => p.status === 'completed')
+    ?.reduce((sum: number, p: any) => sum + (p.budget || 0), 0) || 0;
+
+  // Real chart data from analytics
+  const monthlyData = analyticsData?.monthlyPerformance || [
+    { name: 'Current', leads: totalBidRequests, conversions: completedProjects }
   ];
 
   const pieData = [
-    { name: 'Active Sales Reps', value: salespersons?.filter((s: any) => s.isActive)?.length || 0, color: '#10b981' },
-    { name: 'Inactive Sales Reps', value: salespersons?.filter((s: any) => !s.isActive)?.length || 0, color: '#ef4444' }
+    { name: 'Active Sales Reps', value: activeSalespersons, color: '#10b981' },
+    { name: 'Inactive Sales Reps', value: totalSalespersons - activeSalespersons, color: '#ef4444' },
+    { name: 'Active Contractors', value: activeContractors, color: '#3b82f6' },
+    { name: 'Inactive Contractors', value: totalContractors - activeContractors, color: '#f59e0b' }
   ];
 
   const COLORS = ['#10b981', '#ef4444', '#f59e0b', '#8b5cf6'];
+
+  // Stats object for dashboard cards
+  const stats = {
+    totalSalespersons,
+    activeSalespersons,
+    totalContractors,
+    activeContractors,
+    totalProjects,
+    completedProjects,
+    totalBidRequests,
+    pendingBidRequests,
+    totalRevenue
+  };
 
   if (isLoadingAnalytics || isLoadingUsers || isLoadingSalespersons || isLoadingContractors) {
     return (

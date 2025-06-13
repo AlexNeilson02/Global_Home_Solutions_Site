@@ -125,6 +125,18 @@ const SalesPortalEnhanced: React.FC = () => {
     enabled: !!salesperson?.id
   });
 
+  // Get commission data
+  const { data: commissionData } = useQuery({
+    queryKey: [`/api/commissions/salesperson/${salesperson?.id}/commissions`],
+    enabled: !!salesperson?.id
+  });
+
+  // Get sales analytics with performance metrics
+  const { data: salesAnalytics } = useQuery({
+    queryKey: [`/api/analytics/sales-rep/${salesperson?.id}`],
+    enabled: !!salesperson?.id
+  });
+
   const analytics = analyticsData?.analytics;
   const bidRequests = bidRequestsData?.bidRequests || [];
   const recentBidRequests = analyticsData?.recentBidRequests || [];
@@ -266,21 +278,16 @@ const SalesPortalEnhanced: React.FC = () => {
     }
   };
 
-  // Calculate key metrics
-  const totalVisits = analytics?.totalVisits || 0;
-  const totalConversions = analytics?.conversions || 0;
+  // Calculate key metrics using real data
+  const totalVisits = salesAnalytics?.personalMetrics?.totalQrScans || analytics?.totalVisits || 0;
+  const totalConversions = salesAnalytics?.personalMetrics?.totalConversions || analytics?.conversions || 0;
   const conversionRate = totalVisits > 0 && !isNaN(totalConversions) ? ((totalConversions / totalVisits) * 100).toFixed(1) : '0.0';
-  const totalLeads = salesperson?.totalLeads || 0;
-  const commissionEarnings = salesperson?.commissions || 0;
+  const totalLeads = salesAnalytics?.personalMetrics?.totalLeads || salesperson?.totalLeads || 0;
+  const commissionEarnings = commissionData?.totalEarned || 0;
 
-  // Mock performance data for charts
-  const performanceData = [
-    { month: 'Jan', visits: 145, conversions: 12, leads: 28 },
-    { month: 'Feb', visits: 152, conversions: 18, leads: 35 },
-    { month: 'Mar', visits: 148, conversions: 15, leads: 32 },
-    { month: 'Apr', visits: 161, conversions: 22, leads: 41 },
-    { month: 'May', visits: 155, conversions: 19, leads: 38 },
-    { month: 'Jun', visits: 167, conversions: 25, leads: 45 }
+  // Real performance data from analytics
+  const performanceData = salesAnalytics?.performanceHistory || [
+    { month: 'Current', visits: totalVisits, conversions: totalConversions, leads: totalLeads }
   ];
 
   const statusDistribution = [
