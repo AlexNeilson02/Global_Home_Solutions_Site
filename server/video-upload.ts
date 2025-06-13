@@ -5,38 +5,6 @@ import fs from 'fs';
 import { storage } from './database-storage';
 import { isAuthenticated } from './auth';
 
-// Type declarations for ffmpeg modules
-declare module 'fluent-ffmpeg' {
-  interface FfmpegCommand {
-    videoCodec(codec: string): FfmpegCommand;
-    audioCodec(codec: string): FfmpegCommand;
-    size(size: string): FfmpegCommand;
-    videoBitrate(bitrate: string): FfmpegCommand;
-    audioBitrate(bitrate: string): FfmpegCommand;
-    format(format: string): FfmpegCommand;
-    on(event: 'end', callback: () => void): FfmpegCommand;
-    on(event: 'error', callback: (err: Error) => void): FfmpegCommand;
-    save(filename: string): FfmpegCommand;
-    ffprobe(callback: (err: any, metadata: any) => void): void;
-  }
-  function ffmpeg(input: string): FfmpegCommand;
-  namespace ffmpeg {
-    function setFfprobePath(path: string): void;
-    function ffprobe(input: string, callback: (err: any, metadata: any) => void): void;
-  }
-  export = ffmpeg;
-}
-
-declare module 'ffprobe-static' {
-  export const path: string;
-}
-
-import ffmpeg from 'fluent-ffmpeg';
-import ffprobe from 'ffprobe-static';
-
-// Configure ffmpeg to use the static ffprobe binary
-ffmpeg.setFfprobePath(ffprobe.path);
-
 const router = Router();
 
 // Ensure uploads directory exists
@@ -72,45 +40,19 @@ const videoUpload = multer({
   }
 });
 
-// Function to get video duration and validate
-const validateVideoFile = (filePath: string): Promise<{ duration: number; isValid: boolean; error?: string }> => {
-  return new Promise((resolve) => {
-    ffmpeg.ffprobe(filePath, (err, metadata) => {
-      if (err) {
-        resolve({ duration: 0, isValid: false, error: 'Invalid video file' });
-        return;
-      }
+// Basic file validation (duration will be handled on client side)
+const validateVideoFile = (file: Express.Multer.File): { isValid: boolean; error?: string } => {
+  // Check file size (15MB limit)
+  if (file.size > 15 * 1024 * 1024) {
+    return { isValid: false, error: 'File size must be under 15MB' };
+  }
 
-      const duration = metadata.format?.duration || 0;
-      const isValid = duration <= 60; // Max 1 minute
+  // Check if it's a video file
+  if (!file.mimetype.startsWith('video/')) {
+    return { isValid: false, error: 'Only video files are allowed' };
+  }
 
-      resolve({
-        duration,
-        isValid,
-        error: isValid ? undefined : 'Video must be 60 seconds or less'
-      });
-    });
-  });
-};
-
-// Function to compress video if needed
-const compressVideo = (inputPath: string, outputPath: string): Promise<void> => {
-  return new Promise((resolve, reject) => {
-    ffmpeg(inputPath)
-      .videoCodec('libx264')
-      .audioCodec('aac')
-      .size('854x480') // 480p resolution
-      .videoBitrate('1000k') // 1Mbps video bitrate
-      .audioBitrate('128k') // 128kbps audio bitrate
-      .format('mp4')
-      .on('end', () => {
-        resolve();
-      })
-      .on('error', (err) => {
-        reject(err);
-      })
-      .save(outputPath);
-  });
+  return { isValid: true };
 };
 
 // Upload video endpoint
@@ -123,39 +65,21 @@ router.post('/upload', isAuthenticated, videoUpload.single('video'), async (req:
     const filePath = req.file.path;
     const fileName = req.file.filename;
 
-    // Validate video duration
-    const validation = await validateVideoFile(filePath);
+    // Validate video file
+    const validation = validateVideoFile(req.file);
     if (!validation.isValid) {
       // Delete the uploaded file
       fs.unlinkSync(filePath);
       return res.status(400).json({ error: validation.error });
     }
 
-    // Compress video if it's larger than 5MB
-    let finalPath = filePath;
-    if (req.file.size > 5 * 1024 * 1024) {
-      const compressedFileName = `compressed-${fileName}`;
-      const compressedPath = path.join(uploadsDir, compressedFileName);
-      
-      try {
-        await compressVideo(filePath, compressedPath);
-        // Delete original file after compression
-        fs.unlinkSync(filePath);
-        finalPath = compressedPath;
-      } catch (compressionError) {
-        console.warn('Video compression failed, using original file:', compressionError);
-        // Continue with original file if compression fails
-      }
-    }
-
     // Generate public URL for the video
-    const videoUrl = `/uploads/videos/${path.basename(finalPath)}`;
+    const videoUrl = `/uploads/videos/${fileName}`;
 
     res.json({
       success: true,
       videoUrl,
-      duration: validation.duration,
-      fileSize: fs.statSync(finalPath).size,
+      fileSize: req.file.size,
       message: 'Video uploaded successfully'
     });
 

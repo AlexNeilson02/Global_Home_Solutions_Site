@@ -10,6 +10,7 @@ import { Slider } from "@/components/ui/slider";
 import { Textarea } from "@/components/ui/textarea";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { VideoUpload } from "@/components/VideoUpload";
 import { useToast } from "@/hooks/use-toast";
 import { useState, useRef, useEffect } from "react";
 import { 
@@ -168,6 +169,44 @@ function ContractorDashboard() {
   const handleSpendCapChange = (value: number[]) => {
     setSpendCap(value);
     updateSpendCapMutation.mutate(value[0]);
+  };
+
+  const handleVideoUploaded = async (videoUrl: string) => {
+    try {
+      await apiRequest("PATCH", `/api/contractors/${contractorData.id}`, {
+        videoUrl
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/users/me"] });
+      toast({
+        title: "Video uploaded",
+        description: "Your intro video has been successfully uploaded.",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Update failed",
+        description: "Failed to save video URL. Please try again.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleVideoRemoved = async () => {
+    try {
+      await apiRequest("PATCH", `/api/contractors/${contractorData.id}`, {
+        videoUrl: null
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/users/me"] });
+      toast({
+        title: "Video removed",
+        description: "Your intro video has been removed.",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Update failed",
+        description: "Failed to remove video. Please try again.",
+        variant: "destructive"
+      });
+    }
   };
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -550,86 +589,19 @@ function ContractorDashboard() {
             </CardContent>
           </Card>
 
-          {/* Upload Media */}
+          {/* Intro Video Upload */}
           <Card className="w-full">
             <CardHeader>
-              <CardTitle className="text-xl font-bold text-center">UPLOAD MEDIA</CardTitle>
+              <CardTitle className="text-xl font-bold text-center">INTRO VIDEO</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-6">
-              {/* Upload Area */}
-              <div 
-                className="border-2 border-dashed border-border rounded-lg p-8 text-center cursor-pointer hover:border-primary transition-colors"
-                onClick={() => fileInputRef.current?.click()}
-              >
-                <Upload className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-                <p className="text-lg font-semibold mb-2">UPLOAD</p>
-                <p className="text-sm text-muted-foreground">
-                  Click to upload images or videos (up to 50MB each)
-                </p>
-              </div>
-              
-              <input
-                ref={fileInputRef}
-                type="file"
-                multiple
-                accept="image/*,video/*"
-                onChange={handleFileUpload}
-                className="hidden"
+            <CardContent>
+              <VideoUpload
+                currentVideoUrl={contractorData?.videoUrl}
+                onVideoUploaded={handleVideoUploaded}
+                onVideoRemoved={handleVideoRemoved}
+                maxFileSize={15}
+                maxDuration={60}
               />
-
-              {/* Uploaded Files Preview */}
-              {uploadedFiles.length > 0 && (
-                <div className="space-y-4">
-                  <Label className="text-sm font-semibold">Uploaded Files:</Label>
-                  <div className="grid grid-cols-2 gap-4">
-                    {uploadedFiles.map((file, index) => (
-                      <div key={index} className="relative border border-border rounded-lg overflow-hidden">
-                        <Button
-                          variant="destructive"
-                          size="sm"
-                          className="absolute top-2 right-2 z-10 h-6 w-6 p-0"
-                          onClick={() => removeFile(index)}
-                        >
-                          <X className="h-3 w-3" />
-                        </Button>
-                        
-                        {file.type === 'image' ? (
-                          <div className="relative">
-                            <img 
-                              src={file.url} 
-                              alt={file.name}
-                              className="w-full h-24 object-cover"
-                            />
-                            <div className="absolute bottom-1 left-1 bg-black/50 text-white px-1 rounded text-xs flex items-center gap-1">
-                              <ImageIcon className="h-3 w-3" />
-                              IMG
-                            </div>
-                          </div>
-                        ) : (
-                          <div className="relative">
-                            <video 
-                              src={file.url}
-                              className="w-full h-24 object-cover"
-                              controls={false}
-                            />
-                            <div className="absolute inset-0 flex items-center justify-center bg-black/20">
-                              <Play className="h-8 w-8 text-white" />
-                            </div>
-                            <div className="absolute bottom-1 left-1 bg-black/50 text-white px-1 rounded text-xs flex items-center gap-1">
-                              <FileVideo className="h-3 w-3" />
-                              VID
-                            </div>
-                          </div>
-                        )}
-                        
-                        <div className="p-2">
-                          <p className="text-xs truncate">{file.name}</p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
             </CardContent>
           </Card>
         </div>
