@@ -1155,7 +1155,7 @@ const ContractorPortalEnhanced: React.FC = () => {
 
             {/* Project Tracking Tab */}
             <TabsContent value="tracking" className="space-y-6">
-              <Card>
+              <Card style={antiYellowStyles}>
                 <CardHeader>
                   <CardTitle>Project Tracking & Management</CardTitle>
                   <CardDescription>
@@ -1167,7 +1167,7 @@ const ContractorPortalEnhanced: React.FC = () => {
                     <div className="space-y-6">
                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                         {bidRequests.filter((bid: any) => bid.status === 'won' || bid.status === 'bid_sent').map((project: any) => (
-                          <Card key={project.id} className="cursor-pointer hover:shadow-md transition-shadow">
+                          <Card key={project.id} className="cursor-pointer hover:shadow-md transition-shadow" style={antiYellowStyles}>
                             <CardHeader className="pb-3">
                               <div className="flex items-center justify-between">
                                 <CardTitle className="text-base">{project.serviceRequested}</CardTitle>
