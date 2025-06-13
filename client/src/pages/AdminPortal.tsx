@@ -16,6 +16,33 @@ const AdminPortal: React.FC = () => {
   const queryClient = useQueryClient();
   const isMobile = useIsMobile();
 
+  // Style object to remove yellow coloring with subtle borders
+  const antiYellowStyles = {
+    backgroundColor: 'white',
+    color: 'black',
+    outline: 'none',
+    outlineColor: 'transparent',
+    outlineWidth: '0',
+    outlineStyle: 'none',
+    border: '1px solid #e5e7eb',
+    boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)'
+  } as const;
+
+  // Enhanced style for inputs and interactive elements
+  const antiYellowInputStyles = {
+    backgroundColor: 'white',
+    color: 'black',
+    outline: 'none',
+    outlineColor: 'transparent',
+    outlineWidth: '0',
+    outlineStyle: 'none',
+    border: '2px solid #e5e7eb',
+    boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
+    WebkitAppearance: 'none',
+    MozAppearance: 'none',
+    appearance: 'none'
+  } as const;
+
   // Logout mutation
   const logoutMutation = useMutation({
     mutationFn: async () => {
@@ -92,7 +119,7 @@ const AdminPortal: React.FC = () => {
                 System overview and management dashboard
               </p>
             </div>
-            <Button onClick={handleBackToPortals} variant="outline" disabled={logoutMutation.isPending}>
+            <Button onClick={handleBackToPortals} variant="outline" disabled={logoutMutation.isPending} style={antiYellowInputStyles}>
               {logoutMutation.isPending ? "Logging out..." : "Back to Portals"}
             </Button>
           </div>
@@ -111,7 +138,7 @@ const AdminPortal: React.FC = () => {
             <TabsContent value="dashboard" className="space-y-6">
               {/* Key Metrics Cards - Mobile: 2 columns, Desktop: 4 columns */}
               <div className="grid grid-cols-2 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-                <Card>
+                <Card style={antiYellowStyles}>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">Total Users</CardTitle>
                     <Users className="h-4 w-4 text-muted-foreground" />
@@ -124,7 +151,7 @@ const AdminPortal: React.FC = () => {
                   </CardContent>
                 </Card>
 
-                <Card>
+                <Card style={antiYellowStyles}>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">Active Projects</CardTitle>
                     <Building className="h-4 w-4 text-muted-foreground" />
@@ -137,7 +164,7 @@ const AdminPortal: React.FC = () => {
                   </CardContent>
                 </Card>
 
-                <Card>
+                <Card style={antiYellowStyles}>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">Pending Requests</CardTitle>
                     <AlertTriangle className="h-4 w-4 text-muted-foreground" />
@@ -150,7 +177,7 @@ const AdminPortal: React.FC = () => {
                   </CardContent>
                 </Card>
 
-                <Card>
+                <Card style={antiYellowStyles}>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">System Health</CardTitle>
                     <Shield className="h-4 w-4 text-muted-foreground" />
@@ -166,7 +193,7 @@ const AdminPortal: React.FC = () => {
 
               {/* Charts */}
               <div className="grid md:grid-cols-2 gap-6">
-                <Card>
+                <Card style={antiYellowStyles}>
                   <CardHeader>
                     <CardTitle>System Overview</CardTitle>
                     <CardDescription>Key platform metrics</CardDescription>
@@ -184,7 +211,7 @@ const AdminPortal: React.FC = () => {
                   </CardContent>
                 </Card>
 
-                <Card>
+                <Card style={antiYellowStyles}>
                   <CardHeader>
                     <CardTitle>User Distribution</CardTitle>
                     <CardDescription>Platform user breakdown</CardDescription>
