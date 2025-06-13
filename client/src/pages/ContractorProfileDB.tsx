@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useParams, useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import BidRequestForm from "@/components/BidRequestForm";
+import { ContractorVideoDisplay } from "@/components/ContractorVideoDisplay";
 import "../styles/ContractorProfile.css";
 
 export default function ContractorProfileDB() {
@@ -55,6 +56,21 @@ export default function ContractorProfileDB() {
           ))}
         </ul>
 
+        {/* Display intro video if available */}
+        {contractor.videoUrl && (
+          <>
+            <h4>Intro Video</h4>
+            <div className="intro-video-section">
+              <ContractorVideoDisplay
+                videoUrl={contractor.videoUrl}
+                contractorName={contractor.companyName}
+                className="w-full max-w-md"
+                showControls={true}
+              />
+            </div>
+          </>
+        )}
+
         {contractor.mediaFiles && contractor.mediaFiles.length > 0 && (
           <>
             <h4>Media</h4>
@@ -63,8 +79,13 @@ export default function ContractorProfileDB() {
                 .filter((file: any) => file.type === 'video')
                 .map((video: any, i: number) => (
                   <div key={i} className="video-item">
-                    <p>📹 {video.name}</p>
-                    <p>{video.description}</p>
+                    <ContractorVideoDisplay
+                      videoUrl={video.url}
+                      contractorName={contractor.companyName}
+                      className="w-full max-w-sm"
+                      showControls={true}
+                    />
+                    {video.description && <p className="mt-2 text-sm text-gray-600">{video.description}</p>}
                   </div>
                 ))}
               {contractor.mediaFiles
