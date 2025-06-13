@@ -509,12 +509,24 @@ html {
   .login-portal input,
   .login-portal textarea,
   .login-portal select,
+  .sales-portal input,
+  .sales-portal textarea,
+  .sales-portal select,
+  .sales-portal-form input,
+  .sales-portal-form textarea,
+  .sales-portal-form select,
+  .sales-dashboard input,
+  .sales-dashboard textarea,
+  .sales-dashboard select,
   [data-component="bid-request-form"] input,
   [data-component="bid-request-form"] textarea,
   [data-component="bid-request-form"] select,
   [data-component="login-form"] input,
   [data-component="login-form"] textarea,
-  [data-component="login-form"] select {
+  [data-component="login-form"] select,
+  [data-component="sales-portal"] input,
+  [data-component="sales-portal"] textarea,
+  [data-component="sales-portal"] select {
     outline: none !important;
     outline-width: 0 !important;
     outline-style: none !important;
@@ -535,12 +547,24 @@ html {
   .login-portal input:focus,
   .login-portal textarea:focus,
   .login-portal select:focus,
+  .sales-portal input:focus,
+  .sales-portal textarea:focus,
+  .sales-portal select:focus,
+  .sales-portal-form input:focus,
+  .sales-portal-form textarea:focus,
+  .sales-portal-form select:focus,
+  .sales-dashboard input:focus,
+  .sales-dashboard textarea:focus,
+  .sales-dashboard select:focus,
   [data-component="bid-request-form"] input:focus,
   [data-component="bid-request-form"] textarea:focus,
   [data-component="bid-request-form"] select:focus,
   [data-component="login-form"] input:focus,
   [data-component="login-form"] textarea:focus,
-  [data-component="login-form"] select:focus {
+  [data-component="login-form"] select:focus,
+  [data-component="sales-portal"] input:focus,
+  [data-component="sales-portal"] textarea:focus,
+  [data-component="sales-portal"] select:focus {
     outline: none !important;
     outline-width: 0 !important;
     outline-style: none !important;
@@ -557,8 +581,12 @@ html {
   /* Autofill targeting for component-specific forms */
   .bid-request-form input:-webkit-autofill,
   .login-portal input:-webkit-autofill,
+  .sales-portal input:-webkit-autofill,
+  .sales-portal-form input:-webkit-autofill,
+  .sales-dashboard input:-webkit-autofill,
   [data-component="bid-request-form"] input:-webkit-autofill,
-  [data-component="login-form"] input:-webkit-autofill {
+  [data-component="login-form"] input:-webkit-autofill,
+  [data-component="sales-portal"] input:-webkit-autofill {
     -webkit-box-shadow: 0 0 0 1000px white inset !important;
     -webkit-text-fill-color: black !important;
     outline: none !important;
@@ -1072,14 +1100,20 @@ html {
   /* Portal Login Forms - Only target the login modal forms */
   .login-portal,
   [data-component="login-form"],
-  .auth-form {
+  .auth-form,
+  .sales-portal,
+  .sales-portal-form,
+  .sales-dashboard {
     background-color: white !important;
     color: black !important;
   }
   
   .login-portal *,
   [data-component="login-form"] *,
-  .auth-form * {
+  .auth-form *,
+  .sales-portal *,
+  .sales-portal-form *,
+  .sales-dashboard * {
     background-color: inherit !important;
     color: inherit !important;
   }
@@ -1089,7 +1123,12 @@ html {
   .card,
   .apple-card,
   .stat-card,
-  .feature-box {
+  .feature-box,
+  .sales-portal-card,
+  .sales-dashboard-card,
+  .performance-card,
+  .analytics-card,
+  .commission-card {
     background-color: white !important;
     color: black !important;
   }
@@ -1099,6 +1138,11 @@ html {
     /* Large monitor fixes */
     .bid-request-form,
     .portal-card,
+    .sales-portal,
+    .sales-portal-form,
+    .sales-dashboard,
+    .sales-portal-card,
+    .sales-dashboard-card,
     [data-radix-dialog-content],
     .card,
     .apple-card {
