@@ -485,7 +485,7 @@ const ContractorPortalEnhanced: React.FC = () => {
                 Welcome back, {contractor?.companyName || 'Contractor'}
               </p>
             </div>
-            <Button onClick={() => logoutMutation.mutate()} variant="outline" disabled={logoutMutation.isPending}>
+            <Button onClick={() => logoutMutation.mutate()} variant="outline" disabled={logoutMutation.isPending} style={antiYellowInputStyles}>
               {logoutMutation.isPending ? "Logging out..." : "Back to Portals"}
             </Button>
           </div>
@@ -1211,7 +1211,7 @@ const ContractorPortalEnhanced: React.FC = () => {
                       <p className="text-muted-foreground mb-4">
                         Win some bids to start tracking projects with detailed timelines
                       </p>
-                      <Button onClick={() => setActiveTab('bids')}>
+                      <Button onClick={() => setActiveTab('bids')} style={antiYellowInputStyles}>
                         View Bid Requests
                       </Button>
                     </div>
@@ -1238,6 +1238,7 @@ const ContractorPortalEnhanced: React.FC = () => {
                 variant="ghost"
                 size="sm"
                 onClick={() => setViewingBidDetails(null)}
+                style={antiYellowInputStyles}
               >
                 <X className="h-4 w-4" />
               </Button>
@@ -1370,6 +1371,7 @@ const ContractorPortalEnhanced: React.FC = () => {
                       setViewingBidDetails(null);
                     }}
                     disabled={contactCustomerMutation.isPending}
+                    style={antiYellowInputStyles}
                   >
                     <Phone className="h-4 w-4 mr-2" />
                     Contact Customer
@@ -1384,6 +1386,7 @@ const ContractorPortalEnhanced: React.FC = () => {
                       setViewingBidDetails(null);
                     }}
                     disabled={sendBidMutation.isPending}
+                    style={antiYellowInputStyles}
                   >
                     <FileText className="h-4 w-4 mr-2" />
                     Send Bid
@@ -1399,6 +1402,7 @@ const ContractorPortalEnhanced: React.FC = () => {
                         setViewingBidDetails(null);
                       }}
                       disabled={updateProjectStatusMutation.isPending}
+                      style={antiYellowInputStyles}
                     >
                       <Star className="h-4 w-4 mr-2" />
                       Won Project
@@ -1411,6 +1415,7 @@ const ContractorPortalEnhanced: React.FC = () => {
                         setViewingBidDetails(null);
                       }}
                       disabled={updateProjectStatusMutation.isPending}
+                      style={antiYellowInputStyles}
                     >
                       Lost Project
                     </Button>
@@ -1420,6 +1425,7 @@ const ContractorPortalEnhanced: React.FC = () => {
                 <Button
                   variant="outline"
                   onClick={() => setViewingBidDetails(null)}
+                  style={antiYellowInputStyles}
                 >
                   Close
                 </Button>
