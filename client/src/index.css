@@ -1177,20 +1177,33 @@ html {
       color: black !important;
     }
     
-    /* Override any yellow/off-white backgrounds and outlines */
+    /* NUCLEAR OVERRIDE: Enhanced yellow removal with more color variations */
     *[style*="background-color: yellow"],
     *[style*="background: yellow"],
     *[style*="background-color: #fff"],
     *[style*="background-color: #fffef7"],
     *[style*="background-color: #fefdf8"],
+    *[style*="background-color: #fffff0"],
+    *[style*="background-color: #ffffe0"],
+    *[style*="background-color: #fffe"],
+    *[style*="background-color: rgb(255, 255, 240)"],
+    *[style*="background-color: rgb(255, 255, 224)"],
+    *[style*="background: #fff"],
+    *[style*="background: #fffef7"],
+    *[style*="background: #fefdf8"],
+    *[style*="background: rgb(255, 255, 240)"],
     *[style*="outline: yellow"],
     *[style*="outline-color: yellow"],
     *[style*="border: yellow"],
     *[style*="border-color: yellow"] {
       background-color: white !important;
+      background: white !important;
+      background-image: none !important;
       outline: none !important;
       outline-color: transparent !important;
       border-color: #d1d5db !important;
+      -webkit-box-shadow: none !important;
+      box-shadow: none !important;
     }
   }
   
@@ -1208,4 +1221,88 @@ html {
       color: black !important;
     }
   }
+}
+
+/* NUCLEAR OVERRIDE: SalesPortalEnhanced Specific Targeting - Maximum Specificity */
+/* Target the exact component structure from SalesPortalEnhanced.tsx */
+div.min-h-screen.bg-gray-50,
+div.min-h-screen.bg-gray-50 *,
+div.min-h-screen.bg-gray-50 div,
+div.min-h-screen.bg-gray-50 div *,
+div.container.mx-auto,
+div.container.mx-auto *,
+div.container.mx-auto div,
+div.container.mx-auto div *,
+div.max-w-7xl.mx-auto,
+div.max-w-7xl.mx-auto *,
+div.max-w-7xl.mx-auto div,
+div.max-w-7xl.mx-auto div *,
+[data-state="active"],
+[data-state="active"] *,
+[data-state="active"] div,
+[data-state="active"] div *,
+[role="tabpanel"],
+[role="tabpanel"] *,
+[role="tabpanel"] div,
+[role="tabpanel"] div *,
+div[class*="grid"],
+div[class*="grid"] *,
+div[class*="grid"] div,
+div[class*="grid"] div *,
+div[class*="space-y"],
+div[class*="space-y"] *,
+div[class*="space-y"] div,
+div[class*="space-y"] div *,
+[data-radix-tabs-content],
+[data-radix-tabs-content] *,
+[data-radix-tabs-content] div,
+[data-radix-tabs-content] div *,
+/* Target Card components specifically */
+div[data-radix-collapsible-content],
+div[data-radix-collapsible-content] *,
+[class*="card"],
+[class*="card"] *,
+[class*="card"] div,
+[class*="card"] div *,
+/* Target any element that might have yellow/cream styling */
+*[style*="background"],
+*[class*="bg-"],
+*[class*="background"] {
+  background-color: white !important;
+  background: white !important;
+  background-image: none !important;
+  color: black !important;
+  outline: none !important;
+  outline-color: transparent !important;
+  border-color: #d1d5db !important;
+  -webkit-box-shadow: none !important;
+  -moz-box-shadow: none !important;
+  box-shadow: none !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  appearance: none !important;
+}
+
+/* Ultra-specific override for any remaining yellow elements */
+html *[style*="background-color"],
+html *[style*="background:"],
+html *[style*="backgroundColor"],
+html body *[style*="background-color"],
+html body *[style*="background:"],
+html body *[style*="backgroundColor"] {
+  background-color: white !important;
+  background: white !important;
+  background-image: none !important;
+}
+
+/* Override computed styles that might be causing yellow */
+* {
+  --tw-bg-opacity: 1 !important;
+  --tw-text-opacity: 1 !important;
+}
+
+/* Force white background on everything within sales portal */
+body div.min-h-screen.bg-gray-50 * {
+  background-color: white !important;
+  background: white !important;
 }
