@@ -125,7 +125,7 @@ export function CommissionDashboard({ salespersonId }: CommissionDashboardProps)
       <div className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {[...Array(4)].map((_, i) => (
-            <Card key={i} className="animate-pulse">
+            <Card key={i} style={antiYellowStyles} className="animate-pulse">
               <CardHeader className="pb-2">
                 <div className="h-4 bg-gray-200 rounded w-3/4"></div>
               </CardHeader>
@@ -143,7 +143,7 @@ export function CommissionDashboard({ salespersonId }: CommissionDashboardProps)
     <div className="space-y-6">
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card>
+        <Card style={antiYellowStyles}>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Earnings</CardTitle>
             <DollarSign className="h-4 w-4 text-muted-foreground" />
@@ -158,7 +158,7 @@ export function CommissionDashboard({ salespersonId }: CommissionDashboardProps)
           </CardContent>
         </Card>
 
-        <Card>
+        <Card style={antiYellowStyles}>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Pending Earnings</CardTitle>
             <Clock className="h-4 w-4 text-muted-foreground" />
@@ -173,7 +173,7 @@ export function CommissionDashboard({ salespersonId }: CommissionDashboardProps)
           </CardContent>
         </Card>
 
-        <Card>
+        <Card style={antiYellowStyles}>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Commission Records</CardTitle>
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
@@ -188,7 +188,7 @@ export function CommissionDashboard({ salespersonId }: CommissionDashboardProps)
           </CardContent>
         </Card>
 
-        <Card>
+        <Card style={antiYellowStyles}>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Paid Commissions</CardTitle>
             <CheckCircle className="h-4 w-4 text-muted-foreground" />
@@ -251,7 +251,7 @@ export function CommissionDashboard({ salespersonId }: CommissionDashboardProps)
         </div>
 
         <TabsContent value="recent" className="space-y-4">
-          <Card>
+          <Card style={antiYellowStyles}>
             <CardHeader>
               <CardTitle>Commission History</CardTitle>
               <CardDescription>
@@ -313,7 +313,7 @@ export function CommissionDashboard({ salespersonId }: CommissionDashboardProps)
         </TabsContent>
 
         <TabsContent value="rates" className="space-y-4">
-          <Card>
+          <Card style={antiYellowStyles}>
             <CardHeader>
               <CardTitle>Commission Rate Structure</CardTitle>
               <CardDescription>
