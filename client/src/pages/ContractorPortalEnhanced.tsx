@@ -852,6 +852,7 @@ const ContractorPortalEnhanced: React.FC = () => {
                                   variant="destructive"
                                   onClick={() => removeMediaFile(index)}
                                   className="h-6 w-6 p-0"
+                                  style={antiYellowInputStyles}
                                 >
                                   <Trash2 className="h-3 w-3" />
                                 </Button>
