@@ -1209,3 +1209,68 @@ html {
     }
   }
 }
+
+/* Sales Portal Specific Yellow Removal - Solution 1 */
+.sales-portal-container,
+.sales-portal-content,
+.sales-portal-wrapper {
+  background-color: rgb(249 250 251) !important; /* bg-gray-50 */
+}
+
+.sales-portal-container *,
+.sales-portal-content *,
+.sales-portal-wrapper * {
+  outline: none !important;
+  outline-color: transparent !important;
+  outline-width: 0 !important;
+  outline-style: none !important;
+}
+
+.sales-portal-container input,
+.sales-portal-container textarea,
+.sales-portal-container select,
+.sales-portal-container button,
+.sales-portal-content input,
+.sales-portal-content textarea,
+.sales-portal-content select,
+.sales-portal-content button {
+  background-color: white !important;
+  border: 2px solid #d1d5db !important;
+  outline: none !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  appearance: none !important;
+}
+
+.sales-portal-container input:focus,
+.sales-portal-container textarea:focus,
+.sales-portal-container select:focus,
+.sales-portal-content input:focus,
+.sales-portal-content textarea:focus,
+.sales-portal-content select:focus {
+  outline: none !important;
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1) !important;
+}
+
+.sales-portal-container .card,
+.sales-portal-container [data-radix-dialog-content],
+.sales-portal-content .card,
+.sales-portal-content [data-radix-dialog-content] {
+  background-color: white !important;
+  color: black !important;
+}
+
+/* Remove any yellow styling from sales portal elements */
+.sales-portal-container *[style*="yellow"],
+.sales-portal-container *[style*="#fff"],
+.sales-portal-container *[style*="#fffef7"],
+.sales-portal-container *[style*="#fefdf8"],
+.sales-portal-content *[style*="yellow"],
+.sales-portal-content *[style*="#fff"],
+.sales-portal-content *[style*="#fffef7"],
+.sales-portal-content *[style*="#fefdf8"] {
+  background-color: white !important;
+  outline: none !important;
+  border-color: #d1d5db !important;
+}
