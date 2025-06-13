@@ -41,6 +41,33 @@ export default function AdminPortalEnhanced() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
+  // Style object to remove yellow coloring with subtle borders
+  const antiYellowStyles = {
+    backgroundColor: 'white',
+    color: 'black',
+    outline: 'none',
+    outlineColor: 'transparent',
+    outlineWidth: '0',
+    outlineStyle: 'none',
+    border: '1px solid #e5e7eb',
+    boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)'
+  } as const;
+
+  // Enhanced style for inputs and interactive elements
+  const antiYellowInputStyles = {
+    backgroundColor: 'white',
+    color: 'black',
+    outline: 'none',
+    outlineColor: 'transparent',
+    outlineWidth: '0',
+    outlineStyle: 'none',
+    border: '2px solid #e5e7eb',
+    boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
+    WebkitAppearance: 'none',
+    MozAppearance: 'none',
+    appearance: 'none'
+  } as const;
+
   // Logout mutation
   const logoutMutation = useMutation({
     mutationFn: async () => {

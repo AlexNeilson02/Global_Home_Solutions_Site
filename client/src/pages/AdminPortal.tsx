@@ -240,7 +240,7 @@ const AdminPortal: React.FC = () => {
 
             {/* User Management Tab */}
             <TabsContent value="users" className="space-y-6">
-              <Card>
+              <Card style={antiYellowStyles}>
                 <CardHeader>
                   <CardTitle>Sales Team</CardTitle>
                   <CardDescription>Manage sales representatives</CardDescription>
@@ -258,7 +258,7 @@ const AdminPortal: React.FC = () => {
                           <Badge variant="outline">
                             Active
                           </Badge>
-                          <Button size="sm" variant="outline">
+                          <Button size="sm" variant="outline" style={antiYellowInputStyles}>
                             View Profile
                           </Button>
                         </div>
@@ -273,7 +273,7 @@ const AdminPortal: React.FC = () => {
 
             {/* Contractors Tab */}
             <TabsContent value="contractors" className="space-y-6">
-              <Card>
+              <Card style={antiYellowStyles}>
                 <CardHeader>
                   <CardTitle>Contractor Network</CardTitle>
                   <CardDescription>Manage contractor partnerships</CardDescription>
@@ -291,7 +291,7 @@ const AdminPortal: React.FC = () => {
                           <Badge variant="outline">
                             Verified
                           </Badge>
-                          <Button size="sm" variant="outline">
+                          <Button size="sm" variant="outline" style={antiYellowInputStyles}>
                             View Details
                           </Button>
                         </div>
@@ -306,7 +306,7 @@ const AdminPortal: React.FC = () => {
 
             {/* Analytics Tab */}
             <TabsContent value="analytics" className="space-y-6">
-              <Card>
+              <Card style={antiYellowStyles}>
                 <CardHeader>
                   <CardTitle>Platform Analytics</CardTitle>
                   <CardDescription>Comprehensive system performance metrics</CardDescription>
@@ -334,7 +334,7 @@ const AdminPortal: React.FC = () => {
 
             {/* Settings Tab */}
             <TabsContent value="settings" className="space-y-6">
-              <Card>
+              <Card style={antiYellowStyles}>
                 <CardHeader>
                   <CardTitle className="flex items-center space-x-2">
                     <Settings className="h-5 w-5" />
@@ -369,7 +369,7 @@ const AdminPortal: React.FC = () => {
                       </p>
                     </div>
                   </div>
-                  <Button className="mt-4">
+                  <Button className="mt-4" style={antiYellowInputStyles}>
                     Update Settings
                   </Button>
                 </CardContent>
