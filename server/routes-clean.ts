@@ -410,9 +410,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log('Creating bid request with data:', bidRequestData);
       const bidRequest = await storage.createBidRequest(bidRequestData);
 
-      // If there's a sales rep attribution, update their stats, create commission, and notify them
-      if (salespersonId) {
-        try {
+      // Create commission record (either for salesperson or admin if no salesperson)
+      try {
+        console.log('Creating commission record...');
+        const { CommissionService } = await import('./commission-service');
+        
+        if (salespersonId) {
+          console.log(`Creating commission for salesperson: ${salespersonId}`);
           // Increment the salesperson's successful conversions
           await storage.incrementSalespersonStats(Number(salespersonId), 'successfulConversions');
           
@@ -422,22 +426,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
             const salesUser = await storage.getUser(salesperson.userId);
             console.log(`Bid request attributed to sales rep: ${salesUser?.fullName} (ID: ${salespersonId})`);
             
-            // Create commission record for this bid request
-            try {
-              await CommissionService.createCommissionForBidRequest(bidRequest, salesperson.id);
-              console.log(`Commission created for bid request ${bidRequest.id}, salesperson ${salespersonId}`);
-            } catch (commissionError) {
-              console.error('Error creating commission:', commissionError);
-              // Log but don't fail the bid request creation
-            }
-            
-            // Here you could send email notification to sales rep
-            // await sendSalesRepNotification(salesUser, bidRequest);
+            // Create commission record with salesperson attribution
+            await CommissionService.createCommissionForBidRequest(bidRequest, salesperson.id);
+            console.log(`Commission created for bid request ${bidRequest.id}, salesperson ${salespersonId}`);
           }
-        } catch (error) {
-          console.error('Error updating salesperson stats:', error);
-          // Don't fail the entire request if sales rep update fails
+        } else {
+          console.log('No salesperson reference - commission will be assigned to admin');
+          // Create commission record with admin attribution (salesperson_id = null)
+          await CommissionService.createCommissionForBidRequest(bidRequest, null);
+          console.log(`Admin commission created for bid request ${bidRequest.id}`);
         }
+      } catch (commissionError) {
+        console.error('Error creating commission record:', commissionError);
+        // Log but don't fail the bid request creation
       }
 
       // Get contractor details for notification
