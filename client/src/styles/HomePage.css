@@ -117,6 +117,27 @@ h3 {
   color: #eee;
   cursor: not-allowed;
 }
+
+.profile-btn {
+  background: none;
+  border: none;
+  color: #2563eb;
+  text-decoration: underline;
+  cursor: pointer;
+  font-size: 0.9rem;
+  padding: 4px 0;
+  margin-bottom: 8px;
+}
+
+.profile-btn:hover {
+  color: #1d4ed8;
+  text-decoration: underline;
+}
+
+.blue-link {
+  color: #2563eb !important;
+  text-decoration: underline;
+}
 .video-gallery {
   margin-top: 12px;
   display: flex;
