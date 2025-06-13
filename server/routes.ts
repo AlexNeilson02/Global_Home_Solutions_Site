@@ -891,17 +891,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       console.log('Bid request created successfully:', bidRequest.id);
 
-      // Create commission record if salesperson is involved
-      if (bidRequest.salespersonId) {
-        try {
+      // Create commission record (either for salesperson or admin if no salesperson)
+      try {
+        if (bidRequest.salespersonId) {
           console.log('Creating commission record for salesperson:', bidRequest.salespersonId);
-          const { CommissionService } = await import('./commission-service');
-          await CommissionService.createCommissionForBidRequest(bidRequest, bidRequest.serviceRequested || 'General Services');
-          console.log('Commission record created successfully');
-        } catch (commissionError) {
-          console.error('Error creating commission record:', commissionError);
-          // Don't fail the entire request for commission errors
+        } else {
+          console.log('No salesperson reference - commission will be assigned to admin');
         }
+        const { CommissionService } = await import('./commission-service');
+        await CommissionService.createCommissionForBidRequest(bidRequest, bidRequest.salespersonId);
+        console.log('Commission record created successfully');
+      } catch (commissionError) {
+        console.error('Error creating commission record:', commissionError);
+        // Don't fail the entire request for commission errors
       }
 
       // Send WebSocket notification with error handling

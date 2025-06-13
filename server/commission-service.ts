@@ -29,7 +29,7 @@ export class CommissionService {
    */
   static async createCommissionForBidRequest(
     bidRequest: BidRequest,
-    salespersonId: number,
+    salespersonId: number | null,
     overrideManagerId?: number
   ): Promise<void> {
     try {
@@ -94,10 +94,30 @@ export class CommissionService {
 
       const commissionAmounts = this.calculateCommissionAmounts(serviceCategory);
 
-      // Create commission record
+      // Commission rule: If no salesperson reference, assign commission to admin
+      let effectiveRecipientId = salespersonId;
+      let isAdminCommission = false;
+      
+      if (!salespersonId) {
+        // Find admin user
+        const allUsers = await storage.getAllUsers();
+        const adminUser = allUsers.find(user => user.role === 'admin');
+        if (adminUser) {
+          effectiveRecipientId = adminUser.id;
+          isAdminCommission = true;
+          console.log(`No salesperson reference - assigning commission to admin (ID: ${adminUser.id})`);
+        }
+      }
+
+      // Create commission record (only if we have a valid recipient)
+      if (!effectiveRecipientId) {
+        console.log('No valid recipient found for commission - skipping commission creation');
+        return;
+      }
+
       const commissionRecord: InsertCommissionRecord = {
         bidRequestId: bidRequest.id,
-        salespersonId: salespersonId,
+        salespersonId: effectiveRecipientId,
         overrideManagerId: overrideManagerId || null,
         serviceCategory: bidRequest.serviceRequested,
         totalCommission: commissionAmounts.totalCommission,
@@ -110,12 +130,18 @@ export class CommissionService {
 
       const createdRecord = await storage.createCommissionRecord(commissionRecord);
 
-      // Update salesperson commission total
-      const salesperson = await storage.getSalesperson(salespersonId);
-      if (salesperson) {
-        await storage.updateSalesperson(salespersonId, {
-          commissions: (salesperson.commissions || 0) + commissionAmounts.salesmanAmount
-        });
+      // Update commission totals - either for salesperson or admin
+      if (isAdminCommission) {
+        // For admin, we could track this separately or just log it
+        console.log(`Admin commission earned: $${commissionAmounts.salesmanAmount} from unattributed lead`);
+      } else {
+        // Update salesperson commission total
+        const salesperson = await storage.getSalesperson(effectiveRecipientId);
+        if (salesperson) {
+          await storage.updateSalesperson(effectiveRecipientId, {
+            commissions: (salesperson.commissions || 0) + commissionAmounts.salesmanAmount
+          });
+        }
       }
 
       // Process immediate payment (since your requirement is immediate payout)
