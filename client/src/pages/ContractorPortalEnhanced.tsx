@@ -799,8 +799,9 @@ const ContractorPortalEnhanced: React.FC = () => {
                             onChange={(e) => setNewSpecialty(e.target.value)}
                             placeholder="Add specialty"
                             onKeyPress={(e) => e.key === 'Enter' && addSpecialty()}
+                            style={antiYellowInputStyles}
                           />
-                          <Button type="button" onClick={addSpecialty} size="sm">
+                          <Button type="button" onClick={addSpecialty} size="sm" style={antiYellowInputStyles}>
                             <Plus className="h-4 w-4" />
                           </Button>
                         </div>
@@ -826,8 +827,9 @@ const ContractorPortalEnhanced: React.FC = () => {
                             onChange={(e) => setNewServiceArea(e.target.value)}
                             placeholder="Add service area"
                             onKeyPress={(e) => e.key === 'Enter' && addServiceArea()}
+                            style={antiYellowInputStyles}
                           />
-                          <Button type="button" onClick={addServiceArea} size="sm">
+                          <Button type="button" onClick={addServiceArea} size="sm" style={antiYellowInputStyles}>
                             <Plus className="h-4 w-4" />
                           </Button>
                         </div>
@@ -882,12 +884,13 @@ const ContractorPortalEnhanced: React.FC = () => {
 
                       {/* Action Buttons */}
                       <div className="flex justify-end space-x-3">
-                        <Button variant="outline" onClick={handleCancelEdit}>
+                        <Button variant="outline" onClick={handleCancelEdit} style={antiYellowInputStyles}>
                           Cancel
                         </Button>
                         <Button 
                           onClick={handleSaveProfile} 
                           disabled={updateContractorMutation.isPending}
+                          style={antiYellowInputStyles}
                         >
                           {updateContractorMutation.isPending ? "Saving..." : "Save Changes"}
                         </Button>
@@ -900,7 +903,7 @@ const ContractorPortalEnhanced: React.FC = () => {
 
             {/* Projects Tab */}
             <TabsContent value="projects" className="space-y-6">
-              <Card>
+              <Card style={antiYellowStyles}>
                 <CardHeader>
                   <CardTitle>My Projects</CardTitle>
                   <CardDescription>Track and manage sent bids and active projects</CardDescription>
@@ -958,6 +961,7 @@ const ContractorPortalEnhanced: React.FC = () => {
                               size="sm"
                               variant="outline"
                               onClick={() => setViewingBidDetails(project)}
+                              style={antiYellowInputStyles}
                             >
                               <Eye className="h-4 w-4 mr-1" />
                               View Details
@@ -970,6 +974,7 @@ const ContractorPortalEnhanced: React.FC = () => {
                                   className="bg-green-600 hover:bg-green-700 text-white"
                                   onClick={() => updateProjectStatusMutation.mutate({ requestId: project.id, status: 'won' })}
                                   disabled={updateProjectStatusMutation.isPending}
+                                  style={antiYellowInputStyles}
                                 >
                                   <Star className="h-4 w-4 mr-1" />
                                   Won Project
@@ -980,6 +985,7 @@ const ContractorPortalEnhanced: React.FC = () => {
                                   className="text-orange-600 border-orange-300 hover:bg-orange-50"
                                   onClick={() => updateProjectStatusMutation.mutate({ requestId: project.id, status: 'lost' })}
                                   disabled={updateProjectStatusMutation.isPending}
+                                  style={antiYellowInputStyles}
                                 >
                                   Lost Project
                                 </Button>
@@ -991,6 +997,7 @@ const ContractorPortalEnhanced: React.FC = () => {
                               variant="destructive"
                               onClick={() => deleteBidRequestMutation.mutate(project.id)}
                               disabled={deleteBidRequestMutation.isPending}
+                              style={antiYellowInputStyles}
                             >
                               <Trash2 className="h-4 w-4 mr-1" />
                               Remove
@@ -1012,7 +1019,7 @@ const ContractorPortalEnhanced: React.FC = () => {
 
             {/* Bids Tab */}
             <TabsContent value="bids" className="space-y-6">
-              <Card>
+              <Card style={antiYellowStyles}>
                 <CardHeader>
                   <CardTitle>Bid Requests</CardTitle>
                   <CardDescription>Manage incoming bid requests and opportunities</CardDescription>
@@ -1069,6 +1076,7 @@ const ContractorPortalEnhanced: React.FC = () => {
                               size="sm"
                               variant="outline"
                               onClick={() => setViewingBidDetails(bid)}
+                              style={antiYellowInputStyles}
                             >
                               <Eye className="h-4 w-4 mr-1" />
                               View Details
@@ -1080,6 +1088,7 @@ const ContractorPortalEnhanced: React.FC = () => {
                                 className="bg-blue-600 hover:bg-blue-700 text-white"
                                 onClick={() => contactCustomerMutation.mutate(bid.id)}
                                 disabled={contactCustomerMutation.isPending}
+                                style={antiYellowInputStyles}
                               >
                                 <Phone className="h-4 w-4 mr-1" />
                                 Contact Customer
@@ -1092,6 +1101,7 @@ const ContractorPortalEnhanced: React.FC = () => {
                                 className="bg-green-600 hover:bg-green-700 text-white"
                                 onClick={() => sendBidMutation.mutate(bid.id)}
                                 disabled={sendBidMutation.isPending}
+                                style={antiYellowInputStyles}
                               >
                                 <FileText className="h-4 w-4 mr-1" />
                                 Send Bid
@@ -1103,6 +1113,7 @@ const ContractorPortalEnhanced: React.FC = () => {
                               variant="destructive"
                               onClick={() => deleteBidRequestMutation.mutate(bid.id)}
                               disabled={deleteBidRequestMutation.isPending}
+                              style={antiYellowInputStyles}
                             >
                               <Trash2 className="h-4 w-4 mr-1" />
                               Decline
@@ -1124,7 +1135,7 @@ const ContractorPortalEnhanced: React.FC = () => {
 
             {/* Documents Tab */}
             <TabsContent value="documents" className="space-y-6">
-              <Card>
+              <Card style={antiYellowStyles}>
                 <CardHeader>
                   <CardTitle>Document Management</CardTitle>
                   <CardDescription>
