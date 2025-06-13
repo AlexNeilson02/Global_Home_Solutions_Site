@@ -168,7 +168,7 @@ export function CommissionDashboard({ salespersonId }: CommissionDashboardProps)
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-green-600">
-              {formatCurrency(summary?.totalEarned || 0)}
+              {formatCurrency(summary?.totalEarnedCommissions || 0)}
             </div>
             <p className="text-xs text-muted-foreground">
               All time commission earnings
@@ -183,7 +183,7 @@ export function CommissionDashboard({ salespersonId }: CommissionDashboardProps)
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-orange-600">
-              {formatCurrency(summary?.pendingCommissions || 0)}
+              {formatCurrency(summary?.totalPendingCommissions || 0)}
             </div>
             <p className="text-xs text-muted-foreground">
               Awaiting payment processing
@@ -198,7 +198,7 @@ export function CommissionDashboard({ salespersonId }: CommissionDashboardProps)
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {summary?.totalRecords || 0}
+              {summary?.totalCommissionRecords || 0}
             </div>
             <p className="text-xs text-muted-foreground">
               Total commission records
@@ -213,7 +213,7 @@ export function CommissionDashboard({ salespersonId }: CommissionDashboardProps)
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-green-600">
-              {formatCurrency(summary?.paidCommissions || 0)}
+              {formatCurrency(summary?.totalEarnedCommissions || 0)}
             </div>
             <p className="text-xs text-muted-foreground">
               Successfully processed

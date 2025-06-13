@@ -548,15 +548,7 @@ export default function AdminPortalEnhanced() {
     );
   }
 
-  const stats = {
-    totalSalespersons: salespersons?.length || 0,
-    activeSalespersons: salespersons?.filter((s: any) => s.isActive)?.length || 0,
-    totalContractors: contractors?.length || 0,
-    activeContractors: contractors?.filter((c: any) => c.isActive)?.length || 0,
-    totalProjects: projects?.length || 0,
-    totalBidRequests: bidRequests?.length || 0,
-    pendingBidRequests: bidRequests?.filter((br: any) => br.status === 'pending')?.length || 0
-  };
+
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
