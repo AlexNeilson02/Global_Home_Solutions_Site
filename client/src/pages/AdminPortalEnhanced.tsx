@@ -698,6 +698,7 @@ export default function AdminPortalEnhanced() {
                         <Button 
                           type="button" 
                           className="w-full bg-white text-black border-2 border-black hover:bg-gray-100 font-semibold"
+                          style={antiYellowInputStyles}
                           onClick={async () => {
                             const username = (document.getElementById('username') as HTMLInputElement)?.value;
                             const fullName = (document.getElementById('fullName') as HTMLInputElement)?.value;
@@ -797,7 +798,7 @@ export default function AdminPortalEnhanced() {
 
           {/* Contractors Tab */}
           <TabsContent value="contractors">
-            <Card>
+            <Card style={antiYellowStyles}>
               <CardHeader>
                 <div className="flex justify-between items-center">
                   <div>
@@ -806,7 +807,7 @@ export default function AdminPortalEnhanced() {
                   </div>
                   <Dialog>
                     <DialogTrigger asChild>
-                      <Button className="bg-white text-black border-2 border-black hover:bg-gray-100 font-semibold">
+                      <Button className="bg-white text-black border-2 border-black hover:bg-gray-100 font-semibold" style={antiYellowInputStyles}>
                         <Plus className="h-4 w-4 mr-2 text-black" />
                         Add Contractor
                       </Button>
@@ -1034,7 +1035,7 @@ export default function AdminPortalEnhanced() {
 
           {/* Bid Requests Tab */}
           <TabsContent value="bid-requests">
-            <Card>
+            <Card style={antiYellowStyles}>
               <CardHeader>
                 <CardTitle>Bid Requests Management</CardTitle>
                 <CardDescription>Monitor and manage incoming bid requests</CardDescription>
