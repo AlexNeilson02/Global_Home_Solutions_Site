@@ -40,6 +40,7 @@ export default function AdminPortalEnhanced() {
   const [, navigate] = useLocation();
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const [activeTab, setActiveTab] = useState("salespersons");
 
   // Style object to remove yellow coloring with subtle borders
   const antiYellowStyles = {
@@ -616,13 +617,56 @@ export default function AdminPortalEnhanced() {
         </div>
 
         {/* Main Content */}
-        <Tabs defaultValue="salespersons" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6 pb-20 sm:pb-0">
+          {/* Desktop/Tablet Navigation - Hidden on mobile */}
+          <TabsList className="hidden sm:grid w-full grid-cols-4">
             <TabsTrigger value="salespersons">Sales Representatives</TabsTrigger>
             <TabsTrigger value="contractors">Contractors</TabsTrigger>
             <TabsTrigger value="bid-requests">Bid Requests</TabsTrigger>
             <TabsTrigger value="analytics">Analytics</TabsTrigger>
           </TabsList>
+
+          {/* Mobile Navigation - Fixed bottom bar, shown only on mobile */}
+          <div className="sm:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 z-50">
+            <div className="grid grid-cols-4 h-16">
+              <button
+                onClick={() => setActiveTab("salespersons")}
+                className={`flex flex-col items-center justify-center gap-1 text-xs hover:bg-gray-100 dark:hover:bg-gray-800 ${
+                  activeTab === "salespersons" ? "text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950" : ""
+                }`}
+              >
+                <Users className="h-5 w-5" />
+                <span>Sales</span>
+              </button>
+              <button
+                onClick={() => setActiveTab("contractors")}
+                className={`flex flex-col items-center justify-center gap-1 text-xs hover:bg-gray-100 dark:hover:bg-gray-800 ${
+                  activeTab === "contractors" ? "text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950" : ""
+                }`}
+              >
+                <Building2 className="h-5 w-5" />
+                <span>Contractors</span>
+              </button>
+              <button
+                onClick={() => setActiveTab("bid-requests")}
+                className={`flex flex-col items-center justify-center gap-1 text-xs hover:bg-gray-100 dark:hover:bg-gray-800 ${
+                  activeTab === "bid-requests" ? "text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950" : ""
+                }`}
+              >
+                <Target className="h-5 w-5" />
+                <span>Bids</span>
+              </button>
+              <button
+                onClick={() => setActiveTab("analytics")}
+                className={`flex flex-col items-center justify-center gap-1 text-xs hover:bg-gray-100 dark:hover:bg-gray-800 ${
+                  activeTab === "analytics" ? "text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950" : ""
+                }`}
+              >
+                <BarChart3 className="h-5 w-5" />
+                <span>Analytics</span>
+              </button>
+            </div>
+          </div>
 
           {/* Sales Representatives Tab */}
           <TabsContent value="salespersons">

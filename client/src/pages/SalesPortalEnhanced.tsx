@@ -318,8 +318,9 @@ const SalesPortalEnhanced: React.FC = () => {
             </Button>
           </div>
 
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-            <TabsList className="grid w-full grid-cols-6">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6 pb-20 sm:pb-0">
+            {/* Desktop/Tablet Navigation - Hidden on mobile */}
+            <TabsList className="hidden sm:grid w-full grid-cols-6">
               <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
               <TabsTrigger value="profile">Profile</TabsTrigger>
               <TabsTrigger value="qr-tools">QR & Tools</TabsTrigger>
@@ -327,6 +328,68 @@ const SalesPortalEnhanced: React.FC = () => {
               <TabsTrigger value="commissions">Commissions</TabsTrigger>
               <TabsTrigger value="analytics">Analytics</TabsTrigger>
             </TabsList>
+
+            {/* Mobile Navigation - Fixed bottom bar, shown only on mobile */}
+            <div className="sm:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 z-50">
+              <div className="grid grid-cols-3 h-16">
+                <button
+                  onClick={() => setActiveTab("dashboard")}
+                  className={`flex flex-col items-center justify-center gap-1 text-xs hover:bg-gray-100 dark:hover:bg-gray-800 ${
+                    activeTab === "dashboard" ? "text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950" : ""
+                  }`}
+                >
+                  <BarChart3 className="h-5 w-5" />
+                  <span>Dashboard</span>
+                </button>
+                <button
+                  onClick={() => setActiveTab("profile")}
+                  className={`flex flex-col items-center justify-center gap-1 text-xs hover:bg-gray-100 dark:hover:bg-gray-800 ${
+                    activeTab === "profile" ? "text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950" : ""
+                  }`}
+                >
+                  <Edit3 className="h-5 w-5" />
+                  <span>Profile</span>
+                </button>
+                <button
+                  onClick={() => setActiveTab("qr-tools")}
+                  className={`flex flex-col items-center justify-center gap-1 text-xs hover:bg-gray-100 dark:hover:bg-gray-800 ${
+                    activeTab === "qr-tools" ? "text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950" : ""
+                  }`}
+                >
+                  <QrCode className="h-5 w-5" />
+                  <span>QR Tools</span>
+                </button>
+              </div>
+              <div className="grid grid-cols-3 h-16 border-t border-gray-200 dark:border-gray-700">
+                <button
+                  onClick={() => setActiveTab("leads")}
+                  className={`flex flex-col items-center justify-center gap-1 text-xs hover:bg-gray-100 dark:hover:bg-gray-800 ${
+                    activeTab === "leads" ? "text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950" : ""
+                  }`}
+                >
+                  <Users className="h-4 w-4" />
+                  <span>Leads</span>
+                </button>
+                <button
+                  onClick={() => setActiveTab("commissions")}
+                  className={`flex flex-col items-center justify-center gap-1 text-xs hover:bg-gray-100 dark:hover:bg-gray-800 ${
+                    activeTab === "commissions" ? "text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950" : ""
+                  }`}
+                >
+                  <DollarSign className="h-4 w-4" />
+                  <span>Commission</span>
+                </button>
+                <button
+                  onClick={() => setActiveTab("analytics")}
+                  className={`flex flex-col items-center justify-center gap-1 text-xs hover:bg-gray-100 dark:hover:bg-gray-800 ${
+                    activeTab === "analytics" ? "text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950" : ""
+                  }`}
+                >
+                  <TrendingUp className="h-4 w-4" />
+                  <span>Analytics</span>
+                </button>
+              </div>
+            </div>
 
             {/* Dashboard Tab */}
             <TabsContent value="dashboard" className="space-y-6">
