@@ -43,6 +43,16 @@ function App() {
               <AdminPortalEnhanced />
             </ProtectedRoute>
           </Route>
+          <Route path="/checkout">
+            <ProtectedRoute>
+              <Checkout />
+            </ProtectedRoute>
+          </Route>
+          <Route path="/subscribe">
+            <ProtectedRoute>
+              <Subscribe />
+            </ProtectedRoute>
+          </Route>
         </div>
       </TooltipProvider>
     </Router>
