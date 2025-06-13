@@ -845,16 +845,17 @@ export default function AdminPortalEnhanced() {
           <TabsContent value="contractors">
             <Card style={antiYellowStyles}>
               <CardHeader>
-                <div className="flex justify-between items-center">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                   <div>
-                    <CardTitle>Contractors Management</CardTitle>
-                    <CardDescription>Manage contractor profiles and verification status</CardDescription>
+                    <CardTitle className="text-lg sm:text-xl">Contractors Management</CardTitle>
+                    <CardDescription className="text-sm">Manage contractor profiles and verification status</CardDescription>
                   </div>
                   <Dialog>
                     <DialogTrigger asChild>
-                      <Button className="bg-white text-black border-2 border-black hover:bg-gray-100 font-semibold" style={antiYellowInputStyles}>
+                      <Button className="bg-white text-black border-2 border-black hover:bg-gray-100 font-semibold text-sm sm:text-base w-full sm:w-auto" style={antiYellowInputStyles}>
                         <Plus className="h-4 w-4 mr-2 text-black" />
-                        Add Contractor
+                        <span className="hidden sm:inline">Add Contractor</span>
+                        <span className="sm:hidden">Add</span>
                       </Button>
                     </DialogTrigger>
                     <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto">
@@ -1082,74 +1083,157 @@ export default function AdminPortalEnhanced() {
           <TabsContent value="bid-requests">
             <Card style={antiYellowStyles}>
               <CardHeader>
-                <CardTitle>Bid Requests Management</CardTitle>
-                <CardDescription>Monitor and manage incoming bid requests</CardDescription>
+                <CardTitle className="text-lg sm:text-xl">Bid Requests Management</CardTitle>
+                <CardDescription className="text-sm">Monitor and manage incoming bid requests</CardDescription>
               </CardHeader>
               <CardContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Customer</TableHead>
-                      <TableHead>Service</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Date</TableHead>
-                      <TableHead>Salesperson</TableHead>
-                      <TableHead>Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {bidRequests.map((request: any) => (
-                      <TableRow key={request.id}>
-                        <TableCell>
+                {/* Mobile view - Cards layout for smaller screens */}
+                <div className="block sm:hidden space-y-4">
+                  {bidRequests.map((request: any) => (
+                    <Card key={request.id} className="p-4">
+                      <div className="space-y-3">
+                        <div className="flex justify-between items-start">
                           <div>
-                            <p className="font-medium">{request.fullName}</p>
-                            <p className="text-sm text-gray-500">{request.email}</p>
+                            <p className="font-medium text-sm">{request.fullName}</p>
+                            <p className="text-xs text-gray-500">{request.email}</p>
+                            <p className="text-xs text-gray-500">{request.phone}</p>
                           </div>
-                        </TableCell>
-                        <TableCell>{request.serviceRequested}</TableCell>
-                        <TableCell>
                           <Badge variant={
                             request.status === 'pending' ? "outline" :
                             request.status === 'approved' ? "default" : "destructive"
                           }>
                             {request.status}
                           </Badge>
-                        </TableCell>
-                        <TableCell>{new Date(request.createdAt).toLocaleDateString()}</TableCell>
-                        <TableCell>{request.salesperson?.fullName || 'Unassigned'}</TableCell>
-                        <TableCell>
-                          <div className="flex gap-1">
-                            <Select
-                              value={request.status}
-                              onValueChange={(value) => 
-                                updateBidRequestStatus.mutate({ 
-                                  bidRequestId: request.id, 
-                                  status: value 
-                                })
-                              }
-                            >
-                              <SelectTrigger className="w-32">
-                                <SelectValue />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="pending">Pending</SelectItem>
-                                <SelectItem value="approved">Approved</SelectItem>
-                                <SelectItem value="rejected">Rejected</SelectItem>
-                              </SelectContent>
-                            </Select>
-                            <Button
-                              size="sm"
-                              variant="destructive"
-                              onClick={() => deleteBidRequest.mutate(request.id)}
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium">Service: {request.serviceRequested}</p>
+                          <p className="text-xs text-gray-500">Budget: ${request.budget || 'Not specified'}</p>
+                          <p className="text-xs text-gray-500">Address: {request.address || 'Not provided'}</p>
+                        </div>
+                        <div className="text-xs text-gray-500">
+                          <p>Date: {new Date(request.createdAt).toLocaleDateString()}</p>
+                          <p>Salesperson: {request.salesperson?.fullName || 'Unassigned'}</p>
+                        </div>
+                        {request.projectDescription && (
+                          <div>
+                            <p className="text-xs font-medium">Description:</p>
+                            <p className="text-xs text-gray-600">{request.projectDescription}</p>
                           </div>
-                        </TableCell>
+                        )}
+                        <div className="flex gap-2">
+                          <Select
+                            value={request.status}
+                            onValueChange={(value) => 
+                              updateBidRequestStatus.mutate({ 
+                                bidRequestId: request.id, 
+                                status: value 
+                              })
+                            }
+                          >
+                            <SelectTrigger className="flex-1 h-8 text-xs">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="pending">Pending</SelectItem>
+                              <SelectItem value="approved">Approved</SelectItem>
+                              <SelectItem value="rejected">Rejected</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <Button
+                            size="sm"
+                            variant="destructive"
+                            onClick={() => deleteBidRequest.mutate(request.id)}
+                            className="h-8 w-8 p-0"
+                          >
+                            <Trash2 className="h-3 w-3" />
+                          </Button>
+                        </div>
+                      </div>
+                    </Card>
+                  ))}
+                </div>
+
+                {/* Desktop view - Table layout for larger screens */}
+                <div className="hidden sm:block">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Customer Details</TableHead>
+                        <TableHead>Service & Budget</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead>Date</TableHead>
+                        <TableHead>Salesperson</TableHead>
+                        <TableHead>Actions</TableHead>
                       </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {bidRequests.map((request: any) => (
+                        <TableRow key={request.id}>
+                          <TableCell>
+                            <div>
+                              <p className="font-medium">{request.fullName}</p>
+                              <p className="text-sm text-gray-500">{request.email}</p>
+                              <p className="text-sm text-gray-500">{request.phone}</p>
+                              {request.address && (
+                                <p className="text-xs text-gray-400">{request.address}</p>
+                              )}
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <div>
+                              <p className="font-medium">{request.serviceRequested}</p>
+                              <p className="text-sm text-gray-500">Budget: ${request.budget || 'Not specified'}</p>
+                              {request.projectDescription && (
+                                <p className="text-xs text-gray-400 mt-1 max-w-xs truncate" title={request.projectDescription}>
+                                  {request.projectDescription}
+                                </p>
+                              )}
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant={
+                              request.status === 'pending' ? "outline" :
+                              request.status === 'approved' ? "default" : "destructive"
+                            }>
+                              {request.status}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>{new Date(request.createdAt).toLocaleDateString()}</TableCell>
+                          <TableCell>{request.salesperson?.fullName || 'Unassigned'}</TableCell>
+                          <TableCell>
+                            <div className="flex gap-1">
+                              <Select
+                                value={request.status}
+                                onValueChange={(value) => 
+                                  updateBidRequestStatus.mutate({ 
+                                    bidRequestId: request.id, 
+                                    status: value 
+                                  })
+                                }
+                              >
+                                <SelectTrigger className="w-32">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="pending">Pending</SelectItem>
+                                  <SelectItem value="approved">Approved</SelectItem>
+                                  <SelectItem value="rejected">Rejected</SelectItem>
+                                </SelectContent>
+                              </Select>
+                              <Button
+                                size="sm"
+                                variant="destructive"
+                                onClick={() => deleteBidRequest.mutate(request.id)}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
                     ))}
                   </TableBody>
-                </Table>
+                  </Table>
+                </div>
               </CardContent>
             </Card>
           </TabsContent>

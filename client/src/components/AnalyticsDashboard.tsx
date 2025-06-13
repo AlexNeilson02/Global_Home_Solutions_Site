@@ -185,15 +185,15 @@ const AnalyticsDashboard: React.FC<AnalyticsProps> = ({ userRole, userId }) => {
 
           {/* Commission Analytics */}
           <div>
-            <h3 className="text-lg font-semibold mb-4">Commission Analytics</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <h3 className="text-base sm:text-lg font-semibold mb-4">Commission Analytics</h3>
+            <div className="grid grid-cols-2 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
               <Card style={antiYellowStyles}>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Total Commissions</CardTitle>
-                  <DollarSign className="h-4 w-4 text-muted-foreground" />
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3 sm:p-4">
+                  <CardTitle className="text-xs sm:text-sm font-medium truncate">Total Commissions</CardTitle>
+                  <DollarSign className="h-4 w-4 text-muted-foreground flex-shrink-0" />
                 </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold text-green-600">{formatCurrency(commissions?.totalCommissions || 0)}</div>
+                <CardContent className="p-3 pt-0 sm:p-4 sm:pt-0">
+                  <div className="text-lg sm:text-2xl font-bold text-green-600">{formatCurrency(commissions?.totalCommissions || 0)}</div>
                   <p className="text-xs text-muted-foreground">
                     All commission earnings
                   </p>
@@ -201,12 +201,12 @@ const AnalyticsDashboard: React.FC<AnalyticsProps> = ({ userRole, userId }) => {
               </Card>
 
               <Card style={antiYellowStyles}>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Pending Commissions</CardTitle>
-                  <Target className="h-4 w-4 text-muted-foreground" />
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3 sm:p-4">
+                  <CardTitle className="text-xs sm:text-sm font-medium truncate">Pending Commissions</CardTitle>
+                  <Target className="h-4 w-4 text-muted-foreground flex-shrink-0" />
                 </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold text-orange-600">{formatCurrency(commissions?.pendingCommissions || 0)}</div>
+                <CardContent className="p-3 pt-0 sm:p-4 sm:pt-0">
+                  <div className="text-lg sm:text-2xl font-bold text-orange-600">{formatCurrency(commissions?.pendingCommissions || 0)}</div>
                   <p className="text-xs text-muted-foreground">
                     Awaiting payment
                   </p>
@@ -214,12 +214,12 @@ const AnalyticsDashboard: React.FC<AnalyticsProps> = ({ userRole, userId }) => {
               </Card>
 
               <Card style={antiYellowStyles}>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Commission Records</CardTitle>
-                  <Building className="h-4 w-4 text-muted-foreground" />
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3 sm:p-4">
+                  <CardTitle className="text-xs sm:text-sm font-medium truncate">Commission Records</CardTitle>
+                  <Building className="h-4 w-4 text-muted-foreground flex-shrink-0" />
                 </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{commissions?.totalRecords || 0}</div>
+                <CardContent className="p-3 pt-0 sm:p-4 sm:pt-0">
+                  <div className="text-lg sm:text-2xl font-bold">{commissions?.totalRecords || 0}</div>
                   <p className="text-xs text-muted-foreground">
                     Total commission transactions
                   </p>
@@ -227,12 +227,12 @@ const AnalyticsDashboard: React.FC<AnalyticsProps> = ({ userRole, userId }) => {
               </Card>
 
               <Card style={antiYellowStyles}>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Top Earner</CardTitle>
-                  <TrendingUp className="h-4 w-4 text-muted-foreground" />
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3 sm:p-4">
+                  <CardTitle className="text-xs sm:text-sm font-medium truncate">Top Earner</CardTitle>
+                  <TrendingUp className="h-4 w-4 text-muted-foreground flex-shrink-0" />
                 </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{formatCurrency(commissions?.topEarner?.earnings || 0)}</div>
+                <CardContent className="p-3 pt-0 sm:p-4 sm:pt-0">
+                  <div className="text-lg sm:text-2xl font-bold">{formatCurrency(commissions?.topEarner?.earnings || 0)}</div>
                   <p className="text-xs text-muted-foreground">
                     {commissions?.topEarner?.name || 'No data'}
                   </p>
