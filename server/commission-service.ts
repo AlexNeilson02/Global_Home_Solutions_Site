@@ -123,9 +123,9 @@ export class CommissionService {
         console.log(`Admin commission earned: $${commissionAmounts.salesmanAmount} from unattributed lead`);
       } else {
         // Update salesperson commission total
-        const salesperson = await storage.getSalesperson(effectiveRecipientId);
+        const salesperson = await storage.getSalesperson(salespersonId!);
         if (salesperson) {
-          await storage.updateSalesperson(effectiveRecipientId, {
+          await storage.updateSalesperson(salespersonId!, {
             commissions: (salesperson.commissions || 0) + commissionAmounts.salesmanAmount
           });
         }
