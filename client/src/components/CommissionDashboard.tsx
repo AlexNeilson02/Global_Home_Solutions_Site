@@ -57,7 +57,7 @@ export function CommissionDashboard({ salespersonId }: CommissionDashboardProps)
     to: new Date()
   });
 
-  // Style object to remove yellow coloring - Solution #2
+  // Style object to remove yellow coloring with subtle borders - Solution #2
   const antiYellowStyles = {
     backgroundColor: 'white',
     color: 'black',
@@ -65,11 +65,11 @@ export function CommissionDashboard({ salespersonId }: CommissionDashboardProps)
     outlineColor: 'transparent',
     outlineWidth: '0',
     outlineStyle: 'none',
-    border: '1px solid #d1d5db',
-    boxShadow: 'none'
+    border: '1px solid #e5e7eb',
+    boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)'
   } as const;
 
-  // Enhanced style for inputs and interactive elements
+  // Enhanced style for inputs and interactive elements with subtle borders
   const antiYellowInputStyles = {
     backgroundColor: 'white',
     color: 'black',
@@ -77,8 +77,8 @@ export function CommissionDashboard({ salespersonId }: CommissionDashboardProps)
     outlineColor: 'transparent',
     outlineWidth: '0',
     outlineStyle: 'none',
-    border: '2px solid #d1d5db',
-    boxShadow: 'none',
+    border: '1px solid #e5e7eb',
+    boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
     WebkitAppearance: 'none',
     MozAppearance: 'none',
     appearance: 'none'
