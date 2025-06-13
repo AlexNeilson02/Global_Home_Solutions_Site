@@ -119,7 +119,7 @@ export function CommissionDashboard({ salespersonId }: CommissionDashboardProps)
       case 'processing':
         return 'bg-blue-100 text-blue-800';
       case 'pending':
-        return 'bg-yellow-100 text-yellow-800';
+        return 'bg-orange-100 text-orange-800';
       default:
         return 'bg-gray-100 text-gray-800';
     }
@@ -182,7 +182,7 @@ export function CommissionDashboard({ salespersonId }: CommissionDashboardProps)
             <Clock className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-yellow-600">
+            <div className="text-2xl font-bold text-orange-600">
               {formatCurrency(summary?.pendingCommissions || 0)}
             </div>
             <p className="text-xs text-muted-foreground">

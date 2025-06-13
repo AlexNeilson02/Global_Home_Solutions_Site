@@ -92,7 +92,7 @@ const PerformanceMonitor: React.FC = () => {
       case 'good':
         return <CheckCircle className="h-4 w-4 text-green-500" />;
       case 'fair':
-        return <AlertTriangle className="h-4 w-4 text-yellow-500" />;
+        return <AlertTriangle className="h-4 w-4 text-orange-500" />;
       case 'poor':
         return <AlertTriangle className="h-4 w-4 text-red-500" />;
       default:
@@ -105,7 +105,7 @@ const PerformanceMonitor: React.FC = () => {
       case 'good':
         return 'text-green-600 bg-green-50 dark:bg-green-900/20';
       case 'fair':
-        return 'text-yellow-600 bg-yellow-50 dark:bg-yellow-900/20';
+        return 'text-orange-600 bg-orange-50 dark:bg-orange-900/20';
       case 'poor':
         return 'text-red-600 bg-red-50 dark:bg-red-900/20';
       default:

@@ -206,7 +206,7 @@ const AnalyticsDashboard: React.FC<AnalyticsProps> = ({ userRole, userId }) => {
                   <Target className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold text-yellow-600">{formatCurrency(commissions?.pendingCommissions || 0)}</div>
+                  <div className="text-2xl font-bold text-orange-600">{formatCurrency(commissions?.pendingCommissions || 0)}</div>
                   <p className="text-xs text-muted-foreground">
                     Awaiting payment
                   </p>
@@ -420,7 +420,7 @@ const AnalyticsDashboard: React.FC<AnalyticsProps> = ({ userRole, userId }) => {
                   <span className="font-medium">Pending</span>
                   <Badge variant="outline">{conversions?.pending || 0}</Badge>
                 </div>
-                <div className="flex items-center justify-between p-3 bg-yellow-50 rounded">
+                <div className="flex items-center justify-between p-3 bg-orange-50 rounded">
                   <span className="font-medium">Contacted</span>
                   <Badge variant="outline">{conversions?.contacted || 0}</Badge>
                 </div>
