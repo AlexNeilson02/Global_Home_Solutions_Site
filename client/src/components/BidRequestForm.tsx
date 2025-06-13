@@ -236,6 +236,9 @@ export default function BidRequestForm({ isOpen, onClose, contractor, trackedSal
   });
 
   const onSubmit = (data: BidRequestForm) => {
+    console.log('BidRequestForm - trackedSalesperson:', trackedSalesperson);
+    console.log('BidRequestForm - trackedSalesperson.id:', trackedSalesperson?.id);
+    
     // Map frontend form fields to backend expected fields
     const backendData = {
       customerName: data.customerName,
@@ -251,6 +254,7 @@ export default function BidRequestForm({ isOpen, onClose, contractor, trackedSal
       ...(trackedSalesperson && { salespersonId: trackedSalesperson.id })
     };
     
+    console.log('BidRequestForm - Final backend data:', backendData);
     submitBidRequest.mutate(backendData);
   };
 
