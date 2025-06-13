@@ -552,7 +552,7 @@ export default function AdminPortalEnhanced() {
               variant="outline"
               onClick={handleBackToPortals}
               disabled={logoutMutation.isPending}
-              className="flex items-center gap-2"
+              className="flex items-center gap-2 w-full sm:w-auto"
               style={antiYellowInputStyles}
             >
               <Users className="h-4 w-4" />
@@ -674,14 +674,15 @@ export default function AdminPortalEnhanced() {
               <CardHeader>
                 <div className="flex justify-between items-center">
                   <div>
-                    <CardTitle>Sales Representatives Management</CardTitle>
-                    <CardDescription>Monitor sales performance and manage team members</CardDescription>
+                    <CardTitle className="text-lg sm:text-xl">Sales Representatives Management</CardTitle>
+                    <CardDescription className="text-sm">Monitor sales performance and manage team members</CardDescription>
                   </div>
                   <Dialog>
                     <DialogTrigger asChild>
-                      <Button className="bg-white text-black border-2 border-black hover:bg-gray-100 font-semibold" style={antiYellowInputStyles}>
+                      <Button className="bg-white text-black border-2 border-black hover:bg-gray-100 font-semibold text-sm sm:text-base" style={antiYellowInputStyles}>
                         <Plus className="h-4 w-4 mr-2 text-black" />
-                        Add Salesperson
+                        <span className="hidden sm:inline">Add Salesperson</span>
+                        <span className="sm:hidden">Add</span>
                       </Button>
                     </DialogTrigger>
                     <DialogContent className="sm:max-w-[600px]">
@@ -797,25 +798,25 @@ export default function AdminPortalEnhanced() {
               <CardContent>
                 <div className="space-y-4">
                   {salespersons.map((salesperson: any) => (
-                    <div key={salesperson.id} className="border rounded-lg p-4">
+                    <div key={salesperson.id} className="border rounded-lg p-3 sm:p-4">
                       <div className="flex justify-between items-start mb-3">
-                        <div className="flex-1">
-                          <h4 className="font-semibold">{salesperson.fullName || 'No Name Provided'}</h4>
-                          <p className="text-sm text-gray-600 dark:text-gray-300">
+                        <div className="flex-1 min-w-0">
+                          <h4 className="font-semibold text-sm sm:text-base truncate">{salesperson.fullName || 'No Name Provided'}</h4>
+                          <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 truncate">
                             Profile: {salesperson.profileUrl}
                           </p>
-                          <div className="grid grid-cols-3 gap-4 mt-3">
+                          <div className="grid grid-cols-3 gap-2 sm:gap-4 mt-3">
                             <div className="text-center">
-                              <div className="text-lg font-bold">{salesperson.totalLeads || 0}</div>
+                              <div className="text-sm sm:text-lg font-bold">{salesperson.totalLeads || 0}</div>
                               <div className="text-xs text-gray-500">Total Leads</div>
                             </div>
                             <div className="text-center">
-                              <div className="text-lg font-bold">{salesperson.conversionRate && !isNaN(salesperson.conversionRate) ? ((salesperson.conversionRate) * 100).toFixed(1) : '0.0'}%</div>
-                              <div className="text-xs text-gray-500">Conversion Rate</div>
+                              <div className="text-sm sm:text-lg font-bold">{salesperson.conversionRate && !isNaN(salesperson.conversionRate) ? ((salesperson.conversionRate) * 100).toFixed(1) : '0.0'}%</div>
+                              <div className="text-xs text-gray-500">Conversion</div>
                             </div>
                             <div className="text-center">
-                              <div className="text-lg font-bold">${(salesperson.commissions || 0).toLocaleString()}</div>
-                              <div className="text-xs text-gray-500">Commissions</div>
+                              <div className="text-sm sm:text-lg font-bold">${(salesperson.commissions || 0).toLocaleString()}</div>
+                              <div className="text-xs text-gray-500">Commission</div>
                             </div>
                           </div>
                         </div>
@@ -825,12 +826,12 @@ export default function AdminPortalEnhanced() {
                       </div>
                       <div className="flex justify-end gap-2">
                         <Button size="sm" variant="outline" onClick={() => handleViewDetails(salesperson)}>
-                          <Eye className="h-4 w-4 mr-1" />
-                          View Details
+                          <Eye className="h-4 w-4 sm:mr-1" />
+                          <span className="hidden sm:inline">View Details</span>
                         </Button>
                         <Button size="sm" variant="outline" onClick={() => handleEdit(salesperson)}>
-                          <Edit3 className="h-4 w-4 mr-1" />
-                          Edit
+                          <Edit3 className="h-4 w-4 sm:mr-1" />
+                          <span className="hidden sm:inline">Edit</span>
                         </Button>
                       </div>
                     </div>
