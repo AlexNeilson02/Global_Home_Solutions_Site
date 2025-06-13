@@ -562,55 +562,55 @@ export default function AdminPortalEnhanced() {
         </div>
 
         {/* Quick Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-2 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
           <Card style={antiYellowStyles}>
-            <CardContent className="p-6">
+            <CardContent className="p-4 sm:p-6">
               <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600 dark:text-gray-300">Sales Reps</p>
-                  <p className="text-2xl font-bold text-gray-900 dark:text-white">{stats.totalSalespersons}</p>
+                <div className="min-w-0 flex-1">
+                  <p className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-300 truncate">Sales Reps</p>
+                  <p className="text-lg sm:text-2xl font-bold text-gray-900 dark:text-white">{stats.totalSalespersons}</p>
                   <p className="text-xs text-green-600">{stats.activeSalespersons} active</p>
                 </div>
-                <Users className="h-8 w-8 text-blue-600" />
+                <Users className="h-6 w-6 sm:h-8 sm:w-8 text-blue-600 flex-shrink-0" />
               </div>
             </CardContent>
           </Card>
 
           <Card style={antiYellowStyles}>
-            <CardContent className="p-6">
+            <CardContent className="p-4 sm:p-6">
               <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600 dark:text-gray-300">Contractors</p>
-                  <p className="text-2xl font-bold text-gray-900 dark:text-white">{stats.totalContractors}</p>
+                <div className="min-w-0 flex-1">
+                  <p className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-300 truncate">Contractors</p>
+                  <p className="text-lg sm:text-2xl font-bold text-gray-900 dark:text-white">{stats.totalContractors}</p>
                   <p className="text-xs text-green-600">{stats.activeContractors} verified</p>
                 </div>
-                <Building2 className="h-8 w-8 text-green-600" />
+                <Building2 className="h-6 w-6 sm:h-8 sm:w-8 text-green-600 flex-shrink-0" />
               </div>
             </CardContent>
           </Card>
 
           <Card style={antiYellowStyles}>
-            <CardContent className="p-6">
+            <CardContent className="p-4 sm:p-6">
               <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600 dark:text-gray-300">Total Projects</p>
-                  <p className="text-2xl font-bold text-gray-900 dark:text-white">{stats.totalProjects}</p>
+                <div className="min-w-0 flex-1">
+                  <p className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-300 truncate">Total Projects</p>
+                  <p className="text-lg sm:text-2xl font-bold text-gray-900 dark:text-white">{stats.totalProjects}</p>
                   <p className="text-xs text-blue-600">Active projects</p>
                 </div>
-                <FileText className="h-8 w-8 text-purple-600" />
+                <FileText className="h-6 w-6 sm:h-8 sm:w-8 text-purple-600 flex-shrink-0" />
               </div>
             </CardContent>
           </Card>
 
           <Card style={antiYellowStyles}>
-            <CardContent className="p-6">
+            <CardContent className="p-4 sm:p-6">
               <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600 dark:text-gray-300">Bid Requests</p>
-                  <p className="text-2xl font-bold text-gray-900 dark:text-white">{stats.totalBidRequests}</p>
+                <div className="min-w-0 flex-1">
+                  <p className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-300 truncate">Bid Requests</p>
+                  <p className="text-lg sm:text-2xl font-bold text-gray-900 dark:text-white">{stats.totalBidRequests}</p>
                   <p className="text-xs text-orange-600">{stats.pendingBidRequests} pending</p>
                 </div>
-                <Target className="h-8 w-8 text-orange-600" />
+                <Target className="h-6 w-6 sm:h-8 sm:w-8 text-orange-600 flex-shrink-0" />
               </div>
             </CardContent>
           </Card>

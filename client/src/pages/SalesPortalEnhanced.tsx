@@ -394,47 +394,47 @@ const SalesPortalEnhanced: React.FC = () => {
             {/* Dashboard Tab */}
             <TabsContent value="dashboard" className="space-y-6">
               {/* Key Metrics */}
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+              <div className="grid grid-cols-2 sm:grid-cols-1 md:grid-cols-4 gap-4 sm:gap-6">
                 <Card style={antiYellowStyles}>
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Total Visits</CardTitle>
-                    <Eye className="h-4 w-4 text-muted-foreground" />
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3 sm:p-4">
+                    <CardTitle className="text-xs sm:text-sm font-medium truncate">Total Visits</CardTitle>
+                    <Eye className="h-4 w-4 text-muted-foreground flex-shrink-0" />
                   </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold">{totalVisits}</div>
+                  <CardContent className="p-3 pt-0 sm:p-4 sm:pt-0">
+                    <div className="text-lg sm:text-2xl font-bold">{totalVisits}</div>
                     <p className="text-xs text-muted-foreground">Profile page views</p>
                   </CardContent>
                 </Card>
 
                 <Card style={antiYellowStyles}>
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Conversions</CardTitle>
-                    <Target className="h-4 w-4 text-muted-foreground" />
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3 sm:p-4">
+                    <CardTitle className="text-xs sm:text-sm font-medium truncate">Conversions</CardTitle>
+                    <Target className="h-4 w-4 text-muted-foreground flex-shrink-0" />
                   </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold">{totalConversions}</div>
+                  <CardContent className="p-3 pt-0 sm:p-4 sm:pt-0">
+                    <div className="text-lg sm:text-2xl font-bold">{totalConversions}</div>
                     <p className="text-xs text-muted-foreground">{conversionRate}% conversion rate</p>
                   </CardContent>
                 </Card>
 
                 <Card style={antiYellowStyles}>
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Total Leads</CardTitle>
-                    <Users className="h-4 w-4 text-muted-foreground" />
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3 sm:p-4">
+                    <CardTitle className="text-xs sm:text-sm font-medium truncate">Total Leads</CardTitle>
+                    <Users className="h-4 w-4 text-muted-foreground flex-shrink-0" />
                   </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold">{totalLeads}</div>
+                  <CardContent className="p-3 pt-0 sm:p-4 sm:pt-0">
+                    <div className="text-lg sm:text-2xl font-bold">{totalLeads}</div>
                     <p className="text-xs text-muted-foreground">Generated leads</p>
                   </CardContent>
                 </Card>
 
                 <Card style={antiYellowStyles}>
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Commissions</CardTitle>
-                    <TrendingUp className="h-4 w-4 text-muted-foreground" />
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3 sm:p-4">
+                    <CardTitle className="text-xs sm:text-sm font-medium truncate">Commissions</CardTitle>
+                    <TrendingUp className="h-4 w-4 text-muted-foreground flex-shrink-0" />
                   </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold">${commissionEarnings.toLocaleString()}</div>
+                  <CardContent className="p-3 pt-0 sm:p-4 sm:pt-0">
+                    <div className="text-lg sm:text-2xl font-bold">${commissionEarnings.toLocaleString()}</div>
                     <p className="text-xs text-muted-foreground">Total earnings</p>
                   </CardContent>
                 </Card>

@@ -577,47 +577,47 @@ const ContractorPortalEnhanced: React.FC = () => {
             {/* Dashboard Tab */}
             <TabsContent value="dashboard" className="space-y-6">
               {/* Key Metrics */}
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+              <div className="grid grid-cols-2 sm:grid-cols-1 md:grid-cols-4 gap-4 sm:gap-6">
                 <Card style={antiYellowStyles}>
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Completed Projects</CardTitle>
-                    <Building2 className="h-4 w-4 text-muted-foreground" />
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3 sm:p-4">
+                    <CardTitle className="text-xs sm:text-sm font-medium truncate">Completed Projects</CardTitle>
+                    <Building2 className="h-4 w-4 text-muted-foreground flex-shrink-0" />
                   </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold">{completedProjects}</div>
+                  <CardContent className="p-3 pt-0 sm:p-4 sm:pt-0">
+                    <div className="text-lg sm:text-2xl font-bold">{completedProjects}</div>
                     <p className="text-xs text-muted-foreground">+12% from last month</p>
                   </CardContent>
                 </Card>
 
                 <Card style={antiYellowStyles}>
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Active Projects</CardTitle>
-                    <FileText className="h-4 w-4 text-muted-foreground" />
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3 sm:p-4">
+                    <CardTitle className="text-xs sm:text-sm font-medium truncate">Active Projects</CardTitle>
+                    <FileText className="h-4 w-4 text-muted-foreground flex-shrink-0" />
                   </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold">{activeProjects}</div>
+                  <CardContent className="p-3 pt-0 sm:p-4 sm:pt-0">
+                    <div className="text-lg sm:text-2xl font-bold">{activeProjects}</div>
                     <p className="text-xs text-muted-foreground">Currently in progress</p>
                   </CardContent>
                 </Card>
 
                 <Card style={antiYellowStyles}>
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Pending Bids</CardTitle>
-                    <Mail className="h-4 w-4 text-muted-foreground" />
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3 sm:p-4">
+                    <CardTitle className="text-xs sm:text-sm font-medium truncate">Pending Bids</CardTitle>
+                    <Mail className="h-4 w-4 text-muted-foreground flex-shrink-0" />
                   </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold">{pendingBids}</div>
+                  <CardContent className="p-3 pt-0 sm:p-4 sm:pt-0">
+                    <div className="text-lg sm:text-2xl font-bold">{pendingBids}</div>
                     <p className="text-xs text-muted-foreground">Awaiting response</p>
                   </CardContent>
                 </Card>
 
                 <Card style={antiYellowStyles}>
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
-                    <DollarSign className="h-4 w-4 text-muted-foreground" />
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3 sm:p-4">
+                    <CardTitle className="text-xs sm:text-sm font-medium truncate">Total Revenue</CardTitle>
+                    <DollarSign className="h-4 w-4 text-muted-foreground flex-shrink-0" />
                   </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold">${totalRevenue.toLocaleString()}</div>
+                  <CardContent className="p-3 pt-0 sm:p-4 sm:pt-0">
+                    <div className="text-lg sm:text-2xl font-bold">${totalRevenue.toLocaleString()}</div>
                     <p className="text-xs text-muted-foreground">+8% from last month</p>
                   </CardContent>
                 </Card>
