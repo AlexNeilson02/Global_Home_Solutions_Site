@@ -1053,14 +1053,6 @@ export default function AdminPortalEnhanced() {
                             <span>Specialties: {contractor.specialties?.length || 0}</span>
                           </div>
                         </div>
-                        <div className="flex gap-2">
-                          <Badge variant={contractor.isVerified ? "default" : "outline"}>
-                            {contractor.isVerified ? "Verified" : "Unverified"}
-                          </Badge>
-                          <Badge variant={contractor.isActive ? "default" : "destructive"}>
-                            {contractor.isActive ? "Active" : "Inactive"}
-                          </Badge>
-                        </div>
                       </div>
                       <div className="flex justify-end gap-2">
                         <Button size="sm" variant="outline" onClick={() => handleContractorView(contractor)} className="border-black text-black hover:bg-gray-100 dark:border-white dark:text-white dark:hover:bg-gray-800">
@@ -1092,16 +1084,19 @@ export default function AdminPortalEnhanced() {
                   {bidRequests.map((request: any) => (
                     <Card key={request.id} className="p-4" style={antiYellowStyles}>
                       <div className="space-y-3">
-                        <div className="flex justify-between items-start">
-                          <div>
-                            <p className="font-medium text-sm">{request.fullName}</p>
-                            <p className="text-xs text-gray-500">{request.email}</p>
-                            <p className="text-xs text-gray-500">{request.phone}</p>
+                        <div className="flex justify-between items-start gap-2">
+                          <div className="flex-1 min-w-0">
+                            <p className="font-medium text-sm truncate">{request.fullName}</p>
+                            <p className="text-xs text-gray-500 truncate">{request.email}</p>
+                            <p className="text-xs text-gray-500 truncate">{request.phone}</p>
                           </div>
-                          <Badge variant={
-                            request.status === 'pending' ? "outline" :
-                            request.status === 'approved' ? "default" : "destructive"
-                          }>
+                          <Badge 
+                            variant={
+                              request.status === 'pending' ? "outline" :
+                              request.status === 'approved' ? "default" : "destructive"
+                            }
+                            className="flex-shrink-0 text-xs px-2 py-1"
+                          >
                             {request.status}
                           </Badge>
                         </div>
