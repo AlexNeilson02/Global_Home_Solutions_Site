@@ -13,6 +13,7 @@ export default function HomePage() {
   const [selectedContractor, setSelectedContractor] = useState<any>(null);
   const [showBidForm, setShowBidForm] = useState(false);
   const [trackedSalesperson, setTrackedSalesperson] = useState<any>(null);
+  const [scrollProgress, setScrollProgress] = useState(0);
 
   // Fetch contractors from database
   const { data: contractors, isLoading } = useQuery({
@@ -69,6 +70,19 @@ export default function HomePage() {
       setSearchTriggered(false);
     }
   }, [trade, searchTriggered]);
+
+  // Handle scroll for gradient effect
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollTop = window.pageYOffset;
+      const documentHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = Math.min(scrollTop / documentHeight, 1);
+      setScrollProgress(progress);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const handleCategoryClick = (category) => {
     setTrade(category);
@@ -127,7 +141,16 @@ export default function HomePage() {
         </div>
       )}
       
-      <header>
+      <header 
+        style={{
+          background: `linear-gradient(135deg, 
+            hsl(${220 + scrollProgress * 40}, 70%, ${35 + scrollProgress * 15}%) 0%, 
+            hsl(${240 + scrollProgress * 30}, 75%, ${45 + scrollProgress * 20}%) 25%, 
+            hsl(${220 + scrollProgress * 35}, 70%, ${40 + scrollProgress * 25}%) 50%, 
+            hsl(${230 + scrollProgress * 25}, 80%, ${50 + scrollProgress * 30}%) 75%, 
+            hsl(${210 + scrollProgress * 45}, 85%, ${60 + scrollProgress * 25}%) 100%)`
+        }}
+      >
         <img src={logoPath} alt="Global Home Solutions Logo" className="logo-hero" />
         <h1>Global Home Solutions</h1>
         <p className="culture">
