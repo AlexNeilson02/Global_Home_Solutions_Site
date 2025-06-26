@@ -245,10 +245,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const newContractor = await storage.createContractor({
         userId: newUser.id,
         companyName,
-        description: description || 'Professional contractor services',
-        hourlyRate: hourlyRate ? parseFloat(hourlyRate) : null,
-        serviceAreas: serviceAreas || [],
-        isActive: true
+        description: description || 'Professional contractor services'
       });
       console.log('Contractor created successfully:', newContractor.id);
 

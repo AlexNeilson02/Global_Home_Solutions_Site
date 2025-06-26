@@ -111,23 +111,7 @@ export class DatabaseStorage implements IStorage {
   async createContractor(insertContractor: InsertContractor): Promise<Contractor> {
     console.log('DatabaseStorage.createContractor called with:', insertContractor);
     try {
-      const [contractor] = await db.insert(contractors).values({
-        userId: insertContractor.userId,
-        companyName: insertContractor.companyName,
-        description: insertContractor.description || 'Professional contractor services',
-        specialties: insertContractor.specialties || null,
-        serviceAreas: insertContractor.serviceAreas || null,
-        serviceCategoryIds: insertContractor.serviceCategoryIds || null,
-        hourlyRate: insertContractor.hourlyRate || null,
-        logoUrl: insertContractor.logoUrl || null,
-        videoUrl: insertContractor.videoUrl || null,
-        isVerified: insertContractor.isVerified || false,
-        isActive: insertContractor.isActive !== undefined ? insertContractor.isActive : true,
-        subscriptionTier: insertContractor.subscriptionTier || 'basic',
-        monthlySpendCap: insertContractor.monthlySpendCap || 1000,
-        paymentMethodAdded: insertContractor.paymentMethodAdded || false,
-        mediaFiles: insertContractor.mediaFiles || []
-      }).returning();
+      const [contractor] = await db.insert(contractors).values(insertContractor).returning();
       console.log('Contractor created successfully in database:', contractor);
       return contractor;
     } catch (error) {
