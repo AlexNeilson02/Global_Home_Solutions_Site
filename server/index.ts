@@ -1,5 +1,5 @@
 import express, { type Request, Response, NextFunction } from "express";
-import { registerRoutes } from "./routes-clean";
+import { registerRoutes } from "./routes";
 import { enhancedRouter } from "./enhanced-routes.js";
 import { commissionRouter } from "./commission-routes";
 import { videoUploadRouter } from "./video-upload";
