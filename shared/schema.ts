@@ -62,7 +62,7 @@ export const contractors = pgTable("contractors", {
   subscriptionTier: text("subscription_tier").default("basic"), // basic, premium, pro
   monthlySpendCap: real("monthly_spend_cap").default(1000),
   paymentMethodAdded: boolean("payment_method_added").default(false),
-  mediaFiles: json("media_files").$type<{url: string, type: 'image' | 'video', name: string}[]>().default([]),
+  // Media files are now stored in AWS S3, URLs tracked separately for performance
 });
 
 // Salespersons table
@@ -156,7 +156,7 @@ export const documents = pgTable("documents", {
   fileType: text("file_type").notNull(), // image, video, document, etc.
   mimeType: text("mime_type").notNull(),
   fileSize: integer("file_size").notNull(), // in bytes
-  fileUrl: text("file_url").notNull(), // base64 data URL or file path
+  fileUrl: text("file_url").notNull(), // AWS S3 URL only for performance
   uploadedBy: integer("uploaded_by").notNull().references(() => users.id),
   category: text("category").notNull().default("general"), // project, portfolio, profile, contract, etc.
   relatedId: integer("related_id"), // ID of related entity (project, bid request, etc.)

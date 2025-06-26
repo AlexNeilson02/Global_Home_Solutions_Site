@@ -130,7 +130,7 @@ export class DatabaseStorage implements IStorage {
       if (insertContractor.subscriptionTier) contractorData.subscriptionTier = insertContractor.subscriptionTier;
       if (insertContractor.monthlySpendCap !== undefined) contractorData.monthlySpendCap = insertContractor.monthlySpendCap;
       if (insertContractor.paymentMethodAdded !== undefined) contractorData.paymentMethodAdded = insertContractor.paymentMethodAdded;
-      if (insertContractor.mediaFiles) contractorData.mediaFiles = insertContractor.mediaFiles;
+      // Media files are now handled separately through AWS S3 for performance
       
       console.log('Processed contractor data for insertion:', contractorData);
       const [contractor] = await db.insert(contractors).values(contractorData as any).returning();

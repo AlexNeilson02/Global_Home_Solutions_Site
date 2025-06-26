@@ -2,30 +2,34 @@ import { Router } from 'express';
 import { Request, Response } from 'express';
 import { storage } from './database-storage.js';
 import { isAuthenticated, requireRole } from './auth.js';
-import { upload, fileToBase64 } from './file-upload-service.js';
+import { s3Upload } from './aws-s3-config.js';
+import { MediaService } from './media-service.js';
 import path from 'path';
 
 export const enhancedRouter = Router();
 
-// File upload endpoint for contractor logos and media (now using AWS S3)
-enhancedRouter.post('/upload/contractor-media', isAuthenticated, upload.array('files', 10), async (req: Request, res: Response) => {
+// File upload endpoint for contractor logos and media (optimized AWS S3)
+enhancedRouter.post('/upload/contractor-media', isAuthenticated, s3Upload.array('files', 10), async (req: Request, res: Response) => {
   try {
     const files = req.files as any[];
     if (!files || files.length === 0) {
       return res.status(400).json({ message: 'No files uploaded' });
     }
 
-    const uploadedFiles = files.map(file => {
-      return {
-        url: file.location, // S3 URL from multer-s3
-        key: file.key, // S3 key for future reference
-        type: file.mimetype.startsWith('image/') ? 'image' : 'video',
-        name: file.originalname,
-        size: file.size
-      };
-    });
+    const userId = (req as any).user?.id;
+    if (!userId) {
+      return res.status(401).json({ message: 'User not authenticated' });
+    }
 
-    res.json({ files: uploadedFiles });
+    // Process files through optimized media service
+    const mediaFiles = await MediaService.uploadFiles(
+      files,
+      userId,
+      'contractor-media',
+      undefined
+    );
+
+    res.json({ files: mediaFiles });
   } catch (error) {
     console.error('File upload error:', error);
     res.status(500).json({ message: 'File upload failed' });
