@@ -266,7 +266,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         throw new Error(`Contractor profile creation failed: ${contractorError.message}`);
       }
 
-      res.status(200).json({ 
+      const responseData = { 
         message: "Contractor created successfully",
         contractor: newContractor,
         user: {
@@ -276,7 +276,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
           email: newUser.email,
           phone: newUser.phone
         }
-      });
+      };
+      console.log('Sending response:', JSON.stringify(responseData, null, 2));
+      res.status(200).json(responseData);
     } catch (error) {
       console.error('Error creating contractor:', error);
       console.error('Error stack:', error.stack);

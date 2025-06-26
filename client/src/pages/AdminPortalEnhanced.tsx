@@ -282,9 +282,23 @@ export default function AdminPortalEnhanced() {
       try {
         const response = await apiRequest('POST', '/api/contractors', contractorData);
         console.log('Frontend: Got response:', response.status, response.statusText);
-        const result = await response.json();
-        console.log('Frontend: Parsed JSON result:', result);
-        return result;
+        console.log('Frontend: Response headers:', [...response.headers.entries()]);
+        
+        // Check if response is actually JSON
+        const contentType = response.headers.get('content-type');
+        console.log('Frontend: Content-Type:', contentType);
+        
+        // Get response text first to see what we're dealing with
+        const responseText = await response.clone().text();
+        console.log('Frontend: Response text (first 500 chars):', responseText.substring(0, 500));
+        
+        if (contentType && contentType.includes('application/json')) {
+          const result = await response.json();
+          console.log('Frontend: Parsed JSON result:', result);
+          return result;
+        } else {
+          throw new Error(`Server returned non-JSON response: ${contentType}. Response: ${responseText.substring(0, 200)}`);
+        }
       } catch (error) {
         console.error('Frontend: Mutation error:', error);
         throw error;
