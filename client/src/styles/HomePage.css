@@ -43,7 +43,6 @@ header {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  transition: background 0.1s ease-out;
 }
 header h1 {
   text-align: center;
