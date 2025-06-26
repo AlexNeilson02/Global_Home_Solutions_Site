@@ -538,13 +538,12 @@ const ContractorPortalEnhanced: React.FC = () => {
 
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6 pb-20 sm:pb-0">
             {/* Desktop/Tablet Navigation - Hidden on mobile */}
-            <TabsList className="hidden sm:grid w-full grid-cols-7">
+            <TabsList className="hidden sm:grid w-full grid-cols-6">
               <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
               <TabsTrigger value="profile">Company Profile</TabsTrigger>
-              <TabsTrigger value="projects">Projects</TabsTrigger>
+              <TabsTrigger value="projects">Sent Bids</TabsTrigger>
               <TabsTrigger value="bids">Bid Requests</TabsTrigger>
               <TabsTrigger value="documents">Documents</TabsTrigger>
-              <TabsTrigger value="tracking">Project Tracking</TabsTrigger>
               <TabsTrigger value="analytics">Analytics</TabsTrigger>
             </TabsList>
 
@@ -576,7 +575,7 @@ const ContractorPortalEnhanced: React.FC = () => {
                   }`}
                 >
                   <FileText className="h-5 w-5" />
-                  <span>Projects</span>
+                  <span>Sent Bids</span>
                 </button>
                 <button
                   onClick={() => setActiveTab("bids")}
@@ -595,15 +594,6 @@ const ContractorPortalEnhanced: React.FC = () => {
                 >
                   <FileText className="h-4 w-4" />
                   <span>Docs</span>
-                </button>
-                <button
-                  onClick={() => setActiveTab("tracking")}
-                  className={`flex flex-col items-center justify-center gap-1 text-xs hover:bg-gray-100 dark:hover:bg-gray-800 px-4 min-w-[80px] flex-shrink-0 ${
-                    activeTab === "tracking" ? "text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950" : ""
-                  }`}
-                >
-                  <MapPin className="h-4 w-4" />
-                  <span>Tracking</span>
                 </button>
                 <button
                   onClick={() => setActiveTab("analytics")}
@@ -1285,72 +1275,7 @@ const ContractorPortalEnhanced: React.FC = () => {
               </Card>
             </TabsContent>
 
-            {/* Project Tracking Tab */}
-            <TabsContent value="tracking" className="space-y-6">
-              <Card style={antiYellowStyles}>
-                <CardHeader>
-                  <CardTitle>Project Tracking & Management</CardTitle>
-                  <CardDescription>
-                    Track project progress with detailed timelines and milestone management
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  {bidRequests.filter((bid: any) => bid.status === 'won' || bid.status === 'bid_sent').length > 0 ? (
-                    <div className="space-y-6">
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {bidRequests.filter((bid: any) => bid.status === 'won' || bid.status === 'bid_sent').map((project: any) => (
-                          <Card key={project.id} className="cursor-pointer hover:shadow-md transition-shadow" style={antiYellowStyles}>
-                            <CardHeader className="pb-3">
-                              <div className="flex items-center justify-between">
-                                <CardTitle className="text-base">{project.serviceRequested}</CardTitle>
-                                <Badge variant={
-                                  project.status === 'won' ? 'default' :
-                                  project.status === 'bid_sent' ? 'secondary' : 'outline'
-                                }>
-                                  {project.status}
-                                </Badge>
-                              </div>
-                            </CardHeader>
-                            <CardContent className="space-y-3">
-                              <p className="text-sm text-muted-foreground line-clamp-2">
-                                {project.description}
-                              </p>
-                              <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                                <MapPin className="h-3 w-3" />
-                                <span className="truncate">{project.address}</span>
-                              </div>
-                              {project.budget && (
-                                <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                                  <DollarSign className="h-3 w-3" />
-                                  <span>{project.budget}</span>
-                                </div>
-                              )}
-                              <div className="pt-2 space-y-2">
-                                <ProjectTimeline 
-                                  projectId={project.id} 
-                                  canEdit={true}
-                                />
-                              </div>
-                            </CardContent>
-                          </Card>
-                        ))}
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="text-center py-12">
-                      <Building2 className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                      <h3 className="text-lg font-medium mb-2">No Active Projects</h3>
-                      <p className="text-muted-foreground mb-4">
-                        Win some bids to start tracking projects with detailed timelines
-                      </p>
-                      <Button onClick={() => setActiveTab('bids')} style={antiYellowInputStyles}>
-                        View Bid Requests
-                      </Button>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            </TabsContent>
+
 
             {/* Analytics Tab */}
             <TabsContent value="analytics" className="space-y-6">
