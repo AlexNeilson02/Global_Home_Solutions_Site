@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -277,10 +278,8 @@ export default function AdminPortalEnhanced() {
   // Contractor create mutation
   const createContractorMutation = useMutation({
     mutationFn: async (contractorData: any) => {
-      return apiRequest('/api/contractors', {
-        method: 'POST',
-        body: contractorData
-      });
+      const response = await apiRequest('POST', '/api/contractors', contractorData);
+      return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/contractors'] });
