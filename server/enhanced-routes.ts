@@ -7,20 +7,21 @@ import path from 'path';
 
 export const enhancedRouter = Router();
 
-// File upload endpoint for contractor logos and media
+// File upload endpoint for contractor logos and media (now using AWS S3)
 enhancedRouter.post('/upload/contractor-media', isAuthenticated, upload.array('files', 10), async (req: Request, res: Response) => {
   try {
-    const files = req.files as Express.Multer.File[];
+    const files = req.files as any[];
     if (!files || files.length === 0) {
       return res.status(400).json({ message: 'No files uploaded' });
     }
 
     const uploadedFiles = files.map(file => {
-      const base64Data = fileToBase64(file.path, file.mimetype);
       return {
-        url: base64Data,
+        url: file.location, // S3 URL from multer-s3
+        key: file.key, // S3 key for future reference
         type: file.mimetype.startsWith('image/') ? 'image' : 'video',
-        name: file.originalname
+        name: file.originalname,
+        size: file.size
       };
     });
 

@@ -1,34 +1,16 @@
 import { Router, Request, Response } from 'express';
-import multer from 'multer';
-import path from 'path';
-import fs from 'fs';
 import { storage } from './database-storage';
 import { isAuthenticated } from './auth';
+import { s3Upload } from './aws-s3-config';
+import multer from 'multer';
 
 const router = Router();
 
-// Ensure uploads directory exists
-const uploadsDir = path.join(process.cwd(), 'uploads', 'videos');
-if (!fs.existsSync(uploadsDir)) {
-  fs.mkdirSync(uploadsDir, { recursive: true });
-}
-
-// Configure multer for video uploads
-const videoStorage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, uploadsDir);
-  },
-  filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    const extension = path.extname(file.originalname);
-    cb(null, `contractor-video-${uniqueSuffix}${extension}`);
-  }
-});
-
+// Configure multer for video uploads with S3
 const videoUpload = multer({
-  storage: videoStorage,
+  storage: s3Upload.storage,
   limits: {
-    fileSize: 15 * 1024 * 1024, // 15MB limit
+    fileSize: 100 * 1024 * 1024, // 100MB limit for better quality videos
   },
   fileFilter: (req, file, cb) => {
     // Check if file is a video
