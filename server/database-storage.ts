@@ -111,12 +111,35 @@ export class DatabaseStorage implements IStorage {
   async createContractor(insertContractor: InsertContractor): Promise<Contractor> {
     console.log('DatabaseStorage.createContractor called with:', insertContractor);
     try {
-      const [contractor] = await db.insert(contractors).values(insertContractor).returning();
+      // Create contractor with explicit field mapping
+      const contractorData: any = {
+        userId: insertContractor.userId,
+        companyName: insertContractor.companyName,
+        description: insertContractor.description || 'Professional contractor services'
+      };
+
+      // Add optional fields only if they exist
+      if (insertContractor.hourlyRate !== undefined) contractorData.hourlyRate = insertContractor.hourlyRate;
+      if (insertContractor.specialties) contractorData.specialties = insertContractor.specialties;
+      if (insertContractor.serviceAreas) contractorData.serviceAreas = insertContractor.serviceAreas;
+      if (insertContractor.serviceCategoryIds) contractorData.serviceCategoryIds = insertContractor.serviceCategoryIds;
+      if (insertContractor.logoUrl) contractorData.logoUrl = insertContractor.logoUrl;
+      if (insertContractor.videoUrl) contractorData.videoUrl = insertContractor.videoUrl;
+      if (insertContractor.isVerified !== undefined) contractorData.isVerified = insertContractor.isVerified;
+      if (insertContractor.isActive !== undefined) contractorData.isActive = insertContractor.isActive;
+      if (insertContractor.subscriptionTier) contractorData.subscriptionTier = insertContractor.subscriptionTier;
+      if (insertContractor.monthlySpendCap !== undefined) contractorData.monthlySpendCap = insertContractor.monthlySpendCap;
+      if (insertContractor.paymentMethodAdded !== undefined) contractorData.paymentMethodAdded = insertContractor.paymentMethodAdded;
+      if (insertContractor.mediaFiles) contractorData.mediaFiles = insertContractor.mediaFiles;
+      
+      console.log('Processed contractor data for insertion:', contractorData);
+      const [contractor] = await db.insert(contractors).values(contractorData as any).returning();
       console.log('Contractor created successfully in database:', contractor);
       return contractor;
     } catch (error) {
       console.error('Error creating contractor in database:', error);
-      throw error;
+      console.error('Error details:', error);
+      throw new Error(`Failed to create contractor: ${error.message}`);
     }
   }
 

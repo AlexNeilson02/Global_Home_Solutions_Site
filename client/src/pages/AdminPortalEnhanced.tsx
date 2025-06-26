@@ -283,8 +283,13 @@ export default function AdminPortalEnhanced() {
         body: JSON.stringify(contractorData)
       });
       if (!response.ok) {
-        const error = await response.text();
-        throw new Error(error);
+        try {
+          const errorData = await response.json();
+          throw new Error(errorData.error || errorData.message || 'Failed to create contractor');
+        } catch (parseError) {
+          const errorText = await response.text();
+          throw new Error(errorText || 'Failed to create contractor');
+        }
       }
       return response.json();
     },
