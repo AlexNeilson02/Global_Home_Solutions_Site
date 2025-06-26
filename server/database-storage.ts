@@ -39,8 +39,15 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
-    const [user] = await db.insert(users).values(insertUser).returning();
-    return user;
+    console.log('DatabaseStorage.createUser called with:', insertUser);
+    try {
+      const [user] = await db.insert(users).values(insertUser).returning();
+      console.log('User created successfully in database:', user);
+      return user;
+    } catch (error) {
+      console.error('Error creating user in database:', error);
+      throw error;
+    }
   }
 
   async updateUser(id: number, userData: Partial<User>): Promise<User | undefined> {
@@ -102,8 +109,31 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createContractor(insertContractor: InsertContractor): Promise<Contractor> {
-    const [contractor] = await db.insert(contractors).values(insertContractor).returning();
-    return contractor;
+    console.log('DatabaseStorage.createContractor called with:', insertContractor);
+    try {
+      const [contractor] = await db.insert(contractors).values({
+        userId: insertContractor.userId,
+        companyName: insertContractor.companyName,
+        description: insertContractor.description || 'Professional contractor services',
+        specialties: insertContractor.specialties || null,
+        serviceAreas: insertContractor.serviceAreas || null,
+        serviceCategoryIds: insertContractor.serviceCategoryIds || null,
+        hourlyRate: insertContractor.hourlyRate || null,
+        logoUrl: insertContractor.logoUrl || null,
+        videoUrl: insertContractor.videoUrl || null,
+        isVerified: insertContractor.isVerified || false,
+        isActive: insertContractor.isActive !== undefined ? insertContractor.isActive : true,
+        subscriptionTier: insertContractor.subscriptionTier || 'basic',
+        monthlySpendCap: insertContractor.monthlySpendCap || 1000,
+        paymentMethodAdded: insertContractor.paymentMethodAdded || false,
+        mediaFiles: insertContractor.mediaFiles || []
+      }).returning();
+      console.log('Contractor created successfully in database:', contractor);
+      return contractor;
+    } catch (error) {
+      console.error('Error creating contractor in database:', error);
+      throw error;
+    }
   }
 
   async updateContractor(id: number, contractorData: Partial<Contractor>): Promise<Contractor | undefined> {
