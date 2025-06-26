@@ -1,94 +1,74 @@
 import multer from 'multer';
-import path from 'path';
-import fs from 'fs';
+import { s3Upload, generatePresignedUrl, getS3Url, uploadFileToS3, deleteFileFromS3, extractS3Key } from './aws-s3-config';
 
-// Ensure uploads directory exists
-const uploadsDir = path.join(process.cwd(), 'uploads');
-if (!fs.existsSync(uploadsDir)) {
-  fs.mkdirSync(uploadsDir, { recursive: true });
-}
+// Export S3-based upload middleware
+export const upload = s3Upload;
 
-// Configure multer for file uploads
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, uploadsDir);
-  },
-  filename: (req, file, cb) => {
-    // Generate unique filename with timestamp
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
-  }
-});
-
-// File filter to allow only images and videos
-const fileFilter = (req: any, file: any, cb: any) => {
-  const allowedMimes = [
-    'image/jpeg',
-    'image/jpg', 
-    'image/png',
-    'image/gif',
-    'image/webp',
-    'video/mp4',
-    'video/webm',
-    'video/mov',
-    'video/avi'
-  ];
-  
-  if (allowedMimes.includes(file.mimetype)) {
-    cb(null, true);
-  } else {
-    cb(new Error('Invalid file type. Only images and videos are allowed.'), false);
-  }
-};
-
-export const upload = multer({
-  storage,
-  fileFilter,
-  limits: {
-    fileSize: 100 * 1024 * 1024, // 100MB limit for videos
-    files: 10 // Maximum 10 files
-  }
-});
-
-// Helper function to convert file to base64 data URL
-export const fileToBase64 = (filePath: string, mimeType: string): string => {
+// Helper function to get file URL from S3
+export const getFileUrl = async (key: string, usePresigned: boolean = false): Promise<string> => {
   try {
-    const fileBuffer = fs.readFileSync(filePath);
-    const base64String = fileBuffer.toString('base64');
-    return `data:${mimeType};base64,${base64String}`;
+    if (usePresigned) {
+      return await generatePresignedUrl(key);
+    }
+    return getS3Url(key);
   } catch (error) {
-    console.error('Error converting file to base64:', error);
+    console.error('Error getting file URL:', error);
     throw error;
   }
 };
 
-// Helper function to save base64 data as file
-export const saveBase64ToFile = (base64Data: string, filename: string): string => {
+// Helper function for backward compatibility - converts S3 file to data URL if needed
+export const fileToBase64 = async (s3Key: string, mimeType: string): Promise<string> => {
   try {
-    // Extract base64 data (remove data:mime;base64, prefix)
+    // For S3 files, return the direct URL instead of base64
+    // This improves performance by avoiding large base64 strings
+    return getS3Url(s3Key);
+  } catch (error) {
+    console.error('Error getting S3 file URL:', error);
+    throw error;
+  }
+};
+
+// Helper function to save base64 data to S3
+export const saveBase64ToS3 = async (base64Data: string, filename: string, userId?: string): Promise<string> => {
+  try {
+    // Extract base64 data and mime type
     const matches = base64Data.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);
     if (!matches || matches.length !== 3) {
       throw new Error('Invalid base64 data format');
     }
     
+    const mimeType = matches[1];
     const buffer = Buffer.from(matches[2], 'base64');
-    const filePath = path.join(uploadsDir, filename);
-    fs.writeFileSync(filePath, buffer);
     
-    return filePath;
+    // Create S3 key
+    const timestamp = Date.now();
+    const randomSuffix = Math.round(Math.random() * 1E9);
+    const folder = mimeType.startsWith('image/') ? 'images' : 'videos';
+    const key = `${folder}/${userId || 'anonymous'}/${timestamp}-${randomSuffix}-${filename}`;
+    
+    // Upload to S3
+    const url = await uploadFileToS3(buffer, key, mimeType, {
+      originalName: filename,
+      uploadedBy: userId || 'anonymous',
+      uploadedAt: new Date().toISOString(),
+    });
+    
+    return url;
   } catch (error) {
-    console.error('Error saving base64 to file:', error);
+    console.error('Error saving base64 to S3:', error);
     throw error;
   }
 };
 
-// Helper function to delete file
-export const deleteFile = (filePath: string): void => {
+// Helper function to delete file from S3
+export const deleteFile = async (s3Url: string): Promise<void> => {
   try {
-    if (fs.existsSync(filePath)) {
-      fs.unlinkSync(filePath);
+    const key = extractS3Key(s3Url);
+    if (key) {
+      await deleteFileFromS3(key);
     }
   } catch (error) {
-    console.error('Error deleting file:', error);
+    console.error('Error deleting file from S3:', error);
   }
 };
