@@ -278,8 +278,17 @@ export default function AdminPortalEnhanced() {
   // Contractor create mutation
   const createContractorMutation = useMutation({
     mutationFn: async (contractorData: any) => {
-      const response = await apiRequest('POST', '/api/contractors', contractorData);
-      return response.json();
+      console.log('Frontend: Sending contractor data:', contractorData);
+      try {
+        const response = await apiRequest('POST', '/api/contractors', contractorData);
+        console.log('Frontend: Got response:', response.status, response.statusText);
+        const result = await response.json();
+        console.log('Frontend: Parsed JSON result:', result);
+        return result;
+      } catch (error) {
+        console.error('Frontend: Mutation error:', error);
+        throw error;
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/contractors'] });

@@ -81,9 +81,19 @@ export async function setupAuth(app: Express) {
 
 // Authentication middleware
 export const isAuthenticated: RequestHandler = (req, res, next) => {
+  console.log('Auth check - isAuthenticated:', req.isAuthenticated());
+  console.log('Auth check - user:', req.user ? 'exists' : 'null');
+  console.log('Auth check - session:', req.session ? 'exists' : 'null');
+  
   if (req.isAuthenticated()) {
     return next();
   }
+  
+  // For API routes, return JSON error instead of redirecting
+  if (req.path.startsWith('/api/')) {
+    return res.status(401).json({ message: "Unauthorized - Please log in" });
+  }
+  
   res.status(401).json({ message: "Unauthorized" });
 };
 
