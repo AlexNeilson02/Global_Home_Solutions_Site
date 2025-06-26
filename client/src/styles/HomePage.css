@@ -38,8 +38,6 @@ html, body {
 header {
   text-align: center;
   padding: 80px 20px 120px 20px;
-  background: linear-gradient(135deg, #1e3a8a 0%, #3730a3 100%);
-  color: white;
   min-height: 100vh;
   display: flex;
   flex-direction: column;

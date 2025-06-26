@@ -227,18 +227,7 @@ export default function HomePage() {
           </div>
         </section>
       )}
-      <section className="info-section">
-        <button className="info-btn">Understanding Construction & the Bidding Process</button>
-        <div className="promise-section">
-          <h3>Why Homeowners Trust Global Home Solutions</h3>
-          <ul>
-            <li>Qualified contractors only</li>
-            <li>Guaranteed 24-hour response</li>
-            <li>Bids in less than 5 days</li>
-            <li>Person-to-person service</li>
-          </ul>
-        </div>
-      </section>
+      
 
       {/* Bid Request Form Modal */}
       {selectedContractor && (
