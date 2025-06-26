@@ -241,12 +241,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log('User created successfully:', newUser.id);
 
       // Create contractor profile
-      console.log('Creating contractor profile...');
-      const newContractor = await storage.createContractor({
+      console.log('Creating contractor profile for user ID:', newUser.id);
+      const contractorData = {
         userId: newUser.id,
         companyName,
-        description: description || 'Professional contractor services'
-      });
+        description: description || 'Professional contractor services',
+        hourlyRate: hourlyRate ? parseFloat(hourlyRate) : null,
+        serviceAreas: serviceAreas || null
+      };
+      console.log('Contractor data to insert:', contractorData);
+      const newContractor = await storage.createContractor(contractorData);
       console.log('Contractor created successfully:', newContractor.id);
 
       res.status(201).json({ 
