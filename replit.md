@@ -45,10 +45,11 @@ This is a comprehensive home services platform that connects homeowners with con
 - **Contractor specialty** matching
 
 ### File Management
-- **Video upload system** with duration and size validation
-- **Image handling** for contractor profiles and portfolios
-- **Base64 encoding** for file storage and transmission
-- **Multer integration** for secure file processing
+- **AWS S3 cloud storage** for scalable media hosting
+- **Video upload system** with 100MB size limit and cloud optimization
+- **Image handling** with S3 URLs for faster loading
+- **Multer-S3 integration** for direct cloud uploads
+- **Progressive upload** with progress tracking
 
 ## Data Flow
 

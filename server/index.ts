@@ -3,6 +3,7 @@ import { registerRoutes } from "./routes-clean";
 import { enhancedRouter } from "./enhanced-routes.js";
 import { commissionRouter } from "./commission-routes";
 import { videoUploadRouter } from "./video-upload";
+import { s3TestRouter } from "./s3-test";
 import { setupVite, serveStatic, log } from "./vite";
 import { seedDatabase } from "./seed-data";
 import { seedCommissionData } from "./seed-commission-data";
@@ -69,8 +70,8 @@ app.use((req, res, next) => {
   // Register video upload routes
   app.use('/api/video', videoUploadRouter);
   
-  // Serve uploaded files statically
-  app.use('/uploads', express.static('uploads'));
+  // Register S3 test routes
+  app.use('/api/s3', s3TestRouter);
   
   // Seed the database with initial data
   await seedDatabase();
