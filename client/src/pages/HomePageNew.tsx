@@ -3,6 +3,7 @@ import { useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import BidRequestForm from "@/components/BidRequestForm";
+import { WatermelonLogo } from "../components/WatermelonLogo";
 import logoPath from "@/assets/global-home-solutions-logo.png";
 import "../styles/HomePage.css";
 
