@@ -113,7 +113,7 @@ enhancedRouter.patch('/admin/users/:id/status', isAuthenticated, requireRole(['a
     const userId = parseInt(req.params.id);
     const { isActive } = req.body;
 
-    const updatedUser = await storage.updateUser(userId, { isActive });
+    const updatedUser = await storage.getUser(userId);
     
     if (!updatedUser) {
       return res.status(404).json({ message: 'User not found' });

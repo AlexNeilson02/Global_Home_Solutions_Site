@@ -36,7 +36,7 @@ export const createOptimizedImageElement = (src: string, alt: string): HTMLImage
   return img;
 };
 
-// Upload files to S3 via API
+// Upload files to S3 via optimized API
 export const uploadFilesToS3 = async (files: File[]): Promise<MediaFile[]> => {
   const formData = new FormData();
   
@@ -44,7 +44,7 @@ export const uploadFilesToS3 = async (files: File[]): Promise<MediaFile[]> => {
     formData.append('files', file);
   });
   
-  const response = await fetch('/api/upload/contractor-media', {
+  const response = await fetch('/api/enhanced/upload/contractor-media', {
     method: 'POST',
     body: formData,
     credentials: 'include',
