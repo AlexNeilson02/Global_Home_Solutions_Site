@@ -274,6 +274,51 @@ export default function AdminPortalEnhanced() {
     }
   });
 
+  // Contractor create mutation
+  const createContractorMutation = useMutation({
+    mutationFn: async (contractorData: any) => {
+      const response = await fetch('/api/contractors', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(contractorData)
+      });
+      if (!response.ok) {
+        const error = await response.text();
+        throw new Error(error);
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/contractors'] });
+      setContractorAddOpen(false);
+      // Reset form
+      setContractorAddData({
+        username: '',
+        password: '',
+        confirmPassword: '',
+        fullName: '',
+        email: '',
+        phone: '',
+        companyName: '',
+        description: '',
+        hourlyRate: '',
+        specialties: [],
+        serviceAreas: ''
+      });
+      toast({
+        title: "Success",
+        description: "Contractor created successfully"
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: `Failed to create contractor: ${error.message}`,
+        variant: "destructive"
+      });
+    }
+  });
+
   const handleViewDetails = (salesperson: any) => {
     setSelectedSalesperson(salesperson);
     setViewDetailsOpen(true);
@@ -989,65 +1034,43 @@ export default function AdminPortalEnhanced() {
                         </div>
                         <Button 
                           className="w-full bg-black text-white hover:bg-gray-800"
-                          onClick={async () => {
-                            try {
-                              // Validate passwords match
-                              if (contractorAddData.password !== contractorAddData.confirmPassword) {
-                                alert('Passwords do not match');
-                                return;
-                              }
-
-                              // Validate required fields
-                              if (!contractorAddData.username || !contractorAddData.fullName || !contractorAddData.email || 
-                                  !contractorAddData.companyName || !contractorAddData.password) {
-                                alert('Please fill in all required fields');
-                                return;
-                              }
-
-                              const response = await fetch('/api/contractors', {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({
-                                  username: contractorAddData.username,
-                                  password: contractorAddData.password,
-                                  fullName: contractorAddData.fullName,
-                                  email: contractorAddData.email,
-                                  phone: contractorAddData.phone,
-                                  companyName: contractorAddData.companyName,
-                                  description: contractorAddData.description,
-                                  hourlyRate: contractorAddData.hourlyRate ? parseFloat(contractorAddData.hourlyRate) : null,
-                                  serviceAreas: contractorAddData.serviceAreas ? contractorAddData.serviceAreas.split(',').map(area => area.trim()) : []
-                                })
+                          onClick={() => {
+                            // Validate passwords match
+                            if (contractorAddData.password !== contractorAddData.confirmPassword) {
+                              toast({
+                                title: "Error",
+                                description: "Passwords do not match",
+                                variant: "destructive"
                               });
-                              
-                              if (response.ok) {
-                                alert('Contractor created successfully!');
-                                // Reset form
-                                setContractorAddData({
-                                  username: '',
-                                  password: '',
-                                  confirmPassword: '',
-                                  fullName: '',
-                                  email: '',
-                                  phone: '',
-                                  companyName: '',
-                                  description: '',
-                                  hourlyRate: '',
-                                  specialties: [],
-                                  serviceAreas: ''
-                                });
-                                // Refresh data
-                                window.location.reload();
-                              } else {
-                                const error = await response.text();
-                                alert(`Error: ${error}`);
-                              }
-                            } catch (error) {
-                              alert(`Error: ${error}`);
+                              return;
                             }
+
+                            // Validate required fields
+                            if (!contractorAddData.username || !contractorAddData.fullName || !contractorAddData.email || 
+                                !contractorAddData.companyName || !contractorAddData.password) {
+                              toast({
+                                title: "Error",
+                                description: "Please fill in all required fields",
+                                variant: "destructive"
+                              });
+                              return;
+                            }
+
+                            createContractorMutation.mutate({
+                              username: contractorAddData.username,
+                              password: contractorAddData.password,
+                              fullName: contractorAddData.fullName,
+                              email: contractorAddData.email,
+                              phone: contractorAddData.phone,
+                              companyName: contractorAddData.companyName,
+                              description: contractorAddData.description,
+                              hourlyRate: contractorAddData.hourlyRate ? parseFloat(contractorAddData.hourlyRate) : null,
+                              serviceAreas: contractorAddData.serviceAreas ? contractorAddData.serviceAreas.split(',').map(area => area.trim()) : []
+                            });
                           }}
+                          disabled={createContractorMutation.isPending}
                         >
-                          Create Contractor
+                          {createContractorMutation.isPending ? 'Creating...' : 'Create Contractor'}
                         </Button>
                       </div>
                     </DialogContent>
