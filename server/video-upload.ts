@@ -6,27 +6,14 @@ import multer from 'multer';
 
 const router = Router();
 
-// Configure multer for video uploads with S3
-const videoUpload = multer({
-  storage: s3Upload.storage,
-  limits: {
-    fileSize: 100 * 1024 * 1024, // 100MB limit for better quality videos
-  },
-  fileFilter: (req, file, cb) => {
-    // Check if file is a video
-    if (file.mimetype.startsWith('video/')) {
-      cb(null, true);
-    } else {
-      cb(new Error('Only video files are allowed'));
-    }
-  }
-});
+// Use the S3 upload directly for videos
+const videoUpload = s3Upload;
 
-// Basic file validation (duration will be handled on client side)
-const validateVideoFile = (file: Express.Multer.File): { isValid: boolean; error?: string } => {
-  // Check file size (15MB limit)
-  if (file.size > 15 * 1024 * 1024) {
-    return { isValid: false, error: 'File size must be under 15MB' };
+// Basic file validation for S3 uploaded videos
+const validateVideoFile = (file: any): { isValid: boolean; error?: string } => {
+  // Check file size (100MB limit for S3)
+  if (file.size > 100 * 1024 * 1024) {
+    return { isValid: false, error: 'File size must be under 100MB' };
   }
 
   // Check if it's a video file
@@ -37,62 +24,51 @@ const validateVideoFile = (file: Express.Multer.File): { isValid: boolean; error
   return { isValid: true };
 };
 
-// Upload video endpoint
+// Upload video endpoint (now using AWS S3)
 router.post('/upload', isAuthenticated, videoUpload.single('video'), async (req: Request, res: Response) => {
   try {
     if (!req.file) {
       return res.status(400).json({ error: 'No video file provided' });
     }
 
-    const filePath = req.file.path;
-    const fileName = req.file.filename;
-
-    // Validate video file
-    const validation = validateVideoFile(req.file);
-    if (!validation.isValid) {
-      // Delete the uploaded file
-      fs.unlinkSync(filePath);
-      return res.status(400).json({ error: validation.error });
+    const file = req.file as any; // S3 multer file object
+    
+    // Basic validation
+    if (file.size > 100 * 1024 * 1024) { // 100MB limit
+      return res.status(400).json({ error: 'File size must be under 100MB' });
     }
 
-    // Generate public URL for the video
-    const videoUrl = `/uploads/videos/${fileName}`;
+    if (!file.mimetype.startsWith('video/')) {
+      return res.status(400).json({ error: 'Only video files are allowed' });
+    }
 
     res.json({
       success: true,
-      videoUrl,
-      fileSize: req.file.size,
-      message: 'Video uploaded successfully'
+      videoUrl: file.location, // S3 URL
+      key: file.key, // S3 key for future reference
+      fileSize: file.size,
+      message: 'Video uploaded successfully to cloud storage'
     });
 
   } catch (error: any) {
     console.error('Video upload error:', error);
-    
-    // Clean up uploaded file if it exists
-    if (req.file?.path && fs.existsSync(req.file.path)) {
-      fs.unlinkSync(req.file.path);
-    }
 
     if (error.code === 'LIMIT_FILE_SIZE') {
-      return res.status(400).json({ error: 'File size too large. Maximum 15MB allowed.' });
+      return res.status(400).json({ error: 'File size too large. Maximum 100MB allowed.' });
     }
 
     res.status(500).json({ error: error.message || 'Video upload failed' });
   }
 });
 
-// Delete video endpoint
-router.delete('/:filename', isAuthenticated, async (req: Request, res: Response) => {
+// Delete video from S3 endpoint
+router.delete('/:key', isAuthenticated, async (req: Request, res: Response) => {
   try {
-    const filename = req.params.filename;
-    const filePath = path.join(uploadsDir, filename);
-
-    if (fs.existsSync(filePath)) {
-      fs.unlinkSync(filePath);
-      res.json({ success: true, message: 'Video deleted successfully' });
-    } else {
-      res.status(404).json({ error: 'Video file not found' });
-    }
+    const { key } = req.params;
+    const { deleteFileFromS3 } = await import('./aws-s3-config');
+    
+    await deleteFileFromS3(decodeURIComponent(key));
+    res.json({ success: true, message: 'Video deleted successfully from cloud storage' });
   } catch (error: any) {
     console.error('Video delete error:', error);
     res.status(500).json({ error: 'Failed to delete video' });
