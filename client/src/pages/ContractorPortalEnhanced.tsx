@@ -613,23 +613,23 @@ const ContractorPortalEnhanced: React.FC = () => {
               <div className="grid grid-cols-2 sm:grid-cols-1 md:grid-cols-4 gap-3 sm:gap-6">
                 <Card style={antiYellowStyles}>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3 sm:p-4">
-                    <CardTitle className="text-xs sm:text-sm font-medium truncate">Completed Projects</CardTitle>
+                    <CardTitle className="text-xs sm:text-sm font-medium truncate">Won Bids</CardTitle>
                     <Building2 className="h-4 w-4 text-muted-foreground flex-shrink-0" />
                   </CardHeader>
                   <CardContent className="p-3 pt-0 sm:p-4 sm:pt-0">
-                    <div className="text-lg sm:text-2xl font-bold">{completedProjects}</div>
-                    <p className="text-xs text-muted-foreground">+12% from last month</p>
+                    <div className="text-lg sm:text-2xl font-bold">{bidRequests.filter((b: any) => b.status === 'won').length}</div>
+                    <p className="text-xs text-muted-foreground">Successful bids</p>
                   </CardContent>
                 </Card>
 
                 <Card style={antiYellowStyles}>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3 sm:p-4">
-                    <CardTitle className="text-xs sm:text-sm font-medium truncate">Active Projects</CardTitle>
+                    <CardTitle className="text-xs sm:text-sm font-medium truncate">Bids Sent</CardTitle>
                     <FileText className="h-4 w-4 text-muted-foreground flex-shrink-0" />
                   </CardHeader>
                   <CardContent className="p-3 pt-0 sm:p-4 sm:pt-0">
-                    <div className="text-lg sm:text-2xl font-bold">{activeProjects}</div>
-                    <p className="text-xs text-muted-foreground">Currently in progress</p>
+                    <div className="text-lg sm:text-2xl font-bold">{bidRequests.filter((b: any) => b.status === 'bid_sent' || b.status === 'won' || b.status === 'lost').length}</div>
+                    <p className="text-xs text-muted-foreground">Total bids submitted</p>
                   </CardContent>
                 </Card>
 
@@ -660,7 +660,7 @@ const ContractorPortalEnhanced: React.FC = () => {
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <Card style={antiYellowStyles}>
                   <CardHeader>
-                    <CardTitle>Project Performance Overview</CardTitle>
+                    <CardTitle>Bid Performance Overview</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <ResponsiveContainer width="100%" height={300}>
@@ -669,8 +669,8 @@ const ContractorPortalEnhanced: React.FC = () => {
                         <XAxis dataKey="month" />
                         <YAxis />
                         <Tooltip />
-                        <Bar dataKey="completed" fill="#10b981" name="Completed" />
-                        <Bar dataKey="active" fill="#3b82f6" name="Active" />
+                        <Bar dataKey="completed" fill="#10b981" name="Won Bids" />
+                        <Bar dataKey="active" fill="#3b82f6" name="Sent Bids" />
                       </BarChart>
                     </ResponsiveContainer>
                   </CardContent>
@@ -678,7 +678,7 @@ const ContractorPortalEnhanced: React.FC = () => {
 
                 <Card style={antiYellowStyles}>
                   <CardHeader>
-                    <CardTitle>Project Status Distribution</CardTitle>
+                    <CardTitle>Bid Status Distribution</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <ResponsiveContainer width="100%" height={300}>
@@ -1023,12 +1023,12 @@ const ContractorPortalEnhanced: React.FC = () => {
               </Card>
             </TabsContent>
 
-            {/* Projects Tab */}
+            {/* Sent Bids Tab */}
             <TabsContent value="projects" className="space-y-6">
               <Card style={antiYellowStyles}>
                 <CardHeader>
-                  <CardTitle>My Projects</CardTitle>
-                  <CardDescription>Track and manage sent bids and active projects</CardDescription>
+                  <CardTitle>Sent Bids</CardTitle>
+                  <CardDescription>View and manage all bids you've submitted to customers</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
@@ -1129,9 +1129,9 @@ const ContractorPortalEnhanced: React.FC = () => {
                       ))
                     ) : (
                       <div className="text-center py-12">
-                        <Building2 className="h-12 w-12 text-gray-400 mx-auto mb-3" />
-                        <p className="text-gray-500 text-lg">No projects yet</p>
-                        <p className="text-gray-400 text-sm">Sent bids will appear here for tracking</p>
+                        <Mail className="h-12 w-12 text-gray-400 mx-auto mb-3" />
+                        <p className="text-gray-500 text-lg">No sent bids yet</p>
+                        <p className="text-gray-400 text-sm">Bids you submit will appear here</p>
                       </div>
                     )}
                   </div>

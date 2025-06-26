@@ -121,6 +121,7 @@ This is a comprehensive home services platform that connects homeowners with con
 - June 26, 2025. Initial setup
 - June 26, 2025. Integrated AWS S3 cloud storage for media files - significantly improved performance by replacing local file storage with scalable cloud infrastructure
 - June 26, 2025. Reset database to clean slate - removed all test data, keeping only admin user for fresh start
+- June 26, 2025. Removed project tracking functionality from contractor portal - transformed "Projects" tab to "Sent Bids" to focus on bid management rather than project lifecycle tracking
 
 ## User Preferences
 
