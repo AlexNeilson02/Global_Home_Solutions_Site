@@ -35,6 +35,17 @@ html, body {
   padding-top: 30px !important;
   max-width: 130px;
 }
+header {
+  text-align: center;
+  padding: 80px 20px 120px 20px;
+  background: linear-gradient(135deg, #1e3a8a 0%, #3730a3 100%);
+  color: white;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
 header h1 {
   text-align: center;
   color: #2ca7f8;
@@ -348,4 +359,11 @@ ul {
 
 .clear-search-btn:hover {
   background: #cc3333;
+}
+
+.logo-hero {
+  width: 400px;
+  height: auto;
+  margin-bottom: 60px;
+  margin-top: 40px;
 }
