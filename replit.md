@@ -84,6 +84,12 @@ This is a comprehensive home services platform that connects homeowners with con
 - **Connection pooling** with retry logic for reliability
 - **Session storage** in dedicated sessions table
 
+### Cloud Storage
+- **AWS S3** for media file storage and delivery
+- **IAM-based security** with dedicated bucket access
+- **Direct upload** from client to S3 for optimal performance
+- **Organized folder structure** by file type and user
+
 ### Email Services
 - **SendGrid** for transactional email delivery
 - **Email templates** for bid notifications and communications
@@ -113,6 +119,7 @@ This is a comprehensive home services platform that connects homeowners with con
 ## Changelog
 
 - June 26, 2025. Initial setup
+- June 26, 2025. Integrated AWS S3 cloud storage for media files - significantly improved performance by replacing local file storage with scalable cloud infrastructure
 
 ## User Preferences
 
