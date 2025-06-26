@@ -250,8 +250,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
         serviceAreas: serviceAreas || null
       };
       console.log('Contractor data to insert:', contractorData);
-      const newContractor = await storage.createContractor(contractorData);
-      console.log('Contractor created successfully:', newContractor.id);
+      
+      let newContractor;
+      try {
+        newContractor = await storage.createContractor(contractorData);
+        console.log('Contractor created successfully:', newContractor);
+      } catch (contractorError) {
+        console.error('Failed to create contractor profile:', contractorError);
+        // Clean up the user if contractor creation fails
+        try {
+          await storage.deleteUser?.(newUser.id);
+        } catch (cleanupError) {
+          console.error('Failed to cleanup user after contractor error:', cleanupError);
+        }
+        throw new Error(`Contractor profile creation failed: ${contractorError.message}`);
+      }
 
       res.status(200).json({ 
         message: "Contractor created successfully",
