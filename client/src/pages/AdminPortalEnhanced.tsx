@@ -277,21 +277,10 @@ export default function AdminPortalEnhanced() {
   // Contractor create mutation
   const createContractorMutation = useMutation({
     mutationFn: async (contractorData: any) => {
-      const response = await fetch('/api/contractors', {
+      return apiRequest('/api/contractors', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(contractorData)
+        body: contractorData
       });
-      if (!response.ok) {
-        try {
-          const errorData = await response.json();
-          throw new Error(errorData.error || errorData.message || 'Failed to create contractor');
-        } catch (parseError) {
-          const errorText = await response.text();
-          throw new Error(errorText || 'Failed to create contractor');
-        }
-      }
-      return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/contractors'] });
