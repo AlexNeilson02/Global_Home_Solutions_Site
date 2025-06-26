@@ -300,6 +300,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Create contractor endpoint (admin only)
   apiRouter.post("/contractors", isAuthenticated, requireRole(['admin']), async (req: Request, res: Response) => {
     try {
+      console.log('Creating contractor with data:', req.body);
+      
       const {
         username,
         password,
@@ -314,25 +316,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Validate required fields
       if (!username || !password || !fullName || !email || !companyName) {
+        console.log('Missing required fields');
         return res.status(400).json({ message: "Username, password, full name, email, and company name are required" });
       }
 
       // Check if username already exists
       const existingUser = await storage.getUserByUsername(username);
       if (existingUser) {
+        console.log('Username already exists:', username);
         return res.status(400).json({ message: "Username already exists" });
       }
 
       // Check if email already exists
       const existingUserByEmail = await storage.getUserByEmail(email);
       if (existingUserByEmail) {
+        console.log('Email already exists:', email);
         return res.status(400).json({ message: "Email already exists" });
       }
 
       // Hash password
       const hashedPassword = await hashPassword(password);
+      console.log('Password hashed successfully');
 
       // Create user account
+      console.log('Creating user account...');
       const newUser = await storage.createUser({
         username,
         password: hashedPassword,
@@ -341,8 +348,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         phone: phone || null,
         role: 'contractor'
       });
+      console.log('User created successfully:', newUser.id);
 
       // Create contractor profile
+      console.log('Creating contractor profile...');
       const newContractor = await storage.createContractor({
         userId: newUser.id,
         companyName,
@@ -351,6 +360,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         serviceAreas: serviceAreas || [],
         isActive: true
       });
+      console.log('Contractor created successfully:', newContractor.id);
 
       res.status(201).json({ 
         message: "Contractor created successfully",
@@ -365,7 +375,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error) {
       console.error('Error creating contractor:', error);
-      res.status(500).json({ message: "Failed to create contractor" });
+      console.error('Error stack:', error.stack);
+      res.status(500).json({ message: "Failed to create contractor", error: error.message });
     }
   });
 
