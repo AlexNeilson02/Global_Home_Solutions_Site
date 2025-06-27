@@ -147,6 +147,12 @@ h3 {
   color: #03b6fc !important;
   text-decoration: underline;
 }
+
+/* Electrical contractor card background */
+.electrician-bg {
+  background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%) !important;
+  background-image: none !important;
+}
 .video-gallery {
   margin-top: 12px;
   display: flex;
