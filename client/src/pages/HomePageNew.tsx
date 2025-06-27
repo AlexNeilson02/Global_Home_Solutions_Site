@@ -130,7 +130,6 @@ export default function HomePage() {
           </p>
         </div>
       )}
-      
       <header>
         <img src={logoPath} alt="Global Home Solutions Logo" className="logo-hero" />
         <h1>Global Home Solutions</h1>
@@ -158,7 +157,6 @@ export default function HomePage() {
         </div>
         <button className="find-contractor-btn" onClick={handleFindContractor}>Find a Contractor</button>
       </section>
-
       {/* Featured Contractors Section - Only show when no search has been triggered */}
       {!searchTriggered && (
         <section className="category-section">
@@ -245,14 +243,13 @@ export default function HomePage() {
                 />
               </div>
               <div className="category-content">
-                <h3>Window Washing</h3>
+                <h3>Watermelon Window Washing</h3>
                 <button className="category-btn">Find Window Washers</button>
               </div>
             </div>
           </div>
         </section>
       )}
-
       {searchTriggered && trade && (
         <section className="contractors-section">
           <h2>{trade} Contractors</h2>
@@ -286,8 +283,6 @@ export default function HomePage() {
           </div>
         </section>
       )}
-      
-
       {/* Bid Request Form Modal */}
       {selectedContractor && (
         <BidRequestForm
