@@ -7,6 +7,7 @@ import { WatermelonLogo } from "../components/WatermelonLogo";
 import logoPath from "@/assets/global-home-solutions-logo.png";
 import watermelonWWLogo from "@/assets/watermelon-ww-logo.png";
 import vaultLogo from "@/assets/vault-logo.png";
+import continentalLogo from "@/assets/continental-concrete-logo.jpeg";
 import "../styles/HomePage.css";
 
 export default function HomePage() {
@@ -179,11 +180,21 @@ export default function HomePage() {
 
             <div className="category-card" onClick={() => navigate('/contractor/12')}>
               <div className="category-image" style={{
-                backgroundImage: 'url(https://images.unsplash.com/photo-1504307651254-35680f356dfd?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80)',
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-                height: '150px'
+                height: '150px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor: '#f8f9fa'
               }}>
+                <img 
+                  src={continentalLogo} 
+                  alt="Continental Concrete" 
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover'
+                  }}
+                />
               </div>
               <div className="category-content">
                 <h3>Continental Concrete</h3>
