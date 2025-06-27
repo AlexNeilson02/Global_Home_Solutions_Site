@@ -237,9 +237,8 @@ ul {
   cursor: pointer;
   transition: transform 0.2s ease;
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  display: flex;
-  flex-direction: column;
-  height: 250px;
+  position: relative;
+  padding-bottom: 70px;
 }
 
 .category-card:hover {
@@ -283,11 +282,7 @@ ul {
 
 .category-content {
   padding: 20px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  flex: 1;
-  height: 100px;
+  position: relative;
 }
 
 .category-content h3 {
@@ -295,9 +290,6 @@ ul {
   font-size: 1.3rem;
   margin: 0 0 15px 0;
   font-weight: 600;
-  flex-grow: 1;
-  display: flex;
-  align-items: center;
 }
 
 .category-btn {
@@ -308,9 +300,11 @@ ul {
   border-radius: 8px;
   font-weight: bold;
   cursor: pointer;
-  width: 100%;
+  width: calc(100% - 40px);
   font-size: 1rem;
-  margin-top: auto;
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
 }
 
 .category-btn:hover {
