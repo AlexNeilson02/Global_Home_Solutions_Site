@@ -174,10 +174,59 @@ export default function HomePage() {
                   alignItems: 'center',
                   justifyContent: 'center',
                   height: '100%',
-                  fontSize: '4rem',
-                  color: 'white'
+                  padding: '20px'
                 }}>
-                  ⚡
+                  <svg width="80" height="80" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                    {/* AI-generated electrical circuit design */}
+                    <defs>
+                      <linearGradient id="circuitGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style={{stopColor: '#60a5fa', stopOpacity: 1}} />
+                        <stop offset="100%" style={{stopColor: '#3b82f6', stopOpacity: 1}} />
+                      </linearGradient>
+                      <filter id="glow">
+                        <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+                        <feMerge> 
+                          <feMergeNode in="coloredBlur"/>
+                          <feMergeNode in="SourceGraphic"/>
+                        </feMerge>
+                      </filter>
+                    </defs>
+                    
+                    {/* Circuit board background */}
+                    <rect width="100" height="100" fill="rgba(255,255,255,0.1)" rx="8"/>
+                    
+                    {/* Main lightning bolt */}
+                    <path d="M45 10 L30 45 L50 40 L35 90 L70 35 L50 40 Z" 
+                          fill="url(#circuitGrad)" 
+                          filter="url(#glow)"
+                          stroke="#ffffff" 
+                          strokeWidth="1"/>
+                    
+                    {/* Circuit traces */}
+                    <g stroke="#ffffff" strokeWidth="1.5" fill="none" opacity="0.7">
+                      <path d="M15 20 L25 20 L30 25"/>
+                      <path d="M70 15 L80 15 L85 20"/>
+                      <path d="M20 70 L30 70 L35 75"/>
+                      <path d="M75 75 L85 75 L90 80"/>
+                      <circle cx="25" cy="20" r="2" fill="#ffffff"/>
+                      <circle cx="80" cy="15" r="2" fill="#ffffff"/>
+                      <circle cx="30" cy="70" r="2" fill="#ffffff"/>
+                      <circle cx="85" cy="75" r="2" fill="#ffffff"/>
+                    </g>
+                    
+                    {/* Energy particles */}
+                    <g fill="#ffffff" opacity="0.8">
+                      <circle cx="20" cy="30" r="1">
+                        <animate attributeName="opacity" values="0.3;1;0.3" dur="2s" repeatCount="indefinite"/>
+                      </circle>
+                      <circle cx="75" cy="25" r="1">
+                        <animate attributeName="opacity" values="1;0.3;1" dur="1.5s" repeatCount="indefinite"/>
+                      </circle>
+                      <circle cx="25" cy="80" r="1">
+                        <animate attributeName="opacity" values="0.5;1;0.5" dur="1.8s" repeatCount="indefinite"/>
+                      </circle>
+                    </g>
+                  </svg>
                 </div>
               </div>
               <div className="category-content">
