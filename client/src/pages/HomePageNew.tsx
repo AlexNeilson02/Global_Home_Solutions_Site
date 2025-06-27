@@ -224,7 +224,7 @@ export default function HomePage() {
               </div>
             </div>
 
-            <div className="category-card" onClick={() => handleCategoryClick("Window Washing")}>
+            <div className="category-card" onClick={() => navigate('/contractor/13')}>
               <div className="category-image" style={{
                 height: '150px',
                 display: 'flex',
@@ -244,7 +244,7 @@ export default function HomePage() {
               </div>
               <div className="category-content">
                 <h3>Watermelon Window Washing</h3>
-                <button className="category-btn">Find Window Washers</button>
+                <button className="category-btn">View Profile</button>
               </div>
             </div>
           </div>
