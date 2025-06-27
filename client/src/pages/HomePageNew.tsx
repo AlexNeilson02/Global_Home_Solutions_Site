@@ -216,9 +216,9 @@ export default function HomePage() {
                   src={watermelonWWLogo} 
                   alt="Watermelon Window Washing" 
                   style={{
-                    maxWidth: '80%',
-                    maxHeight: '80%',
-                    objectFit: 'contain'
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover'
                   }}
                 />
               </div>
