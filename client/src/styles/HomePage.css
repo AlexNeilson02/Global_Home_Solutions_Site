@@ -280,6 +280,10 @@ ul {
 
 .category-content {
   padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 80px;
 }
 
 .category-content h3 {
@@ -287,6 +291,9 @@ ul {
   font-size: 1.3rem;
   margin: 0 0 15px 0;
   font-weight: 600;
+  flex-grow: 1;
+  display: flex;
+  align-items: center;
 }
 
 .category-btn {
@@ -299,6 +306,7 @@ ul {
   cursor: pointer;
   width: 100%;
   font-size: 1rem;
+  margin-top: auto;
 }
 
 .category-btn:hover {
