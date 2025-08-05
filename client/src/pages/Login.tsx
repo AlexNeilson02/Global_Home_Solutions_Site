@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
-import { Link, useNavigate } from "react-router-dom";
+import { useLocation, Link } from "wouter";
 
 const loginSchema = z.object({
   username: z.string().min(1, "Username is required"),
@@ -18,7 +18,7 @@ type LoginForm = z.infer<typeof loginSchema>;
 
 export default function Login() {
   const { toast } = useToast();
-  const navigate = useNavigate();
+  const [, setLocation] = useLocation();
   const [isLoading, setIsLoading] = useState(false);
 
   const form = useForm<LoginForm>({
@@ -56,16 +56,16 @@ export default function Login() {
       // Redirect based on user role
       switch (result.user.role) {
         case "contractor":
-          navigate("/contractor-portal");
+          setLocation("/contractor-portal");
           break;
         case "salesperson":
-          navigate("/sales-portal");
+          setLocation("/sales-portal");
           break;
         case "admin":
-          navigate("/admin-portal");
+          setLocation("/admin-portal");
           break;
         default:
-          navigate("/");
+          setLocation("/");
       }
     } catch (error) {
       toast({
@@ -134,7 +134,7 @@ export default function Login() {
                   <p className="text-sm text-gray-600">
                     Don't have an account?
                   </p>
-                  <Link to="/contractor-registration">
+                  <Link href="/contractor-registration">
                     <Button variant="outline" className="w-full">
                       Register as Contractor
                     </Button>
