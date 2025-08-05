@@ -8,7 +8,7 @@ import logoPath from "@/assets/global-home-solutions-logo.png";
 import watermelonWWLogo from "@/assets/watermelon-ww-logo.png";
 import vaultLogo from "@/assets/vault-logo.png";
 import continentalLogo from "@/assets/continental-concrete-logo.jpeg";
-import heroBackgroundImage from "@/assets/0F1A4638_1754427544413.jpeg";
+import heroBackgroundImage from "@/assets/ghs-office-front.png";
 import "../styles/HomePage.css";
 
 export default function HomePage() {
