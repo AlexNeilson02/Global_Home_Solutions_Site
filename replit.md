@@ -126,6 +126,7 @@ This is a comprehensive home services platform that connects homeowners with con
 - June 26, 2025. Resolved critical routing conflict preventing contractor creation - fixed server route imports from routes-clean.ts to routes.ts, enabling proper JSON API responses and database persistence
 - June 27, 2025. Created "Find Electricians" card - replaced first contractor profile card with electrical service search functionality, featuring blue gradient background with professional stock photo of electrician working on electrical panel and category-based search integration
 - August 5, 2025. Connected home page contractor tiles to individual profiles - updated Continental Concrete (ID 19), Vault Pest Control (ID 20), and Watermelon Window Washing (ID 18) tiles to navigate directly to their respective contractor profile pages with proper database integration
+- August 5, 2025. Fixed QR code commission tracking system - implemented comprehensive solution for salesperson attribution including retry logic, enhanced error handling, visual feedback in bid forms, improved database lookup with case-insensitive matching, and detailed debugging logs to ensure sales reps receive proper commission credit when customers scan QR codes and submit bid requests
 
 ## User Preferences
 

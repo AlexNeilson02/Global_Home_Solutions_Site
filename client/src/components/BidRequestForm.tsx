@@ -238,6 +238,13 @@ export default function BidRequestForm({ isOpen, onClose, contractor, trackedSal
   });
 
   const onSubmit = (data: BidRequestForm) => {
+    console.log('=== BID REQUEST SUBMISSION DEBUG ===');
+    console.log('Tracking loading:', trackingLoading);
+    console.log('Tracking complete:', trackingComplete);
+    console.log('Tracked salesperson:', trackedSalesperson);
+    console.log('SessionStorage salesperson:', sessionStorage.getItem('trackedSalesperson'));
+    console.log('===================================');
+    
     // Ensure tracking is complete before allowing submission
     if (trackingLoading) {
       toast({
@@ -247,12 +254,6 @@ export default function BidRequestForm({ isOpen, onClose, contractor, trackedSal
       });
       return;
     }
-
-    console.log('BidRequestForm - Tracking status:', { 
-      trackingLoading, 
-      trackingComplete, 
-      trackedSalesperson: trackedSalesperson?.id 
-    });
     
     // Map frontend form fields to backend expected fields
     const backendData = {
@@ -269,7 +270,9 @@ export default function BidRequestForm({ isOpen, onClose, contractor, trackedSal
       ...(trackedSalesperson && { salespersonId: trackedSalesperson.id })
     };
     
-    console.log('BidRequestForm - Final backend data with salesperson tracking:', backendData);
+    console.log('🚀 BidRequestForm - Final backend data:', backendData);
+    console.log('🎯 Salesperson ID being sent:', backendData.salespersonId || 'NONE');
+    
     submitBidRequest.mutate(backendData);
   };
 

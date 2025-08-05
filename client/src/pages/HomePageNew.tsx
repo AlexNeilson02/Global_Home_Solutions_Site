@@ -37,10 +37,18 @@ export default function HomePage() {
     ?.map((service: any) => service.name)
     ?.sort((a: string, b: string) => a.localeCompare(b)) || [];
 
-  // Track QR code visits for sales rep attribution with robust error handling
+  // Track QR code visits for sales rep attribution with comprehensive debugging
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const refParam = urlParams.get('ref');
+    
+    console.log('=== QR Tracking Debug ===');
+    console.log('Current URL:', window.location.href); 
+    console.log('URL params:', Object.fromEntries(urlParams.entries()));
+    console.log('Ref param:', refParam);
+    console.log('Current trackedSalesperson:', trackedSalesperson);
+    console.log('Tracking loading:', trackingLoading);
+    console.log('========================');
     
     // Check sessionStorage first for existing tracking
     const stored = sessionStorage.getItem('trackedSalesperson');
@@ -50,7 +58,7 @@ export default function HomePage() {
         if (parsedSalesperson && parsedSalesperson.id) {
           setTrackedSalesperson(parsedSalesperson);
           setTrackingComplete(true);
-          console.log('Restored tracked salesperson from session:', parsedSalesperson);
+          console.log('✓ Restored tracked salesperson from session:', parsedSalesperson);
           return;
         }
       } catch (error) {
@@ -61,36 +69,45 @@ export default function HomePage() {
     
     if (refParam && !trackedSalesperson && !trackingLoading) {
       setTrackingLoading(true);
-      console.log('Starting salesperson tracking for ref:', refParam);
+      console.log('🔄 Starting salesperson tracking for ref:', refParam);
       
-      // Track the visit for commission attribution with retry logic
+      // Track the visit for commission attribution with enhanced debugging
       const trackVisit = async (retryCount = 0) => {
         try {
+          console.log(`📡 Attempt ${retryCount + 1}: Making track-visit API call...`);
+          
           const response = await apiRequest('POST', '/api/track-visit', {
             salespersonProfileUrl: refParam,
             userAgent: navigator.userAgent,
             referrer: document.referrer
           });
           
+          console.log('📡 Raw response status:', response.status);
+          console.log('📡 Raw response headers:', Object.fromEntries(response.headers.entries()));
+          
           const data = await response.json();
-          console.log('Visit tracking response:', data);
+          console.log('📡 Visit tracking response data:', data);
           
           if (data.success && data.salesperson && data.salesperson.id) {
             setTrackedSalesperson(data.salesperson);
             sessionStorage.setItem('trackedSalesperson', JSON.stringify(data.salesperson));
-            console.log('Successfully tracked salesperson:', data.salesperson);
+            console.log('✅ Successfully tracked salesperson:', data.salesperson);
             setTrackingComplete(true);
           } else {
             throw new Error('Invalid tracking response: ' + JSON.stringify(data));
           }
         } catch (error) {
-          console.error('Visit tracking failed (attempt ' + (retryCount + 1) + '):', error);
+          console.error(`❌ Visit tracking failed (attempt ${retryCount + 1}):`, error);
+          console.error('❌ Error details:', error.message);
+          console.error('❌ Error stack:', error.stack);
           
           // Retry up to 2 times with exponential backoff
           if (retryCount < 2) {
-            setTimeout(() => trackVisit(retryCount + 1), Math.pow(2, retryCount) * 1000);
+            const delay = Math.pow(2, retryCount) * 1000;
+            console.log(`🔄 Retrying in ${delay}ms...`);
+            setTimeout(() => trackVisit(retryCount + 1), delay);
           } else {
-            console.error('All tracking attempts failed for ref:', refParam);
+            console.error('❌ All tracking attempts failed for ref:', refParam);
             setTrackingComplete(true); // Allow form to work without tracking
           }
         } finally {
@@ -103,7 +120,11 @@ export default function HomePage() {
       trackVisit();
     } else if (!refParam) {
       // No QR code reference, mark tracking as complete
+      console.log('ℹ️ No ref parameter found - marking tracking complete');
       setTrackingComplete(true);
+    } else {
+      console.log('🚫 Skipping tracking: refParam exists but conditions not met');
+      console.log('🚫 Current state:', { refParam, trackedSalesperson: !!trackedSalesperson, trackingLoading });
     }
   }, [trackedSalesperson, trackingLoading]);
 
