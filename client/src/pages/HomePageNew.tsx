@@ -182,14 +182,7 @@ export default function HomePage() {
 
   return (
     <div className="homepage-container">
-      {/* QR Code Tracking Banner */}
-      {trackedSalesperson && (
-        <div className="bg-blue-600 text-white px-4 py-3 text-center">
-          <p className="text-sm">
-            👋 Welcome! You were referred by <strong>{trackedSalesperson.fullName}</strong>, your dedicated sales representative.
-          </p>
-        </div>
-      )}
+
       <header className="hero-header">
         <div className="hero-image-container">
           <img 
