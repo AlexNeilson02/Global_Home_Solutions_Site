@@ -52,15 +52,6 @@ export async function seedDatabase() {
         phone: '555-0102',
         role: 'salesperson',
         lastLogin: null,
-      },
-      {
-        username: 'admin2',
-        password: await hashPassword('admin456'),
-        email: 'admin2@globalhomesolutions.com',
-        fullName: 'Admin Manager',
-        phone: '555-0103',
-        role: 'admin',
-        lastLogin: null,
       }
     ];
 

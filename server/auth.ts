@@ -25,7 +25,7 @@ export function getSession() {
     saveUninitialized: false,
     cookie: {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production', // Enable secure cookies in production
+      secure: false, // Disable secure cookies for Replit deployment
       maxAge: sessionTtl,
       sameSite: 'lax',
     },
