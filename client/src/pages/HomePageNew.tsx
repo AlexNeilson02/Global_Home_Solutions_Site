@@ -33,7 +33,7 @@ export default function HomePage() {
   });
 
   // Sort services alphabetically for the dropdown
-  const trades = servicesData?.services
+  const trades = (servicesData as any)?.services
     ?.map((service: any) => service.name)
     ?.sort((a: string, b: string) => a.localeCompare(b)) || [];
 
@@ -134,7 +134,7 @@ export default function HomePage() {
     }
   }, [trade, searchTriggered]);
 
-  const handleCategoryClick = (category) => {
+  const handleCategoryClick = (category: string) => {
     setTrade(category);
     setSearchTriggered(true);
   };

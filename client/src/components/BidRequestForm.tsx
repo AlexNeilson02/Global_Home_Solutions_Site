@@ -60,6 +60,25 @@ export default function BidRequestForm({ isOpen, onClose, contractor, trackedSal
   const queryClient = useQueryClient();
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
   const [filePreviewUrls, setFilePreviewUrls] = useState<string[]>([]);
+  
+  // Always check sessionStorage for tracked salesperson as fallback
+  const getTrackedSalesperson = () => {
+    if (trackedSalesperson) return trackedSalesperson;
+    
+    try {
+      const stored = sessionStorage.getItem('trackedSalesperson');
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (parsed && parsed.id) {
+          console.log('✅ Retrieved salesperson from sessionStorage:', parsed);
+          return parsed;
+        }
+      }
+    } catch (error) {
+      console.warn('Failed to parse stored salesperson:', error);
+    }
+    return null;
+  };
 
   // Fetch available services from the database
   const { data: servicesData } = useQuery({
@@ -241,8 +260,12 @@ export default function BidRequestForm({ isOpen, onClose, contractor, trackedSal
     console.log('=== BID REQUEST SUBMISSION DEBUG ===');
     console.log('Tracking loading:', trackingLoading);
     console.log('Tracking complete:', trackingComplete);
-    console.log('Tracked salesperson:', trackedSalesperson);
-    console.log('SessionStorage salesperson:', sessionStorage.getItem('trackedSalesperson'));
+    console.log('Prop trackedSalesperson:', trackedSalesperson);
+    console.log('SessionStorage raw:', sessionStorage.getItem('trackedSalesperson'));
+    
+    // Get the actual tracked salesperson (from props or sessionStorage)
+    const actualTrackedSalesperson = getTrackedSalesperson();
+    console.log('🎯 Final tracked salesperson to use:', actualTrackedSalesperson);
     console.log('===================================');
     
     // Ensure tracking is complete before allowing submission
@@ -267,11 +290,11 @@ export default function BidRequestForm({ isOpen, onClose, contractor, trackedSal
       budget: data.budget,
       contractorId: contractor.id,
       // Add salesperson attribution for commission tracking
-      ...(trackedSalesperson && { salespersonId: trackedSalesperson.id })
+      ...(actualTrackedSalesperson && { salespersonId: actualTrackedSalesperson.id })
     };
     
     console.log('🚀 BidRequestForm - Final backend data:', backendData);
-    console.log('🎯 Salesperson ID being sent:', backendData.salespersonId || 'NONE');
+    console.log('🎯 Salesperson ID being sent:', backendData.salespersonId || 'NONE - NO COMMISSION TRACKING');
     
     submitBidRequest.mutate(backendData);
   };
@@ -298,13 +321,30 @@ export default function BidRequestForm({ isOpen, onClose, contractor, trackedSal
             </div>
           )}
           
-          {!trackingLoading && trackedSalesperson && (
-            <div className="bg-green-50 dark:bg-green-950 border border-green-200 dark:border-green-800 rounded-lg p-3 mt-2">
-              <span className="text-sm text-green-700 dark:text-green-300">
-                ✓ Referral tracked - Your sales rep will receive credit for this lead
-              </span>
-            </div>
-          )}
+          {/* Enhanced tracking status display */}
+          {(() => {
+            const actualTrackedSalesperson = getTrackedSalesperson();
+            if (!trackingLoading && actualTrackedSalesperson) {
+              return (
+                <div className="bg-green-50 dark:bg-green-950 border border-green-200 dark:border-green-800 rounded-lg p-3 mt-2">
+                  <div className="flex items-center text-green-700 dark:text-green-300 text-sm">
+                    <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
+                    <span>Sales rep <strong>{actualTrackedSalesperson.profileUrl}</strong> will receive commission credit</span>
+                  </div>
+                </div>
+              );
+            } else if (!trackingLoading && !actualTrackedSalesperson) {
+              return (
+                <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-3 mt-2">
+                  <div className="flex items-center text-gray-600 dark:text-gray-400 text-sm">
+                    <div className="w-2 h-2 bg-gray-400 rounded-full mr-2"></div>
+                    <span>No sales rep tracking detected</span>
+                  </div>
+                </div>
+              );
+            }
+            return null;
+          })()}
         </DialogHeader>
         
         <Form {...form}>
