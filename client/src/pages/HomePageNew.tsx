@@ -186,7 +186,7 @@ export default function HomePage() {
               </div>
             </div>
 
-            <div className="category-card" onClick={() => navigate('/contractor/12')}>
+            <div className="category-card" onClick={() => navigate('/contractor/19')}>
               <div className="category-image" style={{
                 height: '150px',
                 display: 'flex',
@@ -210,7 +210,7 @@ export default function HomePage() {
               </div>
             </div>
 
-            <div className="category-card" onClick={() => navigate('/contractor/12')}>
+            <div className="category-card" onClick={() => navigate('/contractor/20')}>
               <div className="category-image" style={{
                 height: '150px',
                 display: 'flex',
@@ -234,7 +234,7 @@ export default function HomePage() {
               </div>
             </div>
 
-            <div className="category-card" onClick={() => navigate('/contractor/13')}>
+            <div className="category-card" onClick={() => navigate('/contractor/18')}>
               <div className="category-image" style={{
                 height: '150px',
                 display: 'flex',
