@@ -33,7 +33,6 @@ export async function seedDatabase() {
         fullName: 'System Administrator',
         phone: '555-0100',
         role: 'admin',
-        lastLogin: null,
       },
       {
         username: 'contractor',
@@ -42,7 +41,6 @@ export async function seedDatabase() {
         fullName: 'John Smith',
         phone: '555-0101',
         role: 'contractor',
-        lastLogin: null,
       },
       {
         username: 'salesperson',
@@ -51,7 +49,6 @@ export async function seedDatabase() {
         fullName: 'Jane Doe',
         phone: '555-0102',
         role: 'salesperson',
-        lastLogin: null,
       }
     ];
 
@@ -297,11 +294,7 @@ export async function seedDatabase() {
       logoUrl: 'https://images.unsplash.com/photo-1607472586893-edb57bdc0e39?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=300&q=80',
       isVerified: true,
       isActive: true,
-      subscriptionTier: 'premium',
-      mediaFiles: [
-        { url: '/videos/apex1.mp4', type: 'video', name: 'Apex Demo 1' },
-        { url: '/videos/apex2.mp4', type: 'video', name: 'Apex Demo 2' }
-      ]
+      subscriptionTier: 'premium'
     }).returning();
 
     // Elite Electricians
@@ -315,10 +308,7 @@ export async function seedDatabase() {
       logoUrl: 'https://images.unsplash.com/photo-1621905251189-08b45d6a269e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=300&q=80',
       isVerified: true,
       isActive: true,
-      subscriptionTier: 'premium',
-      mediaFiles: [
-        { url: '/videos/elite1.mp4', type: 'video', name: 'Elite Demo' }
-      ]
+      subscriptionTier: 'premium'
     }).returning();
 
     // Premier Flooring Solutions
@@ -332,11 +322,7 @@ export async function seedDatabase() {
       logoUrl: 'https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=300&q=80',
       isVerified: true,
       isActive: true,
-      subscriptionTier: 'pro',
-      mediaFiles: [
-        { url: '/videos/flooring1.mp4', type: 'video', name: 'Flooring Demo 1' },
-        { url: '/videos/flooring2.mp4', type: 'video', name: 'Flooring Demo 2' }
-      ]
+      subscriptionTier: 'pro'
     }).returning();
 
     // Solid Concrete Works
@@ -350,10 +336,7 @@ export async function seedDatabase() {
       logoUrl: 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=300&q=80',
       isVerified: true,
       isActive: false, // This was marked as "sold out" in the original data
-      subscriptionTier: 'basic',
-      mediaFiles: [
-        { url: '/videos/concrete1.mp4', type: 'video', name: 'Concrete Demo' }
-      ]
+      subscriptionTier: 'basic'
     }).returning();
 
     // Rooftop Masters
@@ -367,11 +350,7 @@ export async function seedDatabase() {
       logoUrl: 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=300&q=80',
       isVerified: true,
       isActive: true,
-      subscriptionTier: 'premium',
-      mediaFiles: [
-        { url: '/videos/roofing1.mp4', type: 'video', name: 'Roofing Demo 1' },
-        { url: '/videos/roofing2.mp4', type: 'video', name: 'Roofing Demo 2' }
-      ]
+      subscriptionTier: 'premium'
     }).returning();
 
     // Climate Control HVAC
@@ -385,10 +364,73 @@ export async function seedDatabase() {
       logoUrl: 'https://images.unsplash.com/photo-1621905251918-48416bd8575a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=300&q=80',
       isVerified: true,
       isActive: true,
-      subscriptionTier: 'pro',
-      mediaFiles: [
-        { url: '/videos/hvac1.mp4', type: 'video', name: 'HVAC Demo' }
-      ]
+      subscriptionTier: 'pro'
+    }).returning();
+
+    // Watermelon Window Washing
+    const contractorUserWatermelon = await db.insert(users).values({
+      username: 'watermelon',
+      password: await hashPassword('watermelon123'),
+      email: 'contact@watermelonww.com',
+      fullName: 'Watermelon Window Washing',
+      phone: '555-WINDOW',
+      role: 'contractor',
+    }).returning();
+
+    const contractorWatermelon = await db.insert(contractors).values({
+      userId: contractorUserWatermelon[0].id,
+      companyName: 'Watermelon Window Washing',
+      description: 'Professional window cleaning services for residential and commercial properties. Streak-free results guaranteed!',
+      specialties: ['Window Cleaning', 'Pressure Washing', 'Gutter Cleaning'],
+      hourlyRate: 45,
+      logoUrl: null,
+      isVerified: true,
+      isActive: true,
+      subscriptionTier: 'pro'
+    }).returning();
+
+    // Vault Pest Control
+    const contractorUserVault = await db.insert(users).values({
+      username: 'vault',
+      password: await hashPassword('vault123'),
+      email: 'contact@vaultpest.com',
+      fullName: 'Vault Pest Control',
+      phone: '555-VAULT',
+      role: 'contractor',
+    }).returning();
+
+    const contractorVault = await db.insert(contractors).values({
+      userId: contractorUserVault[0].id,
+      companyName: 'Vault Pest Control',
+      description: 'Comprehensive pest control solutions for homes and businesses. Safe, effective, and environmentally responsible treatments.',
+      specialties: ['Pest Control', 'Termite Treatment', 'Rodent Control'],
+      hourlyRate: 75,
+      logoUrl: null,
+      isVerified: true,
+      isActive: true,
+      subscriptionTier: 'premium'
+    }).returning();
+
+    // Continental Concrete
+    const contractorUserContinental = await db.insert(users).values({
+      username: 'continental',
+      password: await hashPassword('continental123'),
+      email: 'contact@continentalconcrete.com',
+      fullName: 'Continental Concrete',
+      phone: '555-CONCRETE',
+      role: 'contractor',
+    }).returning();
+
+    const contractorContinental = await db.insert(contractors).values({
+      userId: contractorUserContinental[0].id,
+      companyName: 'Continental Concrete',
+      description: 'Premium concrete and masonry services. Specializing in driveways, patios, foundations, and decorative concrete work.',
+      specialties: ['Concrete', 'Masonry', 'Driveways', 'Decorative Concrete'],
+      hourlyRate: 85,
+      logoUrl: null,
+      isVerified: true,
+      isActive: true,
+      subscriptionTier: 'premium'
     }).returning();
 
     // Create salesperson
