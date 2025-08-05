@@ -130,17 +130,15 @@ export default function HomePage() {
           </p>
         </div>
       )}
-      <header 
-        className="hero-header"
-        style={{
-          backgroundImage: `url('/attached_assets/0F1A4638_1754427544413.jpeg')`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
-          position: 'relative'
-        }}
-      >
-        <div className="hero-overlay">
+      <header className="hero-header">
+        <div className="hero-image-container">
+          <img 
+            src="/attached_assets/0F1A4638_1754427544413.jpeg" 
+            alt="Home Construction Background" 
+            className="hero-background-image"
+          />
+        </div>
+        <div className="hero-content">
           <img src={logoPath} alt="Global Home Solutions Logo" className="logo-hero" />
           <h1>Global Home Solutions</h1>
           <p className="culture">
