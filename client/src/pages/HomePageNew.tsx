@@ -130,12 +130,23 @@ export default function HomePage() {
           </p>
         </div>
       )}
-      <header>
-        <img src={logoPath} alt="Global Home Solutions Logo" className="logo-hero" />
-        <h1>Global Home Solutions</h1>
-        <p className="culture">
-          Browse by trade to view qualified contractors. Watch their videos, review completed projects, and select the professional who best matches your needs.
-        </p>
+      <header 
+        className="hero-header"
+        style={{
+          backgroundImage: `url('/attached_assets/0F1A4638_1754427544413.jpeg')`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+          position: 'relative'
+        }}
+      >
+        <div className="hero-overlay">
+          <img src={logoPath} alt="Global Home Solutions Logo" className="logo-hero" />
+          <h1>Global Home Solutions</h1>
+          <p className="culture">
+            Browse by trade to view qualified contractors. Watch their videos, review completed projects, and select the professional who best matches your needs.
+          </p>
+        </div>
       </header>
       <section className="search-section">
         <div className="search-input-container">
