@@ -418,16 +418,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { salespersonProfileUrl, userAgent, referrer } = req.body;
       
+      console.log('Track visit request received:', { 
+        salespersonProfileUrl, 
+        userAgent: userAgent?.substring(0, 50) + '...', 
+        referrer,
+        ip: req.ip 
+      });
+      
       if (!salespersonProfileUrl) {
+        console.error('Missing salesperson profile URL in track-visit request');
         return res.status(400).json({ message: "Salesperson profile URL is required" });
       }
 
-      // Get salesperson by profile URL
+      // Get salesperson by profile URL with improved error handling
+      console.log('Looking up salesperson by profile URL:', salespersonProfileUrl);
       const salesperson = await storage.getSalespersonByProfileUrl(salespersonProfileUrl);
       
       if (!salesperson) {
-        return res.status(404).json({ message: "Salesperson not found" });
+        console.error('Salesperson not found for profile URL:', salespersonProfileUrl);
+        
+        // Log all available salesperson profile URLs for debugging
+        const allSalespersons = await storage.getAllSalespersons();
+        console.log('Available salesperson profile URLs:', 
+          allSalespersons.map(s => s.profileUrl).join(', ')
+        );
+        
+        return res.status(404).json({ 
+          message: "Salesperson not found",
+          requestedProfile: salespersonProfileUrl,
+          availableProfiles: allSalespersons.map(s => s.profileUrl)
+        });
       }
+
+      console.log('Found salesperson:', { id: salesperson.id, profileUrl: salesperson.profileUrl });
 
       // Create page visit record for tracking
       const pageVisit = await storage.createPageVisit({
@@ -438,8 +461,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         visitorIp: req.ip || null
       });
 
+      console.log('Created page visit record:', pageVisit.id);
+
       // Increment salesperson's total visits
       await storage.incrementSalespersonStats(salesperson.id, 'totalVisits');
+      
+      console.log('Successfully tracked visit for salesperson:', salesperson.id);
 
       res.json({ 
         success: true, 
@@ -449,8 +476,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       });
     } catch (error) {
-      console.error("Error tracking visit:", error);
-      res.status(500).json({ message: "Error tracking visit" });
+      console.error("Detailed error tracking visit:", error);
+      console.error("Error stack:", error.stack);
+      res.status(500).json({ 
+        message: "Error tracking visit",
+        error: error.message 
+      });
     }
   });
 

@@ -18,6 +18,8 @@ export default function HomePage() {
   const [selectedContractor, setSelectedContractor] = useState<any>(null);
   const [showBidForm, setShowBidForm] = useState(false);
   const [trackedSalesperson, setTrackedSalesperson] = useState<any>(null);
+  const [trackingLoading, setTrackingLoading] = useState(false);
+  const [trackingComplete, setTrackingComplete] = useState(false);
 
   // Fetch contractors from database
   const { data: contractors, isLoading } = useQuery({
@@ -35,39 +37,75 @@ export default function HomePage() {
     ?.map((service: any) => service.name)
     ?.sort((a: string, b: string) => a.localeCompare(b)) || [];
 
-  // Track QR code visits for sales rep attribution
+  // Track QR code visits for sales rep attribution with robust error handling
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const refParam = urlParams.get('ref');
     
-    if (refParam && !trackedSalesperson) {
-      // Track the visit for commission attribution
-      apiRequest('POST', '/api/track-visit', {
-        salespersonProfileUrl: refParam,
-        userAgent: navigator.userAgent,
-        referrer: document.referrer
-      })
-      .then((response) => response.json())
-      .then((data) => {
-        console.log('Visit tracking response:', data);
-        if (data.success) {
-          setTrackedSalesperson(data.salesperson);
-          // Store in sessionStorage to persist during the session
-          sessionStorage.setItem('trackedSalesperson', JSON.stringify(data.salesperson));
-          console.log('Tracked salesperson set:', data.salesperson);
+    // Check sessionStorage first for existing tracking
+    const stored = sessionStorage.getItem('trackedSalesperson');
+    if (stored && !trackedSalesperson) {
+      try {
+        const parsedSalesperson = JSON.parse(stored);
+        if (parsedSalesperson && parsedSalesperson.id) {
+          setTrackedSalesperson(parsedSalesperson);
+          setTrackingComplete(true);
+          console.log('Restored tracked salesperson from session:', parsedSalesperson);
+          return;
         }
-      })
-      .catch((error) => {
-        console.log('Visit tracking failed:', error);
-      });
-    } else if (!trackedSalesperson) {
-      // Check if we have a tracked salesperson from sessionStorage
-      const stored = sessionStorage.getItem('trackedSalesperson');
-      if (stored) {
-        setTrackedSalesperson(JSON.parse(stored));
+      } catch (error) {
+        console.warn('Failed to parse stored salesperson data:', error);
+        sessionStorage.removeItem('trackedSalesperson');
       }
     }
-  }, [trackedSalesperson]);
+    
+    if (refParam && !trackedSalesperson && !trackingLoading) {
+      setTrackingLoading(true);
+      console.log('Starting salesperson tracking for ref:', refParam);
+      
+      // Track the visit for commission attribution with retry logic
+      const trackVisit = async (retryCount = 0) => {
+        try {
+          const response = await apiRequest('POST', '/api/track-visit', {
+            salespersonProfileUrl: refParam,
+            userAgent: navigator.userAgent,
+            referrer: document.referrer
+          });
+          
+          const data = await response.json();
+          console.log('Visit tracking response:', data);
+          
+          if (data.success && data.salesperson && data.salesperson.id) {
+            setTrackedSalesperson(data.salesperson);
+            sessionStorage.setItem('trackedSalesperson', JSON.stringify(data.salesperson));
+            console.log('Successfully tracked salesperson:', data.salesperson);
+            setTrackingComplete(true);
+          } else {
+            throw new Error('Invalid tracking response: ' + JSON.stringify(data));
+          }
+        } catch (error) {
+          console.error('Visit tracking failed (attempt ' + (retryCount + 1) + '):', error);
+          
+          // Retry up to 2 times with exponential backoff
+          if (retryCount < 2) {
+            setTimeout(() => trackVisit(retryCount + 1), Math.pow(2, retryCount) * 1000);
+          } else {
+            console.error('All tracking attempts failed for ref:', refParam);
+            setTrackingComplete(true); // Allow form to work without tracking
+          }
+        } finally {
+          if (retryCount === 0) {
+            setTrackingLoading(false);
+          }
+        }
+      };
+      
+      trackVisit();
+    } else if (!refParam) {
+      // No QR code reference, mark tracking as complete
+      setTrackingComplete(true);
+    }
+  }, [trackedSalesperson, trackingLoading]);
 
   useEffect(() => {
     if (!trade) {
@@ -304,6 +342,8 @@ export default function HomePage() {
           onClose={handleCloseBidForm}
           contractor={selectedContractor}
           trackedSalesperson={trackedSalesperson}
+          trackingLoading={trackingLoading}
+          trackingComplete={trackingComplete}
         />
       )}
     </div>

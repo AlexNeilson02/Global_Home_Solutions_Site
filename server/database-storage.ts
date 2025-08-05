@@ -182,8 +182,30 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getSalespersonByProfileUrl(profileUrl: string): Promise<Salesperson | undefined> {
-    const [salesperson] = await db.select().from(salespersons).where(eq(salespersons.profileUrl, profileUrl));
-    return salesperson;
+    // Normalize the profile URL for better matching
+    const normalizedUrl = profileUrl.trim().toLowerCase();
+    
+    // Try exact match first
+    const [exactMatch] = await db.select().from(salespersons).where(eq(salespersons.profileUrl, profileUrl));
+    if (exactMatch) return exactMatch;
+    
+    // Try case-insensitive match
+    const allSalespersons = await db.select().from(salespersons);
+    const caseInsensitiveMatch = allSalespersons.find(s => 
+      s.profileUrl && s.profileUrl.toLowerCase() === normalizedUrl
+    );
+    if (caseInsensitiveMatch) return caseInsensitiveMatch;
+    
+    // Try URL decoded match (in case of encoding issues)
+    try {
+      const decodedUrl = decodeURIComponent(profileUrl);
+      const [decodedMatch] = await db.select().from(salespersons).where(eq(salespersons.profileUrl, decodedUrl));
+      if (decodedMatch) return decodedMatch;
+    } catch (error) {
+      console.warn('URL decoding failed for profile URL:', profileUrl);
+    }
+    
+    return undefined;
   }
 
   async createSalesperson(insertSalesperson: InsertSalesperson): Promise<Salesperson> {

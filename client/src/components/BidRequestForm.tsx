@@ -51,9 +51,11 @@ interface BidRequestFormProps {
     fullName: string;
     profileUrl: string;
   };
+  trackingLoading?: boolean;
+  trackingComplete?: boolean;
 }
 
-export default function BidRequestForm({ isOpen, onClose, contractor, trackedSalesperson }: BidRequestFormProps) {
+export default function BidRequestForm({ isOpen, onClose, contractor, trackedSalesperson, trackingLoading = false, trackingComplete = true }: BidRequestFormProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
@@ -236,8 +238,21 @@ export default function BidRequestForm({ isOpen, onClose, contractor, trackedSal
   });
 
   const onSubmit = (data: BidRequestForm) => {
-    console.log('BidRequestForm - trackedSalesperson:', trackedSalesperson);
-    console.log('BidRequestForm - trackedSalesperson.id:', trackedSalesperson?.id);
+    // Ensure tracking is complete before allowing submission
+    if (trackingLoading) {
+      toast({
+        title: "Please wait",
+        description: "Still processing your referral link. Please try again in a moment.",
+        variant: "default",
+      });
+      return;
+    }
+
+    console.log('BidRequestForm - Tracking status:', { 
+      trackingLoading, 
+      trackingComplete, 
+      trackedSalesperson: trackedSalesperson?.id 
+    });
     
     // Map frontend form fields to backend expected fields
     const backendData = {
@@ -254,7 +269,7 @@ export default function BidRequestForm({ isOpen, onClose, contractor, trackedSal
       ...(trackedSalesperson && { salespersonId: trackedSalesperson.id })
     };
     
-    console.log('BidRequestForm - Final backend data:', backendData);
+    console.log('BidRequestForm - Final backend data with salesperson tracking:', backendData);
     submitBidRequest.mutate(backendData);
   };
 
@@ -267,7 +282,26 @@ export default function BidRequestForm({ isOpen, onClose, contractor, trackedSal
             Fill out the form below to request a bid for your project. 
             {contractor.companyName} specializes in: {contractor.specialties?.join(", ")}
           </DialogDescription>
-
+          
+          {/* Show tracking status */}
+          {trackingLoading && (
+            <div className="bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg p-3 mt-2">
+              <div className="flex items-center space-x-2">
+                <div className="animate-spin h-4 w-4 border-2 border-blue-600 border-t-transparent rounded-full"></div>
+                <span className="text-sm text-blue-700 dark:text-blue-300">
+                  Processing referral link...
+                </span>
+              </div>
+            </div>
+          )}
+          
+          {!trackingLoading && trackedSalesperson && (
+            <div className="bg-green-50 dark:bg-green-950 border border-green-200 dark:border-green-800 rounded-lg p-3 mt-2">
+              <span className="text-sm text-green-700 dark:text-green-300">
+                ✓ Referral tracked - Your sales rep will receive credit for this lead
+              </span>
+            </div>
+          )}
         </DialogHeader>
         
         <Form {...form}>
@@ -480,10 +514,12 @@ export default function BidRequestForm({ isOpen, onClose, contractor, trackedSal
               </Button>
               <Button 
                 type="submit" 
-                disabled={submitBidRequest.isPending}
-                className="bg-blue-600 hover:bg-blue-700 text-white font-semibold"
+                disabled={submitBidRequest.isPending || trackingLoading}
+                className="bg-blue-600 hover:bg-blue-700 text-white font-semibold disabled:opacity-50"
               >
-                {submitBidRequest.isPending ? "Sending..." : "Send Bid Request"}
+                {trackingLoading ? "Processing referral..." : 
+                 submitBidRequest.isPending ? "Sending..." : 
+                 "Send Bid Request"}
               </Button>
             </div>
           </form>
