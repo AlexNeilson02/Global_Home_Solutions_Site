@@ -139,13 +139,7 @@ export default function HomePage() {
             className="hero-background-image"
           />
         </div>
-        <div className="hero-content">
-          <img src={logoPath} alt="Global Home Solutions Logo" className="logo-hero" />
-          <h1>Global Home Solutions</h1>
-          <p className="culture">
-            Browse by trade to view qualified contractors. Watch their videos, review completed projects, and select the professional who best matches your needs.
-          </p>
-        </div>
+        
       </header>
       <section className="search-section">
         <div className="search-input-container">
