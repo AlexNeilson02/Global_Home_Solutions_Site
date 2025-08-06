@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import "../styles/HomePage.css";
 import watermelonLogo from "@assets/Watermelon_WW_Logo_Square_1750971640089.png";
 import vaultLogo from "@assets/Vault_Logo_Square_1751036708596.png";
+import continentalLogo from "@assets/Continental Concrete Logo — 6.24.2025 Proof Alpha_1751036821066.jpeg";
 
 interface ServiceCategoriesResponse {
   services: Array<{
@@ -228,7 +229,7 @@ const ServiceSelection = () => {
                 backgroundColor: '#f8f9fa'
               }}>
                 <img 
-                  src="/attached_assets/Continental Concrete Logo — 6.24.2025 Proof Alpha_1751036821066.jpeg" 
+                  src={continentalLogo} 
                   alt="Continental Concrete" 
                   style={{
                     width: '100%',
