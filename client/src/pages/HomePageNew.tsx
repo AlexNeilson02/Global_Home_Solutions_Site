@@ -106,7 +106,42 @@ export default function HomePage() {
   }, [trackedSalesperson, trackingLoading]);
 
   return (
-    <div className="homepage-container">
+    <div className="homepage-container" style={{ height: '100vh', overflow: 'hidden' }}>
+      <div style={{ 
+        position: 'absolute', 
+        top: '40px', 
+        left: '50%', 
+        transform: 'translateX(-50%)', 
+        zIndex: 10 
+      }}>
+        <button 
+          onClick={() => navigate('/services')}
+          style={{
+            backgroundColor: '#007bff',
+            color: 'white',
+            padding: '25px 60px',
+            fontSize: '28px',
+            fontWeight: 'bold',
+            border: 'none',
+            borderRadius: '15px',
+            cursor: 'pointer',
+            boxShadow: '0 8px 20px rgba(0,123,255,0.3)',
+            transition: 'all 0.3s ease',
+            textTransform: 'uppercase',
+            letterSpacing: '1px'
+          }}
+          onMouseOver={(e) => {
+            e.currentTarget.style.backgroundColor = '#0056b3';
+            e.currentTarget.style.transform = 'scale(1.05)';
+          }}
+          onMouseOut={(e) => {
+            e.currentTarget.style.backgroundColor = '#007bff';
+            e.currentTarget.style.transform = 'scale(1)';
+          }}
+        >
+          Find a Contractor
+        </button>
+      </div>
       <header className="hero-header">
         <div className="hero-image-container">
           <img 
@@ -117,23 +152,6 @@ export default function HomePage() {
         </div>
       </header>
       <div style={{ height: '100px' }}></div>
-      <div style={{ textAlign: 'center', padding: '20px' }}>
-        <button 
-          onClick={() => navigate('/services')}
-          style={{
-            backgroundColor: '#007bff',
-            color: 'white',
-            padding: '15px 30px',
-            fontSize: '18px',
-            border: 'none',
-            borderRadius: '8px',
-            cursor: 'pointer',
-            boxShadow: '0 4px 8px rgba(0,0,0,0.1)'
-          }}
-        >
-          Find a Contractor
-        </button>
-      </div>
     </div>
   );
 }

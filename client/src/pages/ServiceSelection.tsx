@@ -80,13 +80,30 @@ const ServiceSelection = () => {
   const filteredContractors = getFilteredContractors();
 
   return (
-    <div className="homepage-container">
-      <section className="search-section">
-        <div className="search-input-container">
+    <div className="homepage-container" style={{ 
+      display: 'flex', 
+      flexDirection: 'column', 
+      alignItems: 'center', 
+      justifyContent: 'center',
+      minHeight: '100vh',
+      padding: '20px'
+    }}>
+      <section className="search-section" style={{ 
+        maxWidth: '600px', 
+        width: '100%',
+        textAlign: 'center'
+      }}>
+        <div className="search-input-container" style={{ marginBottom: '20px' }}>
           <select
             className="service-dropdown"
             value={trade}
             onChange={e => setTrade(e.target.value)}
+            style={{ 
+              width: '100%', 
+              maxWidth: '400px',
+              margin: '0 auto',
+              display: 'block'
+            }}
           >
             <option value="">Select a service...</option>
             {trades.map(tr => (
@@ -99,14 +116,30 @@ const ServiceSelection = () => {
             </button>
           )}
         </div>
-        <button className="find-contractor-btn" onClick={handleFindContractor}>Find a Contractor</button>
+        <button 
+          className="find-contractor-btn" 
+          onClick={handleFindContractor}
+          style={{ margin: '0 auto', display: 'block' }}
+        >
+          Find a Contractor
+        </button>
       </section>
 
       {/* Featured Contractors Section - Only show when no search has been triggered */}
       {!searchTriggered && (
-        <section className="category-section">
+        <section className="category-section" style={{ 
+          maxWidth: '800px', 
+          width: '100%',
+          textAlign: 'center',
+          marginTop: '40px'
+        }}>
           <h2>Find the right contractor for your project</h2>
-          <div className="category-grid">
+          <div className="category-grid" style={{ 
+            display: 'grid', 
+            gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', 
+            gap: '20px',
+            justifyContent: 'center'
+          }}>
             <div className="category-card" onClick={() => handleCategoryClick("Electrical")}>
               <div className="category-image electrician-bg" style={{
                 backgroundSize: 'cover',
@@ -182,8 +215,13 @@ const ServiceSelection = () => {
 
       {/* Search Results Section */}
       {searchTriggered && (
-        <section className="search-results">
-          <div className="results-header">
+        <section className="search-results" style={{ 
+          maxWidth: '800px', 
+          width: '100%',
+          textAlign: 'center',
+          marginTop: '40px'
+        }}>
+          <div className="results-header" style={{ marginBottom: '30px' }}>
             <h2>Contractors for "{trade}"</h2>
             <button className="back-to-categories" onClick={clearSearch}>
               ← Back to Categories
@@ -195,12 +233,18 @@ const ServiceSelection = () => {
               <p>No contractors found for "{trade}". Try a different service category.</p>
             </div>
           ) : (
-            <div className="contractor-list">
+            <div className="contractor-list" style={{ 
+              display: 'grid', 
+              gap: '20px',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+              justifyContent: 'center'
+            }}>
               {filteredContractors.map((contractor: any) => (
                 <div 
                   key={contractor.id} 
                   className="contractor-card"
                   onClick={() => setLocation(`/contractor/${contractor.id}`)}
+                  style={{ margin: '0 auto' }}
                 >
                   <div className="contractor-image">
                     {contractor.profileImage ? (
