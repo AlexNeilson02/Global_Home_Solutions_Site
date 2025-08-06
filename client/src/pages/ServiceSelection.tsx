@@ -93,67 +93,75 @@ const ServiceSelection = () => {
         width: '100%',
         textAlign: 'center'
       }}>
-        <div className="search-input-container" style={{ marginBottom: '20px', position: 'relative', width: '100%' }}>
-          <select
-            className="service-dropdown"
-            value={trade}
-            onChange={e => setTrade(e.target.value)}
-            style={{ 
-              width: '100%',
-              fontSize: '20px',
-              padding: '20px 60px 20px 25px',
-              borderRadius: '12px',
-              border: '2px solid #ddd',
-              backgroundColor: 'white',
-              boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
-              fontWeight: '500',
-              appearance: 'none',
-              cursor: 'pointer'
-            }}
-          >
-            <option value="">Select a service...</option>
-            {trades.map(tr => (
-              <option key={tr} value={tr}>{tr}</option>
-            ))}
-          </select>
-          {trade && (
-            <button 
-              className="clear-search-btn" 
-              onClick={clearSearch}
-              style={{
-                position: 'absolute',
-                right: '15px',
-                top: '50%',
-                transform: 'translateY(-50%)',
-                background: 'none',
-                border: 'none',
-                fontSize: '24px',
-                cursor: 'pointer',
-                color: '#666',
-                zIndex: 1
+        <div style={{ 
+          display: 'flex', 
+          gap: '15px', 
+          alignItems: 'center', 
+          justifyContent: 'center',
+          marginBottom: '40px',
+          flexWrap: 'wrap'
+        }}>
+          <div className="search-input-container" style={{ position: 'relative', flex: '1', minWidth: '300px', maxWidth: '400px' }}>
+            <select
+              className="service-dropdown"
+              value={trade}
+              onChange={e => setTrade(e.target.value)}
+              style={{ 
+                width: '100%',
+                fontSize: '18px',
+                padding: '15px 50px 15px 20px',
+                borderRadius: '8px',
+                border: '2px solid #ddd',
+                backgroundColor: 'white',
+                boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
+                fontWeight: '500',
+                appearance: 'none',
+                cursor: 'pointer'
               }}
             >
-              ✕
-            </button>
-          )}
-        </div>
-        <div style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
+              <option value="">Select a service...</option>
+              {trades.map(tr => (
+                <option key={tr} value={tr}>{tr}</option>
+              ))}
+            </select>
+            {trade && (
+              <button 
+                className="clear-search-btn" 
+                onClick={clearSearch}
+                style={{
+                  position: 'absolute',
+                  right: '15px',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  background: 'none',
+                  border: 'none',
+                  fontSize: '20px',
+                  cursor: 'pointer',
+                  color: '#666',
+                  zIndex: 1
+                }}
+              >
+                ✕
+              </button>
+            )}
+          </div>
           <button 
             className="find-contractor-btn" 
             onClick={handleFindContractor}
             style={{ 
-              fontSize: '22px',
-              padding: '15px 40px',
+              fontSize: '18px',
+              padding: '15px 30px',
               backgroundColor: '#00aeef',
               color: 'white',
               border: 'none',
-              borderRadius: '12px',
+              borderRadius: '8px',
               cursor: 'pointer',
               fontWeight: 'bold',
               textTransform: 'uppercase',
               letterSpacing: '1px',
               boxShadow: '0 6px 16px rgba(0,174,239,0.3)',
-              transition: 'all 0.3s ease'
+              transition: 'all 0.3s ease',
+              whiteSpace: 'nowrap'
             }}
             onMouseOver={(e) => {
               e.currentTarget.style.backgroundColor = '#0088cc';
