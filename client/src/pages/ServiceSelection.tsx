@@ -102,8 +102,9 @@ const ServiceSelection = () => {
           flexDirection: 'column',
           alignItems: 'center', 
           justifyContent: 'center',
-          marginBottom: '40px',
-          gap: '10px'
+          marginTop: '80px',
+          marginBottom: '20px',
+          gap: '5px'
         }}>
           <div className="search-input-container" style={{ position: 'relative', width: '100%', minWidth: '600px' }}>
             <select
@@ -190,7 +191,7 @@ const ServiceSelection = () => {
           maxWidth: '800px', 
           width: '100%',
           textAlign: 'center',
-          marginTop: '40px'
+          marginTop: '15px'
         }}>
           <h2>Find the right contractor for your project</h2>
           <div className="category-grid" style={{ 
