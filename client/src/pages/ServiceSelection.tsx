@@ -2,7 +2,8 @@ import React, { useState } from "react";
 import { useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import "../styles/HomePage.css";
-// Using attached asset path directly
+import watermelonLogo from "@assets/Watermelon_WW_Logo_Square_1750971640089.png";
+import vaultLogo from "@assets/Vault_Logo_Square_1751036708596.png";
 
 interface ServiceCategoriesResponse {
   services: Array<{
@@ -252,7 +253,7 @@ const ServiceSelection = () => {
                 backgroundColor: '#f8f9fa'
               }}>
                 <img 
-                  src="/attached_assets/Watermelon_WW_Logo_Square_1750971640089.png" 
+                  src={watermelonLogo} 
                   alt="Watermelon Window Washing" 
                   style={{
                     width: '100%',
@@ -277,7 +278,7 @@ const ServiceSelection = () => {
                 backgroundColor: '#f8f9fa'
               }}>
                 <img 
-                  src="/attached_assets/Vault_Logo_Square_1751036708596.png" 
+                  src={vaultLogo} 
                   alt="Vault Pest Control" 
                   style={{
                     width: '100%',
