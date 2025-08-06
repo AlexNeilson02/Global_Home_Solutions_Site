@@ -11,13 +11,13 @@ export default function ContractorProfile() {
   if (!contractor) return <div>Contractor not found.</div>;
 
   const handleBack = () => {
-    // Navigate back to homepage with the contractor's trade preserved in search
-    navigate(`/?trade=${contractor.trade}`);
+    // Navigate back to services page
+    navigate('/services');
   };
 
   return (
     <div className="contractor-profile">
-      <button onClick={handleBack}>&larr; Back</button>
+      <button onClick={handleBack}>&larr; Back to Services</button>
       <div className="profile-header">
         <img src={contractor.photo} alt={contractor.name} className="profile-photo" />
         <h2>{contractor.name}</h2>

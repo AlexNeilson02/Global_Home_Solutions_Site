@@ -12,7 +12,7 @@ export default function ContractorProfile() {
 
   return (
     <div className="contractor-profile">
-      <button onClick={() => navigate(-1)}>&larr; Back</button>
+      <button onClick={() => navigate('/services')}>&larr; Back to Services</button>
       <div className="profile-header">
         <img src={contractor.photo} alt={contractor.name} className="profile-photo" />
         <h2>{contractor.name}</h2>
@@ -42,5 +42,3 @@ export default function ContractorProfile() {
     </div>
   );
 }
-
-export default ContractorProfile;
