@@ -29,7 +29,7 @@ const Portals: React.FC = () => {
             <img 
               src={logoPath} 
               alt="Global Home Solutions" 
-              className="h-64 w-auto"
+              className="h-70 w-auto"
             />
           </div>
           <h1 className="text-4xl font-bold text-white mb-6">
