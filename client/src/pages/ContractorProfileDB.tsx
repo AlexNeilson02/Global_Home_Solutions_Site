@@ -4,13 +4,16 @@ import { useQuery } from "@tanstack/react-query";
 import { useSalesperson } from "@/contexts/SalespersonContext";
 import BidRequestForm from "@/components/BidRequestForm";
 import { ContractorVideoDisplay } from "@/components/ContractorVideoDisplay";
-import { ArrowLeft, Phone, Mail, Globe, MapPin, Star, CheckCircle, Play, User } from "lucide-react";
+import { ArrowLeft, Phone, Mail, Globe, MapPin, Star, CheckCircle, Play, User, X, ChevronLeft, ChevronRight } from "lucide-react";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import "../styles/ContractorProfile.css";
 
 export default function ContractorProfileDB() {
   const { id } = useParams();
   const [, setLocation] = useLocation();
   const [showBidForm, setShowBidForm] = useState(false);
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const [isImageModalOpen, setIsImageModalOpen] = useState(false);
   const { salespersonId } = useSalesperson();
 
   const { data: contractorData, isLoading, error } = useQuery({
@@ -32,6 +35,26 @@ export default function ContractorProfileDB() {
 
   const handleBack = () => {
     setLocation('/');
+  };
+
+  // Get all images from mediaFiles
+  const getImages = () => {
+    return contractor?.mediaFiles?.filter((file: any) => file.type === 'image') || [];
+  };
+
+  const handleImageClick = (index: number) => {
+    setSelectedImageIndex(index);
+    setIsImageModalOpen(true);
+  };
+
+  const handlePreviousImage = () => {
+    const images = getImages();
+    setSelectedImageIndex(prev => prev > 0 ? prev - 1 : images.length - 1);
+  };
+
+  const handleNextImage = () => {
+    const images = getImages();
+    setSelectedImageIndex(prev => prev < images.length - 1 ? prev + 1 : 0);
   };
 
   return (
@@ -158,12 +181,23 @@ export default function ContractorProfileDB() {
                   contractor.mediaFiles
                     .filter((file: any) => file.type === 'image')
                     .map((image: any, i: number) => (
-                      <div key={`image-${i}`} className="bg-slate-800 rounded-xl overflow-hidden border border-slate-700">
+                      <div key={`image-${i}`} className="bg-slate-800 rounded-xl overflow-hidden border border-slate-700 cursor-pointer group relative"
+                           onClick={() => handleImageClick(i)}>
                         <img 
                           src={image.url} 
                           alt={image.name} 
-                          className="w-full h-48 object-cover"
+                          className="w-full h-48 object-cover transition-transform group-hover:scale-105"
                         />
+                        {/* Hover overlay */}
+                        <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all duration-200 flex items-center justify-center">
+                          <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+                            <div className="bg-white rounded-full p-2">
+                              <svg className="w-6 h-6 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
+                              </svg>
+                            </div>
+                          </div>
+                        </div>
                         {image.description && (
                           <p className="p-4 text-sm text-slate-300">{image.description}</p>
                         )}
@@ -259,6 +293,65 @@ export default function ContractorProfileDB() {
           </div>
         </div>
       </div>
+
+      {/* Image Enlargement Modal */}
+      <Dialog open={isImageModalOpen} onOpenChange={setIsImageModalOpen}>
+        <DialogContent className="max-w-4xl w-full p-0 bg-black border-0">
+          {(() => {
+            const images = getImages();
+            const currentImage = images[selectedImageIndex];
+            
+            if (!currentImage) return null;
+            
+            return (
+              <div className="relative">
+                {/* Close button */}
+                <button
+                  onClick={() => setIsImageModalOpen(false)}
+                  className="absolute top-4 right-4 z-50 bg-black bg-opacity-50 hover:bg-opacity-75 text-white rounded-full p-2 transition-all"
+                >
+                  <X size={24} />
+                </button>
+
+                {/* Navigation buttons */}
+                {images.length > 1 && (
+                  <>
+                    <button
+                      onClick={handlePreviousImage}
+                      className="absolute left-4 top-1/2 transform -translate-y-1/2 z-50 bg-black bg-opacity-50 hover:bg-opacity-75 text-white rounded-full p-2 transition-all"
+                    >
+                      <ChevronLeft size={24} />
+                    </button>
+                    <button
+                      onClick={handleNextImage}
+                      className="absolute right-4 top-1/2 transform -translate-y-1/2 z-50 bg-black bg-opacity-50 hover:bg-opacity-75 text-white rounded-full p-2 transition-all"
+                    >
+                      <ChevronRight size={24} />
+                    </button>
+                  </>
+                )}
+
+                {/* Image */}
+                <img
+                  src={currentImage.url}
+                  alt={currentImage.name}
+                  className="w-full h-auto max-h-[90vh] object-contain"
+                />
+
+                {/* Image info */}
+                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-6">
+                  <p className="text-white font-medium">{currentImage.name}</p>
+                  {images.length > 1 && (
+                    <p className="text-slate-300 text-sm mt-1">
+                      {selectedImageIndex + 1} of {images.length}
+                    </p>
+                  )}
+                </div>
+              </div>
+            );
+          })()}
+        </DialogContent>
+      </Dialog>
 
       {/* Bid Request Form Modal */}
       <BidRequestForm
