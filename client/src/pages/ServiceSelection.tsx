@@ -215,7 +215,7 @@ const ServiceSelection = () => {
               </div>
               <div className="category-content">
                 <h3>Electrical</h3>
-                <button className="category-btn">Find Electricians</button>
+                <button className="category-btn">Find Contractors</button>
               </div>
             </div>
 
@@ -240,7 +240,7 @@ const ServiceSelection = () => {
               </div>
               <div className="category-content">
                 <h3>Continental Concrete</h3>
-                <button className="category-btn">Find Continental Concrete</button>
+                <button className="category-btn">Find Contractors</button>
               </div>
             </div>
 
@@ -265,7 +265,7 @@ const ServiceSelection = () => {
               </div>
               <div className="category-content">
                 <h3>Watermelon Window Washing</h3>
-                <button className="category-btn">Find Watermelon Window Washing</button>
+                <button className="category-btn">Find Contractors</button>
               </div>
             </div>
 
@@ -290,7 +290,7 @@ const ServiceSelection = () => {
               </div>
               <div className="category-content">
                 <h3>Vault Pest Control</h3>
-                <button className="category-btn">Find Vault Pest Control</button>
+                <button className="category-btn">Find Contractors</button>
               </div>
             </div>
           </div>
