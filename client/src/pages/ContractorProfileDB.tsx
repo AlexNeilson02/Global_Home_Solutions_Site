@@ -59,8 +59,8 @@ export default function ContractorProfileDB() {
               
               <div className="relative px-8 pb-8">
                 {/* Logo */}
-                <div className="absolute -top-16 left-8">
-                  <div className="w-32 h-32 bg-slate-700 rounded-2xl shadow-lg p-3 flex items-center justify-center border border-slate-600">
+                <div className="absolute -top-20 left-8">
+                  <div className="w-40 h-40 bg-slate-700 rounded-2xl shadow-lg p-4 flex items-center justify-center border border-slate-600">
                     <img 
                       src={contractor.logoUrl || 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80'} 
                       alt={contractor.companyName} 
@@ -70,7 +70,7 @@ export default function ContractorProfileDB() {
                 </div>
 
                 {/* Company Info */}
-                <div className="pt-20">
+                <div className="pt-24">
                   <div className="flex items-center justify-between">
                     <div>
                       <h1 className="text-3xl font-bold text-white mb-2">{contractor.companyName}</h1>
