@@ -89,23 +89,23 @@ const ServiceSelection = () => {
       padding: '20px'
     }}>
       <section className="search-section" style={{ 
+        maxWidth: '600px', 
         width: '100%',
-        textAlign: 'center',
-        padding: '0 20px'
+        textAlign: 'center'
       }}>
-        <div className="search-input-container" style={{ marginBottom: '30px', position: 'relative', maxWidth: '600px', margin: '0 auto' }}>
+        <div className="search-input-container" style={{ marginBottom: '30px', position: 'relative', maxWidth: '500px', margin: '0 auto' }}>
           <select
             className="service-dropdown"
             value={trade}
             onChange={e => setTrade(e.target.value)}
             style={{ 
               width: '100%',
-              fontSize: '24px',
+              fontSize: '20px',
               padding: '20px 60px 20px 25px',
               borderRadius: '12px',
               border: '2px solid #ddd',
               backgroundColor: 'white',
-              boxShadow: '0 6px 16px rgba(0,0,0,0.1)',
+              boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
               fontWeight: '500',
               appearance: 'none',
               cursor: 'pointer'
