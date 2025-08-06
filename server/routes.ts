@@ -514,7 +514,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         additionalInformation,
         contractorId,
         salespersonId,
-        sessionTrackingId,
         // Legacy fields for backward compatibility
         customerName,
         customerEmail,
@@ -572,46 +571,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
         timeline: finalTimeline,
         budget: budget || null,
         preferredContactMethod: preferredContactMethod || "email",
-        additionalInformation: additionalInformation || (mediaUrls.length > 0 ? JSON.stringify({ mediaUrls }) : null),
-        // QR/NFC verification for commission eligibility
-        sessionTrackingId: sessionTrackingId || null,
-        isCommissionEligible: !!(salespersonId && sessionTrackingId)
+        additionalInformation: additionalInformation || (mediaUrls.length > 0 ? JSON.stringify({ mediaUrls }) : null)
       };
 
       console.log('Creating bid request with data:', bidRequestData);
       const bidRequest = await storage.createBidRequest(bidRequestData);
 
-      // Create commission record (either for salesperson or admin if no salesperson)
+      // Create commission record - simple salesperson_id based attribution
       try {
         console.log('Creating commission record...');
         const { CommissionService } = await import('./commission-service');
         
         if (salespersonId) {
-          console.log(`🔍 COMMISSION CHECK: Salesperson ${salespersonId} attributed to bid request ${bidRequest.id}`);
-          console.log(`📊 Session tracking ID: ${sessionTrackingId || 'NONE'}`);
-          console.log(`✅ Commission eligible: ${bidRequestData.isCommissionEligible}`);
+          console.log(`💰 PROCESSING COMMISSION: Salesperson ${salespersonId} attributed to bid request ${bidRequest.id}`);
           
-          if (bidRequestData.isCommissionEligible) {
-            console.log(`💰 PROCESSING COMMISSION for verified QR/NFC visit`);
-            // Increment the salesperson's successful conversions
-            await storage.incrementSalespersonStats(Number(salespersonId), 'successfulConversions');
+          // Increment the salesperson's successful conversions
+          await storage.incrementSalespersonStats(Number(salespersonId), 'successfulConversions');
+          
+          // Get salesperson and user details for notification
+          const salesperson = await storage.getSalesperson(Number(salespersonId));
+          if (salesperson) {
+            const salesUser = await storage.getUser(salesperson.userId);
+            console.log(`Bid request attributed to sales rep: ${salesUser?.fullName} (ID: ${salespersonId})`);
             
-            // Get salesperson and user details for notification
-            const salesperson = await storage.getSalesperson(Number(salespersonId));
-            if (salesperson) {
-              const salesUser = await storage.getUser(salesperson.userId);
-              console.log(`Bid request attributed to sales rep: ${salesUser?.fullName} (ID: ${salespersonId})`);
-              
-              // Create commission record with salesperson attribution
-              await CommissionService.createCommissionForBidRequest(bidRequest, salesperson.id);
-              console.log(`Commission created for bid request ${bidRequest.id}, salesperson ${salespersonId}`);
-            }
-          } else {
-            console.log(`🚫 COMMISSION DENIED: Salesperson ${salespersonId} not eligible - no verified QR/NFC visit`);
-            console.log(`❌ Commission only paid for users who arrive via QR/NFC codes`);
+            // Create commission record with salesperson attribution
+            await CommissionService.createCommissionForBidRequest(bidRequest, salesperson.id);
+            console.log(`Commission created for bid request ${bidRequest.id}, salesperson ${salespersonId}`);
           }
         } else {
-          console.log('No salesperson reference - commission will be assigned to admin');
+          console.log('No salesperson_id in URL - commission will be assigned to admin');
           // Create commission record with admin attribution (salesperson_id = null)
           await CommissionService.createCommissionForBidRequest(bidRequest, null);
           console.log(`Admin commission created for bid request ${bidRequest.id}`);

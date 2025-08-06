@@ -9,125 +9,26 @@ import "../styles/HomePage.css";
 
 export default function HomePage() {
   const [, navigate] = useLocation();
-  const [trackedSalesperson, setTrackedSalesperson] = useState<any>(null);
-  const [trackingLoading, setTrackingLoading] = useState(false);
-  const [trackingComplete, setTrackingComplete] = useState(false);
+  // Simple salesperson tracking from URL parameter
+  const [salespersonId, setSalespersonId] = useState<number | null>(null);
 
-  // Track QR code visits for sales rep attribution with comprehensive debugging
+  // Extract salesperson_id from URL on page load
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
-    const refParam = urlParams.get('ref');
+    const salespersonIdParam = urlParams.get('salesperson_id');
     
-    console.log('=== QR Tracking Debug ===');
-    console.log('Current URL:', window.location.href); 
-    console.log('URL params:', Object.fromEntries(urlParams.entries()));
-    console.log('Ref param:', refParam);
-    console.log('Current trackedSalesperson:', trackedSalesperson);
-    console.log('Tracking loading:', trackingLoading);
-    console.log('========================');
-    
-    // CRITICAL: Only restore from sessionStorage if there's a QR parameter
-    // This prevents attribution when users visit directly without QR codes
-    if (refParam) {
-      // Check sessionStorage for existing tracking ONLY if there's a QR parameter
-      const stored = sessionStorage.getItem('trackedSalesperson');
-      if (stored && !trackedSalesperson) {
-        try {
-          const parsedSalesperson = JSON.parse(stored);
-          // Verify that stored data has proper verification fields
-          if (parsedSalesperson && parsedSalesperson.id && parsedSalesperson.sessionTrackingId && parsedSalesperson.isVerified) {
-            setTrackedSalesperson(parsedSalesperson);
-            setTrackingComplete(true);
-            console.log('✓ Restored verified tracked salesperson from session:', parsedSalesperson);
-            return;
-          }
-        } catch (error) {
-          console.warn('Failed to parse stored salesperson data:', error);
-          sessionStorage.removeItem('trackedSalesperson');
-        }
+    if (salespersonIdParam) {
+      const id = parseInt(salespersonIdParam);
+      if (!isNaN(id)) {
+        setSalespersonId(id);
+        console.log('✅ Salesperson ID extracted from URL:', id);
+      } else {
+        console.warn('⚠️ Invalid salesperson_id in URL:', salespersonIdParam);
       }
     } else {
-      // CRITICAL: Clear any existing tracking when visiting without QR parameter
-      console.log('🧹 Clearing previous sales attribution - direct visit without QR code');
-      sessionStorage.removeItem('trackedSalesperson');
-      setTrackedSalesperson(null);
+      console.log('ℹ️ No salesperson_id in URL - no commission assignment');
     }
-    
-    if (refParam && !trackedSalesperson && !trackingLoading) {
-      setTrackingLoading(true);
-      console.log('🔄 Starting salesperson tracking for ref:', refParam);
-      
-      // Track the visit for commission attribution with enhanced debugging
-      const trackVisit = async (retryCount = 0) => {
-        try {
-          console.log(`📞 Making API call to track visit (attempt ${retryCount + 1}):`, {
-            url: '/api/track-visit',
-            method: 'POST',
-            body: { salespersonProfileUrl: refParam }
-          });
-          
-          const response = await fetch('/api/track-visit', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ salespersonProfileUrl: refParam })
-          });
-          
-          if (!response.ok) {
-            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-          }
-          
-          const responseData = await response.json();
-          
-          if (responseData.success && responseData.salesperson) {
-            console.log('✅ Visit tracked successfully:', responseData);
-            
-            // Store both salesperson and session tracking ID for commission verification
-            const trackingData = {
-              ...responseData.salesperson,
-              sessionTrackingId: responseData.sessionTrackingId,
-              isVerified: responseData.isVerified
-            };
-            
-            // Set state with full verification data
-            setTrackedSalesperson(trackingData);
-            setTrackingComplete(true);
-            
-            try {
-              sessionStorage.setItem('trackedSalesperson', JSON.stringify(trackingData));
-              console.log('💾 Stored verified tracking data:', trackingData);
-            } catch (storageError) {
-              console.warn('Failed to store in sessionStorage:', storageError);
-            }
-          } else {
-            console.warn('⚠️ API returned unsuccessful response:', responseData);
-          }
-        } catch (error: unknown) {
-          console.error(`❌ Error tracking visit (attempt ${retryCount + 1}):`, error);
-          
-          // Retry up to 3 times for network errors
-          if (retryCount < 2) {
-            const delay = (retryCount + 1) * 1000; // 1s, 2s, 3s delays
-            console.log(`🔄 Retrying in ${delay}ms...`);
-            setTimeout(() => trackVisit(retryCount + 1), delay);
-            return;
-          }
-          
-          console.error('💥 Max retries exceeded. Visit tracking failed.');
-        } finally {
-          if (retryCount >= 2) {
-            setTrackingLoading(false);
-          }
-        }
-      };
-      
-      trackVisit();
-    } else if (!refParam && !trackedSalesperson) {
-      console.log('ℹ️ No ref parameter found - marking tracking complete');
-      setTrackingComplete(true);
-    }
-  }, []);  // Run only on mount to avoid infinite loops
+  }, []);
 
   return (
     <div className="homepage-container" style={{ height: '100vh', overflow: 'hidden', position: 'relative' }}>

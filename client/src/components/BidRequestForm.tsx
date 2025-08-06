@@ -46,49 +46,18 @@ interface BidRequestFormProps {
     companyName: string;
     specialties: string[];
   };
-  trackedSalesperson?: {
-    id: number;
-    fullName?: string;
-    profileUrl: string;
-    sessionTrackingId?: string;
-    isVerified?: boolean;
-  };
-  trackingLoading?: boolean;
-  trackingComplete?: boolean;
+  salespersonId?: number | null;
 }
 
-export default function BidRequestForm({ isOpen, onClose, contractor, trackedSalesperson, trackingLoading = false, trackingComplete = true }: BidRequestFormProps) {
+export default function BidRequestForm({ isOpen, onClose, contractor, salespersonId }: BidRequestFormProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
   const [filePreviewUrls, setFilePreviewUrls] = useState<string[]>([]);
   
-  // CRITICAL: Only use verified salesperson data for commission attribution
-  const getTrackedSalesperson = () => {
-    if (trackedSalesperson && trackedSalesperson.sessionTrackingId && trackedSalesperson.isVerified) {
-      return trackedSalesperson;
-    }
-    
-    try {
-      const stored = sessionStorage.getItem('trackedSalesperson');
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        // STRICT VERIFICATION: Only use if it has proper verification fields
-        if (parsed && parsed.id && parsed.sessionTrackingId && parsed.isVerified) {
-          console.log('✅ Retrieved VERIFIED salesperson from sessionStorage:', parsed);
-          return parsed;
-        } else {
-          console.log('❌ Stored salesperson data lacks verification - ignoring for commission');
-          // Clear invalid data
-          sessionStorage.removeItem('trackedSalesperson');
-        }
-      }
-    } catch (error) {
-      console.warn('Failed to parse stored salesperson:', error);
-      sessionStorage.removeItem('trackedSalesperson');
-    }
-    console.log('🚫 No verified salesperson found - no commission attribution');
-    return null;
+  // Simple check for salesperson commission assignment
+  const shouldAssignCommission = () => {
+    return salespersonId !== null && salespersonId !== undefined && !isNaN(salespersonId);
   };
 
   // Fetch available services from the database
@@ -186,9 +155,9 @@ export default function BidRequestForm({ isOpen, onClose, contractor, trackedSal
         formData.append('budget', data.budget || '');
         formData.append('contractorId', data.contractorId.toString());
         
-        // Add salesperson attribution for commission tracking
-        if (trackedSalesperson) {
-          formData.append('salespersonId', trackedSalesperson.id.toString());
+        // Add salesperson attribution for commission tracking (only if URL parameter present)
+        if (shouldAssignCommission()) {
+          formData.append('salespersonId', salespersonId!.toString());
         }
         
         // Add files
@@ -215,8 +184,8 @@ export default function BidRequestForm({ isOpen, onClose, contractor, trackedSal
         // Use regular JSON for requests without files
         const submissionData = {
           ...data,
-          // Add salesperson attribution for commission tracking
-          ...(trackedSalesperson && { salespersonId: trackedSalesperson.id })
+          // Add salesperson attribution for commission tracking (only if URL parameter present)
+          ...(shouldAssignCommission() && { salespersonId: salespersonId })
         };
         
         const response = await fetch("/api/bid-requests", {
@@ -257,25 +226,9 @@ export default function BidRequestForm({ isOpen, onClose, contractor, trackedSal
 
   const onSubmit = (data: BidRequestForm) => {
     console.log('=== BID REQUEST SUBMISSION DEBUG ===');
-    console.log('Tracking loading:', trackingLoading);
-    console.log('Tracking complete:', trackingComplete);
-    console.log('Prop trackedSalesperson:', trackedSalesperson);
-    console.log('SessionStorage raw:', sessionStorage.getItem('trackedSalesperson'));
-    
-    // Get the actual tracked salesperson (from props or sessionStorage)
-    const actualTrackedSalesperson = getTrackedSalesperson();
-    console.log('🎯 Final tracked salesperson to use:', actualTrackedSalesperson);
+    console.log('Salesperson ID from URL:', salespersonId);
+    console.log('Should assign commission:', shouldAssignCommission());
     console.log('===================================');
-    
-    // Ensure tracking is complete before allowing submission
-    if (trackingLoading) {
-      toast({
-        title: "Please wait",
-        description: "Still processing your referral link. Please try again in a moment.",
-        variant: "default",
-      });
-      return;
-    }
     
     // Map frontend form fields to backend expected fields
     const backendData = {
@@ -288,11 +241,8 @@ export default function BidRequestForm({ isOpen, onClose, contractor, trackedSal
       preferredTimeframe: data.preferredTimeframe,
       budget: data.budget,
       contractorId: contractor.id,
-      // Add salesperson attribution for commission tracking
-      ...(actualTrackedSalesperson && { 
-        salespersonId: actualTrackedSalesperson.id,
-        sessionTrackingId: actualTrackedSalesperson.sessionTrackingId
-      })
+      // Only add salesperson ID if present in URL parameter
+      ...(shouldAssignCommission() && { salespersonId: salespersonId })
     };
     
     console.log('🚀 BidRequestForm - Final backend data:', backendData);

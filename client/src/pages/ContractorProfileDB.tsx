@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams, useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import BidRequestForm from "@/components/BidRequestForm";
@@ -10,6 +10,21 @@ export default function ContractorProfileDB() {
   const { id } = useParams();
   const [, setLocation] = useLocation();
   const [showBidForm, setShowBidForm] = useState(false);
+  const [salespersonId, setSalespersonId] = useState<number | null>(null);
+
+  // Extract salesperson_id from URL on page load
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const salespersonIdParam = urlParams.get('salesperson_id');
+    
+    if (salespersonIdParam) {
+      const id = parseInt(salespersonIdParam);
+      if (!isNaN(id)) {
+        setSalespersonId(id);
+        console.log('✅ Salesperson ID extracted from URL:', id);
+      }
+    }
+  }, []);
 
   const { data: contractorData, isLoading, error } = useQuery({
     queryKey: ['/api/contractors', id],
@@ -284,6 +299,7 @@ export default function ContractorProfileDB() {
         isOpen={showBidForm}
         onClose={() => setShowBidForm(false)}
         contractor={contractor}
+        salespersonId={salespersonId}
       />
     </div>
   );
