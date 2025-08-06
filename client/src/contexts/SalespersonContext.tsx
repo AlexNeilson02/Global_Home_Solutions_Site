@@ -23,13 +23,22 @@ interface SalespersonProviderProps {
 export const SalespersonProvider: React.FC<SalespersonProviderProps> = ({ children }) => {
   const [salespersonId, setSalespersonId] = useState<number | null>(null);
 
-  // Initialize salesperson tracking from URL or sessionStorage on app load
+  // Initialize salesperson tracking ONLY when QR parameters are present
   useEffect(() => {
     const initializeSalesperson = async () => {
       // Check URL parameters first
       const urlParams = new URLSearchParams(window.location.search);
       const salespersonIdParam = urlParams.get('salesperson_id');
       const refParam = urlParams.get('ref');
+      
+      // CRITICAL: Only proceed if QR parameters are present
+      if (!salespersonIdParam && !refParam) {
+        // Clear any existing session data when no QR parameters present
+        sessionStorage.removeItem('salespersonId');
+        setSalespersonId(null);
+        console.log('🚫 No QR parameters - cleared any existing salesperson tracking');
+        return;
+      }
       
       if (salespersonIdParam) {
         // Direct salesperson_id parameter
@@ -61,28 +70,8 @@ export const SalespersonProvider: React.FC<SalespersonProviderProps> = ({ childr
         }
       }
       
-      // CRITICAL FIX: Only restore from sessionStorage if URL has salesperson parameters
-      // This prevents false attribution when users visit without QR codes
-      const hasQRParams = salespersonIdParam || refParam;
-      if (hasQRParams) {
-        // Check sessionStorage for existing salesperson tracking only when QR params present
-        const storedSalespersonId = sessionStorage.getItem('salespersonId');
-        if (storedSalespersonId) {
-          const id = parseInt(storedSalespersonId);
-          if (!isNaN(id)) {
-            setSalespersonId(id);
-            console.log('✅ Restored salesperson tracking from session:', id);
-            return;
-          }
-        }
-      } else {
-        // Clear any existing session data when no QR parameters present
-        sessionStorage.removeItem('salespersonId');
-        setSalespersonId(null);
-        console.log('🚫 No QR parameters - cleared any existing salesperson tracking');
-      }
-      
-      console.log('ℹ️ No salesperson parameter - no commission assignment');
+      // If we reach here with QR params but failed to set up tracking
+      console.log('⚠️ QR parameters present but salesperson tracking failed');
     };
 
     initializeSalesperson();
