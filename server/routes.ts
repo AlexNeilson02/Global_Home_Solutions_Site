@@ -379,8 +379,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid salesperson profile" });
       }
       
-      // Increment total visits
-      await storage.incrementSalespersonStats(salesperson.id, 'totalVisits');
+      // Note: Visit tracking is handled separately by /api/track-visit endpoint
+      // to avoid double-counting visits when QR codes are scanned
       
       // Get the user associated with this salesperson
       const user = await storage.getUser(salesperson.userId);
