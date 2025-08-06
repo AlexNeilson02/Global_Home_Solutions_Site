@@ -149,12 +149,12 @@ const ServiceSelection = () => {
             className="find-contractor-btn" 
             onClick={handleFindContractor}
             style={{ 
-              fontSize: '18px',
-              padding: '15px 50px',
+              fontSize: '20px',
+              padding: '18px 60px',
               backgroundColor: '#00aeef',
               color: 'white',
               border: 'none',
-              borderRadius: '8px',
+              borderRadius: '10px',
               cursor: 'pointer',
               fontWeight: 'bold',
               textTransform: 'uppercase',
@@ -163,8 +163,8 @@ const ServiceSelection = () => {
               transition: 'all 0.3s ease',
               whiteSpace: 'nowrap',
               marginTop: '10px',
-              minWidth: '250px',
-              maxWidth: '350px'
+              minWidth: '280px',
+              maxWidth: '380px'
             }}
             onMouseOver={(e) => {
               e.currentTarget.style.backgroundColor = '#0088cc';
