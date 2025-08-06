@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { 
   Building2, 
   Camera, 
@@ -78,7 +79,7 @@ const ContractorPortalEnhanced: React.FC = () => {
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [logoPreview, setLogoPreview] = useState<string>('');
   const [mediaFiles, setMediaFiles] = useState<{url: string, type: 'image' | 'video', name: string}[]>([]);
-  const [newSpecialty, setNewSpecialty] = useState('');
+
   const [viewingBidDetails, setViewingBidDetails] = useState<any | null>(null);
   const [viewingMedia, setViewingMedia] = useState<{url: string, type: 'image' | 'video', index: number, allMedia: any[]} | null>(null);
   const [newServiceArea, setNewServiceArea] = useState('');
@@ -129,6 +130,13 @@ const ContractorPortalEnhanced: React.FC = () => {
   });
 
   const bidRequests = bidRequestsData?.bidRequests || [];
+
+  // Get service categories for specialties dropdown
+  const { data: servicesData } = useQuery({
+    queryKey: ["/api/service-categories"],
+  });
+  
+  const serviceCategories = servicesData?.services || [];
 
   // Contact customer mutation
   const contactCustomerMutation = useMutation({
@@ -392,16 +400,7 @@ const ContractorPortalEnhanced: React.FC = () => {
     setMediaFiles(prev => prev.filter((_, i) => i !== index));
   };
 
-  // Add specialty
-  const addSpecialty = () => {
-    if (newSpecialty.trim() && !editForm.specialties.includes(newSpecialty.trim())) {
-      setEditForm({
-        ...editForm,
-        specialties: [...editForm.specialties, newSpecialty.trim()]
-      });
-      setNewSpecialty('');
-    }
-  };
+
 
   // Remove specialty
   const removeSpecialty = (specialty: string) => {
@@ -915,17 +914,34 @@ const ContractorPortalEnhanced: React.FC = () => {
                           ))}
                         </div>
                         <div className="flex gap-2">
-                          <Input
-                            value={newSpecialty}
-                            onChange={(e) => setNewSpecialty(e.target.value)}
-                            placeholder="Add specialty"
-                            onKeyPress={(e) => e.key === 'Enter' && addSpecialty()}
-                            style={antiYellowInputStyles}
-                          />
-                          <Button type="button" onClick={addSpecialty} size="sm" style={antiYellowInputStyles}>
-                            <Plus className="h-4 w-4" />
-                          </Button>
+                          <Select
+                            value=""
+                            onValueChange={(value) => {
+                              if (value && !editForm.specialties.includes(value)) {
+                                setEditForm(prev => ({
+                                  ...prev,
+                                  specialties: [...prev.specialties, value]
+                                }));
+                              }
+                            }}
+                          >
+                            <SelectTrigger className="flex-1" style={antiYellowInputStyles}>
+                              <SelectValue placeholder="Select specialty from service categories" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {serviceCategories
+                                .filter((category: any) => !editForm.specialties.includes(category.name))
+                                .map((category: any) => (
+                                  <SelectItem key={category.id} value={category.name}>
+                                    {category.name}
+                                  </SelectItem>
+                                ))}
+                            </SelectContent>
+                          </Select>
                         </div>
+                        {serviceCategories.length === 0 && (
+                          <p className="text-sm text-gray-500 mt-2">Loading service categories...</p>
+                        )}
                       </div>
 
                       {/* Service Areas */}
