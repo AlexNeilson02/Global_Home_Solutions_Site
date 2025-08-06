@@ -137,17 +137,6 @@ const ServiceSelection = () => {
             </button>
           )}
         </div>
-        <div style={{ marginBottom: '20px' }}>
-          <h1 style={{ 
-            fontSize: '32px', 
-            fontWeight: 'bold', 
-            color: '#333', 
-            margin: '0',
-            textAlign: 'center'
-          }}>
-            Find the Perfect Contractor for Your Project
-          </h1>
-        </div>
         <div style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
           <button 
             className="find-contractor-btn" 
