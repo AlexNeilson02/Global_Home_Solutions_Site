@@ -63,28 +63,36 @@ export default function HomePage() {
           console.log(`📞 Making API call to track visit (attempt ${retryCount + 1}):`, {
             url: '/api/track-visit',
             method: 'POST',
-            body: { profileUrl: refParam }
+            body: { salespersonProfileUrl: refParam }
           });
           
-          const response = await apiRequest('/api/track-visit', {
+          const response = await fetch('/api/track-visit', {
             method: 'POST',
-            body: JSON.stringify({ salespersonProfileUrl: refParam }),
             headers: {
               'Content-Type': 'application/json'
-            }
+            },
+            body: JSON.stringify({ salespersonProfileUrl: refParam })
           });
           
-          if (response.success && response.salesperson) {
-            console.log('✅ Visit tracked successfully:', response);
-            setTrackedSalesperson(response.salesperson);
-            setTrackingComplete(true);
+          if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+          }
+          
+          const responseData = await response.json();
+          
+          if (responseData.success && responseData.salesperson) {
+            console.log('✅ Visit tracked successfully:', responseData);
             
             // Store both salesperson and session tracking ID for commission verification
             const trackingData = {
-              ...response.salesperson,
-              sessionTrackingId: response.sessionTrackingId,
-              isVerified: response.isVerified
+              ...responseData.salesperson,
+              sessionTrackingId: responseData.sessionTrackingId,
+              isVerified: responseData.isVerified
             };
+            
+            // Set state with full verification data
+            setTrackedSalesperson(trackingData);
+            setTrackingComplete(true);
             
             try {
               sessionStorage.setItem('trackedSalesperson', JSON.stringify(trackingData));
@@ -93,7 +101,7 @@ export default function HomePage() {
               console.warn('Failed to store in sessionStorage:', storageError);
             }
           } else {
-            console.warn('⚠️ API returned unsuccessful response:', response);
+            console.warn('⚠️ API returned unsuccessful response:', responseData);
           }
         } catch (error: unknown) {
           console.error(`❌ Error tracking visit (attempt ${retryCount + 1}):`, error);
@@ -119,7 +127,7 @@ export default function HomePage() {
       console.log('ℹ️ No ref parameter found - marking tracking complete');
       setTrackingComplete(true);
     }
-  }, [trackedSalesperson, trackingLoading]);
+  }, []);  // Run only on mount to avoid infinite loops
 
   return (
     <div className="homepage-container" style={{ height: '100vh', overflow: 'hidden', position: 'relative' }}>

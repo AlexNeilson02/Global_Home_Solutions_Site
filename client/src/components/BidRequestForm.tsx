@@ -48,8 +48,10 @@ interface BidRequestFormProps {
   };
   trackedSalesperson?: {
     id: number;
-    fullName: string;
+    fullName?: string;
     profileUrl: string;
+    sessionTrackingId?: string;
+    isVerified?: boolean;
   };
   trackingLoading?: boolean;
   trackingComplete?: boolean;
@@ -233,19 +235,7 @@ export default function BidRequestForm({ isOpen, onClose, contractor, trackedSal
         const errorData = await response.text();
         throw new Error(`Failed to submit bid request: ${errorData}`);
       }
-      
-      // Check if response has content before parsing JSON
-      const responseText = await response.text();
-      if (!responseText) {
-        return { success: true };
-      }
-      
-      try {
-        return JSON.parse(responseText);
-      } catch (e) {
-        console.warn("Response is not valid JSON:", responseText);
-        return { success: true };
-      }
+      return response.json();
     },
     onSuccess: () => {
       toast({
