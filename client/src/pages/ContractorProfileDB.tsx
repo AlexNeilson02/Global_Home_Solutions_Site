@@ -71,10 +71,10 @@ export default function ContractorProfileDB() {
                   </div>
                 </div>
 
-                {/* Company Info with About Services */}
+                {/* Company Info */}
                 <div className="pt-24">
-                  <div className="flex flex-col lg:flex-row lg:items-start gap-6">
-                    {/* Left side - Company name and status */}
+                  <div className="flex items-start gap-6 mb-6">
+                    {/* Company name and status next to logo area */}
                     <div className="flex-shrink-0">
                       <h1 className="text-3xl font-bold text-white mb-2">{contractor.companyName}</h1>
                       <div className="flex items-center gap-2">
@@ -82,31 +82,31 @@ export default function ContractorProfileDB() {
                         <span className="text-green-400 font-medium">Available Now</span>
                       </div>
                     </div>
+                  </div>
+                  
+                  {/* About Our Services - Below company name */}
+                  <div className="mb-6">
+                    <h3 className="text-lg font-bold text-white mb-3">About Our Services</h3>
+                    <p className="text-slate-300 leading-relaxed text-sm mb-4">
+                      {contractor.description || "Professional contractor services with years of experience delivering quality work."}
+                    </p>
                     
-                    {/* Right side - About Our Services */}
-                    <div className="flex-grow max-w-md">
-                      <h3 className="text-lg font-bold text-white mb-2">About Our Services</h3>
-                      <p className="text-slate-300 leading-relaxed text-sm mb-3">
-                        {contractor.description || "Professional contractor services with years of experience delivering quality work."}
-                      </p>
-                      
-                      {/* Specialties */}
-                      {contractor.specialties && contractor.specialties.length > 0 && (
-                        <div>
-                          <h4 className="text-sm font-semibold text-white mb-2">Specialties</h4>
-                          <div className="flex flex-wrap gap-1">
-                            {contractor.specialties.map((specialty: string, i: number) => (
-                              <span 
-                                key={i} 
-                                className="bg-blue-600 text-blue-100 px-2 py-1 rounded-full text-xs font-medium"
-                              >
-                                {specialty}
-                              </span>
-                            ))}
-                          </div>
+                    {/* Specialties */}
+                    {contractor.specialties && contractor.specialties.length > 0 && (
+                      <div>
+                        <h4 className="text-sm font-semibold text-white mb-2">Specialties</h4>
+                        <div className="flex flex-wrap gap-2">
+                          {contractor.specialties.map((specialty: string, i: number) => (
+                            <span 
+                              key={i} 
+                              className="bg-blue-600 text-blue-100 px-2 py-1 rounded-full text-xs font-medium"
+                            >
+                              {specialty}
+                            </span>
+                          ))}
                         </div>
-                      )}
-                    </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -179,13 +179,7 @@ export default function ContractorProfileDB() {
                 )}
               </div>
               
-              {/* Future testimonials placeholder */}
-              <div className="mt-8">
-                <h3 className="text-xl font-semibold text-white mb-4">Customer Testimonials</h3>
-                <div className="text-center py-6">
-                  <p className="text-slate-400">Customer testimonials will be displayed here once available.</p>
-                </div>
-              </div>
+
             </div>
 
 
