@@ -243,6 +243,56 @@ const ServiceSelection = () => {
               </div>
             </div>
 
+            <div className="category-card" onClick={() => setLocation('/contractor/18')}>
+              <div className="category-image" style={{
+                height: '150px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor: '#f8f9fa'
+              }}>
+                <img 
+                  src="/attached_assets/Watermelon_WW_Logo_Square_1750971640089.png" 
+                  alt="Watermelon Window Washing" 
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'contain',
+                    padding: '20px'
+                  }}
+                />
+              </div>
+              <div className="category-content">
+                <h3>Watermelon Window Washing</h3>
+                <button className="category-btn">Find Watermelon Window Washing</button>
+              </div>
+            </div>
+
+            <div className="category-card" onClick={() => setLocation('/contractor/20')}>
+              <div className="category-image" style={{
+                height: '150px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor: '#f8f9fa'
+              }}>
+                <img 
+                  src="/attached_assets/Vault_Logo_Square_1751036708596.png" 
+                  alt="Vault Pest Control" 
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'contain',
+                    padding: '20px'
+                  }}
+                />
+              </div>
+              <div className="category-content">
+                <h3>Vault Pest Control</h3>
+                <button className="category-btn">Find Vault Pest Control</button>
+              </div>
+            </div>
+
             <div className="category-card" onClick={() => handleCategoryClick("Plumbing")}>
               <div className="category-image plumber-bg" style={{
                 height: '150px'
