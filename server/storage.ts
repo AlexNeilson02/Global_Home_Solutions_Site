@@ -33,6 +33,8 @@ export interface IStorage {
   updateContractor(id: number, contractor: Partial<Contractor>): Promise<Contractor | undefined>;
   getAllContractors(): Promise<Contractor[]>;
   getFeaturedContractors(limit: number): Promise<Contractor[]>;
+  updateContractorStripeInfo(contractorId: number, stripeInfo: { stripeCustomerId?: string; stripeSubscriptionId?: string | null }): Promise<Contractor | undefined>;
+  getContractorByStripeSubscriptionId(subscriptionId: string): Promise<Contractor | undefined>;
   
   // Salesperson methods
   getSalesperson(id: number): Promise<Salesperson | undefined>;
@@ -108,6 +110,7 @@ export interface IStorage {
   createCommissionPayment(payment: InsertCommissionPayment): Promise<CommissionPayment>;
   getCommissionPaymentsByRecipient(recipientId: number): Promise<CommissionPayment[]>;
   updateCommissionPaymentStatus(id: number, status: string): Promise<CommissionPayment | undefined>;
+  getPendingCommissionsForContractor(contractorId: number): Promise<CommissionRecord[]>;
   
   // Commission analytics
   getCommissionSummaryBySalesperson(salespersonId: number, startDate?: Date, endDate?: Date): Promise<{

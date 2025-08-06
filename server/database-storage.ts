@@ -165,6 +165,23 @@ export class DatabaseStorage implements IStorage {
       .limit(limit);
   }
 
+  async updateContractorStripeInfo(contractorId: number, stripeInfo: { stripeCustomerId?: string; stripeSubscriptionId?: string | null }): Promise<Contractor | undefined> {
+    const [contractor] = await db
+      .update(contractors)
+      .set(stripeInfo)
+      .where(eq(contractors.id, contractorId))
+      .returning();
+    return contractor;
+  }
+
+  async getContractorByStripeSubscriptionId(subscriptionId: string): Promise<Contractor | undefined> {
+    const [contractor] = await db
+      .select()
+      .from(contractors)
+      .where(eq(contractors.stripeSubscriptionId, subscriptionId));
+    return contractor;
+  }
+
   // Salesperson methods
   async getSalesperson(id: number): Promise<Salesperson | undefined> {
     const [salesperson] = await db.select().from(salespersons).where(eq(salespersons.id, id));
@@ -1130,6 +1147,17 @@ export class DatabaseStorage implements IStorage {
       corpTotal: records.reduce((sum, r) => sum + (r.corpAmount || 0), 0),
       totalRecords: records.length
     };
+  }
+
+  async getPendingCommissionsForContractor(contractorId: number): Promise<CommissionRecord[]> {
+    const records = await db
+      .select()
+      .from(commissionRecords)
+      .where(and(
+        eq(commissionRecords.contractorId, contractorId),
+        eq(commissionRecords.paymentStatus, 'pending')
+      ));
+    return records;
   }
 }
 

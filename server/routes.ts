@@ -5,6 +5,7 @@ import multer from "multer";
 import { storage } from "./database-storage";
 import { setupAuth, isAuthenticated, requireRole } from "./auth";
 import { CommissionService } from "./commission-service";
+import Stripe from "stripe";
 import { z } from "zod";
 import QRCode from "qrcode";
 import { 
@@ -31,6 +32,20 @@ const upload = multer({
     }
   },
 });
+
+// Initialize Stripe - use environment variable or ask for API keys
+let stripe: Stripe | null = null;
+try {
+  if (process.env.STRIPE_SECRET_KEY) {
+    stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+      apiVersion: "2024-09-30.acacia",
+    });
+  } else {
+    console.log("STRIPE_SECRET_KEY not found - subscription features will not work");
+  }
+} catch (error) {
+  console.error("Failed to initialize Stripe:", error);
+}
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Setup authentication first
@@ -1266,6 +1281,232 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(400).json({ message: "Failed to create status update" });
     }
   });
+
+  // Subscription management endpoints
+  apiRouter.post("/create-subscription", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      if (!stripe) {
+        return res.status(500).json({ 
+          message: "Payment processing unavailable. Please contact support.",
+          needsSetup: true 
+        });
+      }
+
+      const user = req.user as User;
+      const { contractorId, amount, type } = req.body;
+
+      // Validate contractor ownership
+      const contractor = await storage.getContractor(contractorId);
+      if (!contractor || contractor.userId !== user.id) {
+        return res.status(403).json({ message: "Access denied to contractor account" });
+      }
+
+      // Create or retrieve Stripe customer
+      let customerId = contractor.stripeCustomerId;
+      if (!customerId) {
+        const customer = await stripe.customers.create({
+          email: user.email,
+          name: contractor.companyName || user.username,
+          metadata: {
+            contractorId: contractorId.toString(),
+            userId: user.id.toString()
+          }
+        });
+        customerId = customer.id;
+        await storage.updateContractorStripeInfo(contractorId, { stripeCustomerId: customerId });
+      }
+
+      // Create subscription
+      const subscription = await stripe.subscriptions.create({
+        customer: customerId,
+        items: [{
+          price_data: {
+            currency: 'usd',
+            product_data: {
+              name: 'Contractor Premium Subscription',
+              description: 'Monthly subscription with automatic commission payments'
+            },
+            unit_amount: amount, // $100 in cents
+            recurring: {
+              interval: 'month'
+            }
+          }
+        }],
+        payment_behavior: 'default_incomplete',
+        expand: ['latest_invoice.payment_intent'],
+        metadata: {
+          contractorId: contractorId.toString(),
+          type: type || 'monthly'
+        }
+      });
+
+      // Store subscription ID
+      await storage.updateContractorStripeInfo(contractorId, { 
+        stripeSubscriptionId: subscription.id 
+      });
+
+      const latestInvoice = subscription.latest_invoice as Stripe.Invoice;
+      const paymentIntent = latestInvoice?.payment_intent as Stripe.PaymentIntent;
+
+      res.json({
+        subscriptionId: subscription.id,
+        clientSecret: paymentIntent?.client_secret,
+        status: subscription.status
+      });
+
+    } catch (error) {
+      console.error("Error creating subscription:", error);
+      res.status(500).json({ message: "Failed to create subscription" });
+    }
+  });
+
+  apiRouter.get("/subscription-status/:contractorId", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const contractorId = parseInt(req.params.contractorId);
+      const user = req.user as User;
+
+      const contractor = await storage.getContractor(contractorId);
+      if (!contractor || contractor.userId !== user.id) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+
+      if (!contractor.stripeSubscriptionId || !stripe) {
+        return res.json({ status: 'inactive' });
+      }
+
+      const subscription = await stripe.subscriptions.retrieve(contractor.stripeSubscriptionId);
+      
+      res.json({
+        status: subscription.status === 'active' ? 'active' : 'inactive',
+        currentPeriodEnd: subscription.current_period_end,
+        nextBilling: new Date(subscription.current_period_end * 1000).toISOString()
+      });
+
+    } catch (error) {
+      console.error("Error checking subscription status:", error);
+      res.json({ status: 'inactive' });
+    }
+  });
+
+  apiRouter.post("/cancel-subscription", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      if (!stripe) {
+        return res.status(500).json({ message: "Payment processing unavailable" });
+      }
+
+      const user = req.user as User;
+      const { contractorId } = req.body;
+
+      const contractor = await storage.getContractor(contractorId);
+      if (!contractor || contractor.userId !== user.id) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+
+      if (!contractor.stripeSubscriptionId) {
+        return res.status(404).json({ message: "No active subscription found" });
+      }
+
+      await stripe.subscriptions.cancel(contractor.stripeSubscriptionId);
+      
+      // Update contractor record
+      await storage.updateContractorStripeInfo(contractorId, { 
+        stripeSubscriptionId: null 
+      });
+
+      res.json({ message: "Subscription cancelled successfully" });
+
+    } catch (error) {
+      console.error("Error cancelling subscription:", error);
+      res.status(500).json({ message: "Failed to cancel subscription" });
+    }
+  });
+
+  // Webhook endpoint for handling Stripe events and commission processing
+  apiRouter.post("/webhook/stripe", async (req: Request, res: Response) => {
+    try {
+      if (!stripe) {
+        return res.status(500).send("Stripe not configured");
+      }
+
+      const sig = req.headers['stripe-signature'];
+      let event: Stripe.Event;
+
+      try {
+        // In production, you should set up webhook endpoint secrets
+        event = stripe.webhooks.constructEvent(req.body, sig as string, process.env.STRIPE_WEBHOOK_SECRET || "");
+      } catch (err) {
+        console.error('Webhook signature verification failed:', err);
+        return res.status(400).send(`Webhook Error: ${err.message}`);
+      }
+
+      // Handle successful subscription payments
+      if (event.type === 'invoice.payment_succeeded') {
+        const invoice = event.data.object as Stripe.Invoice;
+        const subscriptionId = invoice.subscription as string;
+
+        // Find contractor by subscription ID
+        const contractor = await storage.getContractorByStripeSubscriptionId(subscriptionId);
+        if (!contractor) {
+          console.error('Contractor not found for subscription:', subscriptionId);
+          return res.status(404).send('Contractor not found');
+        }
+
+        // Process commission payments
+        await processCommissionPayments(contractor.id, invoice.amount_paid || 0);
+      }
+
+      res.json({ received: true });
+
+    } catch (error) {
+      console.error("Webhook error:", error);
+      res.status(500).send("Webhook handler failed");
+    }
+  });
+
+  // Helper function to process commission payments
+  async function processCommissionPayments(contractorId: number, paymentAmount: number) {
+    try {
+      // Get all relevant commission records for this contractor
+      const commissionRecords = await storage.getPendingCommissionsForContractor(contractorId);
+      
+      // Calculate commission distribution
+      const adminCommissionRate = 0.10; // 10% to admin
+      const salesRepCommissionRate = 0.05; // 5% to sales rep
+      
+      const adminCommission = paymentAmount * adminCommissionRate;
+      const salesRepCommission = paymentAmount * salesRepCommissionRate;
+      
+      // Process admin commission
+      await storage.createCommissionPayment({
+        type: 'admin_subscription',
+        amount: adminCommission,
+        contractorId: contractorId,
+        status: 'processed',
+        description: `Admin commission from $${(paymentAmount / 100).toFixed(2)} subscription payment`
+      });
+      
+      // Process sales rep commissions for any active attributions
+      if (commissionRecords && commissionRecords.length > 0) {
+        for (const record of commissionRecords) {
+          if (record.salespersonId) {
+            await storage.createCommissionPayment({
+              type: 'sales_subscription',
+              amount: salesRepCommission,
+              contractorId: contractorId,
+              salespersonId: record.salespersonId,
+              status: 'processed',
+              description: `Sales rep commission from $${(paymentAmount / 100).toFixed(2)} subscription payment`
+            });
+          }
+        }
+      }
+      
+      console.log(`Processed commission payments for contractor ${contractorId}: Admin: $${(adminCommission / 100).toFixed(2)}, Sales Rep: $${(salesRepCommission / 100).toFixed(2)}`);
+      
+    } catch (error) {
+      console.error("Error processing commission payments:", error);
+    }
+  }
 
   const httpServer = createServer(app);
   

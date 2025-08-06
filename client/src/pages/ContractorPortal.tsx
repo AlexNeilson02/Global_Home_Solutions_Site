@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
-import { Building, Users, FileText, TrendingUp, Calendar, Star, Edit, Save, X, Bell, BellRing } from "lucide-react";
+import { Building, Users, FileText, TrendingUp, Calendar, Star, Edit, Save, X, Bell, BellRing, CreditCard, DollarSign } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
@@ -83,6 +83,10 @@ const ContractorPortal: React.FC = () => {
   
   // Bid details viewer state
   const [viewingBidDetails, setViewingBidDetails] = useState<any | null>(null);
+
+  // Subscription state
+  const [subscriptionStatus, setSubscriptionStatus] = useState<'active' | 'inactive' | 'loading'>('loading');
+  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
 
   // Function to open media viewer
   const openMediaViewer = (url: string, type: 'image' | 'video', index: number, allMedia: any[] = []) => {
@@ -443,6 +447,88 @@ const ContractorPortal: React.FC = () => {
     }
   };
 
+  // Subscription management functions
+  const handleSubscriptionPayment = async () => {
+    setIsProcessingPayment(true);
+    try {
+      // Create payment intent for $100 monthly subscription
+      const response = await fetch('/api/create-subscription', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          contractorId: contractorId,
+          amount: 10000, // $100 in cents
+          type: 'monthly'
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to create subscription');
+      }
+
+      const { clientSecret } = await response.json();
+      
+      // Redirect to subscription payment page
+      window.location.href = `/subscription-payment?client_secret=${clientSecret}&contractor_id=${contractorId}`;
+      
+    } catch (error) {
+      console.error('Error creating subscription:', error);
+      toast({
+        title: "Payment Error",
+        description: "Failed to set up subscription. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsProcessingPayment(false);
+    }
+  };
+
+  const cancelSubscription = async () => {
+    try {
+      const response = await fetch('/api/cancel-subscription', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ contractorId: contractorId }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to cancel subscription');
+      }
+
+      setSubscriptionStatus('inactive');
+      toast({
+        title: "Subscription Cancelled",
+        description: "Your subscription has been cancelled successfully.",
+      });
+      
+    } catch (error) {
+      console.error('Error cancelling subscription:', error);
+      toast({
+        title: "Error",
+        description: "Failed to cancel subscription. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  // Check subscription status on load
+  useEffect(() => {
+    if (contractorId) {
+      fetch(`/api/subscription-status/${contractorId}`)
+        .then(response => response.json())
+        .then(data => {
+          setSubscriptionStatus(data.status === 'active' ? 'active' : 'inactive');
+        })
+        .catch(() => {
+          setSubscriptionStatus('inactive');
+        });
+    }
+  }, [contractorId]);
+
   // Mock performance data for charts
   const projectData = [
     { month: 'Jan', completed: 8, active: 12, revenue: 45000 },
@@ -484,7 +570,7 @@ const ContractorPortal: React.FC = () => {
           }} className="space-y-6">
             {/* Desktop Navigation - Only show on desktop */}
             {!isMobile && (
-              <TabsList className="grid w-full grid-cols-4">
+              <TabsList className="grid w-full grid-cols-5">
                 <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
                 <TabsTrigger value="projects">Projects</TabsTrigger>
                 <TabsTrigger value="leads" className="relative">
@@ -498,6 +584,7 @@ const ContractorPortal: React.FC = () => {
                     </Badge>
                   )}
                 </TabsTrigger>
+                <TabsTrigger value="subscription">Subscription</TabsTrigger>
                 <TabsTrigger value="profile">Company Profile</TabsTrigger>
               </TabsList>
             )}
@@ -1027,6 +1114,167 @@ const ContractorPortal: React.FC = () => {
                           {contractor?.serviceAreas?.map((area: string, index: number) => (
                             <Badge key={index} variant="outline">{area}</Badge>
                           )) || <p className="text-gray-500">No service areas listed</p>}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* Subscription Tab */}
+            <TabsContent value="subscription" className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <CreditCard className="h-5 w-5" />
+                    Subscription Management
+                  </CardTitle>
+                  <CardDescription>
+                    Manage your monthly subscription and commission payments
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  {subscriptionStatus === 'loading' ? (
+                    <div className="flex items-center justify-center py-8">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                    </div>
+                  ) : subscriptionStatus === 'active' ? (
+                    <div className="space-y-4">
+                      <div className="flex items-center gap-3 p-4 bg-green-50 border border-green-200 rounded-lg">
+                        <div className="flex-shrink-0">
+                          <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+                            <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                            </svg>
+                          </div>
+                        </div>
+                        <div>
+                          <h3 className="text-sm font-medium text-green-900">Active Subscription</h3>
+                          <p className="text-sm text-green-700">Your $100/month subscription is active and current.</p>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <Card>
+                          <CardHeader className="pb-3">
+                            <CardTitle className="text-lg flex items-center gap-2">
+                              <DollarSign className="h-4 w-4" />
+                              Monthly Subscription
+                            </CardTitle>
+                          </CardHeader>
+                          <CardContent>
+                            <div className="space-y-2">
+                              <div className="flex justify-between">
+                                <span className="text-sm text-gray-600">Monthly Fee:</span>
+                                <span className="font-semibold">$100.00</span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span className="text-sm text-gray-600">Next Billing:</span>
+                                <span className="text-sm">{new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString()}</span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span className="text-sm text-gray-600">Status:</span>
+                                <Badge variant="secondary" className="bg-green-100 text-green-700">Active</Badge>
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+
+                        <Card>
+                          <CardHeader className="pb-3">
+                            <CardTitle className="text-lg">Commission Payments</CardTitle>
+                          </CardHeader>
+                          <CardContent>
+                            <div className="space-y-2">
+                              <div className="flex justify-between">
+                                <span className="text-sm text-gray-600">Auto-Pay Enabled:</span>
+                                <Badge variant="secondary" className="bg-blue-100 text-blue-700">Yes</Badge>
+                              </div>
+                              <div className="flex justify-between">
+                                <span className="text-sm text-gray-600">Sales Rep Commission:</span>
+                                <span className="text-sm">Auto-processed</span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span className="text-sm text-gray-600">Admin Commission:</span>
+                                <span className="text-sm">Auto-processed</span>
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      </div>
+
+                      <div className="border-t pt-4">
+                        <div className="flex justify-between items-center">
+                          <div>
+                            <h3 className="text-sm font-medium text-gray-900">Subscription Actions</h3>
+                            <p className="text-sm text-gray-500">Manage your subscription settings</p>
+                          </div>
+                          <Button 
+                            variant="outline" 
+                            onClick={cancelSubscription}
+                            className="text-red-600 border-red-300 hover:bg-red-50"
+                          >
+                            Cancel Subscription
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="space-y-6">
+                      <div className="text-center py-8">
+                        <div className="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
+                          <CreditCard className="h-8 w-8 text-gray-400" />
+                        </div>
+                        <h3 className="text-lg font-medium text-gray-900 mb-2">No Active Subscription</h3>
+                        <p className="text-gray-600 mb-6">Subscribe to access premium features and automatic commission payments.</p>
+                        
+                        <div className="max-w-md mx-auto">
+                          <Card>
+                            <CardHeader>
+                              <CardTitle className="text-xl text-center">Premium Subscription</CardTitle>
+                              <div className="text-center">
+                                <span className="text-3xl font-bold">$100</span>
+                                <span className="text-gray-500">/month</span>
+                              </div>
+                            </CardHeader>
+                            <CardContent className="space-y-4">
+                              <ul className="space-y-2">
+                                <li className="flex items-center gap-2">
+                                  <svg className="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                  </svg>
+                                  <span className="text-sm">Automatic commission payments</span>
+                                </li>
+                                <li className="flex items-center gap-2">
+                                  <svg className="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                  </svg>
+                                  <span className="text-sm">Priority customer leads</span>
+                                </li>
+                                <li className="flex items-center gap-2">
+                                  <svg className="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                  </svg>
+                                  <span className="text-sm">Enhanced profile visibility</span>
+                                </li>
+                                <li className="flex items-center gap-2">
+                                  <svg className="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                  </svg>
+                                  <span className="text-sm">Advanced analytics dashboard</span>
+                                </li>
+                              </ul>
+                              
+                              <Button 
+                                onClick={handleSubscriptionPayment}
+                                disabled={isProcessingPayment}
+                                className="w-full bg-blue-600 hover:bg-blue-700"
+                              >
+                                {isProcessingPayment ? 'Processing...' : 'Subscribe Now'}
+                              </Button>
+                            </CardContent>
+                          </Card>
                         </div>
                       </div>
                     </div>

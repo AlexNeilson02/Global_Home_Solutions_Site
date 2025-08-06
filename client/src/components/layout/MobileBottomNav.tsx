@@ -11,7 +11,8 @@ import {
   User,
   BarChart3,
   Target,
-  DollarSign
+  DollarSign,
+  CreditCard
 } from 'lucide-react';
 
 interface MobileBottomNavProps {
@@ -34,6 +35,7 @@ const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
           { id: 'dashboard', label: 'Home', icon: Home },
           { id: 'projects', label: 'Projects', icon: Building },
           { id: 'leads', label: 'Leads', icon: Bell, hasNotification: notificationCount > 0 },
+          { id: 'subscription', label: 'Subscribe', icon: CreditCard },
           { id: 'profile', label: 'Profile', icon: User }
         ];
       case 'admin':
