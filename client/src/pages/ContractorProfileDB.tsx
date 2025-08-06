@@ -12,17 +12,40 @@ export default function ContractorProfileDB() {
   const [showBidForm, setShowBidForm] = useState(false);
   const [salespersonId, setSalespersonId] = useState<number | null>(null);
 
-  // Extract salesperson_id from URL on page load
+  // Extract salesperson info from URL on page load - supports both formats
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const salespersonIdParam = urlParams.get('salesperson_id');
+    const refParam = urlParams.get('ref');
     
     if (salespersonIdParam) {
+      // New format: ?salesperson_id=123
       const id = parseInt(salespersonIdParam);
       if (!isNaN(id)) {
         setSalespersonId(id);
         console.log('✅ Salesperson ID extracted from URL:', id);
       }
+    } else if (refParam) {
+      // QR code format: ?ref=username - need to lookup salesperson by profileUrl
+      console.log('✅ QR code ref parameter found:', refParam);
+      // Fetch salesperson by profileUrl to get ID
+      const fetchSalespersonByRef = async () => {
+        try {
+          const response = await fetch(`/api/salesperson/${refParam}`);
+          if (response.ok) {
+            const data = await response.json();
+            if (data.salesperson) {
+              setSalespersonId(data.salesperson.id);
+              console.log('✅ Salesperson ID from QR ref:', data.salesperson.id);
+            }
+          }
+        } catch (error) {
+          console.warn('⚠️ Could not find salesperson for ref:', refParam);
+        }
+      };
+      fetchSalespersonByRef();
+    } else {
+      console.log('ℹ️ No salesperson parameter in URL - no commission assignment');
     }
   }, []);
 
