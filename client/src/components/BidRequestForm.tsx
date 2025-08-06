@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
+import { useSalesperson } from "@/contexts/SalespersonContext";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -46,12 +47,12 @@ interface BidRequestFormProps {
     companyName: string;
     specialties: string[];
   };
-  salespersonId?: number | null;
 }
 
-export default function BidRequestForm({ isOpen, onClose, contractor, salespersonId }: BidRequestFormProps) {
+export default function BidRequestForm({ isOpen, onClose, contractor }: BidRequestFormProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { salespersonId } = useSalesperson();
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
   const [filePreviewUrls, setFilePreviewUrls] = useState<string[]>([]);
   
@@ -61,7 +62,7 @@ export default function BidRequestForm({ isOpen, onClose, contractor, salesperso
   };
 
   // Fetch available services from the database
-  const { data: servicesData } = useQuery({
+  const { data: servicesData } = useQuery<{services: Array<{id: number; name: string}>}>({
     queryKey: ["/api/service-categories"],
     enabled: isOpen, // Only fetch when modal is open
   });

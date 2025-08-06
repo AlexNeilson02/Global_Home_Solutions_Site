@@ -286,7 +286,6 @@ export default function ContractorProfileDB() {
         isOpen={showBidForm}
         onClose={() => setShowBidForm(false)}
         contractor={contractor}
-        salespersonId={salespersonId}
       />
     </div>
   );
