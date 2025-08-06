@@ -89,11 +89,11 @@ const ServiceSelection = () => {
       padding: '20px'
     }}>
       <section className="search-section" style={{ 
-        maxWidth: '600px', 
+        maxWidth: '800px', 
         width: '100%',
         textAlign: 'center'
       }}>
-        <div className="search-input-container" style={{ marginBottom: '30px', position: 'relative', maxWidth: '500px', margin: '0 auto' }}>
+        <div className="search-input-container" style={{ marginBottom: '20px', position: 'relative', width: '100%' }}>
           <select
             className="service-dropdown"
             value={trade}
@@ -137,36 +137,36 @@ const ServiceSelection = () => {
             </button>
           )}
         </div>
-        <button 
-          className="find-contractor-btn" 
-          onClick={handleFindContractor}
-          style={{ 
-            margin: '0 auto', 
-            display: 'block',
-            fontSize: '24px',
-            padding: '20px 50px',
-            backgroundColor: '#00aeef',
-            color: 'white',
-            border: 'none',
-            borderRadius: '12px',
-            cursor: 'pointer',
-            fontWeight: 'bold',
-            textTransform: 'uppercase',
-            letterSpacing: '1px',
-            boxShadow: '0 6px 16px rgba(0,174,239,0.3)',
-            transition: 'all 0.3s ease'
-          }}
-          onMouseOver={(e) => {
-            e.currentTarget.style.backgroundColor = '#0088cc';
-            e.currentTarget.style.transform = 'scale(1.05)';
-          }}
-          onMouseOut={(e) => {
-            e.currentTarget.style.backgroundColor = '#00aeef';
-            e.currentTarget.style.transform = 'scale(1)';
-          }}
-        >
-          Find a Contractor
-        </button>
+        <div style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
+          <button 
+            className="find-contractor-btn" 
+            onClick={handleFindContractor}
+            style={{ 
+              fontSize: '22px',
+              padding: '15px 40px',
+              backgroundColor: '#00aeef',
+              color: 'white',
+              border: 'none',
+              borderRadius: '12px',
+              cursor: 'pointer',
+              fontWeight: 'bold',
+              textTransform: 'uppercase',
+              letterSpacing: '1px',
+              boxShadow: '0 6px 16px rgba(0,174,239,0.3)',
+              transition: 'all 0.3s ease'
+            }}
+            onMouseOver={(e) => {
+              e.currentTarget.style.backgroundColor = '#0088cc';
+              e.currentTarget.style.transform = 'scale(1.05)';
+            }}
+            onMouseOut={(e) => {
+              e.currentTarget.style.backgroundColor = '#00aeef';
+              e.currentTarget.style.transform = 'scale(1)';
+            }}
+          >
+            Find a Contractor
+          </button>
+        </div>
       </section>
 
       {/* Featured Contractors Section - Only show when no search has been triggered */}
