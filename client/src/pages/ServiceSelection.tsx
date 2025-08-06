@@ -101,16 +101,16 @@ const ServiceSelection = () => {
           marginBottom: '40px',
           gap: '10px'
         }}>
-          <div className="search-input-container" style={{ position: 'relative', width: '100%' }}>
+          <div className="search-input-container" style={{ position: 'relative', width: '100%', minWidth: '600px' }}>
             <select
               className="service-dropdown"
               value={trade}
               onChange={e => setTrade(e.target.value)}
               style={{ 
                 width: '100%',
-                fontSize: '18px',
-                padding: '15px 50px 15px 20px',
-                borderRadius: '8px',
+                fontSize: '20px',
+                padding: '18px 60px 18px 25px',
+                borderRadius: '12px',
                 border: '2px solid #ddd',
                 backgroundColor: 'white',
                 boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
