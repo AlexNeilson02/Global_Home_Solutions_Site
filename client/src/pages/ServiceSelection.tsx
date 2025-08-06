@@ -292,28 +292,6 @@ const ServiceSelection = () => {
                 <button className="category-btn">Find Vault Pest Control</button>
               </div>
             </div>
-
-            <div className="category-card" onClick={() => handleCategoryClick("Plumbing")}>
-              <div className="category-image plumber-bg" style={{
-                height: '150px'
-              }}>
-              </div>
-              <div className="category-content">
-                <h3>Plumbing</h3>
-                <button className="category-btn">Find Plumbers</button>
-              </div>
-            </div>
-
-            <div className="category-card" onClick={() => handleCategoryClick("Flooring & Hardwood")}>
-              <div className="category-image flooring-bg" style={{
-                height: '150px'
-              }}>
-              </div>
-              <div className="category-content">
-                <h3>Flooring</h3>
-                <button className="category-btn">Find Flooring Experts</button>
-              </div>
-            </div>
           </div>
         </section>
       )}
