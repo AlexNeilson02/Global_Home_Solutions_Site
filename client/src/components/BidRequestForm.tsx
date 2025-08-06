@@ -469,12 +469,10 @@ export default function BidRequestForm({ isOpen, onClose, contractor, salesperso
               </Button>
               <Button 
                 type="submit" 
-                disabled={submitBidRequest.isPending || trackingLoading}
+                disabled={submitBidRequest.isPending}
                 className="bg-blue-600 hover:bg-blue-700 text-white font-semibold disabled:opacity-50"
               >
-                {trackingLoading ? "Processing referral..." : 
-                 submitBidRequest.isPending ? "Sending..." : 
-                 "Send Bid Request"}
+                {submitBidRequest.isPending ? "Sending..." : "Send Bid Request"}
               </Button>
             </div>
           </form>
