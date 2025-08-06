@@ -377,11 +377,17 @@ const ContractorPortalEnhanced: React.FC = () => {
       const result = e.target?.result as string;
       const fileType = file.type.startsWith('image/') ? 'image' : 'video';
       
-      setMediaFiles(prev => [...prev, {
-        url: result,
-        type: fileType,
-        name: file.name
-      }]);
+      console.log('Adding media file:', { file: file.name, type: fileType, url: result?.substring(0, 50) + '...' });
+      
+      setMediaFiles(prev => {
+        const newMediaFiles = [...prev, {
+          url: result,
+          type: fileType as 'image' | 'video',
+          name: file.name
+        }];
+        console.log('Updated media files:', newMediaFiles.length);
+        return newMediaFiles;
+      });
       
       toast({
         title: "Media uploaded",
@@ -390,6 +396,7 @@ const ContractorPortalEnhanced: React.FC = () => {
     };
     
     reader.onerror = () => {
+      console.error('Failed to read file:', file.name);
       toast({
         title: "Upload failed",
         description: `Failed to process ${file.name}. Please try again.`,
@@ -1019,7 +1026,10 @@ const ContractorPortalEnhanced: React.FC = () => {
 
                       {/* Media Upload */}
                       <div>
-                        <label className="block text-sm font-medium mb-2">Portfolio Media</label>
+                        <label className="block text-sm font-medium mb-2">Portfolio Media ({mediaFiles.length} files)</label>
+                        {mediaFiles.length === 0 && (
+                          <p className="text-sm text-gray-500 mb-2">No media files uploaded yet.</p>
+                        )}
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
                           {mediaFiles.map((media, index) => (
                             <div key={index} className="relative group rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800 aspect-square">
