@@ -65,6 +65,8 @@ export default function BidRequestForm({ isOpen, onClose, contractor, salesperso
     queryKey: ["/api/service-categories"],
     enabled: isOpen, // Only fetch when modal is open
   });
+  
+  const services = servicesData?.services || [];
 
   const form = useForm<BidRequestForm>({
     resolver: zodResolver(bidRequestSchema),
@@ -166,9 +168,7 @@ export default function BidRequestForm({ isOpen, onClose, contractor, salesperso
         });
 
         // Debug: log FormData contents
-        for (let [key, value] of formData.entries()) {
-          console.log(`FormData ${key}:`, value);
-        }
+        console.log('FormData entries:', Array.from(formData.entries()));
 
         const response = await fetch("/api/bid-requests", {
           method: "POST",
@@ -200,11 +200,6 @@ export default function BidRequestForm({ isOpen, onClose, contractor, salesperso
         }
         return response.json();
       }
-      if (!response.ok) {
-        const errorData = await response.text();
-        throw new Error(`Failed to submit bid request: ${errorData}`);
-      }
-      return response.json();
     },
     onSuccess: () => {
       toast({
