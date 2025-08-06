@@ -57,12 +57,13 @@ export const contractors = pgTable("contractors", {
   hourlyRate: real("hourly_rate"),
   logoUrl: text("logo_url"),
   videoUrl: text("video_url"),
+  mediaFiles: json("media_files").$type<{url: string, type: 'image' | 'video', name: string}[]>().default([]),
   isVerified: boolean("is_verified").default(false),
   isActive: boolean("is_active").default(true),
   subscriptionTier: text("subscription_tier").default("basic"), // basic, premium, pro
   monthlySpendCap: real("monthly_spend_cap").default(1000),
   paymentMethodAdded: boolean("payment_method_added").default(false),
-  // Media files are now stored in AWS S3, URLs tracked separately for performance
+  // Media files stored as JSON array with S3 URLs for performance
 });
 
 // Salespersons table

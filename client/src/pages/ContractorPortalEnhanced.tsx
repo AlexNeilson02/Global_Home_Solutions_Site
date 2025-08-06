@@ -377,17 +377,11 @@ const ContractorPortalEnhanced: React.FC = () => {
       const result = e.target?.result as string;
       const fileType = file.type.startsWith('image/') ? 'image' : 'video';
       
-      console.log('Adding media file:', { file: file.name, type: fileType, url: result?.substring(0, 50) + '...' });
-      
-      setMediaFiles(prev => {
-        const newMediaFiles = [...prev, {
-          url: result,
-          type: fileType as 'image' | 'video',
-          name: file.name
-        }];
-        console.log('Updated media files:', newMediaFiles.length);
-        return newMediaFiles;
-      });
+      setMediaFiles(prev => [...prev, {
+        url: result,
+        type: fileType as 'image' | 'video',
+        name: file.name
+      }]);
       
       toast({
         title: "Media uploaded",
