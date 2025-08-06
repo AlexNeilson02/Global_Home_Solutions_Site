@@ -89,7 +89,7 @@ const ServiceSelection = () => {
       padding: '20px'
     }}>
       <section className="search-section" style={{ 
-        maxWidth: '800px', 
+        maxWidth: '1000px', 
         width: '100%',
         textAlign: 'center'
       }}>
