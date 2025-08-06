@@ -84,9 +84,10 @@ const ServiceSelection = () => {
       display: 'flex', 
       flexDirection: 'column', 
       alignItems: 'center', 
-      justifyContent: 'center',
+      justifyContent: 'flex-start',
       minHeight: '100vh',
-      padding: '20px'
+      padding: '20px',
+      paddingTop: '80px'
     }}>
       <section className="search-section" style={{ 
         maxWidth: '800px', 
@@ -98,7 +99,7 @@ const ServiceSelection = () => {
           gap: '15px', 
           alignItems: 'center', 
           justifyContent: 'center',
-          marginBottom: '40px',
+          marginBottom: '60px',
           flexWrap: 'wrap'
         }}>
           <div className="search-input-container" style={{ position: 'relative', flex: '1', minWidth: '300px', maxWidth: '400px' }}>
