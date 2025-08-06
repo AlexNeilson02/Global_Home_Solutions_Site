@@ -138,6 +138,9 @@ const ContractorPortalEnhanced: React.FC = () => {
   
   const serviceCategories = (servicesData as any)?.services || [];
   
+  // Debug logging
+  console.log('Service categories data:', { servicesData, serviceCategories, servicesLoading, servicesError });
+  
   // Log any errors for debugging
   if (servicesError) {
     console.error('Error fetching service categories:', servicesError);
@@ -409,29 +412,46 @@ const ContractorPortalEnhanced: React.FC = () => {
 
   // Remove specialty
   const removeSpecialty = (specialty: string) => {
-    setEditForm({
-      ...editForm,
-      specialties: editForm.specialties.filter(s => s !== specialty)
-    });
+    try {
+      const currentSpecialties = Array.isArray(editForm.specialties) ? editForm.specialties : [];
+      setEditForm(prev => ({
+        ...prev,
+        specialties: currentSpecialties.filter(s => s !== specialty)
+      }));
+    } catch (error) {
+      console.error('Error removing specialty:', error);
+    }
   };
 
   // Add service area
   const addServiceArea = () => {
-    if (newServiceArea.trim() && !editForm.serviceAreas.includes(newServiceArea.trim())) {
-      setEditForm({
-        ...editForm,
-        serviceAreas: [...editForm.serviceAreas, newServiceArea.trim()]
-      });
-      setNewServiceArea('');
+    try {
+      if (newServiceArea.trim()) {
+        const currentServiceAreas = Array.isArray(editForm.serviceAreas) ? editForm.serviceAreas : [];
+        if (!currentServiceAreas.includes(newServiceArea.trim())) {
+          setEditForm(prev => ({
+            ...prev,
+            serviceAreas: [...currentServiceAreas, newServiceArea.trim()]
+          }));
+          setNewServiceArea('');
+        }
+      }
+    } catch (error) {
+      console.error('Error adding service area:', error);
     }
   };
 
   // Remove service area
   const removeServiceArea = (area: string) => {
-    setEditForm({
-      ...editForm,
-      serviceAreas: editForm.serviceAreas.filter(a => a !== area)
-    });
+    try {
+      const currentServiceAreas = Array.isArray(editForm.serviceAreas) ? editForm.serviceAreas : [];
+      setEditForm(prev => ({
+        ...prev,
+        serviceAreas: currentServiceAreas.filter(a => a !== area)
+      }));
+    } catch (error) {
+      console.error('Error removing service area:', error);
+    }
   };
 
   // Update contractor profile mutation
@@ -919,39 +939,54 @@ const ContractorPortalEnhanced: React.FC = () => {
                           ))}
                         </div>
                         <div className="flex gap-2">
-                          <Select
-                            value=""
-                            onValueChange={(value) => {
-                              if (value && value !== "loading") {
-                                const currentSpecialties = editForm.specialties || [];
-                                if (!currentSpecialties.includes(value)) {
-                                  setEditForm(prev => ({
-                                    ...prev,
-                                    specialties: [...currentSpecialties, value]
-                                  }));
+                          {servicesLoading ? (
+                            <div className="flex-1 p-2 text-sm text-gray-500 border rounded">
+                              Loading service categories...
+                            </div>
+                          ) : servicesError ? (
+                            <div className="flex-1 p-2 text-sm text-red-500 border rounded">
+                              Error loading categories
+                            </div>
+                          ) : (
+                            <Select
+                              value=""
+                              onValueChange={(value) => {
+                                try {
+                                  if (value && typeof value === 'string') {
+                                    const currentSpecialties = Array.isArray(editForm.specialties) ? editForm.specialties : [];
+                                    if (!currentSpecialties.includes(value)) {
+                                      setEditForm(prev => ({
+                                        ...prev,
+                                        specialties: [...currentSpecialties, value]
+                                      }));
+                                    }
+                                  }
+                                } catch (error) {
+                                  console.error('Error adding specialty:', error);
                                 }
-                              }
-                            }}
-                          >
-                            <SelectTrigger className="flex-1" style={antiYellowInputStyles}>
-                              <SelectValue placeholder="Select specialty from service categories" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {serviceCategories && serviceCategories.length > 0
-                                ? serviceCategories
+                              }}
+                            >
+                              <SelectTrigger className="flex-1" style={antiYellowInputStyles}>
+                                <SelectValue placeholder="Select specialty from service categories" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {Array.isArray(serviceCategories) && serviceCategories.length > 0 ? (
+                                  serviceCategories
                                     .filter((category: any) => {
-                                      const currentSpecialties = editForm.specialties || [];
-                                      return category?.name && !currentSpecialties.includes(category.name);
+                                      const currentSpecialties = Array.isArray(editForm.specialties) ? editForm.specialties : [];
+                                      return category?.name && typeof category.name === 'string' && !currentSpecialties.includes(category.name);
                                     })
                                     .map((category: any) => (
-                                      <SelectItem key={category.id} value={category.name}>
+                                      <SelectItem key={category.id || category.name} value={category.name}>
                                         {category.name}
                                       </SelectItem>
                                     ))
-                                : <SelectItem value="loading" disabled>Loading categories...</SelectItem>
-                              }
-                            </SelectContent>
-                          </Select>
+                                ) : (
+                                  <SelectItem value="no-categories" disabled>No categories available</SelectItem>
+                                )}
+                              </SelectContent>
+                            </Select>
+                          )}
                         </div>
                         {serviceCategories.length === 0 && (
                           <p className="text-sm text-gray-500 mt-2">Loading service categories...</p>
