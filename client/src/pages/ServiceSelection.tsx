@@ -356,9 +356,9 @@ const ServiceSelection = () => {
                     alignItems: 'center',
                     justifyContent: 'center'
                   }}>
-                    {contractor.profileImage ? (
+                    {contractor.logoUrl ? (
                       <img 
-                        src={contractor.profileImage} 
+                        src={contractor.logoUrl} 
                         alt={contractor.companyName}
                         style={{
                           width: '100%',
