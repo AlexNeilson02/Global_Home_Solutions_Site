@@ -95,13 +95,13 @@ const ServiceSelection = () => {
       }}>
         <div style={{ 
           display: 'flex', 
-          gap: '15px', 
+          flexDirection: 'column',
           alignItems: 'center', 
           justifyContent: 'center',
           marginBottom: '40px',
-          flexWrap: 'wrap'
+          gap: '10px'
         }}>
-          <div className="search-input-container" style={{ position: 'relative', flex: '1', minWidth: '300px', maxWidth: '400px' }}>
+          <div className="search-input-container" style={{ position: 'relative', width: '100%', maxWidth: '400px' }}>
             <select
               className="service-dropdown"
               value={trade}
@@ -161,7 +161,8 @@ const ServiceSelection = () => {
               letterSpacing: '1px',
               boxShadow: '0 6px 16px rgba(0,174,239,0.3)',
               transition: 'all 0.3s ease',
-              whiteSpace: 'nowrap'
+              whiteSpace: 'nowrap',
+              marginTop: '10px'
             }}
             onMouseOver={(e) => {
               e.currentTarget.style.backgroundColor = '#0088cc';
