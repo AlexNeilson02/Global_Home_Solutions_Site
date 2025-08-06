@@ -238,8 +238,8 @@ const ServiceSelection = () => {
                 />
               </div>
               <div className="category-content">
-                <h3>Concrete</h3>
-                <button className="category-btn">Find Concrete Specialists</button>
+                <h3>Continental Concrete</h3>
+                <button className="category-btn">Find Continental Concrete</button>
               </div>
             </div>
 
