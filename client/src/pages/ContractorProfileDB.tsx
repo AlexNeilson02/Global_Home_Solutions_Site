@@ -34,7 +34,7 @@ export default function ContractorProfileDB() {
   if (error || !contractor) return <div>Contractor not found.</div>;
 
   const handleBack = () => {
-    setLocation('/');
+    setLocation('/services');
   };
 
   // Get all images from mediaFiles
