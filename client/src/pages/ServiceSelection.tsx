@@ -150,7 +150,7 @@ const ServiceSelection = () => {
             onClick={handleFindContractor}
             style={{ 
               fontSize: '18px',
-              padding: '15px 50px',
+              padding: '15px 70px',
               backgroundColor: '#00aeef',
               color: 'white',
               border: 'none',
@@ -163,8 +163,8 @@ const ServiceSelection = () => {
               transition: 'all 0.3s ease',
               whiteSpace: 'nowrap',
               marginTop: '10px',
-              minWidth: '250px',
-              maxWidth: '350px'
+              minWidth: '300px',
+              maxWidth: '450px'
             }}
             onMouseOver={(e) => {
               e.currentTarget.style.backgroundColor = '#0088cc';
