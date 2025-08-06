@@ -26,6 +26,7 @@ export class CommissionService {
 
   /**
    * Create commission record when bid request is sent
+   * ONLY if the user arrived via verified QR/NFC code
    */
   static async createCommissionForBidRequest(
     bidRequest: BidRequest,
@@ -33,6 +34,36 @@ export class CommissionService {
     overrideManagerId?: number
   ): Promise<void> {
     try {
+      // ========== COMMISSION ELIGIBILITY CHECK ==========
+      // Verify that this bid request came from a legitimate QR/NFC code scan
+      // Only pay commissions when users arrive via sales rep QR/NFC codes
+      if (salespersonId) {
+        if (!bidRequest.sessionTrackingId) {
+          console.warn(`❌ COMMISSION DENIED: Salesperson ${salespersonId} attributed but no session tracking ID provided`);
+          console.warn(`🚫 NO COMMISSION - Sales rep cannot receive commission without verified QR/NFC attribution`);
+          return; // Exit early - no commission will be created
+        }
+
+        if (!bidRequest.isCommissionEligible) {
+          console.warn(`❌ COMMISSION DENIED: Bid request ${bidRequest.id} marked as not commission eligible`);
+          console.warn(`🚫 NO COMMISSION - Sales rep attribution without verified QR/NFC scan`);
+          return; // Exit early - no commission will be created
+        }
+
+        // Double-check with page visit verification
+        const verifiedVisit = await storage.getVerifiedQrNfcVisit(bidRequest.sessionTrackingId, salespersonId);
+        
+        if (!verifiedVisit) {
+          console.warn(`❌ COMMISSION DENIED: No verified QR/NFC visit found for session ${bidRequest.sessionTrackingId}, salesperson ${salespersonId}`);
+          console.warn(`🚫 NO COMMISSION - Sales rep attribution without verified QR/NFC scan`);
+          return; // Exit early - no commission will be created
+        }
+        
+        console.log(`✅ COMMISSION ELIGIBLE: Verified QR/NFC visit found for session ${bidRequest.sessionTrackingId}, salesperson ${salespersonId}`);
+      } else {
+        console.log(`ℹ️  No salesperson attribution - processing as general lead (no sales commission)`);
+      }
+      
       // Get service category to determine commission amounts
       const serviceCategories = await storage.getAllServiceCategories();
       

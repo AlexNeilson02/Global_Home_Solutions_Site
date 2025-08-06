@@ -290,7 +290,10 @@ export default function BidRequestForm({ isOpen, onClose, contractor, trackedSal
       budget: data.budget,
       contractorId: contractor.id,
       // Add salesperson attribution for commission tracking
-      ...(actualTrackedSalesperson && { salespersonId: actualTrackedSalesperson.id })
+      ...(actualTrackedSalesperson && { 
+        salespersonId: actualTrackedSalesperson.id,
+        sessionTrackingId: actualTrackedSalesperson.sessionTrackingId
+      })
     };
     
     console.log('🚀 BidRequestForm - Final backend data:', backendData);

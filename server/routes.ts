@@ -430,6 +430,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Salesperson profile URL is required" });
       }
 
+      // Generate unique session tracking ID for this visit
+      const sessionTrackingId = `qr_${salespersonProfileUrl}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      console.log('Generated session tracking ID:', sessionTrackingId);
+
       // Get salesperson by profile URL with improved error handling
       console.log('Looking up salesperson by profile URL:', salespersonProfileUrl);
       const salesperson = await storage.getSalespersonByProfileUrl(salespersonProfileUrl);
@@ -452,13 +456,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       console.log('Found salesperson:', { id: salesperson.id, profileUrl: salesperson.profileUrl });
 
-      // Create page visit record for tracking
+      // Create page visit record for tracking with QR/NFC verification
       const pageVisit = await storage.createPageVisit({
         salespersonId: salesperson.id,
         path: '/',
         userAgent: userAgent || null,
         referrer: referrer || null,
-        visitorIp: req.ip || null
+        visitorIp: req.ip || null,
+        // Mark as verified QR/NFC visit for commission eligibility
+        isVerifiedQrNfcVisit: true,
+        qrNfcSource: 'qr_code', // or 'nfc_tag' if coming from NFC
+        sessionTrackingId: sessionTrackingId
       });
 
       console.log('Created page visit record:', pageVisit.id);
@@ -473,7 +481,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         salesperson: {
           id: salesperson.id,
           profileUrl: salesperson.profileUrl
-        }
+        },
+        sessionTrackingId: sessionTrackingId,
+        isVerified: true
       });
     } catch (error) {
       console.error("Detailed error tracking visit:", error);
@@ -504,6 +514,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         additionalInformation,
         contractorId,
         salespersonId,
+        sessionTrackingId,
         // Legacy fields for backward compatibility
         customerName,
         customerEmail,
@@ -561,7 +572,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         timeline: finalTimeline,
         budget: budget || null,
         preferredContactMethod: preferredContactMethod || "email",
-        additionalInformation: additionalInformation || (mediaUrls.length > 0 ? JSON.stringify({ mediaUrls }) : null)
+        additionalInformation: additionalInformation || (mediaUrls.length > 0 ? JSON.stringify({ mediaUrls }) : null),
+        // QR/NFC verification for commission eligibility
+        sessionTrackingId: sessionTrackingId || null,
+        isCommissionEligible: !!(salespersonId && sessionTrackingId)
       };
 
       console.log('Creating bid request with data:', bidRequestData);
@@ -573,19 +587,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const { CommissionService } = await import('./commission-service');
         
         if (salespersonId) {
-          console.log(`Creating commission for salesperson: ${salespersonId}`);
-          // Increment the salesperson's successful conversions
-          await storage.incrementSalespersonStats(Number(salespersonId), 'successfulConversions');
+          console.log(`🔍 COMMISSION CHECK: Salesperson ${salespersonId} attributed to bid request ${bidRequest.id}`);
+          console.log(`📊 Session tracking ID: ${sessionTrackingId || 'NONE'}`);
+          console.log(`✅ Commission eligible: ${bidRequestData.isCommissionEligible}`);
           
-          // Get salesperson and user details for notification
-          const salesperson = await storage.getSalesperson(Number(salespersonId));
-          if (salesperson) {
-            const salesUser = await storage.getUser(salesperson.userId);
-            console.log(`Bid request attributed to sales rep: ${salesUser?.fullName} (ID: ${salespersonId})`);
+          if (bidRequestData.isCommissionEligible) {
+            console.log(`💰 PROCESSING COMMISSION for verified QR/NFC visit`);
+            // Increment the salesperson's successful conversions
+            await storage.incrementSalespersonStats(Number(salespersonId), 'successfulConversions');
             
-            // Create commission record with salesperson attribution
-            await CommissionService.createCommissionForBidRequest(bidRequest, salesperson.id);
-            console.log(`Commission created for bid request ${bidRequest.id}, salesperson ${salespersonId}`);
+            // Get salesperson and user details for notification
+            const salesperson = await storage.getSalesperson(Number(salespersonId));
+            if (salesperson) {
+              const salesUser = await storage.getUser(salesperson.userId);
+              console.log(`Bid request attributed to sales rep: ${salesUser?.fullName} (ID: ${salespersonId})`);
+              
+              // Create commission record with salesperson attribution
+              await CommissionService.createCommissionForBidRequest(bidRequest, salesperson.id);
+              console.log(`Commission created for bid request ${bidRequest.id}, salesperson ${salespersonId}`);
+            }
+          } else {
+            console.log(`🚫 COMMISSION DENIED: Salesperson ${salespersonId} not eligible - no verified QR/NFC visit`);
+            console.log(`❌ Commission only paid for users who arrive via QR/NFC codes`);
           }
         } else {
           console.log('No salesperson reference - commission will be assigned to admin');

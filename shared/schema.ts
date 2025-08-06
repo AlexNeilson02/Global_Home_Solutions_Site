@@ -133,6 +133,9 @@ export const bidRequests = pgTable("bid_requests", {
   lastUpdated: timestamp("last_updated"),
   notes: text("notes"),
   attachments: text("attachments").array(), // document IDs
+  // QR/NFC verification for commission eligibility
+  sessionTrackingId: text("session_tracking_id"), // Links to verified page visit
+  isCommissionEligible: boolean("is_commission_eligible").default(false),
 });
 
 // Page visit tracking table
@@ -146,6 +149,10 @@ export const pageVisits = pgTable("page_visits", {
   timestamp: timestamp("timestamp").defaultNow(),
   convertedToBidRequest: boolean("converted_to_bid_request").default(false),
   bidRequestId: integer("bid_request_id").references(() => bidRequests.id),
+  // QR/NFC verification fields for commission eligibility
+  isVerifiedQrNfcVisit: boolean("is_verified_qr_nfc_visit").default(false),
+  qrNfcSource: text("qr_nfc_source"), // 'qr_code', 'nfc_tag', null
+  sessionTrackingId: text("session_tracking_id"), // Unique ID to link visits to bid requests
 });
 
 // Documents/Files table for organized file management

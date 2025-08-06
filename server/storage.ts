@@ -88,6 +88,8 @@ export interface IStorage {
     uniqueVisitors: number, 
     conversionRate: number 
   }>;
+  // QR/NFC verification for commission eligibility
+  getVerifiedQrNfcVisit(sessionTrackingId: string, salespersonId: number): Promise<PageVisit | undefined>;
 
   // Commission methods
   createCommissionRecord(commission: InsertCommissionRecord): Promise<CommissionRecord>;

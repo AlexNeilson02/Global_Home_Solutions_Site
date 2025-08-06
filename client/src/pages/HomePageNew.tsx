@@ -58,7 +58,7 @@ export default function HomePage() {
           
           const response = await apiRequest('/api/track-visit', {
             method: 'POST',
-            body: JSON.stringify({ profileUrl: refParam }),
+            body: JSON.stringify({ salespersonProfileUrl: refParam }),
             headers: {
               'Content-Type': 'application/json'
             }
@@ -69,10 +69,16 @@ export default function HomePage() {
             setTrackedSalesperson(response.salesperson);
             setTrackingComplete(true);
             
-            // Store in sessionStorage for persistence across page reloads
+            // Store both salesperson and session tracking ID for commission verification
+            const trackingData = {
+              ...response.salesperson,
+              sessionTrackingId: response.sessionTrackingId,
+              isVerified: response.isVerified
+            };
+            
             try {
-              sessionStorage.setItem('trackedSalesperson', JSON.stringify(response.salesperson));
-              console.log('💾 Stored salesperson in session storage');
+              sessionStorage.setItem('trackedSalesperson', JSON.stringify(trackingData));
+              console.log('💾 Stored verified tracking data:', trackingData);
             } catch (storageError) {
               console.warn('Failed to store in sessionStorage:', storageError);
             }

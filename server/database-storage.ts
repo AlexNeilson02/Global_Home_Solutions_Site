@@ -598,6 +598,23 @@ export class DatabaseStorage implements IStorage {
     };
   }
 
+  // QR/NFC verification for commission eligibility
+  async getVerifiedQrNfcVisit(sessionTrackingId: string, salespersonId: number): Promise<PageVisit | undefined> {
+    const [visit] = await db
+      .select()
+      .from(pageVisits)
+      .where(
+        and(
+          eq(pageVisits.sessionTrackingId, sessionTrackingId),
+          eq(pageVisits.salespersonId, salespersonId),
+          eq(pageVisits.isVerifiedQrNfcVisit, true)
+        )
+      )
+      .limit(1);
+    
+    return visit;
+  }
+
   // Document management methods
   async createDocument(insertDocument: InsertDocument): Promise<Document> {
     const [document] = await db.insert(documents).values(insertDocument).returning();
