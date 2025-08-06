@@ -73,7 +73,7 @@ export default function ContractorProfileDB() {
 
                 {/* Company Info with About Services */}
                 <div className="pt-24">
-                  <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
+                  <div className="flex flex-col lg:flex-row lg:items-start gap-6">
                     {/* Left side - Company name and status */}
                     <div className="flex-shrink-0">
                       <h1 className="text-3xl font-bold text-white mb-2">{contractor.companyName}</h1>
@@ -83,7 +83,7 @@ export default function ContractorProfileDB() {
                       </div>
                     </div>
                     
-                    {/* Middle - About Our Services */}
+                    {/* Right side - About Our Services */}
                     <div className="flex-grow max-w-md">
                       <h3 className="text-lg font-bold text-white mb-2">About Our Services</h3>
                       <p className="text-slate-300 leading-relaxed text-sm mb-3">
@@ -106,12 +106,6 @@ export default function ContractorProfileDB() {
                           </div>
                         </div>
                       )}
-                    </div>
-
-                    {/* Right side - Rating */}
-                    <div className="flex items-center gap-1 bg-yellow-100 px-3 py-2 rounded-full flex-shrink-0">
-                      <Star className="text-yellow-500 fill-current" size={16} />
-                      <span className="text-yellow-700 font-medium">4.9</span>
                     </div>
                   </div>
                 </div>
