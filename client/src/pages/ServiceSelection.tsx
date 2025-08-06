@@ -106,7 +106,7 @@ const ServiceSelection = () => {
           marginBottom: '20px',
           gap: '5px'
         }}>
-          <div className="search-input-container" style={{ position: 'relative', width: '100%', maxWidth: '600px', minWidth: '280px' }}>
+          <div className="search-input-container" style={{ position: 'relative', width: '100%', maxWidth: '600px', minWidth: '280px', margin: '0 auto' }}>
             <select
               className="service-dropdown"
               value={trade}
