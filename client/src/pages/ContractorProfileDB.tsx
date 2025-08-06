@@ -88,6 +88,22 @@ export default function ContractorProfileDB() {
               </div>
             </div>
 
+            {/* Request Quote Section */}
+            <div className="bg-slate-800 rounded-2xl shadow-lg p-8 border border-slate-700">
+              <div className="text-center">
+                <h2 className="text-2xl font-bold text-white mb-4">Get Your Free Quote</h2>
+                <p className="text-slate-300 mb-6">
+                  Ready to get started? Request a personalized quote for your project and get connected with our professional team.
+                </p>
+                <button 
+                  onClick={() => setShowBidForm(true)}
+                  className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold py-4 px-8 rounded-xl transition-all duration-200 transform hover:scale-105 shadow-lg text-lg"
+                >
+                  Request Free Quote
+                </button>
+              </div>
+            </div>
+
             {/* About Section */}
             <div className="bg-slate-800 rounded-2xl shadow-lg p-8 border border-slate-700">
               <h2 className="text-2xl font-bold text-white mb-4">About Our Services</h2>
@@ -173,17 +189,25 @@ export default function ContractorProfileDB() {
           {/* Sidebar - Right Column */}
           <div className="lg:col-span-1">
             <div className="sticky top-8 space-y-6">
-              {/* Request Bid Card */}
+              {/* Quick Actions Card */}
               <div className="bg-slate-800 rounded-2xl shadow-lg p-6 border border-slate-700">
-                <button 
-                  onClick={() => setShowBidForm(true)}
-                  className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold py-4 px-6 rounded-xl transition-all duration-200 transform hover:scale-105 shadow-lg"
-                >
-                  Request Free Quote
-                </button>
-                <p className="text-center text-slate-400 text-sm mt-3">
-                  Get a personalized quote for your project
-                </p>
+                <h3 className="text-lg font-bold text-white mb-4">Quick Actions</h3>
+                <div className="space-y-3">
+                  <button 
+                    onClick={() => setShowBidForm(true)}
+                    className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-3 px-4 rounded-lg transition-all duration-200"
+                  >
+                    Request Quote
+                  </button>
+                  {contractor.phone && (
+                    <a 
+                      href={`tel:${contractor.phone}`}
+                      className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-4 rounded-lg transition-all duration-200 block text-center"
+                    >
+                      Call Now
+                    </a>
+                  )}
+                </div>
               </div>
 
               {/* Contact Information */}
