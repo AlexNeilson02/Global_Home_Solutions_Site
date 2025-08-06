@@ -386,7 +386,7 @@ const ServiceSelection = () => {
                   {/* Company Name */}
                   <h3 style={{
                     fontSize: '18px',
-                    fontWeight: '600',
+                    fontWeight: 'bold',
                     color: '#111827',
                     margin: '0 0 12px 0',
                     lineHeight: '1.4'
