@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import { useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
+import { useSalespersonNavigation } from "@/hooks/useSalespersonNavigation";
+import { useSalesperson } from "@/contexts/SalespersonContext";
 import "../styles/HomePage.css";
 import watermelonLogo from "@assets/Watermelon_WW_Logo_Square_1750971640089.png";
 import vaultLogo from "@assets/Vault_Logo_Square_1751036708596.png";
@@ -29,7 +30,8 @@ interface ContractorsResponse {
 }
 
 const ServiceSelection = () => {
-  const [, setLocation] = useLocation();
+  const { navigateWithSalesperson } = useSalespersonNavigation();
+  const { salespersonId } = useSalesperson();
   const [trade, setTrade] = useState("");
   const [searchTriggered, setSearchTriggered] = useState(false);
   const [selectedContractor, setSelectedContractor] = useState<any>(null);
@@ -220,7 +222,7 @@ const ServiceSelection = () => {
               </div>
             </div>
 
-            <div className="category-card" onClick={() => setLocation('/contractor/19')}>
+            <div className="category-card" onClick={() => navigateWithSalesperson('/contractor/19')}>
               <div className="category-image" style={{
                 height: '150px',
                 display: 'flex',
@@ -244,7 +246,7 @@ const ServiceSelection = () => {
               </div>
             </div>
 
-            <div className="category-card" onClick={() => setLocation('/contractor/18')}>
+            <div className="category-card" onClick={() => navigateWithSalesperson('/contractor/18')}>
               <div className="category-image" style={{
                 height: '150px',
                 display: 'flex',
@@ -268,7 +270,7 @@ const ServiceSelection = () => {
               </div>
             </div>
 
-            <div className="category-card" onClick={() => setLocation('/contractor/20')}>
+            <div className="category-card" onClick={() => navigateWithSalesperson('/contractor/20')}>
               <div className="category-image" style={{
                 height: '150px',
                 display: 'flex',
@@ -325,7 +327,7 @@ const ServiceSelection = () => {
                 <div 
                   key={contractor.id} 
                   className="contractor-card"
-                  onClick={() => setLocation(`/contractor/${contractor.id}`)}
+                  onClick={() => navigateWithSalesperson(`/contractor/${contractor.id}`)}
                   style={{ margin: '0 auto' }}
                 >
                   <div className="contractor-image">

@@ -1,15 +1,15 @@
 import React from "react";
-import { useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useSalesperson } from "@/contexts/SalespersonContext";
+import { useSalespersonNavigation } from "@/hooks/useSalespersonNavigation";
 import BidRequestForm from "@/components/BidRequestForm";
 import logoPath from "@/assets/global-home-solutions-logo.png";
 import heroBackgroundImage from "@/assets/ghs-office-front.png";
 import "../styles/HomePage.css";
 
 export default function HomePage() {
-  const [, navigate] = useLocation();
+  const { navigateWithSalesperson } = useSalespersonNavigation();
   const { salespersonId } = useSalesperson();
 
   return (
@@ -31,7 +31,7 @@ export default function HomePage() {
         zIndex: 10 
       }}>
         <button 
-          onClick={() => navigate('/services')}
+          onClick={() => navigateWithSalesperson('/services')}
           style={{
             backgroundColor: '#00aeef',
             color: 'white',
@@ -57,6 +57,23 @@ export default function HomePage() {
         >
           Find a Contractor
         </button>
+        {salespersonId && (
+          <div style={{
+            position: 'absolute',
+            top: '20px',
+            right: '20px',
+            backgroundColor: 'rgba(34, 197, 94, 0.9)',
+            color: 'white',
+            padding: '8px 16px',
+            borderRadius: '20px',
+            fontSize: '14px',
+            fontWeight: '600',
+            boxShadow: '0 4px 12px rgba(34, 197, 94, 0.3)',
+            zIndex: 1000
+          }}>
+            Commission Tracking Active (ID: {salespersonId})
+          </div>
+        )}
       </div>
     </div>
   );
