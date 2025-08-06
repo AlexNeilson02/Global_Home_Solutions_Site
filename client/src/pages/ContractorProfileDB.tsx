@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useSalesperson } from "@/contexts/SalespersonContext";
 import BidRequestForm from "@/components/BidRequestForm";
 import { ContractorVideoDisplay } from "@/components/ContractorVideoDisplay";
-import { ArrowLeft, Phone, Mail, Globe, MapPin, Star, CheckCircle, Play } from "lucide-react";
+import { ArrowLeft, Phone, Mail, Globe, MapPin, Star, CheckCircle, Play, User } from "lucide-react";
 import "../styles/ContractorProfile.css";
 
 export default function ContractorProfileDB() {
@@ -71,17 +71,45 @@ export default function ContractorProfileDB() {
                   </div>
                 </div>
 
-                {/* Company Info */}
+                {/* Company Info with About Services */}
                 <div className="pt-24">
-                  <div className="flex items-center justify-between">
-                    <div>
+                  <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
+                    {/* Left side - Company name and status */}
+                    <div className="flex-shrink-0">
                       <h1 className="text-3xl font-bold text-white mb-2">{contractor.companyName}</h1>
                       <div className="flex items-center gap-2">
                         <CheckCircle className="text-green-400" size={20} />
                         <span className="text-green-400 font-medium">Available Now</span>
                       </div>
                     </div>
-                    <div className="flex items-center gap-1 bg-yellow-100 px-3 py-2 rounded-full">
+                    
+                    {/* Middle - About Our Services */}
+                    <div className="flex-grow max-w-md">
+                      <h3 className="text-lg font-bold text-white mb-2">About Our Services</h3>
+                      <p className="text-slate-300 leading-relaxed text-sm mb-3">
+                        {contractor.description || "Professional contractor services with years of experience delivering quality work."}
+                      </p>
+                      
+                      {/* Specialties */}
+                      {contractor.specialties && contractor.specialties.length > 0 && (
+                        <div>
+                          <h4 className="text-sm font-semibold text-white mb-2">Specialties</h4>
+                          <div className="flex flex-wrap gap-1">
+                            {contractor.specialties.map((specialty: string, i: number) => (
+                              <span 
+                                key={i} 
+                                className="bg-blue-600 text-blue-100 px-2 py-1 rounded-full text-xs font-medium"
+                              >
+                                {specialty}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Right side - Rating */}
+                    <div className="flex items-center gap-1 bg-yellow-100 px-3 py-2 rounded-full flex-shrink-0">
                       <Star className="text-yellow-500 fill-current" size={16} />
                       <span className="text-yellow-700 font-medium">4.9</span>
                     </div>
@@ -106,35 +134,18 @@ export default function ContractorProfileDB() {
               </div>
             </div>
 
-
-
-            {/* Video Section */}
-            {contractor.videoUrl && (
-              <div className="bg-slate-800 rounded-2xl shadow-lg p-8 border border-slate-700">
-                <div className="flex items-center gap-2 mb-4">
-                  <Play className="text-blue-400" size={24} />
-                  <h2 className="text-2xl font-bold text-white">Introduction Video</h2>
-                </div>
-                <div className="rounded-xl overflow-hidden">
-                  <ContractorVideoDisplay
-                    videoUrl={contractor.videoUrl}
-                    contractorName={contractor.companyName}
-                    className="w-full"
-                    showControls={true}
-                  />
-                </div>
-              </div>
-            )}
-
-            {/* Media Gallery */}
-            {contractor.mediaFiles && contractor.mediaFiles.length > 0 && (
-              <div className="bg-slate-800 rounded-2xl shadow-lg p-8 border border-slate-700">
-                <h2 className="text-2xl font-bold text-white mb-6">Project Gallery</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {contractor.mediaFiles
+            {/* Media and Testimonials Section */}
+            <div className="space-y-6">
+              <h2 className="text-2xl font-bold text-white">Media and Testimonials</h2>
+              
+              {/* Flexible area for uploaded media */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {/* Display contractor videos if available */}
+                {contractor.mediaFiles && contractor.mediaFiles.filter((file: any) => file.type === 'video').length > 0 && 
+                  contractor.mediaFiles
                     .filter((file: any) => file.type === 'video')
                     .map((video: any, i: number) => (
-                      <div key={i} className="bg-slate-700 rounded-xl p-4 border border-slate-600">
+                      <div key={`video-${i}`} className="bg-slate-800 rounded-xl p-4 border border-slate-700">
                         <ContractorVideoDisplay
                           videoUrl={video.url}
                           contractorName={contractor.companyName}
@@ -145,11 +156,15 @@ export default function ContractorProfileDB() {
                           <p className="mt-3 text-sm text-slate-300">{video.description}</p>
                         )}
                       </div>
-                    ))}
-                  {contractor.mediaFiles
+                    ))
+                }
+                
+                {/* Display contractor images if available */}
+                {contractor.mediaFiles && contractor.mediaFiles.filter((file: any) => file.type === 'image').length > 0 && 
+                  contractor.mediaFiles
                     .filter((file: any) => file.type === 'image')
                     .map((image: any, i: number) => (
-                      <div key={i} className="bg-slate-700 rounded-xl overflow-hidden border border-slate-600">
+                      <div key={`image-${i}`} className="bg-slate-800 rounded-xl overflow-hidden border border-slate-700">
                         <img 
                           src={image.url} 
                           alt={image.name} 
@@ -159,67 +174,66 @@ export default function ContractorProfileDB() {
                           <p className="p-4 text-sm text-slate-300">{image.description}</p>
                         )}
                       </div>
-                    ))}
+                    ))
+                }
+                
+                {/* Placeholder for when no media is available */}
+                {(!contractor.mediaFiles || contractor.mediaFiles.length === 0) && (
+                  <div className="col-span-full text-center py-8">
+                    <p className="text-slate-400">No media files uploaded yet. Check back soon for videos and images showcasing our work!</p>
+                  </div>
+                )}
+              </div>
+              
+              {/* Future testimonials placeholder */}
+              <div className="mt-8">
+                <h3 className="text-xl font-semibold text-white mb-4">Customer Testimonials</h3>
+                <div className="text-center py-6">
+                  <p className="text-slate-400">Customer testimonials will be displayed here once available.</p>
                 </div>
               </div>
-            )}
+            </div>
+
+
+
           </div>
 
           {/* Sidebar - Right Column */}
           <div className="lg:col-span-1">
             <div className="sticky top-8 space-y-6">
-              {/* About Services */}
-              <div className="bg-slate-800 rounded-2xl shadow-lg p-6 border border-slate-700">
-                <h3 className="text-xl font-bold text-white mb-4">About Our Services</h3>
-                <p className="text-slate-300 leading-relaxed mb-4 text-sm">
-                  {contractor.description || "Professional contractor services with years of experience delivering quality work."}
-                </p>
-                
-                {/* Specialties */}
-                {contractor.specialties && contractor.specialties.length > 0 && (
-                  <div>
-                    <h4 className="text-lg font-semibold text-white mb-3">Specialties</h4>
-                    <div className="flex flex-wrap gap-2">
-                      {contractor.specialties.map((specialty: string, i: number) => (
-                        <span 
-                          key={i} 
-                          className="bg-blue-600 text-blue-100 px-2 py-1 rounded-full text-xs font-medium"
-                        >
-                          {specialty}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-
               {/* Contact Information */}
               <div className="bg-slate-800 rounded-2xl shadow-lg p-6 border border-slate-700">
                 <h3 className="text-xl font-bold text-white mb-4">Contact Information</h3>
                 <div className="space-y-4">
-                  {contractor.phone && (
-                    <div className="flex items-center gap-3">
-                      <div className="bg-blue-600 p-2 rounded-full">
-                        <Phone className="text-white" size={16} />
-                      </div>
-                      <div>
-                        <p className="text-sm text-slate-400">Phone</p>
-                        <p className="font-medium text-white">{contractor.phone}</p>
-                      </div>
+                  <div className="flex items-center gap-3">
+                    <div className="bg-blue-600 p-2 rounded-full">
+                      <Mail className="text-white" size={16} />
                     </div>
-                  )}
+                    <div>
+                      <p className="text-sm text-slate-400">Email</p>
+                      <p className="font-medium text-white">{contractor.email || 'Not provided'}</p>
+                    </div>
+                  </div>
                   
-                  {contractor.email && (
-                    <div className="flex items-center gap-3">
-                      <div className="bg-blue-600 p-2 rounded-full">
-                        <Mail className="text-white" size={16} />
-                      </div>
-                      <div>
-                        <p className="text-sm text-slate-400">Email</p>
-                        <p className="font-medium text-white">{contractor.email}</p>
-                      </div>
+                  <div className="flex items-center gap-3">
+                    <div className="bg-blue-600 p-2 rounded-full">
+                      <Phone className="text-white" size={16} />
                     </div>
-                  )}
+                    <div>
+                      <p className="text-sm text-slate-400">Phone Number</p>
+                      <p className="font-medium text-white">{contractor.phone || 'Not provided'}</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center gap-3">
+                    <div className="bg-blue-600 p-2 rounded-full">
+                      <User className="text-white" size={16} />
+                    </div>
+                    <div>
+                      <p className="text-sm text-slate-400">Owner Name</p>
+                      <p className="font-medium text-white">{contractor.ownerName || 'Not provided'}</p>
+                    </div>
+                  </div>
                   
                   {contractor.website && (
                     <div className="flex items-center gap-3">
@@ -251,29 +265,6 @@ export default function ContractorProfileDB() {
                       </div>
                     </div>
                   )}
-                </div>
-              </div>
-
-              {/* Trust Indicators */}
-              <div className="bg-slate-800 rounded-2xl shadow-lg p-6 border border-slate-700">
-                <h3 className="text-xl font-bold text-white mb-4">Why Choose Us</h3>
-                <div className="space-y-3">
-                  <div className="flex items-center gap-3">
-                    <CheckCircle className="text-green-400" size={20} />
-                    <span className="text-slate-300">Licensed & Insured</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <CheckCircle className="text-green-400" size={20} />
-                    <span className="text-slate-300">Free Estimates</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <CheckCircle className="text-green-400" size={20} />
-                    <span className="text-slate-300">Quality Guaranteed</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <CheckCircle className="text-green-400" size={20} />
-                    <span className="text-slate-300">Local Experts</span>
-                  </div>
                 </div>
               </div>
             </div>
