@@ -138,9 +138,6 @@ const ContractorPortalEnhanced: React.FC = () => {
   
   const serviceCategories = (servicesData as any)?.services || [];
   
-  // Debug logging
-  console.log('Service categories data:', { servicesData, serviceCategories, servicesLoading, servicesError });
-  
   // Log any errors for debugging
   if (servicesError) {
     console.error('Error fetching service categories:', servicesError);
@@ -948,10 +945,13 @@ const ContractorPortalEnhanced: React.FC = () => {
                               Error loading categories
                             </div>
                           ) : (
-                            <Select
+                            <select
+                              className="flex-1 p-2 border border-gray-300 rounded-md bg-white dark:bg-gray-800 dark:border-gray-600 text-sm"
+                              style={antiYellowInputStyles}
                               value=""
-                              onValueChange={(value) => {
+                              onChange={(e) => {
                                 try {
+                                  const value = e.target.value;
                                   if (value && typeof value === 'string') {
                                     const currentSpecialties = Array.isArray(editForm.specialties) ? editForm.specialties : [];
                                     if (!currentSpecialties.includes(value)) {
@@ -966,26 +966,22 @@ const ContractorPortalEnhanced: React.FC = () => {
                                 }
                               }}
                             >
-                              <SelectTrigger className="flex-1" style={antiYellowInputStyles}>
-                                <SelectValue placeholder="Select specialty from service categories" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                {Array.isArray(serviceCategories) && serviceCategories.length > 0 ? (
-                                  serviceCategories
-                                    .filter((category: any) => {
-                                      const currentSpecialties = Array.isArray(editForm.specialties) ? editForm.specialties : [];
-                                      return category?.name && typeof category.name === 'string' && !currentSpecialties.includes(category.name);
-                                    })
-                                    .map((category: any) => (
-                                      <SelectItem key={category.id || category.name} value={category.name}>
-                                        {category.name}
-                                      </SelectItem>
-                                    ))
-                                ) : (
-                                  <SelectItem value="no-categories" disabled>No categories available</SelectItem>
-                                )}
-                              </SelectContent>
-                            </Select>
+                              <option value="" disabled>Select specialty from service categories</option>
+                              {Array.isArray(serviceCategories) && serviceCategories.length > 0 ? (
+                                serviceCategories
+                                  .filter((category: any) => {
+                                    const currentSpecialties = Array.isArray(editForm.specialties) ? editForm.specialties : [];
+                                    return category?.name && typeof category.name === 'string' && !currentSpecialties.includes(category.name);
+                                  })
+                                  .map((category: any) => (
+                                    <option key={category.id || category.name} value={category.name}>
+                                      {category.name}
+                                    </option>
+                                  ))
+                              ) : (
+                                <option value="" disabled>No categories available</option>
+                              )}
+                            </select>
                           )}
                         </div>
                         {serviceCategories.length === 0 && (
