@@ -32,28 +32,7 @@ export default function HomePage() {
       }}>
         <button 
           onClick={() => navigateWithSalesperson('/services')}
-          style={{
-            backgroundColor: '#00aeef',
-            color: 'white',
-            padding: '25px 60px',
-            fontSize: '28px',
-            fontWeight: 'bold',
-            border: 'none',
-            borderRadius: '15px',
-            cursor: 'pointer',
-            boxShadow: '0 8px 20px rgba(0,174,239,0.3)',
-            transition: 'all 0.3s ease',
-            textTransform: 'uppercase',
-            letterSpacing: '1px'
-          }}
-          onMouseOver={(e) => {
-            e.currentTarget.style.backgroundColor = '#0088cc';
-            e.currentTarget.style.transform = 'scale(1.05)';
-          }}
-          onMouseOut={(e) => {
-            e.currentTarget.style.backgroundColor = '#00aeef';
-            e.currentTarget.style.transform = 'scale(1)';
-          }}
+          className="find-contractor-btn"
         >
           Find a Contractor
         </button>
