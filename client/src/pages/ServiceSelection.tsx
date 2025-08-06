@@ -346,8 +346,8 @@ const ServiceSelection = () => {
                 >
                   {/* Logo at the top */}
                   <div style={{ 
-                    width: '120px', 
-                    height: '120px', 
+                    width: '140px', 
+                    height: '140px', 
                     marginBottom: '16px',
                     borderRadius: '12px',
                     overflow: 'hidden',
