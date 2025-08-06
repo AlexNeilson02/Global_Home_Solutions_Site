@@ -328,28 +328,120 @@ const ServiceSelection = () => {
                 <div 
                   key={contractor.id} 
                   className="contractor-card"
-                  onClick={() => navigateWithSalesperson(`/contractor/${contractor.id}`)}
-                  style={{ margin: '0 auto' }}
+                  style={{ 
+                    margin: '0 auto',
+                    background: 'white',
+                    borderRadius: '16px',
+                    padding: '24px',
+                    boxShadow: '0 4px 16px rgba(0,0,0,0.1)',
+                    border: '1px solid #e5e7eb',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    textAlign: 'center',
+                    minHeight: '320px',
+                    width: '100%',
+                    maxWidth: '300px'
+                  }}
                 >
-                  <div className="contractor-image">
+                  {/* Logo at the top */}
+                  <div style={{ 
+                    width: '80px', 
+                    height: '80px', 
+                    marginBottom: '16px',
+                    borderRadius: '12px',
+                    overflow: 'hidden',
+                    backgroundColor: '#f3f4f6',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}>
                     {contractor.profileImage ? (
-                      <img src={contractor.profileImage} alt={contractor.companyName} />
+                      <img 
+                        src={contractor.profileImage} 
+                        alt={contractor.companyName}
+                        style={{
+                          width: '100%',
+                          height: '100%',
+                          objectFit: 'cover'
+                        }}
+                      />
                     ) : (
-                      <div className="contractor-placeholder">
+                      <div style={{
+                        width: '100%',
+                        height: '100%',
+                        backgroundColor: '#e5e7eb',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '24px',
+                        fontWeight: 'bold',
+                        color: '#6b7280'
+                      }}>
                         {contractor.companyName.charAt(0)}
                       </div>
                     )}
                   </div>
-                  <div className="contractor-details">
-                    <h3>{contractor.companyName}</h3>
-                    {contractor.description && <p>{contractor.description.substring(0, 100)}...</p>}
-                    <div className="contractor-specialties">
-                      {contractor.specialties?.slice(0, 3).map((specialty: string, index: number) => (
-                        <span key={index} className="specialty-tag">{specialty}</span>
-                      ))}
-                    </div>
-                  </div>
-                  <button className="view-profile-btn">View Profile</button>
+
+                  {/* Company Name */}
+                  <h3 style={{
+                    fontSize: '18px',
+                    fontWeight: '600',
+                    color: '#111827',
+                    margin: '0 0 12px 0',
+                    lineHeight: '1.4'
+                  }}>
+                    {contractor.companyName}
+                  </h3>
+
+                  {/* View Profile Link */}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigateWithSalesperson(`/contractor/${contractor.id}`);
+                    }}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      color: '#2563eb',
+                      textDecoration: 'underline',
+                      cursor: 'pointer',
+                      fontSize: '14px',
+                      marginBottom: 'auto',
+                      padding: '4px 0'
+                    }}
+                  >
+                    View Profile
+                  </button>
+
+                  {/* Request Bid Button */}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigateWithSalesperson(`/contractor/${contractor.id}`);
+                    }}
+                    style={{
+                      backgroundColor: '#00aeef',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '8px',
+                      padding: '12px 24px',
+                      fontSize: '16px',
+                      fontWeight: '600',
+                      cursor: 'pointer',
+                      width: '100%',
+                      transition: 'all 0.2s ease',
+                      marginTop: '16px'
+                    }}
+                    onMouseOver={(e) => {
+                      e.currentTarget.style.backgroundColor = '#0088cc';
+                    }}
+                    onMouseOut={(e) => {
+                      e.currentTarget.style.backgroundColor = '#00aeef';
+                    }}
+                  >
+                    Request Bid
+                  </button>
                 </div>
               ))}
             </div>
