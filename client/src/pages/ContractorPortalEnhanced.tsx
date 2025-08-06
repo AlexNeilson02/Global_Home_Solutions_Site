@@ -132,11 +132,16 @@ const ContractorPortalEnhanced: React.FC = () => {
   const bidRequests = (bidRequestsData as any)?.bidRequests || [];
 
   // Get service categories for specialties dropdown
-  const { data: servicesData } = useQuery({
+  const { data: servicesData, error: servicesError, isLoading: servicesLoading } = useQuery({
     queryKey: ["/api/service-categories"],
   });
   
   const serviceCategories = (servicesData as any)?.services || [];
+  
+  // Log any errors for debugging
+  if (servicesError) {
+    console.error('Error fetching service categories:', servicesError);
+  }
 
   // Contact customer mutation
   const contactCustomerMutation = useMutation({
@@ -903,7 +908,7 @@ const ContractorPortalEnhanced: React.FC = () => {
                       <div>
                         <label className="block text-sm font-medium mb-2">Specialties</label>
                         <div className="flex flex-wrap gap-2 mb-3">
-                          {editForm.specialties.map((specialty, index) => (
+                          {(editForm.specialties || []).map((specialty, index) => (
                             <Badge key={index} variant="secondary" className="flex items-center gap-1">
                               {specialty}
                               <X 
@@ -917,11 +922,14 @@ const ContractorPortalEnhanced: React.FC = () => {
                           <Select
                             value=""
                             onValueChange={(value) => {
-                              if (value && !editForm.specialties.includes(value)) {
-                                setEditForm(prev => ({
-                                  ...prev,
-                                  specialties: [...prev.specialties, value]
-                                }));
+                              if (value && value !== "loading") {
+                                const currentSpecialties = editForm.specialties || [];
+                                if (!currentSpecialties.includes(value)) {
+                                  setEditForm(prev => ({
+                                    ...prev,
+                                    specialties: [...currentSpecialties, value]
+                                  }));
+                                }
                               }
                             }}
                           >
@@ -929,13 +937,19 @@ const ContractorPortalEnhanced: React.FC = () => {
                               <SelectValue placeholder="Select specialty from service categories" />
                             </SelectTrigger>
                             <SelectContent>
-                              {serviceCategories
-                                .filter((category: any) => !editForm.specialties.includes(category.name))
-                                .map((category: any) => (
-                                  <SelectItem key={category.id} value={category.name}>
-                                    {category.name}
-                                  </SelectItem>
-                                ))}
+                              {serviceCategories && serviceCategories.length > 0
+                                ? serviceCategories
+                                    .filter((category: any) => {
+                                      const currentSpecialties = editForm.specialties || [];
+                                      return category?.name && !currentSpecialties.includes(category.name);
+                                    })
+                                    .map((category: any) => (
+                                      <SelectItem key={category.id} value={category.name}>
+                                        {category.name}
+                                      </SelectItem>
+                                    ))
+                                : <SelectItem value="loading" disabled>Loading categories...</SelectItem>
+                              }
                             </SelectContent>
                           </Select>
                         </div>
