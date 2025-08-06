@@ -90,7 +90,7 @@ const ServiceSelection = () => {
       alignItems: 'center', 
       justifyContent: 'center',
       minHeight: '100vh',
-      padding: '20px'
+      padding: '60px 20px 20px 20px'
     }}>
       <section className="search-section" style={{ 
         maxWidth: '1000px', 
