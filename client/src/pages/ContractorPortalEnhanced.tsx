@@ -113,7 +113,7 @@ const ContractorPortalEnhanced: React.FC = () => {
     enabled: true
   });
 
-  const contractor = userData?.roleData;
+  const contractor = (userData as any)?.roleData;
 
   // Get contractor's projects
   const { data: projectsData } = useQuery({
@@ -121,7 +121,7 @@ const ContractorPortalEnhanced: React.FC = () => {
     enabled: !!contractor?.id
   });
 
-  const projects = projectsData?.projects || [];
+  const projects = (projectsData as any)?.projects || [];
 
   // Get contractor's bid requests
   const { data: bidRequestsData } = useQuery({
@@ -129,14 +129,14 @@ const ContractorPortalEnhanced: React.FC = () => {
     enabled: !!contractor?.id
   });
 
-  const bidRequests = bidRequestsData?.bidRequests || [];
+  const bidRequests = (bidRequestsData as any)?.bidRequests || [];
 
   // Get service categories for specialties dropdown
   const { data: servicesData } = useQuery({
     queryKey: ["/api/service-categories"],
   });
   
-  const serviceCategories = servicesData?.services || [];
+  const serviceCategories = (servicesData as any)?.services || [];
 
   // Contact customer mutation
   const contactCustomerMutation = useMutation({
