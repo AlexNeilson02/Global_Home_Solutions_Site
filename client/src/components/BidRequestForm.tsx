@@ -309,42 +309,7 @@ export default function BidRequestForm({ isOpen, onClose, contractor, trackedSal
             {contractor.companyName} specializes in: {contractor.specialties?.join(", ")}
           </DialogDescription>
           
-          {/* Show tracking status */}
-          {trackingLoading && (
-            <div className="bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg p-3 mt-2">
-              <div className="flex items-center space-x-2">
-                <div className="animate-spin h-4 w-4 border-2 border-blue-600 border-t-transparent rounded-full"></div>
-                <span className="text-sm text-blue-700 dark:text-blue-300">
-                  Processing referral link...
-                </span>
-              </div>
-            </div>
-          )}
-          
-          {/* Enhanced tracking status display */}
-          {(() => {
-            const actualTrackedSalesperson = getTrackedSalesperson();
-            if (!trackingLoading && actualTrackedSalesperson) {
-              return (
-                <div className="bg-green-50 dark:bg-green-950 border border-green-200 dark:border-green-800 rounded-lg p-3 mt-2">
-                  <div className="flex items-center text-green-700 dark:text-green-300 text-sm">
-                    <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
-                    <span>Sales rep <strong>{actualTrackedSalesperson.profileUrl}</strong> will receive commission credit</span>
-                  </div>
-                </div>
-              );
-            } else if (!trackingLoading && !actualTrackedSalesperson) {
-              return (
-                <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-3 mt-2">
-                  <div className="flex items-center text-gray-600 dark:text-gray-400 text-sm">
-                    <div className="w-2 h-2 bg-gray-400 rounded-full mr-2"></div>
-                    <span>No sales rep tracking detected</span>
-                  </div>
-                </div>
-              );
-            }
-            return null;
-          })()}
+
         </DialogHeader>
         
         <Form {...form}>
