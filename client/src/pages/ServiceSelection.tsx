@@ -101,7 +101,7 @@ const ServiceSelection = () => {
           marginBottom: '40px',
           gap: '10px'
         }}>
-          <div className="search-input-container" style={{ position: 'relative', width: '100%', maxWidth: '400px' }}>
+          <div className="search-input-container" style={{ position: 'relative', width: '100%' }}>
             <select
               className="service-dropdown"
               value={trade}
@@ -150,7 +150,7 @@ const ServiceSelection = () => {
             onClick={handleFindContractor}
             style={{ 
               fontSize: '18px',
-              padding: '15px 30px',
+              padding: '15px 50px',
               backgroundColor: '#00aeef',
               color: 'white',
               border: 'none',
@@ -162,7 +162,9 @@ const ServiceSelection = () => {
               boxShadow: '0 6px 16px rgba(0,174,239,0.3)',
               transition: 'all 0.3s ease',
               whiteSpace: 'nowrap',
-              marginTop: '10px'
+              marginTop: '10px',
+              minWidth: '250px',
+              maxWidth: '350px'
             }}
             onMouseOver={(e) => {
               e.currentTarget.style.backgroundColor = '#0088cc';
