@@ -234,8 +234,7 @@ const ServiceSelection = () => {
                   style={{
                     width: '100%',
                     height: '100%',
-                    objectFit: 'contain',
-                    padding: '20px'
+                    objectFit: 'cover'
                   }}
                 />
               </div>
@@ -259,8 +258,7 @@ const ServiceSelection = () => {
                   style={{
                     width: '100%',
                     height: '100%',
-                    objectFit: 'contain',
-                    padding: '20px'
+                    objectFit: 'cover'
                   }}
                 />
               </div>
@@ -284,8 +282,7 @@ const ServiceSelection = () => {
                   style={{
                     width: '100%',
                     height: '100%',
-                    objectFit: 'contain',
-                    padding: '20px'
+                    objectFit: 'cover'
                   }}
                 />
               </div>
