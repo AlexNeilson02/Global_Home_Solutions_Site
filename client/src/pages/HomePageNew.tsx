@@ -26,21 +26,31 @@ export default function HomePage() {
     console.log('Tracking loading:', trackingLoading);
     console.log('========================');
     
-    // Check sessionStorage first for existing tracking
-    const stored = sessionStorage.getItem('trackedSalesperson');
-    if (stored && !trackedSalesperson) {
-      try {
-        const parsedSalesperson = JSON.parse(stored);
-        if (parsedSalesperson && parsedSalesperson.id) {
-          setTrackedSalesperson(parsedSalesperson);
-          setTrackingComplete(true);
-          console.log('✓ Restored tracked salesperson from session:', parsedSalesperson);
-          return;
+    // CRITICAL: Only restore from sessionStorage if there's a QR parameter
+    // This prevents attribution when users visit directly without QR codes
+    if (refParam) {
+      // Check sessionStorage for existing tracking ONLY if there's a QR parameter
+      const stored = sessionStorage.getItem('trackedSalesperson');
+      if (stored && !trackedSalesperson) {
+        try {
+          const parsedSalesperson = JSON.parse(stored);
+          // Verify that stored data has proper verification fields
+          if (parsedSalesperson && parsedSalesperson.id && parsedSalesperson.sessionTrackingId && parsedSalesperson.isVerified) {
+            setTrackedSalesperson(parsedSalesperson);
+            setTrackingComplete(true);
+            console.log('✓ Restored verified tracked salesperson from session:', parsedSalesperson);
+            return;
+          }
+        } catch (error) {
+          console.warn('Failed to parse stored salesperson data:', error);
+          sessionStorage.removeItem('trackedSalesperson');
         }
-      } catch (error) {
-        console.warn('Failed to parse stored salesperson data:', error);
-        sessionStorage.removeItem('trackedSalesperson');
       }
+    } else {
+      // CRITICAL: Clear any existing tracking when visiting without QR parameter
+      console.log('🧹 Clearing previous sales attribution - direct visit without QR code');
+      sessionStorage.removeItem('trackedSalesperson');
+      setTrackedSalesperson(null);
     }
     
     if (refParam && !trackedSalesperson && !trackingLoading) {

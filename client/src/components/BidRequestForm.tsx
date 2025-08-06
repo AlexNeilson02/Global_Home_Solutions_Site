@@ -61,22 +61,31 @@ export default function BidRequestForm({ isOpen, onClose, contractor, trackedSal
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
   const [filePreviewUrls, setFilePreviewUrls] = useState<string[]>([]);
   
-  // Always check sessionStorage for tracked salesperson as fallback
+  // CRITICAL: Only use verified salesperson data for commission attribution
   const getTrackedSalesperson = () => {
-    if (trackedSalesperson) return trackedSalesperson;
+    if (trackedSalesperson && trackedSalesperson.sessionTrackingId && trackedSalesperson.isVerified) {
+      return trackedSalesperson;
+    }
     
     try {
       const stored = sessionStorage.getItem('trackedSalesperson');
       if (stored) {
         const parsed = JSON.parse(stored);
-        if (parsed && parsed.id) {
-          console.log('✅ Retrieved salesperson from sessionStorage:', parsed);
+        // STRICT VERIFICATION: Only use if it has proper verification fields
+        if (parsed && parsed.id && parsed.sessionTrackingId && parsed.isVerified) {
+          console.log('✅ Retrieved VERIFIED salesperson from sessionStorage:', parsed);
           return parsed;
+        } else {
+          console.log('❌ Stored salesperson data lacks verification - ignoring for commission');
+          // Clear invalid data
+          sessionStorage.removeItem('trackedSalesperson');
         }
       }
     } catch (error) {
       console.warn('Failed to parse stored salesperson:', error);
+      sessionStorage.removeItem('trackedSalesperson');
     }
+    console.log('🚫 No verified salesperson found - no commission attribution');
     return null;
   };
 
