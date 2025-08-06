@@ -104,30 +104,7 @@ export default function ContractorProfileDB() {
               </div>
             </div>
 
-            {/* About Section */}
-            <div className="bg-slate-800 rounded-2xl shadow-lg p-8 border border-slate-700">
-              <h2 className="text-2xl font-bold text-white mb-4">About Our Services</h2>
-              <p className="text-slate-300 leading-relaxed mb-6">
-                {contractor.description || "Professional contractor services with years of experience delivering quality work."}
-              </p>
-              
-              {/* Specialties */}
-              {contractor.specialties && contractor.specialties.length > 0 && (
-                <div>
-                  <h3 className="text-lg font-semibold text-white mb-3">Specialties</h3>
-                  <div className="flex flex-wrap gap-2">
-                    {contractor.specialties.map((specialty: string, i: number) => (
-                      <span 
-                        key={i} 
-                        className="bg-blue-600 text-blue-100 px-3 py-1 rounded-full text-sm font-medium"
-                      >
-                        {specialty}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
+
 
             {/* Video Section */}
             {contractor.videoUrl && (
@@ -189,25 +166,29 @@ export default function ContractorProfileDB() {
           {/* Sidebar - Right Column */}
           <div className="lg:col-span-1">
             <div className="sticky top-8 space-y-6">
-              {/* Quick Actions Card */}
+              {/* About Services */}
               <div className="bg-slate-800 rounded-2xl shadow-lg p-6 border border-slate-700">
-                <h3 className="text-lg font-bold text-white mb-4">Quick Actions</h3>
-                <div className="space-y-3">
-                  <button 
-                    onClick={() => setShowBidForm(true)}
-                    className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-3 px-4 rounded-lg transition-all duration-200"
-                  >
-                    Request Quote
-                  </button>
-                  {contractor.phone && (
-                    <a 
-                      href={`tel:${contractor.phone}`}
-                      className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-4 rounded-lg transition-all duration-200 block text-center"
-                    >
-                      Call Now
-                    </a>
-                  )}
-                </div>
+                <h3 className="text-xl font-bold text-white mb-4">About Our Services</h3>
+                <p className="text-slate-300 leading-relaxed mb-4 text-sm">
+                  {contractor.description || "Professional contractor services with years of experience delivering quality work."}
+                </p>
+                
+                {/* Specialties */}
+                {contractor.specialties && contractor.specialties.length > 0 && (
+                  <div>
+                    <h4 className="text-lg font-semibold text-white mb-3">Specialties</h4>
+                    <div className="flex flex-wrap gap-2">
+                      {contractor.specialties.map((specialty: string, i: number) => (
+                        <span 
+                          key={i} 
+                          className="bg-blue-600 text-blue-100 px-2 py-1 rounded-full text-xs font-medium"
+                        >
+                          {specialty}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Contact Information */}
