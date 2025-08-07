@@ -1691,12 +1691,28 @@ const ContractorPortalEnhanced: React.FC = () => {
                       <div className="p-4 bg-white rounded-lg border border-gray-200">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-3">
-                            <div className="flex items-center justify-center w-12 h-8 bg-blue-600 rounded text-white text-sm font-bold">
-                              VISA
+                            <div className={`flex items-center justify-center w-12 h-8 rounded text-white text-sm font-bold ${
+                              contractor.cardBrand?.toLowerCase() === 'visa' ? 'bg-blue-600' :
+                              contractor.cardBrand?.toLowerCase() === 'mastercard' ? 'bg-red-600' :
+                              contractor.cardBrand?.toLowerCase() === 'amex' ? 'bg-green-600' :
+                              contractor.cardBrand?.toLowerCase() === 'discover' ? 'bg-orange-600' :
+                              'bg-gray-600'
+                            }`}>
+                              {contractor.cardBrand?.toUpperCase() || 'CARD'}
                             </div>
                             <div>
-                              <p className="font-medium text-gray-900">Visa ••••4198</p>
-                              <p className="text-sm text-gray-500">01/2028</p>
+                              <p className="font-medium text-gray-900">
+                                {contractor.cardBrand ? 
+                                  `${contractor.cardBrand.charAt(0).toUpperCase() + contractor.cardBrand.slice(1)} ••••${contractor.cardLast4 || '0000'}` :
+                                  'Payment Method Verified'
+                                }
+                              </p>
+                              <p className="text-sm text-gray-500">
+                                {contractor.cardExpMonth && contractor.cardExpYear ?
+                                  `${contractor.cardExpMonth.toString().padStart(2, '0')}/${contractor.cardExpYear}` :
+                                  'Expires: --/--'
+                                }
+                              </p>
                             </div>
                           </div>
                           <div className="flex-shrink-0">

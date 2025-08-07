@@ -1532,14 +1532,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "Access denied" });
       }
 
-      // Update contractor record to mark payment method as added
-      await storage.updateContractor(contractorId, { 
-        paymentMethodAdded: true 
-      });
+      // Fetch payment methods from Stripe to get real card details
+      let cardDetails = null;
+      if (contractor.stripeCustomerId) {
+        try {
+          const paymentMethods = await stripe.paymentMethods.list({
+            customer: contractor.stripeCustomerId,
+            type: 'card',
+          });
+
+          if (paymentMethods.data.length > 0) {
+            const pm = paymentMethods.data[0]; // Get the most recent payment method
+            cardDetails = {
+              paymentMethodId: pm.id,
+              cardBrand: pm.card?.brand || 'unknown',
+              cardLast4: pm.card?.last4 || '0000',
+              cardExpMonth: pm.card?.exp_month || 1,
+              cardExpYear: pm.card?.exp_year || 2025,
+            };
+          }
+        } catch (stripeError) {
+          console.error("Error fetching payment methods from Stripe:", stripeError);
+        }
+      }
+
+      // Update contractor record with payment method details
+      const updateData = {
+        paymentMethodAdded: true,
+        ...(cardDetails && cardDetails)
+      };
+
+      await storage.updateContractor(contractorId, updateData);
 
       res.json({ 
         message: "Payment method status updated successfully",
-        paymentMethodAdded: true
+        paymentMethodAdded: true,
+        cardDetails
       });
 
     } catch (error) {

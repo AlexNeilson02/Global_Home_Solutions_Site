@@ -63,6 +63,12 @@ export const contractors = pgTable("contractors", {
   subscriptionTier: text("subscription_tier").default("basic"), // basic, premium, pro
   monthlySpendCap: real("monthly_spend_cap").default(1000),
   paymentMethodAdded: boolean("payment_method_added").default(false),
+  // Stripe payment method details
+  paymentMethodId: text("payment_method_id"),
+  cardBrand: text("card_brand"), // visa, mastercard, amex, etc.
+  cardLast4: text("card_last4"), // last 4 digits
+  cardExpMonth: integer("card_exp_month"),
+  cardExpYear: integer("card_exp_year"),
   // Media files stored as JSON array with S3 URLs for performance
   
   // Gmail integration
