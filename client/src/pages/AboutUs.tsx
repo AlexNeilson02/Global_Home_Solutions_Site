@@ -4,63 +4,49 @@ import { ArrowLeft, MapPin, Phone, Mail, Users, Award, Home, Building2, Star, Cl
 import logoPath from "@/assets/global-home-solutions-logo.png";
 
 export default function AboutUs() {
-  // Force removal of any overlays
-  React.useEffect(() => {
-    // Remove any dialog overlays
-    const overlays = document.querySelectorAll('[role="dialog"], [data-state="open"], .fixed.inset-0');
-    overlays.forEach(overlay => {
-      const element = overlay as HTMLElement;
-      if (element.style.zIndex && parseInt(element.style.zIndex) > 1000) {
-        element.style.display = 'none';
-      }
-    });
-  }, []);
+  console.log('AboutUs main component rendered - checking for overlay issues');
 
   return (
-    <div 
-      data-page="about-us"
-      className="about-us-page"
-      style={{ 
-        minHeight: '100vh', 
-        backgroundColor: '#f8fafc', 
-        position: 'relative',
-        zIndex: 9999,
-        isolation: 'isolate'
-      }}>
-      {/* Header with Back Button */}
+    <div style={{ 
+      minHeight: '100vh', 
+      backgroundColor: '#ffffff',
+      padding: '0',
+      margin: '0',
+      position: 'relative'
+    }}>
+      {/* Simple Header */}
       <header style={{
-        backgroundColor: 'rgba(255, 255, 255, 0.95)',
-        borderBottom: '1px solid #e2e8f0',
-        position: 'sticky',
-        top: 0,
-        zIndex: 100,
-        padding: '0'
+        backgroundColor: '#ffffff',
+        borderBottom: '2px solid #3b82f6',
+        padding: '20px'
       }}>
         <div style={{
-          maxWidth: '80rem',
+          maxWidth: '1200px',
           margin: '0 auto',
-          padding: '0 1rem',
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'space-between',
-          height: '64px'
+          justifyContent: 'space-between'
         }}>
           <Link href="/" style={{
             display: 'inline-flex',
             alignItems: 'center',
-            color: '#2563eb',
+            color: '#3b82f6',
             textDecoration: 'none',
-            fontSize: '16px',
-            fontWeight: '500'
+            fontSize: '18px',
+            fontWeight: 'bold',
+            padding: '10px 20px',
+            border: '2px solid #3b82f6',
+            borderRadius: '8px',
+            backgroundColor: '#f8fafc'
           }}>
-            <ArrowLeft style={{ width: '20px', height: '20px', marginRight: '8px' }} />
-            Back to Home
+            <ArrowLeft style={{ width: '24px', height: '24px', marginRight: '10px' }} />
+            ← Back to Home
           </Link>
-          <div style={{ display: 'flex', alignItems: 'center' }}>
+          <div>
             <img 
               src={logoPath} 
               alt="Global Home Solutions"
-              style={{ height: '48px', width: 'auto' }}
+              style={{ height: '60px', width: 'auto' }}
             />
           </div>
         </div>
@@ -68,61 +54,92 @@ export default function AboutUs() {
 
       {/* Main Content */}
       <main style={{
-        maxWidth: '80rem',
+        maxWidth: '1200px',
         margin: '0 auto',
-        padding: '2rem 1rem',
-        position: 'relative',
-        zIndex: 10
+        padding: '40px 20px',
+        backgroundColor: '#ffffff'
       }}>
         
         {/* Hero Section */}
-        <div className="text-center mb-20">
-          <div className="inline-flex items-center justify-center w-20 h-20 bg-blue-100 dark:bg-blue-900 rounded-full mb-8">
-            <Building2 className="h-10 w-10 text-blue-600" />
+        <div style={{ textAlign: 'center', marginBottom: '60px' }}>
+          <div style={{
+            width: '80px',
+            height: '80px',
+            backgroundColor: '#dbeafe',
+            borderRadius: '50%',
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            marginBottom: '30px'
+          }}>
+            <Building2 style={{ width: '40px', height: '40px', color: '#2563eb' }} />
           </div>
-          <h1 className="text-5xl md:text-6xl font-bold text-gray-900 dark:text-white mb-6">
-            About <span className="text-blue-600">Global Home Solutions</span>
+          <h1 style={{
+            fontSize: '56px',
+            fontWeight: 'bold',
+            color: '#1f2937',
+            marginBottom: '24px',
+            lineHeight: '1.1'
+          }}>
+            About <span style={{ color: '#2563eb' }}>Global Home Solutions</span>
           </h1>
-          <p className="text-xl md:text-2xl text-gray-600 dark:text-gray-300 max-w-4xl mx-auto leading-relaxed">
-            [Add your company tagline and brief description here]
+          <p style={{
+            fontSize: '24px',
+            color: '#6b7280',
+            maxWidth: '900px',
+            margin: '0 auto',
+            lineHeight: '1.5'
+          }}>
+            Your premier platform connecting homeowners with trusted contractors through innovative sales solutions
           </p>
         </div>
 
         {/* Company Overview Section */}
-        <section className="mb-20">
-          <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl overflow-hidden">
-            <div className="grid lg:grid-cols-2 gap-0">
+        <section style={{ marginBottom: '60px' }}>
+          <div style={{
+            backgroundColor: '#ffffff',
+            borderRadius: '20px',
+            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+            overflow: 'hidden'
+          }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0' }}>
               {/* Content Side */}
-              <div className="p-8 lg:p-12">
-                <div className="flex items-center mb-8">
-                  <Home className="h-8 w-8 text-blue-600 mr-4" />
-                  <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white">Our Story</h2>
+              <div style={{ padding: '48px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', marginBottom: '32px' }}>
+                  <Home style={{ width: '32px', height: '32px', color: '#2563eb', marginRight: '16px' }} />
+                  <h2 style={{ fontSize: '36px', fontWeight: 'bold', color: '#1f2937' }}>Our Story</h2>
                 </div>
-                <div className="space-y-6">
-                  <p className="text-lg text-gray-700 dark:text-gray-300 leading-relaxed">
-                    [Add your company founding story, mission, and core values here. Explain how Global Home Solutions started and what drives your business.]
+                <div style={{ marginBottom: '24px' }}>
+                  <p style={{ fontSize: '18px', color: '#374151', lineHeight: '1.7', marginBottom: '24px' }}>
+                    Global Home Solutions revolutionizes the home improvement industry by connecting homeowners with trusted contractors through innovative door-to-door sales solutions.
                   </p>
-                  <p className="text-lg text-gray-700 dark:text-gray-300 leading-relaxed">
-                    [Include information about your experience in the industry, your commitment to quality, and what sets you apart from competitors.]
+                  <p style={{ fontSize: '18px', color: '#374151', lineHeight: '1.7', marginBottom: '32px' }}>
+                    Our platform streamlines the bidding process, ensures quality work, and provides transparent pricing for all your home improvement needs.
                   </p>
-                  <div className="grid grid-cols-2 gap-6 pt-6">
-                    <div className="text-center">
-                      <div className="text-3xl font-bold text-blue-600 mb-2">[#]+</div>
-                      <div className="text-sm text-gray-600 dark:text-gray-400">Years Experience</div>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
+                    <div style={{ textAlign: 'center' }}>
+                      <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#2563eb', marginBottom: '8px' }}>5+</div>
+                      <div style={{ fontSize: '14px', color: '#6b7280' }}>Years Experience</div>
                     </div>
-                    <div className="text-center">
-                      <div className="text-3xl font-bold text-blue-600 mb-2">[#]+</div>
-                      <div className="text-sm text-gray-600 dark:text-gray-400">Projects Completed</div>
+                    <div style={{ textAlign: 'center' }}>
+                      <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#2563eb', marginBottom: '8px' }}>1000+</div>
+                      <div style={{ fontSize: '14px', color: '#6b7280' }}>Projects Completed</div>
                     </div>
                   </div>
                 </div>
               </div>
               
               {/* Image Placeholder Side */}
-              <div className="bg-gradient-to-br from-blue-500 to-indigo-600 p-8 lg:p-12 flex items-center justify-center">
-                <div className="text-center text-white">
-                  <Building2 className="h-24 w-24 mx-auto mb-6 opacity-80" />
-                  <p className="text-lg opacity-90">[Add company photo, team photo, or office image here]</p>
+              <div style={{
+                background: 'linear-gradient(135deg, #3b82f6 0%, #6366f1 100%)',
+                padding: '48px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}>
+                <div style={{ textAlign: 'center', color: '#ffffff' }}>
+                  <Building2 style={{ width: '96px', height: '96px', margin: '0 auto 24px auto', opacity: '0.8' }} />
+                  <p style={{ fontSize: '18px', opacity: '0.9' }}>Professional home services platform</p>
                 </div>
               </div>
             </div>
@@ -130,11 +147,11 @@ export default function AboutUs() {
         </section>
 
         {/* Values & Differentiators */}
-        <section className="mb-20">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">Why Choose Us</h2>
-            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-              [Add a brief description of what makes your company unique]
+        <section style={{ marginBottom: '60px' }}>
+          <div style={{ textAlign: 'center', marginBottom: '48px' }}>
+            <h2 style={{ fontSize: '36px', fontWeight: 'bold', color: '#1f2937', marginBottom: '16px' }}>Why Choose Us</h2>
+            <p style={{ fontSize: '20px', color: '#6b7280', maxWidth: '800px', margin: '0 auto' }}>
+              We deliver exceptional results through innovation, quality, and customer-first approach
             </p>
           </div>
           
