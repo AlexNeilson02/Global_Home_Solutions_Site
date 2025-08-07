@@ -8,10 +8,8 @@ import { Button } from "@/components/ui/button";
 import { Loader2, Check } from "lucide-react";
 
 // Load Stripe with the actual publishable key
-if (!import.meta.env.VITE_STRIPE_PUBLIC_KEY_GHS) {
-  throw new Error('Missing required Stripe key: VITE_STRIPE_PUBLIC_KEY_GHS');
-}
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY_GHS);
+const stripePublicKey = import.meta.env.VITE_STRIPE_PUBLIC_KEY;
+const stripePromise = stripePublicKey ? loadStripe(stripePublicKey) : null;
 
 const SubscribeForm = () => {
   const stripe = useStripe();
@@ -115,6 +113,28 @@ const SubscribeForm = () => {
 export default function Subscribe() {
   const [clientSecret, setClientSecret] = useState("");
   const { toast } = useToast();
+
+  // If Stripe is not configured, show information message
+  if (!stripePublicKey) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+        <Card className="w-full max-w-md mx-auto">
+          <CardHeader>
+            <CardTitle>Subscription Service</CardTitle>
+            <CardDescription>Premium features coming soon</CardDescription>
+          </CardHeader>
+          <CardContent className="text-center space-y-4">
+            <p className="text-gray-600 dark:text-gray-400">
+              Our subscription service is currently being configured. Premium features will be available soon.
+            </p>
+            <Button className="w-full" disabled>
+              Coming Soon
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   useEffect(() => {
     // Create subscription when page loads
