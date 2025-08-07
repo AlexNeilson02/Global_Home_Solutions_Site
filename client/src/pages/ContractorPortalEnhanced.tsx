@@ -96,8 +96,8 @@ function SubscriptionForm({ contractorId, onSuccess, onError }: SubscriptionForm
         onError(result.error.message || 'Payment failed');
       } else if (result.paymentIntent?.status === 'succeeded' || result.setupIntent?.status === 'succeeded') {
         toast({
-          title: "Subscription Active!",
-          description: "Your monthly subscription has been successfully activated.",
+          title: "Payment Method Added!",
+          description: "Your payment method has been successfully verified and saved.",
         });
         onSuccess();
       }
@@ -122,7 +122,7 @@ function SubscriptionForm({ contractorId, onSuccess, onError }: SubscriptionForm
             Processing Payment...
           </>
         ) : (
-          'Subscribe for $100/month'
+          'Save Payment Method'
         )}
       </Button>
     </form>
@@ -1643,18 +1643,18 @@ const ContractorPortalEnhanced: React.FC = () => {
                     Payment Method
                   </CardTitle>
                   <CardDescription>
-                    Update your payment information for subscription and commission payments
+                    Add and verify your payment method for subscription billing
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   {!clientSecret ? (
                     <div className="space-y-4">
-                      <div className="p-4 bg-gray-50 rounded-lg">
+                      <div className="p-4 bg-gray-50 rounded-lg border">
                         <div className="flex items-center gap-3">
                           <CreditCard className="h-8 w-8 text-gray-400" />
                           <div>
-                            <p className="font-medium">Payment Method on File</p>
-                            <p className="text-sm text-gray-600">**** **** **** 4242 • Expires 12/25</p>
+                            <p className="font-medium text-gray-900">No Payment Method Added</p>
+                            <p className="text-sm text-gray-600">Add a payment method to manage your subscription</p>
                           </div>
                         </div>
                       </div>
@@ -1667,23 +1667,18 @@ const ContractorPortalEnhanced: React.FC = () => {
                         {isProcessingPayment ? (
                           <>
                             <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                            Setting up payment form...
+                            Loading payment form...
                           </>
                         ) : (
-                          'Update Payment Method'
+                          'Add Payment Method'
                         )}
                       </Button>
                     </div>
                   ) : (
-                    <div className="space-y-4">
-                      {/* Test Card Information */}
-                      <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border">
-                        <p className="text-sm font-medium text-blue-800 dark:text-blue-200 mb-2">Test Card Details:</p>
-                        <p className="text-xs text-blue-700 dark:text-blue-300">
-                          Card: 4242 4242 4242 4242<br/>
-                          Expiry: Any future date (e.g., 12/25)<br/>
-                          CVC: Any 3 digits (e.g., 123)
-                        </p>
+                    <div className="space-y-6">
+                      <div className="bg-gray-50 p-4 rounded-lg border">
+                        <h3 className="text-lg font-semibold text-gray-900 mb-4">Payment Information</h3>
+                        <p className="text-sm text-gray-600 mb-4">Enter your payment details to secure your subscription</p>
                       </div>
                       
                       {stripePromise && clientSecret ? (
@@ -1695,6 +1690,31 @@ const ContractorPortalEnhanced: React.FC = () => {
                               theme: 'stripe',
                               variables: {
                                 colorPrimary: '#2563eb',
+                                colorBackground: '#ffffff',
+                                colorText: '#1f2937',
+                                colorDanger: '#ef4444',
+                                fontFamily: 'system-ui, sans-serif',
+                                spacingUnit: '6px',
+                                borderRadius: '8px',
+                              },
+                              rules: {
+                                '.Input': {
+                                  border: '1px solid #e5e7eb',
+                                  borderRadius: '8px',
+                                  padding: '12px',
+                                  fontSize: '16px',
+                                  backgroundColor: '#ffffff',
+                                },
+                                '.Input:focus': {
+                                  border: '2px solid #2563eb',
+                                  boxShadow: '0 0 0 3px rgba(37, 99, 235, 0.1)',
+                                },
+                                '.Label': {
+                                  fontSize: '14px',
+                                  fontWeight: '500',
+                                  color: '#374151',
+                                  marginBottom: '6px',
+                                },
                               },
                             },
                           }}
@@ -1705,29 +1725,32 @@ const ContractorPortalEnhanced: React.FC = () => {
                               setClientSecret('');
                               setIsProcessingPayment(false);
                               toast({
-                                title: "Payment Method Updated",
-                                description: "Your payment information has been successfully updated.",
+                                title: "Payment Method Added",
+                                description: "Your payment information has been successfully verified and saved.",
                               });
                             }}
                             onError={handlePaymentError}
                           />
                         </Elements>
                       ) : (
-                        <div className="text-center py-4">
-                          <p className="text-gray-600">Loading payment form...</p>
+                        <div className="text-center py-8">
+                          <Loader2 className="w-8 h-8 animate-spin mx-auto mb-2 text-blue-600" />
+                          <p className="text-gray-600">Preparing secure payment form...</p>
                         </div>
                       )}
                       
-                      <Button 
-                        variant="outline"
-                        onClick={() => {
-                          setClientSecret('');
-                          setIsProcessingPayment(false);
-                        }}
-                        className="w-full"
-                      >
-                        Cancel Update
-                      </Button>
+                      <div className="flex gap-3">
+                        <Button 
+                          variant="outline"
+                          onClick={() => {
+                            setClientSecret('');
+                            setIsProcessingPayment(false);
+                          }}
+                          className="flex-1"
+                        >
+                          Cancel
+                        </Button>
+                      </div>
                     </div>
                   )}
                 </CardContent>
