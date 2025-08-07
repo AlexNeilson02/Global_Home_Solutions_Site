@@ -1397,6 +1397,47 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Update payment method endpoint
+  apiRouter.post("/update-payment-method", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      if (!stripe) {
+        return res.status(500).json({ message: "Payment processing unavailable" });
+      }
+
+      const user = req.user as User;
+      const { contractorId } = req.body;
+
+      const contractor = await storage.getContractor(contractorId);
+      if (!contractor || contractor.userId !== user.id) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+
+      if (!contractor.stripeCustomerId) {
+        return res.status(400).json({ message: "No customer found" });
+      }
+
+      // Create setup intent to update payment method
+      const setupIntent = await stripe.setupIntents.create({
+        customer: contractor.stripeCustomerId,
+        payment_method_types: ['card'],
+        usage: 'off_session',
+        metadata: {
+          contractor_id: contractorId.toString(),
+          action: 'update_payment_method'
+        }
+      });
+
+      res.json({
+        clientSecret: setupIntent.client_secret,
+        status: 'requires_setup'
+      });
+
+    } catch (error) {
+      console.error("Error updating payment method:", error);
+      res.status(500).json({ message: "Failed to update payment method" });
+    }
+  });
+
   apiRouter.get("/subscription-status/:contractorId", isAuthenticated, async (req: Request, res: Response) => {
     try {
       const contractorId = parseInt(req.params.contractorId);
@@ -1413,10 +1454,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const subscription = await stripe.subscriptions.retrieve(contractor.stripeSubscriptionId);
       
+      const nextBillingDate = subscription.current_period_end ? new Date(subscription.current_period_end * 1000).toISOString() : null;
+      
       res.json({
         status: subscription.status === 'active' ? 'active' : 'inactive',
         currentPeriodEnd: subscription.current_period_end,
-        nextBilling: new Date(subscription.current_period_end * 1000).toISOString()
+        nextBilling: nextBillingDate
       });
 
     } catch (error) {

@@ -643,23 +643,28 @@ const ContractorPortalEnhanced: React.FC = () => {
   const handleSubscriptionPayment = async () => {
     setIsProcessingPayment(true);
     try {
-      // Create payment intent for $100 monthly subscription
-      const response = await apiRequest('POST', '/api/create-subscription', {
-        contractorId: contractor?.id,
-        amount: 10000, // $100 in cents
-        type: 'monthly'
-      });
-
-      const data = await response.json();
-
-      // Set client secret for embedded payment form
-      setClientSecret(data.clientSecret);
-      
+      if (subscriptionStatus === 'active') {
+        // If already subscribed, create setup intent to update payment method
+        const response = await apiRequest('POST', '/api/update-payment-method', {
+          contractorId: contractor?.id
+        });
+        const data = await response.json();
+        setClientSecret(data.clientSecret);
+      } else {
+        // Create new subscription
+        const response = await apiRequest('POST', '/api/create-subscription', {
+          contractorId: contractor?.id,
+          amount: 10000, // $100 in cents
+          type: 'monthly'
+        });
+        const data = await response.json();
+        setClientSecret(data.clientSecret);
+      }
     } catch (error) {
-      console.error('Error creating subscription:', error);
+      console.error('Error setting up payment:', error);
       toast({
         title: "Payment Error",
-        description: "Failed to set up subscription. Please try again.",
+        description: "Failed to set up payment. Please try again.",
         variant: "destructive",
       });
       setIsProcessingPayment(false);
@@ -1622,18 +1627,34 @@ const ContractorPortalEnhanced: React.FC = () => {
                       </div>
 
                       <div className="border-t pt-4">
-                        <div className="flex justify-between items-center">
+                        <div className="flex flex-col gap-4">
                           <div>
                             <h3 className="text-sm font-medium text-gray-900">Subscription Actions</h3>
                             <p className="text-sm text-gray-500">Manage your subscription settings</p>
                           </div>
-                          <Button 
-                            variant="outline" 
-                            onClick={cancelSubscription}
-                            className="text-red-600 border-red-300 hover:bg-red-50"
-                          >
-                            Cancel Subscription
-                          </Button>
+                          <div className="flex gap-3">
+                            <Button 
+                              onClick={handleSubscriptionPayment}
+                              disabled={isProcessingPayment}
+                              className="bg-blue-600 hover:bg-blue-700"
+                            >
+                              {isProcessingPayment ? (
+                                <>
+                                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                  Setting up...
+                                </>
+                              ) : (
+                                'Update Payment Method'
+                              )}
+                            </Button>
+                            <Button 
+                              variant="outline" 
+                              onClick={cancelSubscription}
+                              className="text-red-600 border-red-300 hover:bg-red-50"
+                            >
+                              Cancel Subscription
+                            </Button>
+                          </div>
                         </div>
                       </div>
                     </div>
