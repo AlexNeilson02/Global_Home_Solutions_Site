@@ -23,6 +23,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { Upload, X, Image, Video, File } from "lucide-react";
 
@@ -30,7 +32,7 @@ const bidRequestSchema = z.object({
   customerName: z.string().min(2, "Name must be at least 2 characters"),
   customerEmail: z.string().email("Please enter a valid email address"),
   customerPhone: z.string().min(10, "Please enter a valid phone number"),
-  serviceRequested: z.string().min(1, "Please select a service"),
+  servicesRequested: z.array(z.string()).min(1, "Please select at least one service"),
   projectDescription: z.string().min(10, "Please describe your project in detail"),
   projectAddress: z.string().min(5, "Please enter your project address"),
   preferredTimeframe: z.string().min(1, "Please select a timeframe"),
@@ -67,7 +69,12 @@ export default function BidRequestForm({ isOpen, onClose, contractor }: BidReque
     enabled: isOpen, // Only fetch when modal is open
   });
   
-  const services = servicesData?.services || [];
+  const allServices = servicesData?.services || [];
+  
+  // Filter services to only show contractor's specialties
+  const contractorServices = allServices.filter(service => 
+    contractor.specialties?.includes(service.name)
+  );
 
   const form = useForm<BidRequestForm>({
     resolver: zodResolver(bidRequestSchema),
@@ -75,7 +82,7 @@ export default function BidRequestForm({ isOpen, onClose, contractor }: BidReque
       customerName: "",
       customerEmail: "",
       customerPhone: "",
-      serviceRequested: "",
+      servicesRequested: [],
       projectDescription: "",
       projectAddress: "",
       preferredTimeframe: "",
@@ -152,6 +159,7 @@ export default function BidRequestForm({ isOpen, onClose, contractor }: BidReque
         formData.append('customerName', data.customerName);
         formData.append('customerEmail', data.customerEmail);
         formData.append('customerPhone', data.customerPhone);
+        formData.append('servicesRequested', JSON.stringify(data.servicesRequested));
         formData.append('projectDescription', data.projectDescription);
         formData.append('projectAddress', data.projectAddress);
         formData.append('preferredTimeframe', data.preferredTimeframe);
@@ -231,7 +239,7 @@ export default function BidRequestForm({ isOpen, onClose, contractor }: BidReque
       customerName: data.customerName,
       customerEmail: data.customerEmail, 
       customerPhone: data.customerPhone,
-      serviceRequested: data.serviceRequested,
+      servicesRequested: data.servicesRequested,
       projectDescription: data.projectDescription,
       projectAddress: data.projectAddress,
       preferredTimeframe: data.preferredTimeframe,
@@ -306,24 +314,56 @@ export default function BidRequestForm({ isOpen, onClose, contractor }: BidReque
             
             <FormField
               control={form.control}
-              name="serviceRequested"
+              name="servicesRequested"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Service Requested</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select a service" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {servicesData?.services?.map((service: any) => (
-                        <SelectItem key={service.id} value={service.name}>
-                          {service.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <FormLabel>Services Requested</FormLabel>
+                  <div className="space-y-3">
+                    {contractorServices.length > 0 ? (
+                      <>
+                        <p className="text-sm text-muted-foreground">
+                          Select all services you need from {contractor.companyName}'s specialties:
+                        </p>
+                        <div className="space-y-2">
+                          {contractorServices.map((service) => (
+                            <div key={service.id} className="flex items-center space-x-2">
+                              <Checkbox
+                                id={`service-${service.id}`}
+                                checked={field.value?.includes(service.name) || false}
+                                onCheckedChange={(checked) => {
+                                  const currentValues = field.value || [];
+                                  if (checked) {
+                                    field.onChange([...currentValues, service.name]);
+                                  } else {
+                                    field.onChange(currentValues.filter((value) => value !== service.name));
+                                  }
+                                }}
+                              />
+                              <label
+                                htmlFor={`service-${service.id}`}
+                                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                              >
+                                {service.name}
+                              </label>
+                            </div>
+                          ))}
+                        </div>
+                        {field.value && field.value.length > 0 && (
+                          <div className="flex flex-wrap gap-1 mt-2">
+                            {field.value.map((serviceName) => (
+                              <Badge key={serviceName} variant="secondary" className="text-xs">
+                                {serviceName}
+                              </Badge>
+                            ))}
+                          </div>
+                        )}
+                      </>
+                    ) : (
+                      <p className="text-sm text-muted-foreground">
+                        No services available for this contractor.
+                      </p>
+                    )}
+                  </div>
                   <FormMessage />
                 </FormItem>
               )}

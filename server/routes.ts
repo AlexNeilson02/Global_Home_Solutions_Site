@@ -527,6 +527,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         timeline,
         budget,
         serviceRequested,
+        servicesRequested,
         preferredContactMethod,
         additionalInformation,
         contractorId,
@@ -547,6 +548,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const finalAddress = address || projectAddress;
       const finalDescription = description || projectDescription;
       const finalTimeline = timeline || preferredTimeframe;
+      
+      // Handle services requested - either array or single service
+      let finalServicesRequested;
+      if (servicesRequested) {
+        // Parse if it's a JSON string from FormData
+        if (typeof servicesRequested === 'string') {
+          try {
+            finalServicesRequested = JSON.parse(servicesRequested);
+          } catch (e) {
+            finalServicesRequested = [servicesRequested];
+          }
+        } else {
+          finalServicesRequested = servicesRequested;
+        }
+      } else if (serviceRequested) {
+        finalServicesRequested = [serviceRequested];
+      } else {
+        finalServicesRequested = ["General Services"];
+      }
       
       // Validate required fields
       if (!finalFullName || !finalEmail || !finalPhone || !finalDescription || !finalAddress || !finalTimeline || !contractorId) {
@@ -583,7 +603,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         email: finalEmail,
         phone: finalPhone,
         address: finalAddress,
-        serviceRequested: serviceRequested || "General Services",
+        servicesRequested: finalServicesRequested,
         description: finalDescription,
         timeline: finalTimeline,
         budget: budget || null,
@@ -636,7 +656,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         if (contractor.paymentMethodAdded && contractor.paymentMethodId) {
           try {
             // Get service category details for commission calculation
-            const serviceCategory = await storage.getServiceCategoryByName(serviceRequested || "General Services");
+            const primaryService = finalServicesRequested[0] || "General Services";
+            const serviceCategory = await storage.getServiceCategoryByName(primaryService);
             const baseCommissionAmount = serviceCategory?.baseCost || 50; // Default $50 if no category found
             
             // Calculate commission based on service category
@@ -646,7 +667,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             const chargeResult = await chargeCommissionToContractor(
               Number(contractorId),
               commissionAmount,
-              `Bid request for ${serviceRequested || 'General Services'} - ${finalFullName}`
+              `Bid request for ${finalServicesRequested.join(', ')} - ${finalFullName}`
             );
             
             if (chargeResult && chargeResult.success && chargeResult.paymentIntentId) {
@@ -671,9 +692,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
                   status: 'completed',
                   sourceContractorId: Number(contractorId),
                   sourceBidRequestId: bidRequest.id,
-                  sourceServiceType: serviceRequested || 'General Services',
+                  sourceServiceType: primaryService,
                   stripePaymentIntentId: chargeResult.paymentIntentId,
-                  notes: `Salesperson commission (50%) for bid request: ${serviceRequested || 'General Services'}`
+                  notes: `Salesperson commission (50%) for bid request: ${finalServicesRequested.join(', ')}`
                 });
                 console.log(`💰 Salesperson commission: $${salespersonCommission} to user ${salespersonUser.userId}`);
               }
@@ -689,9 +710,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
                   status: 'completed',
                   sourceContractorId: Number(contractorId),
                   sourceBidRequestId: bidRequest.id,
-                  sourceServiceType: serviceRequested || 'General Services',
+                  sourceServiceType: primaryService,
                   stripePaymentIntentId: chargeResult.paymentIntentId,
-                  notes: `Corp commission (50%) for bid request: ${serviceRequested || 'General Services'}`
+                  notes: `Corp commission (50%) for bid request: ${finalServicesRequested.join(', ')}`
                 });
                 console.log(`🏢 Corp commission: $${corpCommission} to admin user ${adminUser.id}`);
               }
