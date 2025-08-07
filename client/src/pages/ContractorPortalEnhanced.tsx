@@ -567,7 +567,7 @@ const ContractorPortalEnhanced: React.FC = () => {
               <TabsTrigger value="projects">Sent Bids</TabsTrigger>
               <TabsTrigger value="bids">Bid Requests</TabsTrigger>
               <TabsTrigger value="documents">Documents</TabsTrigger>
-              <TabsTrigger value="payments">Payment Processing</TabsTrigger>
+              <TabsTrigger value="subscription">Subscription</TabsTrigger>
               <TabsTrigger value="analytics">Analytics</TabsTrigger>
             </TabsList>
 
@@ -620,13 +620,13 @@ const ContractorPortalEnhanced: React.FC = () => {
                   <span>Docs</span>
                 </button>
                 <button
-                  onClick={() => setActiveTab("payments")}
+                  onClick={() => setActiveTab("subscription")}
                   className={`flex flex-col items-center justify-center gap-1 text-xs hover:bg-gray-100 dark:hover:bg-gray-800 px-4 min-w-[80px] flex-shrink-0 ${
-                    activeTab === "payments" ? "text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950" : ""
+                    activeTab === "subscription" ? "text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950" : ""
                   }`}
                 >
                   <CreditCard className="h-4 w-4" />
-                  <span>Payments</span>
+                  <span>Subscription</span>
                 </button>
                 <button
                   onClick={() => setActiveTab("analytics")}
@@ -1353,83 +1353,148 @@ const ContractorPortalEnhanced: React.FC = () => {
 
 
 
-            {/* Payment Processing Tab */}
-            <TabsContent value="payments" className="space-y-6">
+            {/* Subscription Tab */}
+            <TabsContent value="subscription" className="space-y-6">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* Payment History */}
+                {/* Current Subscription */}
                 <Card style={antiYellowStyles}>
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <CreditCard className="h-5 w-5" />
-                      Recent Payments
+                      Current Plan
                     </CardTitle>
                     <CardDescription>
-                      Track your payment history and status
+                      Your active subscription details
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-4">
-                      {/* Sample payment entries */}
-                      <div className="flex justify-between items-center p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
-                        <div>
-                          <div className="font-medium">Kitchen Remodel Project</div>
-                          <div className="text-sm text-gray-600 dark:text-gray-400">Payment received</div>
-                          <div className="text-xs text-gray-500">Dec 15, 2024</div>
+                      <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+                        <div className="flex justify-between items-center">
+                          <div>
+                            <div className="font-semibold text-lg">Professional Plan</div>
+                            <div className="text-sm text-gray-600 dark:text-gray-400">Access to all features</div>
+                          </div>
+                          <Badge variant="default" className="bg-green-600">Active</Badge>
                         </div>
-                        <div className="text-green-600 font-semibold">+$8,500</div>
                       </div>
                       
-                      <div className="flex justify-between items-center p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
-                        <div>
-                          <div className="font-medium">Bathroom Renovation</div>
-                          <div className="text-sm text-gray-600 dark:text-gray-400">Payment received</div>
-                          <div className="text-xs text-gray-500">Dec 8, 2024</div>
+                      <div className="space-y-3">
+                        <div className="flex justify-between text-sm">
+                          <span>Monthly Cost:</span>
+                          <span className="font-medium">$100.00</span>
                         </div>
-                        <div className="text-green-600 font-semibold">+$4,200</div>
+                        <div className="flex justify-between text-sm">
+                          <span>Next Billing Date:</span>
+                          <span className="font-medium">January 15, 2025</span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span>Payment Method:</span>
+                          <span className="font-medium">•••• •••• •••• 4242</span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span>Auto-renew:</span>
+                          <span className="font-medium text-green-600">Enabled</span>
+                        </div>
                       </div>
                       
-                      <div className="flex justify-between items-center p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg border border-yellow-200 dark:border-yellow-800">
-                        <div>
-                          <div className="font-medium">Deck Installation</div>
-                          <div className="text-sm text-gray-600 dark:text-gray-400">Payment pending</div>
-                          <div className="text-xs text-gray-500">Dec 20, 2024</div>
-                        </div>
-                        <div className="text-yellow-600 font-semibold">$6,750</div>
-                      </div>
+                      <Separator />
                       
-                      <div className="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border">
-                        <div>
-                          <div className="font-medium">Flooring Project</div>
-                          <div className="text-sm text-gray-600 dark:text-gray-400">Invoice sent</div>
-                          <div className="text-xs text-gray-500">Dec 22, 2024</div>
-                        </div>
-                        <div className="text-gray-600 font-semibold">$3,400</div>
+                      <div className="space-y-2">
+                        <h4 className="font-medium">Plan Features</h4>
+                        <ul className="space-y-1 text-sm text-gray-600 dark:text-gray-400">
+                          <li className="flex items-center gap-2">
+                            <span className="w-1.5 h-1.5 bg-green-500 rounded-full"></span>
+                            Unlimited bid requests
+                          </li>
+                          <li className="flex items-center gap-2">
+                            <span className="w-1.5 h-1.5 bg-green-500 rounded-full"></span>
+                            Advanced analytics
+                          </li>
+                          <li className="flex items-center gap-2">
+                            <span className="w-1.5 h-1.5 bg-green-500 rounded-full"></span>
+                            Priority customer support
+                          </li>
+                          <li className="flex items-center gap-2">
+                            <span className="w-1.5 h-1.5 bg-green-500 rounded-full"></span>
+                            Document management
+                          </li>
+                        </ul>
                       </div>
                     </div>
                   </CardContent>
                 </Card>
 
-                {/* Payment Methods & Settings */}
+                {/* Billing History */}
                 <Card style={antiYellowStyles}>
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
-                      <Building2 className="h-5 w-5" />
-                      Payment Settings
+                      <FileText className="h-5 w-5" />
+                      Billing History
                     </CardTitle>
                     <CardDescription>
-                      Manage payment methods and preferences
+                      Recent subscription payments
                     </CardDescription>
                   </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="p-4 border rounded-lg">
-                      <div className="flex justify-between items-center mb-3">
-                        <h4 className="font-medium">Preferred Payment Method</h4>
-                        <Button size="sm" variant="outline" style={antiYellowInputStyles}>
-                          <Edit3 className="h-4 w-4 mr-1" />
-                          Edit
-                        </Button>
+                  <CardContent>
+                    <div className="space-y-3">
+                      <div className="flex justify-between items-center p-3 border rounded-lg">
+                        <div>
+                          <div className="font-medium">December 2024</div>
+                          <div className="text-sm text-gray-600 dark:text-gray-400">Professional Plan</div>
+                          <div className="text-xs text-gray-500">Paid on Dec 15, 2024</div>
+                        </div>
+                        <div className="text-right">
+                          <div className="font-medium">$100.00</div>
+                          <Badge variant="default" className="text-xs bg-green-600">Paid</Badge>
+                        </div>
                       </div>
-                      <div className="flex items-center gap-3">
+                      
+                      <div className="flex justify-between items-center p-3 border rounded-lg">
+                        <div>
+                          <div className="font-medium">November 2024</div>
+                          <div className="text-sm text-gray-600 dark:text-gray-400">Professional Plan</div>
+                          <div className="text-xs text-gray-500">Paid on Nov 15, 2024</div>
+                        </div>
+                        <div className="text-right">
+                          <div className="font-medium">$100.00</div>
+                          <Badge variant="default" className="text-xs bg-green-600">Paid</Badge>
+                        </div>
+                      </div>
+                      
+                      <div className="flex justify-between items-center p-3 border rounded-lg">
+                        <div>
+                          <div className="font-medium">October 2024</div>
+                          <div className="text-sm text-gray-600 dark:text-gray-400">Professional Plan</div>
+                          <div className="text-xs text-gray-500">Paid on Oct 15, 2024</div>
+                        </div>
+                        <div className="text-right">
+                          <div className="font-medium">$100.00</div>
+                          <Badge variant="default" className="text-xs bg-green-600">Paid</Badge>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Subscription Management */}
+              <Card style={antiYellowStyles}>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Building2 className="h-5 w-5" />
+                    Subscription Management
+                  </CardTitle>
+                  <CardDescription>
+                    Manage your plan and payment settings
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    {/* Update Payment Method */}
+                    <div className="p-4 border rounded-lg">
+                      <h4 className="font-medium mb-3">Payment Method</h4>
+                      <div className="flex items-center gap-3 mb-3">
                         <div className="w-10 h-6 bg-blue-600 rounded flex items-center justify-center">
                           <span className="text-white text-xs font-bold">VISA</span>
                         </div>
@@ -1438,82 +1503,49 @@ const ContractorPortalEnhanced: React.FC = () => {
                           <div className="text-xs text-gray-500">Expires 12/27</div>
                         </div>
                       </div>
+                      <Button size="sm" variant="outline" className="w-full" style={antiYellowInputStyles}>
+                        <Edit3 className="h-4 w-4 mr-1" />
+                        Update Payment Method
+                      </Button>
                     </div>
                     
+                    {/* Plan Options */}
                     <div className="p-4 border rounded-lg">
-                      <div className="flex justify-between items-center mb-3">
-                        <h4 className="font-medium">Bank Account (ACH)</h4>
-                        <Button size="sm" variant="outline" style={antiYellowInputStyles}>
-                          <Plus className="h-4 w-4 mr-1" />
-                          Add
+                      <h4 className="font-medium mb-3">Plan Options</h4>
+                      <div className="space-y-2 mb-3">
+                        <div className="text-sm">
+                          <span className="font-medium">Current:</span> Professional ($100/month)
+                        </div>
+                        <div className="text-sm text-gray-600">
+                          All features included
+                        </div>
+                      </div>
+                      <Button size="sm" variant="outline" className="w-full" style={antiYellowInputStyles}>
+                        <Eye className="h-4 w-4 mr-1" />
+                        View All Plans
+                      </Button>
+                    </div>
+                    
+                    {/* Account Actions */}
+                    <div className="p-4 border rounded-lg">
+                      <h4 className="font-medium mb-3">Account Actions</h4>
+                      <div className="space-y-3">
+                        <Button size="sm" variant="outline" className="w-full" style={antiYellowInputStyles}>
+                          <FileText className="h-4 w-4 mr-1" />
+                          Download Invoices
+                        </Button>
+                        <Button 
+                          size="sm" 
+                          variant="destructive" 
+                          className="w-full"
+                          style={antiYellowInputStyles}
+                        >
+                          <X className="h-4 w-4 mr-1" />
+                          Cancel Subscription
                         </Button>
                       </div>
-                      <div className="text-sm text-gray-600">
-                        Save on processing fees with direct bank transfers
-                      </div>
-                    </div>
-
-                    <div className="p-4 border rounded-lg">
-                      <h4 className="font-medium mb-3">Payment Preferences</h4>
-                      <div className="space-y-2 text-sm">
-                        <div className="flex justify-between">
-                          <span>Default payment split:</span>
-                          <span className="font-medium">50% upfront, 50% on completion</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span>Auto-invoice timing:</span>
-                          <span className="font-medium">Upon project completion</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span>Payment terms:</span>
-                          <span className="font-medium">Net 15 days</span>
-                        </div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-
-              {/* Financial Summary */}
-              <Card style={antiYellowStyles}>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <DollarSign className="h-5 w-5" />
-                    Financial Overview
-                  </CardTitle>
-                  <CardDescription>
-                    Monthly financial performance and trends
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-6">
-                    <div className="text-center">
-                      <div className="text-2xl font-bold text-green-600">$18,700</div>
-                      <div className="text-sm text-gray-600">This Month</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-2xl font-bold text-yellow-600">$6,750</div>
-                      <div className="text-sm text-gray-600">Pending</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-2xl font-bold text-blue-600">$156,400</div>
-                      <div className="text-sm text-gray-600">Year to Date</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-2xl font-bold text-gray-600">15</div>
-                      <div className="text-sm text-gray-600">Avg. Days to Payment</div>
                     </div>
                   </div>
-                  
-                  <ResponsiveContainer width="100%" height={200}>
-                    <BarChart data={projectData}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="month" />
-                      <YAxis />
-                      <Tooltip formatter={(value) => [`$${Number(value).toLocaleString()}`, 'Revenue']} />
-                      <Bar dataKey="revenue" fill="#10b981" name="Monthly Revenue" />
-                    </BarChart>
-                  </ResponsiveContainer>
                 </CardContent>
               </Card>
             </TabsContent>
