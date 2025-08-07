@@ -5,28 +5,59 @@ import logoPath from "@/assets/global-home-solutions-logo.png";
 
 export default function AboutUs() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 dark:from-gray-900 dark:to-gray-800">
+    <div style={{ 
+      minHeight: '100vh', 
+      backgroundColor: '#f8fafc', 
+      position: 'relative',
+      zIndex: 1
+    }}>
       {/* Header with Back Button */}
-      <header className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-md shadow-sm sticky top-0 z-10 border-b border-gray-200 dark:border-gray-700">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <Link href="/" className="inline-flex items-center text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 transition-colors font-medium">
-              <ArrowLeft className="h-5 w-5 mr-2" />
-              Back to Home
-            </Link>
-            <div className="flex items-center">
-              <img 
-                src={logoPath} 
-                alt="Global Home Solutions"
-                className="h-12 w-auto"
-              />
-            </div>
+      <header style={{
+        backgroundColor: 'rgba(255, 255, 255, 0.95)',
+        borderBottom: '1px solid #e2e8f0',
+        position: 'sticky',
+        top: 0,
+        zIndex: 100,
+        padding: '0'
+      }}>
+        <div style={{
+          maxWidth: '80rem',
+          margin: '0 auto',
+          padding: '0 1rem',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          height: '64px'
+        }}>
+          <Link href="/" style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            color: '#2563eb',
+            textDecoration: 'none',
+            fontSize: '16px',
+            fontWeight: '500'
+          }}>
+            <ArrowLeft style={{ width: '20px', height: '20px', marginRight: '8px' }} />
+            Back to Home
+          </Link>
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            <img 
+              src={logoPath} 
+              alt="Global Home Solutions"
+              style={{ height: '48px', width: 'auto' }}
+            />
           </div>
         </div>
       </header>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main style={{
+        maxWidth: '80rem',
+        margin: '0 auto',
+        padding: '2rem 1rem',
+        position: 'relative',
+        zIndex: 10
+      }}>
         
         {/* Hero Section */}
         <div className="text-center mb-20">
