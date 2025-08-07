@@ -1498,8 +1498,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
             action: 'verify_payment_method'
           }
         },
-        success_url: `${origin}/contractor-portal-enhanced?setup_success=true&session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: `${origin}/contractor-portal-enhanced?setup_cancelled=true`,
+        success_url: `${origin}/contractor-portal?setup_success=true&session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${origin}/contractor-portal?setup_cancelled=true`,
         metadata: {
           contractor_id: contractorId.toString(),
           action: 'setup_payment_method'
