@@ -4,8 +4,6 @@ import { ArrowLeft, MapPin, Phone, Mail, Users, Award, Home, Building2, Star, Cl
 import logoPath from "@/assets/global-home-solutions-logo.png";
 
 export default function AboutUs() {
-  console.log('AboutUs component rendered');
-  
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 dark:from-gray-900 dark:to-gray-800">
       {/* Header with Back Button */}

@@ -28,8 +28,8 @@ function App() {
           <div className="min-h-screen" style={{ marginTop: 0, paddingTop: 0, position: 'relative', top: 0 }}>
             <Toaster />
             <Route path="/" component={HomePage} />
-            <Route path="/about" component={AboutUsSimple} />
-            <Route path="/about-full" component={AboutUs} />
+            <Route path="/about" component={AboutUs} />
+            <Route path="/about-test" component={AboutUsSimple} />
             <Route path="/services" component={ServiceSelection} />
             <Route path="/portals" component={Portals} />
             <Route path="/contractor/:id" component={ContractorProfile} />

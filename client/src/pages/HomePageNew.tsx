@@ -32,7 +32,7 @@ export default function HomePage() {
       {/* About Us Link */}
       <Link 
         href="/about"
-        onClick={() => console.log('About Us clicked - navigating to /about')}
+
         style={{
           position: 'absolute',
           top: '20px',
