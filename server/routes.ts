@@ -1318,17 +1318,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         await storage.updateContractorStripeInfo(contractorId, { stripeCustomerId: customerId });
       }
 
-      // Create a price for the subscription
+      // Create a product first, then a price
+      const product = await stripe.products.create({
+        name: 'Contractor Premium Subscription'
+      });
+
       const price = await stripe.prices.create({
         unit_amount: amount, // $100 in cents
         currency: 'usd',
         recurring: {
           interval: 'month'
         },
-        product_data: {
-          name: 'Contractor Premium Subscription',
-          description: 'Monthly subscription with automatic commission payments'
-        }
+        product: product.id
       });
 
       // Create subscription
