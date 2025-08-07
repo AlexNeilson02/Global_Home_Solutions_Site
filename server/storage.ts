@@ -24,6 +24,7 @@ export interface IStorage {
   getAllUsers(): Promise<User[]>;
   updateUserLastLogin(id: number): Promise<User | undefined>;
   getUsersByRole(role: string): Promise<User[]>;
+  getUserByRole(role: string): Promise<User | undefined>;
   updateStripeCustomerId(userId: number, stripeCustomerId: string): Promise<User | undefined>;
   updateUserStripeInfo(userId: number, stripeInfo: { customerId: string; subscriptionId: string }): Promise<User | undefined>;
 
@@ -39,6 +40,7 @@ export interface IStorage {
   
   // Salesperson methods
   getSalesperson(id: number): Promise<Salesperson | undefined>;
+  getSalespersonById(id: number): Promise<Salesperson | undefined>;
   getSalespersonByUserId(userId: number): Promise<Salesperson | undefined>;
   getSalespersonByNfcId(nfcId: string): Promise<Salesperson | undefined>;
   getSalespersonByProfileUrl(profileUrl: string): Promise<Salesperson | undefined>;

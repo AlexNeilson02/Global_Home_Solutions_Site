@@ -78,6 +78,11 @@ export class DatabaseStorage implements IStorage {
     return db.select().from(users).where(eq(users.role, role));
   }
 
+  async getUserByRole(role: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.role, role));
+    return user;
+  }
+
   async updateStripeCustomerId(userId: number, stripeCustomerId: string): Promise<User | undefined> {
     const [user] = await db
       .update(users)
@@ -188,6 +193,10 @@ export class DatabaseStorage implements IStorage {
   async getSalesperson(id: number): Promise<Salesperson | undefined> {
     const [salesperson] = await db.select().from(salespersons).where(eq(salespersons.id, id));
     return salesperson;
+  }
+
+  async getSalespersonById(id: number): Promise<Salesperson | undefined> {
+    return this.getSalesperson(id);
   }
 
   async getSalespersonByUserId(userId: number): Promise<Salesperson | undefined> {
