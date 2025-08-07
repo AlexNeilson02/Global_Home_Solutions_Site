@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { Link } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
 import { useSalesperson } from "@/contexts/SalespersonContext";
 import { useSalespersonNavigation } from "@/hooks/useSalespersonNavigation";
@@ -28,6 +29,30 @@ export default function HomePage() {
 
   return (
     <div className="homepage-container" style={{ height: '100vh', overflow: 'hidden', position: 'relative' }}>
+      {/* Subtle About Us Link */}
+      <Link 
+        href="/about"
+        style={{
+          position: 'absolute',
+          top: '20px',
+          left: '20px',
+          color: 'white',
+          textDecoration: 'none',
+          fontSize: '14px',
+          fontWeight: '500',
+          zIndex: 20,
+          padding: '8px 16px',
+          borderRadius: '20px',
+          backgroundColor: 'rgba(0, 0, 0, 0.3)',
+          backdropFilter: 'blur(10px)',
+          transition: 'all 0.3s ease',
+          border: '1px solid rgba(255, 255, 255, 0.2)'
+        }}
+        className="hover:bg-white/30 hover:scale-105"
+      >
+        About Us
+      </Link>
+      
       <header className="hero-header">
         <div className="hero-image-container">
           <img 
