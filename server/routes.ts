@@ -1517,6 +1517,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Mark payment method as added (for manual tracking when webhooks aren't available)
+  apiRouter.post("/mark-payment-method-added", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const user = req.user as User;
+      const { contractorId } = req.body;
+
+      const contractor = await storage.getContractor(contractorId);
+      if (!contractor || contractor.userId !== user.id) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+
+      // Update contractor record to mark payment method as added
+      await storage.updateContractor(contractorId, { 
+        paymentMethodAdded: true 
+      });
+
+      console.log('Payment method marked as added for contractor:', contractorId);
+
+      res.json({ 
+        message: "Payment method status updated successfully",
+        paymentMethodAdded: true 
+      });
+
+    } catch (error) {
+      console.error("Error marking payment method as added:", error);
+      res.status(500).json({ message: "Failed to update payment method status" });
+    }
+  });
+
   apiRouter.get("/subscription-status/:contractorId", isAuthenticated, async (req: Request, res: Response) => {
     try {
       const contractorId = parseInt(req.params.contractorId);
@@ -1598,12 +1627,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).send(`Webhook Error: ${err.message}`);
       }
 
-      // Handle verification payment success - refund immediately
+      // Handle verification payment success - save payment method and refund
       if (event.type === 'payment_intent.succeeded') {
         const paymentIntent = event.data.object as Stripe.PaymentIntent;
         
         if (paymentIntent.metadata?.action === 'verify_payment_method') {
-          console.log('Processing verification payment refund for:', paymentIntent.id);
+          console.log('Processing verification payment for contractor:', paymentIntent.metadata.contractor_id);
+          
+          const contractorId = parseInt(paymentIntent.metadata.contractor_id);
+          
+          // Mark payment method as added in contractor record
+          await storage.updateContractor(contractorId, { 
+            paymentMethodAdded: true 
+          });
+          
+          console.log('Payment method saved for contractor:', contractorId);
           
           // Immediately refund the verification charge
           await stripe.refunds.create({
