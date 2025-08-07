@@ -18,7 +18,6 @@ import Checkout from "@/pages/checkout";
 import Subscribe from "@/pages/subscribe";
 import ServiceSelection from "@/pages/ServiceSelection";
 import AboutUs from "@/pages/AboutUs";
-import AboutUsSimple from "@/pages/AboutUsSimple";
 
 function App() {
   return (
@@ -29,7 +28,6 @@ function App() {
             <Toaster />
             <Route path="/" component={HomePage} />
             <Route path="/about" component={AboutUs} />
-            <Route path="/about-test" component={AboutUsSimple} />
             <Route path="/services" component={ServiceSelection} />
             <Route path="/portals" component={Portals} />
             <Route path="/contractor/:id" component={ContractorProfile} />
