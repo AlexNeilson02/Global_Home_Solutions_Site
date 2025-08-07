@@ -70,6 +70,10 @@ export const contractors = pgTable("contractors", {
   gmailRefreshToken: text("gmail_refresh_token"),
   gmailTokenExpiry: timestamp("gmail_token_expiry"),
   gmailConnected: boolean("gmail_connected").default(false),
+  
+  // Stripe integration
+  stripeCustomerId: text("stripe_customer_id"),
+  stripeSubscriptionId: text("stripe_subscription_id"),
 });
 
 // Salespersons table

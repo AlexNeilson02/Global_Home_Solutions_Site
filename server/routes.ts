@@ -37,9 +37,7 @@ const upload = multer({
 let stripe: Stripe | null = null;
 try {
   if (process.env.STRIPE_SECRET_KEY) {
-    stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-      apiVersion: "2024-09-30.acacia",
-    });
+    stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
   } else {
     console.log("STRIPE_SECRET_KEY not found - subscription features will not work");
   }
@@ -1320,21 +1318,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
         await storage.updateContractorStripeInfo(contractorId, { stripeCustomerId: customerId });
       }
 
+      // Create a price for the subscription
+      const price = await stripe.prices.create({
+        unit_amount: amount, // $100 in cents
+        currency: 'usd',
+        recurring: {
+          interval: 'month'
+        },
+        product_data: {
+          name: 'Contractor Premium Subscription',
+          description: 'Monthly subscription with automatic commission payments'
+        }
+      });
+
       // Create subscription
       const subscription = await stripe.subscriptions.create({
         customer: customerId,
         items: [{
-          price_data: {
-            currency: 'usd',
-            product_data: {
-              name: 'Contractor Premium Subscription',
-              description: 'Monthly subscription with automatic commission payments'
-            },
-            unit_amount: amount, // $100 in cents
-            recurring: {
-              interval: 'month'
-            }
-          }
+          price: price.id
         }],
         payment_behavior: 'default_incomplete',
         expand: ['latest_invoice.payment_intent'],
