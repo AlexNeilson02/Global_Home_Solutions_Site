@@ -14,49 +14,32 @@ export default function AboutUs() {
       margin: '0',
       position: 'relative'
     }}>
-      {/* Simple Header */}
-      <header style={{
+      {/* Fixed Back Arrow */}
+      <Link href="/" style={{
+        position: 'fixed',
+        top: '20px',
+        left: '20px',
+        zIndex: 1000,
+        display: 'inline-flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        width: '50px',
+        height: '50px',
         backgroundColor: '#ffffff',
-        borderBottom: '2px solid #3b82f6',
-        padding: '20px'
+        borderRadius: '50%',
+        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+        color: '#3b82f6',
+        textDecoration: 'none',
+        transition: 'all 0.2s ease'
       }}>
-        <div style={{
-          maxWidth: '1200px',
-          margin: '0 auto',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between'
-        }}>
-          <Link href="/" style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            color: '#3b82f6',
-            textDecoration: 'none',
-            fontSize: '18px',
-            fontWeight: 'bold',
-            padding: '10px 20px',
-            border: '2px solid #3b82f6',
-            borderRadius: '8px',
-            backgroundColor: '#f8fafc'
-          }}>
-            <ArrowLeft style={{ width: '24px', height: '24px', marginRight: '10px' }} />
-            ← Back to Home
-          </Link>
-          <div>
-            <img 
-              src={logoPath} 
-              alt="Global Home Solutions"
-              style={{ height: '60px', width: 'auto' }}
-            />
-          </div>
-        </div>
-      </header>
+        <ArrowLeft style={{ width: '24px', height: '24px' }} />
+      </Link>
 
       {/* Main Content */}
       <main style={{
         maxWidth: '1200px',
         margin: '0 auto',
-        padding: '40px 20px',
+        padding: '60px 20px 40px 20px',
         backgroundColor: '#ffffff'
       }}>
         
