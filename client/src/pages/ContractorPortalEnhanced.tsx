@@ -1685,9 +1685,10 @@ const ContractorPortalEnhanced: React.FC = () => {
                           </svg>
                         </div>
                         <div>
-                          <h4 className="text-sm font-medium text-blue-900">Secure Checkout</h4>
+                          <h4 className="text-sm font-medium text-blue-900">Secure Payment Verification</h4>
                           <p className="text-sm text-blue-700 mt-1">
-                            You'll be redirected to Stripe's secure payment page to safely add your payment method. 
+                            You'll be redirected to Stripe's secure payment page for a $1 verification charge. 
+                            This amount will be automatically refunded once your payment method is verified. 
                             Your card information is encrypted and never stored on our servers.
                           </p>
                         </div>

@@ -1475,12 +1475,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log(`Creating Stripe checkout with origin: ${origin}`);
       console.log(`Headers - host: ${host}, protocol: ${protocol}, origin: ${req.headers.origin}`);
       
-      // Create Checkout session for setup mode (to save payment method)
+      // Create Checkout session for payment mode with $1 verification amount
       const session = await stripe.checkout.sessions.create({
         customer: customerId,
         payment_method_types: ['card'],
-        mode: 'setup',
-        success_url: `${origin}/contractor-portal-enhanced?setup_success=true`,
+        mode: 'payment',
+        line_items: [{
+          price_data: {
+            currency: 'usd',
+            product_data: {
+              name: 'Payment Method Verification',
+              description: 'One-time verification charge (will be refunded immediately)'
+            },
+            unit_amount: 100, // $1.00 verification charge
+          },
+          quantity: 1,
+        }],
+        payment_intent_data: {
+          setup_future_usage: 'off_session', // Save payment method for future use
+          metadata: {
+            contractor_id: contractorId.toString(),
+            action: 'verify_payment_method'
+          }
+        },
+        success_url: `${origin}/contractor-portal-enhanced?setup_success=true&session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${origin}/contractor-portal-enhanced?setup_cancelled=true`,
         metadata: {
           contractor_id: contractorId.toString(),
@@ -1578,6 +1596,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
       } catch (err) {
         console.error('Webhook signature verification failed:', err);
         return res.status(400).send(`Webhook Error: ${err.message}`);
+      }
+
+      // Handle verification payment success - refund immediately
+      if (event.type === 'payment_intent.succeeded') {
+        const paymentIntent = event.data.object as Stripe.PaymentIntent;
+        
+        if (paymentIntent.metadata?.action === 'verify_payment_method') {
+          console.log('Processing verification payment refund for:', paymentIntent.id);
+          
+          // Immediately refund the verification charge
+          await stripe.refunds.create({
+            payment_intent: paymentIntent.id,
+            reason: 'requested_by_customer',
+            metadata: {
+              reason: 'verification_refund',
+              contractor_id: paymentIntent.metadata.contractor_id
+            }
+          });
+          
+          console.log('Verification charge refunded successfully');
+        }
       }
 
       // Handle successful subscription payments
