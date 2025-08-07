@@ -264,6 +264,12 @@ export const commissionPayments = pgTable("commission_payments", {
   recipientId: integer("recipient_id").notNull().references(() => users.id),
   recipientType: text("recipient_type").notNull(), // 'salesperson', 'override', 'corp'
   
+  // Source tracking - WHERE/WHO the money came from
+  sourceContractorId: integer("source_contractor_id").references(() => contractors.id),
+  sourceBidRequestId: integer("source_bid_request_id").references(() => bidRequests.id),
+  sourceServiceType: text("source_service_type"), // What service generated this commission
+  stripePaymentIntentId: text("stripe_payment_intent_id"), // Stripe transaction reference
+  
   // Payment details
   totalAmount: real("total_amount").notNull(),
   commissionRecordIds: integer("commission_record_ids").array().notNull(),

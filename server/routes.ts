@@ -643,13 +643,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
             const commissionAmount = baseCommissionAmount; // Full base cost charged to contractor
             
             // Charge commission to contractor's payment method
-            const chargeSuccess = await chargeCommissionToContractor(
+            const chargeResult = await chargeCommissionToContractor(
               Number(contractorId),
               commissionAmount,
               `Bid request for ${serviceRequested || 'General Services'} - ${finalFullName}`
             );
             
-            if (chargeSuccess) {
+            if (chargeResult && chargeResult.success && chargeResult.paymentIntentId) {
               console.log(`✅ Commission charged: $${commissionAmount} for bid request ${bidRequest.id}`);
               
               // Calculate commission distribution
@@ -669,6 +669,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
                   commissionRecordIds: [], // Will be populated when commission records are created
                   paymentMethod: 'system',
                   status: 'completed',
+                  sourceContractorId: Number(contractorId),
+                  sourceBidRequestId: bidRequest.id,
+                  sourceServiceType: serviceRequested || 'General Services',
+                  stripePaymentIntentId: chargeResult.paymentIntentId,
                   notes: `Salesperson commission (50%) for bid request: ${serviceRequested || 'General Services'}`
                 });
                 console.log(`💰 Salesperson commission: $${salespersonCommission} to user ${salespersonUser.userId}`);
@@ -683,6 +687,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
                   commissionRecordIds: [], // Will be populated when commission records are created
                   paymentMethod: 'system',
                   status: 'completed',
+                  sourceContractorId: Number(contractorId),
+                  sourceBidRequestId: bidRequest.id,
+                  sourceServiceType: serviceRequested || 'General Services',
+                  stripePaymentIntentId: chargeResult.paymentIntentId,
                   notes: `Corp commission (50%) for bid request: ${serviceRequested || 'General Services'}`
                 });
                 console.log(`🏢 Corp commission: $${corpCommission} to admin user ${adminUser.id}`);
@@ -1790,27 +1798,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const adminCommission = paymentAmount * adminCommissionRate;
       const salesRepCommission = paymentAmount * salesRepCommissionRate;
       
+      // Get admin user for commission payment
+      const adminUser = await storage.getUserByRole('admin');
+      
       // Process admin commission
-      await storage.createCommissionPayment({
-        type: 'admin_subscription',
-        amount: adminCommission,
-        contractorId: contractorId,
-        status: 'processed',
-        description: `Admin commission from $${(paymentAmount / 100).toFixed(2)} subscription payment`
-      });
+      if (adminUser) {
+        await storage.createCommissionPayment({
+          recipientId: adminUser.id,
+          recipientType: 'corp',
+          totalAmount: adminCommission / 100, // Convert from cents to dollars
+          commissionRecordIds: [],
+          paymentMethod: 'system',
+          status: 'completed',
+          sourceContractorId: contractorId,
+          sourceServiceType: 'Subscription Payment',
+          notes: `Admin commission from $${(paymentAmount / 100).toFixed(2)} subscription payment`
+        });
+      }
       
       // Process sales rep commissions for any active attributions
       if (commissionRecords && commissionRecords.length > 0) {
         for (const record of commissionRecords) {
           if (record.salespersonId) {
-            await storage.createCommissionPayment({
-              type: 'sales_subscription',
-              amount: salesRepCommission,
-              contractorId: contractorId,
-              salespersonId: record.salespersonId,
-              status: 'processed',
-              description: `Sales rep commission from $${(paymentAmount / 100).toFixed(2)} subscription payment`
-            });
+            const salesperson = await storage.getSalespersonById(record.salespersonId);
+            if (salesperson) {
+              await storage.createCommissionPayment({
+                recipientId: salesperson.userId,
+                recipientType: 'salesperson',
+                totalAmount: salesRepCommission / 100, // Convert from cents to dollars
+                commissionRecordIds: [record.id],
+                paymentMethod: 'system',
+                status: 'completed',
+                sourceContractorId: contractorId,
+                sourceServiceType: 'Subscription Payment',
+                notes: `Sales rep commission from $${(paymentAmount / 100).toFixed(2)} subscription payment`
+              });
+            }
           }
         }
       }
@@ -1823,12 +1846,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   }
 
   // Function to charge commission to contractor's payment method
-  async function chargeCommissionToContractor(contractorId: number, commissionAmount: number, description: string): Promise<boolean> {
+  async function chargeCommissionToContractor(contractorId: number, commissionAmount: number, description: string): Promise<{success: boolean, paymentIntentId?: string}> {
     try {
       const contractor = await storage.getContractor(contractorId);
       if (!contractor || !contractor.stripeCustomerId || !contractor.paymentMethodId) {
         console.error(`Cannot charge commission: contractor ${contractorId} missing Stripe details`);
-        return false;
+        return {success: false};
       }
 
       // Create payment intent for off-session payment (no customer interaction needed)
@@ -1848,14 +1871,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       if (paymentIntent.status === 'succeeded') {
         console.log(`✅ Successfully charged $${commissionAmount} commission to contractor ${contractorId} (Payment Intent ID: ${paymentIntent.id})`);
-        return true;
+        return {success: true, paymentIntentId: paymentIntent.id};
       } else {
         console.error(`❌ Commission charge failed for contractor ${contractorId}: ${paymentIntent.status}`);
-        return false;
+        return {success: false};
       }
     } catch (error) {
       console.error(`Error charging commission to contractor ${contractorId}:`, error);
-      return false;
+      return {success: false};
     }
   }
 
