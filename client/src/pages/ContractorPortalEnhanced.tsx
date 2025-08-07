@@ -26,13 +26,95 @@ import {
   Eye,
   Edit3,
   BarChart3,
-  CreditCard
+  CreditCard,
+  Loader2
 } from "lucide-react";
+import { Elements, useStripe, useElements, PaymentElement } from "@stripe/react-stripe-js";
+import { loadStripe } from "@stripe/stripe-js";
+import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import DocumentManager from "@/components/DocumentManager";
 import ProjectTimeline from "@/components/ProjectTimeline";
 import AnalyticsDashboard from "@/components/AnalyticsDashboard";
+
+// Initialize Stripe
+const stripePublicKey = import.meta.env.VITE_STRIPE_PUBLIC_KEY;
+const stripePromise = stripePublicKey ? loadStripe(stripePublicKey) : null;
+
+// Subscription Payment Form Component
+interface SubscriptionFormProps {
+  contractorId: number;
+  onSuccess: () => void;
+  onError: (error: string) => void;
+}
+
+function SubscriptionForm({ contractorId, onSuccess, onError }: SubscriptionFormProps) {
+  const stripe = useStripe();
+  const elements = useElements();
+  const [isProcessing, setIsProcessing] = useState(false);
+  const { toast } = useToast();
+
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+
+    if (!stripe || !elements) {
+      return;
+    }
+
+    setIsProcessing(true);
+
+    try {
+      const { error: submitError } = await elements.submit();
+      if (submitError) {
+        onError(submitError.message || 'Payment form submission failed');
+        return;
+      }
+
+      const { error, paymentIntent } = await stripe.confirmPayment({
+        elements,
+        confirmParams: {
+          return_url: `${window.location.origin}/contractor-portal-enhanced?subscription_success=true`,
+        },
+        redirect: 'if_required',
+      });
+
+      if (error) {
+        onError(error.message || 'Payment failed');
+      } else if (paymentIntent && paymentIntent.status === 'succeeded') {
+        toast({
+          title: "Subscription Active!",
+          description: "Your monthly subscription has been successfully activated.",
+        });
+        onSuccess();
+      }
+    } catch (err) {
+      onError('An unexpected error occurred during payment');
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <PaymentElement />
+      <Button 
+        type="submit" 
+        disabled={!stripe || isProcessing}
+        className="w-full bg-blue-600 hover:bg-blue-700"
+      >
+        {isProcessing ? (
+          <>
+            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+            Processing Payment...
+          </>
+        ) : (
+          'Subscribe for $100/month'
+        )}
+      </Button>
+    </form>
+  );
+}
 
 const ContractorPortalEnhanced: React.FC = () => {
   const [, navigate] = useLocation();
@@ -84,6 +166,11 @@ const ContractorPortalEnhanced: React.FC = () => {
   const [viewingBidDetails, setViewingBidDetails] = useState<any | null>(null);
   const [viewingMedia, setViewingMedia] = useState<{url: string, type: 'image' | 'video', index: number, allMedia: any[]} | null>(null);
   const [newServiceArea, setNewServiceArea] = useState('');
+  
+  // Subscription state
+  const [subscriptionStatus, setSubscriptionStatus] = useState<'active' | 'inactive' | 'loading'>('loading');
+  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
+  const [clientSecret, setClientSecret] = useState<string>("");
   
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -539,6 +626,97 @@ const ContractorPortalEnhanced: React.FC = () => {
     { name: 'Active', value: activeProjects, color: '#3b82f6' },
     { name: 'Pending', value: pendingBids, color: '#f59e0b' }
   ];
+
+  // Subscription management functions
+  const handleSubscriptionPayment = async () => {
+    setIsProcessingPayment(true);
+    try {
+      // Create payment intent for $100 monthly subscription
+      const response = await apiRequest('POST', '/api/create-subscription', {
+        contractorId: contractor?.id,
+        amount: 10000, // $100 in cents
+        type: 'monthly'
+      });
+
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to create subscription');
+      }
+
+      // Set client secret for embedded payment form
+      setClientSecret(data.clientSecret);
+      
+    } catch (error) {
+      console.error('Error creating subscription:', error);
+      toast({
+        title: "Payment Error",
+        description: "Failed to set up subscription. Please try again.",
+        variant: "destructive",
+      });
+      setIsProcessingPayment(false);
+    }
+  };
+
+  const handlePaymentSuccess = () => {
+    setSubscriptionStatus('active');
+    setClientSecret('');
+    setIsProcessingPayment(false);
+    queryClient.invalidateQueries({ queryKey: [`/api/subscription-status/${contractor?.id}`] });
+  };
+
+  const handlePaymentError = (error: string) => {
+    toast({
+      title: "Payment Failed",
+      description: error,
+      variant: "destructive",
+    });
+    setIsProcessingPayment(false);
+  };
+
+  const cancelSubscription = async () => {
+    try {
+      const response = await fetch('/api/cancel-subscription', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ contractorId: contractor?.id }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to cancel subscription');
+      }
+
+      setSubscriptionStatus('inactive');
+      toast({
+        title: "Subscription Cancelled",
+        description: "Your subscription has been cancelled successfully.",
+      });
+      
+    } catch (error) {
+      console.error('Error cancelling subscription:', error);
+      toast({
+        title: "Error",
+        description: "Failed to cancel subscription. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  // Check subscription status on load
+  useEffect(() => {
+    if (contractor?.id) {
+      fetch(`/api/subscription-status/${contractor.id}`)
+        .then(response => response.json())
+        .then(data => {
+          setSubscriptionStatus(data.status === 'active' ? 'active' : 'inactive');
+        })
+        .catch(() => {
+          setSubscriptionStatus('inactive');
+        });
+    }
+  }, [contractor?.id]);
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -1355,197 +1533,215 @@ const ContractorPortalEnhanced: React.FC = () => {
 
             {/* Subscription Tab */}
             <TabsContent value="subscription" className="space-y-6">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* Current Subscription */}
-                <Card style={antiYellowStyles}>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <CreditCard className="h-5 w-5" />
-                      Current Plan
-                    </CardTitle>
-                    <CardDescription>
-                      Your active subscription details
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
-                        <div className="flex justify-between items-center">
-                          <div>
-                            <div className="font-semibold text-lg">Professional Plan</div>
-                            <div className="text-sm text-gray-600 dark:text-gray-400">Access to all features</div>
-                          </div>
-                          <Badge variant="default" className="bg-green-600">Active</Badge>
-                        </div>
-                      </div>
-                      
-                      <div className="space-y-3">
-                        <div className="flex justify-between text-sm">
-                          <span>Monthly Cost:</span>
-                          <span className="font-medium">$100.00</span>
-                        </div>
-                        <div className="flex justify-between text-sm">
-                          <span>Next Billing Date:</span>
-                          <span className="font-medium">January 15, 2025</span>
-                        </div>
-                        <div className="flex justify-between text-sm">
-                          <span>Payment Method:</span>
-                          <span className="font-medium">•••• •••• •••• 4242</span>
-                        </div>
-                        <div className="flex justify-between text-sm">
-                          <span>Auto-renew:</span>
-                          <span className="font-medium text-green-600">Enabled</span>
-                        </div>
-                      </div>
-                      
-                      <Separator />
-                      
-                      <div className="space-y-2">
-                        <h4 className="font-medium">Plan Features</h4>
-                        <ul className="space-y-1 text-sm text-gray-600 dark:text-gray-400">
-                          <li className="flex items-center gap-2">
-                            <span className="w-1.5 h-1.5 bg-green-500 rounded-full"></span>
-                            Unlimited bid requests
-                          </li>
-                          <li className="flex items-center gap-2">
-                            <span className="w-1.5 h-1.5 bg-green-500 rounded-full"></span>
-                            Advanced analytics
-                          </li>
-                          <li className="flex items-center gap-2">
-                            <span className="w-1.5 h-1.5 bg-green-500 rounded-full"></span>
-                            Priority customer support
-                          </li>
-                          <li className="flex items-center gap-2">
-                            <span className="w-1.5 h-1.5 bg-green-500 rounded-full"></span>
-                            Document management
-                          </li>
-                        </ul>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Billing History */}
-                <Card style={antiYellowStyles}>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <FileText className="h-5 w-5" />
-                      Billing History
-                    </CardTitle>
-                    <CardDescription>
-                      Recent subscription payments
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-3">
-                      <div className="flex justify-between items-center p-3 border rounded-lg">
-                        <div>
-                          <div className="font-medium">December 2024</div>
-                          <div className="text-sm text-gray-600 dark:text-gray-400">Professional Plan</div>
-                          <div className="text-xs text-gray-500">Paid on Dec 15, 2024</div>
-                        </div>
-                        <div className="text-right">
-                          <div className="font-medium">$100.00</div>
-                          <Badge variant="default" className="text-xs bg-green-600">Paid</Badge>
-                        </div>
-                      </div>
-                      
-                      <div className="flex justify-between items-center p-3 border rounded-lg">
-                        <div>
-                          <div className="font-medium">November 2024</div>
-                          <div className="text-sm text-gray-600 dark:text-gray-400">Professional Plan</div>
-                          <div className="text-xs text-gray-500">Paid on Nov 15, 2024</div>
-                        </div>
-                        <div className="text-right">
-                          <div className="font-medium">$100.00</div>
-                          <Badge variant="default" className="text-xs bg-green-600">Paid</Badge>
-                        </div>
-                      </div>
-                      
-                      <div className="flex justify-between items-center p-3 border rounded-lg">
-                        <div>
-                          <div className="font-medium">October 2024</div>
-                          <div className="text-sm text-gray-600 dark:text-gray-400">Professional Plan</div>
-                          <div className="text-xs text-gray-500">Paid on Oct 15, 2024</div>
-                        </div>
-                        <div className="text-right">
-                          <div className="font-medium">$100.00</div>
-                          <Badge variant="default" className="text-xs bg-green-600">Paid</Badge>
-                        </div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-
-              {/* Subscription Management */}
               <Card style={antiYellowStyles}>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <Building2 className="h-5 w-5" />
+                    <CreditCard className="h-5 w-5" />
                     Subscription Management
                   </CardTitle>
                   <CardDescription>
-                    Manage your plan and payment settings
+                    Manage your monthly subscription and commission payments
                   </CardDescription>
                 </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    {/* Update Payment Method */}
-                    <div className="p-4 border rounded-lg">
-                      <h4 className="font-medium mb-3">Payment Method</h4>
-                      <div className="flex items-center gap-3 mb-3">
-                        <div className="w-10 h-6 bg-blue-600 rounded flex items-center justify-center">
-                          <span className="text-white text-xs font-bold">VISA</span>
+                <CardContent className="space-y-6">
+                  {subscriptionStatus === 'loading' ? (
+                    <div className="flex items-center justify-center py-8">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                    </div>
+                  ) : subscriptionStatus === 'active' ? (
+                    <div className="space-y-4">
+                      <div className="flex items-center gap-3 p-4 bg-green-50 border border-green-200 rounded-lg">
+                        <div className="flex-shrink-0">
+                          <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+                            <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                            </svg>
+                          </div>
                         </div>
                         <div>
-                          <div className="text-sm">•••• •••• •••• 4242</div>
-                          <div className="text-xs text-gray-500">Expires 12/27</div>
+                          <h3 className="text-sm font-medium text-green-900">Active Subscription</h3>
+                          <p className="text-sm text-green-700">Your $100/month subscription is active and current.</p>
                         </div>
                       </div>
-                      <Button size="sm" variant="outline" className="w-full" style={antiYellowInputStyles}>
-                        <Edit3 className="h-4 w-4 mr-1" />
-                        Update Payment Method
-                      </Button>
-                    </div>
-                    
-                    {/* Plan Options */}
-                    <div className="p-4 border rounded-lg">
-                      <h4 className="font-medium mb-3">Plan Options</h4>
-                      <div className="space-y-2 mb-3">
-                        <div className="text-sm">
-                          <span className="font-medium">Current:</span> Professional ($100/month)
-                        </div>
-                        <div className="text-sm text-gray-600">
-                          All features included
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <Card>
+                          <CardHeader className="pb-3">
+                            <CardTitle className="text-lg flex items-center gap-2">
+                              <DollarSign className="h-4 w-4" />
+                              Monthly Subscription
+                            </CardTitle>
+                          </CardHeader>
+                          <CardContent>
+                            <div className="space-y-2">
+                              <div className="flex justify-between">
+                                <span className="text-sm text-gray-600">Monthly Fee:</span>
+                                <span className="font-semibold">$100.00</span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span className="text-sm text-gray-600">Next Billing:</span>
+                                <span className="text-sm">{new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString()}</span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span className="text-sm text-gray-600">Status:</span>
+                                <Badge variant="secondary" className="bg-green-100 text-green-700">Active</Badge>
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+
+                        <Card>
+                          <CardHeader className="pb-3">
+                            <CardTitle className="text-lg">Commission Payments</CardTitle>
+                          </CardHeader>
+                          <CardContent>
+                            <div className="space-y-2">
+                              <div className="flex justify-between">
+                                <span className="text-sm text-gray-600">Auto-Pay Enabled:</span>
+                                <Badge variant="secondary" className="bg-blue-100 text-blue-700">Yes</Badge>
+                              </div>
+                              <div className="flex justify-between">
+                                <span className="text-sm text-gray-600">Sales Rep Commission:</span>
+                                <span className="text-sm">Auto-processed</span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span className="text-sm text-gray-600">Admin Commission:</span>
+                                <span className="text-sm">Auto-processed</span>
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      </div>
+
+                      <div className="border-t pt-4">
+                        <div className="flex justify-between items-center">
+                          <div>
+                            <h3 className="text-sm font-medium text-gray-900">Subscription Actions</h3>
+                            <p className="text-sm text-gray-500">Manage your subscription settings</p>
+                          </div>
+                          <Button 
+                            variant="outline" 
+                            onClick={cancelSubscription}
+                            className="text-red-600 border-red-300 hover:bg-red-50"
+                          >
+                            Cancel Subscription
+                          </Button>
                         </div>
                       </div>
-                      <Button size="sm" variant="outline" className="w-full" style={antiYellowInputStyles}>
-                        <Eye className="h-4 w-4 mr-1" />
-                        View All Plans
-                      </Button>
                     </div>
-                    
-                    {/* Account Actions */}
-                    <div className="p-4 border rounded-lg">
-                      <h4 className="font-medium mb-3">Account Actions</h4>
-                      <div className="space-y-3">
-                        <Button size="sm" variant="outline" className="w-full" style={antiYellowInputStyles}>
-                          <FileText className="h-4 w-4 mr-1" />
-                          Download Invoices
-                        </Button>
-                        <Button 
-                          size="sm" 
-                          variant="destructive" 
-                          className="w-full"
-                          style={antiYellowInputStyles}
-                        >
-                          <X className="h-4 w-4 mr-1" />
-                          Cancel Subscription
-                        </Button>
-                      </div>
+                  ) : (
+                    <div className="space-y-6">
+                      {!clientSecret ? (
+                        <div className="text-center py-8">
+                          <div className="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
+                            <CreditCard className="h-8 w-8 text-gray-400" />
+                          </div>
+                          <h3 className="text-lg font-medium text-gray-900 mb-2">No Active Subscription</h3>
+                          <p className="text-gray-600 mb-6">Subscribe to access premium features and automatic commission payments.</p>
+                          
+                          <div className="max-w-md mx-auto">
+                            <Card>
+                              <CardHeader>
+                                <CardTitle className="text-xl text-center">Premium Subscription</CardTitle>
+                                <div className="text-center">
+                                  <span className="text-3xl font-bold">$100</span>
+                                  <span className="text-gray-500">/month</span>
+                                </div>
+                              </CardHeader>
+                              <CardContent className="space-y-4">
+                                <ul className="space-y-2">
+                                  <li className="flex items-center gap-2">
+                                    <svg className="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                    </svg>
+                                    <span className="text-sm">Automatic commission payments</span>
+                                  </li>
+                                  <li className="flex items-center gap-2">
+                                    <svg className="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                    </svg>
+                                    <span className="text-sm">Priority customer leads</span>
+                                  </li>
+                                  <li className="flex items-center gap-2">
+                                    <svg className="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                    </svg>
+                                    <span className="text-sm">Enhanced profile visibility</span>
+                                  </li>
+                                  <li className="flex items-center gap-2">
+                                    <svg className="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                    </svg>
+                                    <span className="text-sm">Advanced analytics dashboard</span>
+                                  </li>
+                                </ul>
+                                
+                                <Button 
+                                  onClick={handleSubscriptionPayment}
+                                  disabled={isProcessingPayment}
+                                  className="w-full bg-blue-600 hover:bg-blue-700"
+                                  style={antiYellowInputStyles}
+                                >
+                                  {isProcessingPayment ? (
+                                    <>
+                                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                      Setting up payment...
+                                    </>
+                                  ) : (
+                                    'Subscribe Now'
+                                  )}
+                                </Button>
+                              </CardContent>
+                            </Card>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="max-w-md mx-auto">
+                          <Card>
+                            <CardHeader>
+                              <CardTitle className="text-xl text-center">Complete Your Subscription</CardTitle>
+                              <CardDescription className="text-center">
+                                Secure payment powered by Stripe
+                              </CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                              {stripePromise && (
+                                <Elements 
+                                  stripe={stripePromise} 
+                                  options={{ 
+                                    clientSecret,
+                                    appearance: {
+                                      theme: 'stripe',
+                                      variables: {
+                                        colorPrimary: '#2563eb',
+                                      },
+                                    },
+                                  }}
+                                >
+                                  <SubscriptionForm 
+                                    contractorId={contractor?.id}
+                                    onSuccess={handlePaymentSuccess}
+                                    onError={handlePaymentError}
+                                  />
+                                </Elements>
+                              )}
+                              <Button 
+                                variant="outline"
+                                onClick={() => {
+                                  setClientSecret('');
+                                  setIsProcessingPayment(false);
+                                }}
+                                className="w-full mt-4"
+                                style={antiYellowInputStyles}
+                              >
+                                Cancel
+                              </Button>
+                            </CardContent>
+                          </Card>
+                        </div>
+                      )}
                     </div>
-                  </div>
+                  )}
                 </CardContent>
               </Card>
             </TabsContent>
