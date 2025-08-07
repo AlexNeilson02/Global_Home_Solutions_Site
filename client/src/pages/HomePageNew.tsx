@@ -29,7 +29,7 @@ export default function HomePage() {
 
   return (
     <div className="homepage-container" style={{ height: '100vh', overflow: 'hidden', position: 'relative' }}>
-      {/* Subtle About Us Link */}
+      {/* About Us Link */}
       <Link 
         href="/about"
         style={{
@@ -38,17 +38,18 @@ export default function HomePage() {
           left: '20px',
           color: 'white',
           textDecoration: 'none',
-          fontSize: '14px',
-          fontWeight: '500',
+          fontSize: '16px',
+          fontWeight: '600',
           zIndex: 20,
-          padding: '8px 16px',
-          borderRadius: '20px',
-          backgroundColor: 'rgba(0, 0, 0, 0.3)',
+          padding: '12px 20px',
+          borderRadius: '25px',
+          backgroundColor: 'rgba(59, 130, 246, 0.7)',
           backdropFilter: 'blur(10px)',
           transition: 'all 0.3s ease',
-          border: '1px solid rgba(255, 255, 255, 0.2)'
+          border: '2px solid rgba(255, 255, 255, 0.3)',
+          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)'
         }}
-        className="hover:bg-white/30 hover:scale-105"
+        className="hover:bg-blue-600/80 hover:scale-105 hover:shadow-lg"
       >
         About Us
       </Link>
