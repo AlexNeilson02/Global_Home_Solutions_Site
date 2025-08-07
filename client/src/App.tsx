@@ -18,6 +18,7 @@ import Checkout from "@/pages/checkout";
 import Subscribe from "@/pages/subscribe";
 import ServiceSelection from "@/pages/ServiceSelection";
 import AboutUs from "@/pages/AboutUs";
+import AboutUsSimple from "@/pages/AboutUsSimple";
 
 function App() {
   return (
@@ -27,7 +28,8 @@ function App() {
           <div className="min-h-screen" style={{ marginTop: 0, paddingTop: 0, position: 'relative', top: 0 }}>
             <Toaster />
             <Route path="/" component={HomePage} />
-            <Route path="/about" component={AboutUs} />
+            <Route path="/about" component={AboutUsSimple} />
+            <Route path="/about-full" component={AboutUs} />
             <Route path="/services" component={ServiceSelection} />
             <Route path="/portals" component={Portals} />
             <Route path="/contractor/:id" component={ContractorProfile} />
