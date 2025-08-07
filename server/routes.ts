@@ -1823,12 +1823,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return false;
       }
 
-      // Create direct charge using the contractor's saved payment method
-      const charge = await stripe.charges.create({
+      // Create payment intent for off-session payment (no customer interaction needed)
+      const paymentIntent = await stripe.paymentIntents.create({
         amount: Math.round(commissionAmount * 100), // Convert to cents
         currency: 'usd',
         customer: contractor.stripeCustomerId,
-        source: contractor.paymentMethodId,
+        payment_method: contractor.paymentMethodId,
+        confirm: true,
+        off_session: true, // This allows charging without customer present
         description: `Commission charge: ${description}`,
         metadata: {
           contractor_id: contractorId.toString(),
@@ -1836,11 +1838,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       });
 
-      if (charge.status === 'succeeded') {
-        console.log(`✅ Successfully charged $${commissionAmount} commission to contractor ${contractorId} (Charge ID: ${charge.id})`);
+      if (paymentIntent.status === 'succeeded') {
+        console.log(`✅ Successfully charged $${commissionAmount} commission to contractor ${contractorId} (Payment Intent ID: ${paymentIntent.id})`);
         return true;
       } else {
-        console.error(`❌ Commission charge failed for contractor ${contractorId}: ${charge.status}`);
+        console.error(`❌ Commission charge failed for contractor ${contractorId}: ${paymentIntent.status}`);
         return false;
       }
     } catch (error) {
