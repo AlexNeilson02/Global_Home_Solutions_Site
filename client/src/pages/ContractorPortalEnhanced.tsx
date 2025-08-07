@@ -27,7 +27,8 @@ import {
   Edit3,
   BarChart3,
   CreditCard,
-  Loader2
+  Loader2,
+  Settings
 } from "lucide-react";
 import { Elements, useStripe, useElements, PaymentElement } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
@@ -183,6 +184,7 @@ const ContractorPortalEnhanced: React.FC = () => {
   const [subscriptionStatus, setSubscriptionStatus] = useState<'active' | 'inactive' | 'loading'>('loading');
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const [clientSecret, setClientSecret] = useState<string>("");
+  const [monthlySpendCap, setMonthlySpendCap] = useState(contractor?.monthlySpendCap || 1000);
   
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -1546,245 +1548,254 @@ const ContractorPortalEnhanced: React.FC = () => {
 
             {/* Subscription Tab */}
             <TabsContent value="subscription" className="space-y-6">
+              {/* Monthly Spending Cap Section */}
+              <Card style={antiYellowStyles}>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <DollarSign className="h-5 w-5" />
+                    Monthly Referral Spending Cap
+                  </CardTitle>
+                  <CardDescription>
+                    Set your maximum monthly budget for referral commission payments
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm font-medium">Current Cap:</span>
+                      <span className="text-2xl font-bold text-blue-600">${monthlySpendCap}</span>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <div className="flex justify-between text-sm text-gray-600">
+                        <span>$0</span>
+                        <span>$10,000</span>
+                      </div>
+                      <input
+                        type="range"
+                        min="0"
+                        max="10000"
+                        step="100"
+                        value={monthlySpendCap}
+                        onChange={(e) => {
+                          setMonthlySpendCap(parseInt(e.target.value));
+                        }}
+                        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                        style={{
+                          background: `linear-gradient(to right, #3b82f6 0%, #3b82f6 ${(monthlySpendCap / 10000) * 100}%, #e5e7eb ${(monthlySpendCap / 10000) * 100}%, #e5e7eb 100%)`
+                        }}
+                      />
+                    </div>
+                    
+                    <div className="grid grid-cols-3 gap-2 text-center">
+                      <div className="p-2 bg-gray-50 rounded">
+                        <div className="text-xs text-gray-500">Conservative</div>
+                        <div className="text-sm font-medium">$500</div>
+                      </div>
+                      <div className="p-2 bg-blue-50 rounded">
+                        <div className="text-xs text-blue-500">Recommended</div>
+                        <div className="text-sm font-medium">$2,500</div>
+                      </div>
+                      <div className="p-2 bg-green-50 rounded">
+                        <div className="text-xs text-green-500">Aggressive</div>
+                        <div className="text-sm font-medium">$5,000+</div>
+                      </div>
+                    </div>
+                    
+                    <Button 
+                      onClick={async () => {
+                        try {
+                          await apiRequest('PATCH', `/api/contractors/${contractor?.id}`, {
+                            monthlySpendCap: monthlySpendCap
+                          });
+                          toast({
+                            title: "Spending Cap Updated",
+                            description: `Monthly referral budget set to $${monthlySpendCap}`,
+                          });
+                        } catch (error) {
+                          toast({
+                            title: "Update Failed",
+                            description: "Could not update spending cap. Please try again.",
+                            variant: "destructive",
+                          });
+                        }
+                      }}
+                      className="w-full"
+                    >
+                      Update Spending Cap
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Payment Method Section */}
               <Card style={antiYellowStyles}>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <CreditCard className="h-5 w-5" />
-                    Subscription Management
+                    Payment Method
                   </CardTitle>
                   <CardDescription>
-                    Manage your monthly subscription and commission payments
+                    Update your payment information for subscription and commission payments
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
-                  {subscriptionStatus === 'loading' ? (
-                    <div className="flex items-center justify-center py-8">
-                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-                    </div>
-                  ) : subscriptionStatus === 'active' ? (
+                  {!clientSecret ? (
                     <div className="space-y-4">
-                      <div className="flex items-center gap-3 p-4 bg-green-50 border border-green-200 rounded-lg">
-                        <div className="flex-shrink-0">
-                          <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
-                            <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                            </svg>
-                          </div>
-                        </div>
-                        <div>
-                          <h3 className="text-sm font-medium text-green-900">Active Subscription</h3>
-                          <p className="text-sm text-green-700">Your $100/month subscription is active and current.</p>
-                        </div>
-                      </div>
-
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <Card>
-                          <CardHeader className="pb-3">
-                            <CardTitle className="text-lg flex items-center gap-2">
-                              <DollarSign className="h-4 w-4" />
-                              Monthly Subscription
-                            </CardTitle>
-                          </CardHeader>
-                          <CardContent>
-                            <div className="space-y-2">
-                              <div className="flex justify-between">
-                                <span className="text-sm text-gray-600">Monthly Fee:</span>
-                                <span className="font-semibold">$100.00</span>
-                              </div>
-                              <div className="flex justify-between">
-                                <span className="text-sm text-gray-600">Next Billing:</span>
-                                <span className="text-sm">{new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString()}</span>
-                              </div>
-                              <div className="flex justify-between">
-                                <span className="text-sm text-gray-600">Status:</span>
-                                <Badge variant="secondary" className="bg-green-100 text-green-700">Active</Badge>
-                              </div>
-                            </div>
-                          </CardContent>
-                        </Card>
-
-                        <Card>
-                          <CardHeader className="pb-3">
-                            <CardTitle className="text-lg">Commission Payments</CardTitle>
-                          </CardHeader>
-                          <CardContent>
-                            <div className="space-y-2">
-                              <div className="flex justify-between">
-                                <span className="text-sm text-gray-600">Auto-Pay Enabled:</span>
-                                <Badge variant="secondary" className="bg-blue-100 text-blue-700">Yes</Badge>
-                              </div>
-                              <div className="flex justify-between">
-                                <span className="text-sm text-gray-600">Sales Rep Commission:</span>
-                                <span className="text-sm">Auto-processed</span>
-                              </div>
-                              <div className="flex justify-between">
-                                <span className="text-sm text-gray-600">Admin Commission:</span>
-                                <span className="text-sm">Auto-processed</span>
-                              </div>
-                            </div>
-                          </CardContent>
-                        </Card>
-                      </div>
-
-                      <div className="border-t pt-4">
-                        <div className="flex flex-col gap-4">
+                      <div className="p-4 bg-gray-50 rounded-lg">
+                        <div className="flex items-center gap-3">
+                          <CreditCard className="h-8 w-8 text-gray-400" />
                           <div>
-                            <h3 className="text-sm font-medium text-gray-900">Subscription Actions</h3>
-                            <p className="text-sm text-gray-500">Manage your subscription settings</p>
-                          </div>
-                          <div className="flex gap-3">
-                            <Button 
-                              onClick={handleSubscriptionPayment}
-                              disabled={isProcessingPayment}
-                              className="bg-blue-600 hover:bg-blue-700"
-                            >
-                              {isProcessingPayment ? (
-                                <>
-                                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                                  Setting up...
-                                </>
-                              ) : (
-                                'Update Payment Method'
-                              )}
-                            </Button>
-                            <Button 
-                              variant="outline" 
-                              onClick={cancelSubscription}
-                              className="text-red-600 border-red-300 hover:bg-red-50"
-                            >
-                              Cancel Subscription
-                            </Button>
+                            <p className="font-medium">Payment Method on File</p>
+                            <p className="text-sm text-gray-600">**** **** **** 4242 • Expires 12/25</p>
                           </div>
                         </div>
                       </div>
+                      
+                      <Button 
+                        onClick={handleSubscriptionPayment}
+                        disabled={isProcessingPayment}
+                        className="w-full bg-blue-600 hover:bg-blue-700"
+                      >
+                        {isProcessingPayment ? (
+                          <>
+                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                            Setting up payment form...
+                          </>
+                        ) : (
+                          'Update Payment Method'
+                        )}
+                      </Button>
                     </div>
                   ) : (
-                    <div className="space-y-6">
-                      {!clientSecret ? (
-                        <div className="text-center py-8">
-                          <div className="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
-                            <CreditCard className="h-8 w-8 text-gray-400" />
-                          </div>
-                          <h3 className="text-lg font-medium text-gray-900 mb-2">No Active Subscription</h3>
-                          <p className="text-gray-600 mb-6">Subscribe to access premium features and automatic commission payments.</p>
-                          
-                          <div className="max-w-md mx-auto">
-                            <Card>
-                              <CardHeader>
-                                <CardTitle className="text-xl text-center">Premium Subscription</CardTitle>
-                                <div className="text-center">
-                                  <span className="text-3xl font-bold">$100</span>
-                                  <span className="text-gray-500">/month</span>
-                                </div>
-                              </CardHeader>
-                              <CardContent className="space-y-4">
-                                <ul className="space-y-2">
-                                  <li className="flex items-center gap-2">
-                                    <svg className="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                                    </svg>
-                                    <span className="text-sm">Automatic commission payments</span>
-                                  </li>
-                                  <li className="flex items-center gap-2">
-                                    <svg className="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                                    </svg>
-                                    <span className="text-sm">Priority customer leads</span>
-                                  </li>
-                                  <li className="flex items-center gap-2">
-                                    <svg className="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                                    </svg>
-                                    <span className="text-sm">Enhanced profile visibility</span>
-                                  </li>
-                                  <li className="flex items-center gap-2">
-                                    <svg className="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                                    </svg>
-                                    <span className="text-sm">Advanced analytics dashboard</span>
-                                  </li>
-                                </ul>
-                                
-                                <Button 
-                                  onClick={handleSubscriptionPayment}
-                                  disabled={isProcessingPayment}
-                                  className="w-full bg-blue-600 hover:bg-blue-700"
-                                  style={antiYellowInputStyles}
-                                >
-                                  {isProcessingPayment ? (
-                                    <>
-                                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                                      Setting up payment...
-                                    </>
-                                  ) : (
-                                    'Subscribe Now'
-                                  )}
-                                </Button>
-                              </CardContent>
-                            </Card>
-                          </div>
-                        </div>
+                    <div className="space-y-4">
+                      {/* Test Card Information */}
+                      <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border">
+                        <p className="text-sm font-medium text-blue-800 dark:text-blue-200 mb-2">Test Card Details:</p>
+                        <p className="text-xs text-blue-700 dark:text-blue-300">
+                          Card: 4242 4242 4242 4242<br/>
+                          Expiry: Any future date (e.g., 12/25)<br/>
+                          CVC: Any 3 digits (e.g., 123)
+                        </p>
+                      </div>
+                      
+                      {stripePromise && clientSecret ? (
+                        <Elements 
+                          stripe={stripePromise} 
+                          options={{ 
+                            clientSecret,
+                            appearance: {
+                              theme: 'stripe',
+                              variables: {
+                                colorPrimary: '#2563eb',
+                              },
+                            },
+                          }}
+                        >
+                          <SubscriptionForm 
+                            contractorId={contractor?.id}
+                            onSuccess={() => {
+                              setClientSecret('');
+                              setIsProcessingPayment(false);
+                              toast({
+                                title: "Payment Method Updated",
+                                description: "Your payment information has been successfully updated.",
+                              });
+                            }}
+                            onError={handlePaymentError}
+                          />
+                        </Elements>
                       ) : (
-                        <div className="max-w-md mx-auto">
-                          <Card>
-                            <CardHeader>
-                              <CardTitle className="text-xl text-center">Complete Your Subscription</CardTitle>
-                              <CardDescription className="text-center">
-                                Secure payment powered by Stripe
-                              </CardDescription>
-                            </CardHeader>
-                            <CardContent>
-                              {/* Test Card Information */}
-                              <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border">
-                                <p className="text-sm font-medium text-blue-800 dark:text-blue-200 mb-2">Test Card Details:</p>
-                                <p className="text-xs text-blue-700 dark:text-blue-300">
-                                  Card: 4242 4242 4242 4242<br/>
-                                  Expiry: Any future date (e.g., 12/25)<br/>
-                                  CVC: Any 3 digits (e.g., 123)
-                                </p>
-                              </div>
-                              
-                              {stripePromise && clientSecret ? (
-                                <Elements 
-                                  stripe={stripePromise} 
-                                  options={{ 
-                                    clientSecret,
-                                    appearance: {
-                                      theme: 'stripe',
-                                      variables: {
-                                        colorPrimary: '#2563eb',
-                                      },
-                                    },
-                                  }}
-                                >
-                                  <SubscriptionForm 
-                                    contractorId={contractor?.id}
-                                    onSuccess={handlePaymentSuccess}
-                                    onError={handlePaymentError}
-                                  />
-                                </Elements>
-                              ) : (
-                                <div className="text-center py-4">
-                                  <p className="text-gray-600">Loading payment form...</p>
-                                </div>
-                              )}
-                              <Button 
-                                variant="outline"
-                                onClick={() => {
-                                  setClientSecret('');
-                                  setIsProcessingPayment(false);
-                                }}
-                                className="w-full mt-4"
-                                style={antiYellowInputStyles}
-                              >
-                                Cancel
-                              </Button>
-                            </CardContent>
-                          </Card>
+                        <div className="text-center py-4">
+                          <p className="text-gray-600">Loading payment form...</p>
                         </div>
                       )}
+                      
+                      <Button 
+                        variant="outline"
+                        onClick={() => {
+                          setClientSecret('');
+                          setIsProcessingPayment(false);
+                        }}
+                        className="w-full"
+                      >
+                        Cancel Update
+                      </Button>
                     </div>
                   )}
+                </CardContent>
+              </Card>
+
+              {/* Subscription Management Section */}
+              <Card style={antiYellowStyles}>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Settings className="h-5 w-5" />
+                    Subscription Management
+                  </CardTitle>
+                  <CardDescription>
+                    Manage your active subscription
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div className="flex items-center gap-3 p-4 bg-green-50 border border-green-200 rounded-lg">
+                    <div className="flex-shrink-0">
+                      <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+                        <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                        </svg>
+                      </div>
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-medium text-green-900">Active Subscription</h3>
+                      <p className="text-sm text-green-700">Your account is active with full access to all features.</p>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <div className="flex justify-between">
+                        <span className="text-sm text-gray-600">Status:</span>
+                        <Badge variant="secondary" className="bg-green-100 text-green-700">Active</Badge>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-sm text-gray-600">Plan:</span>
+                        <span className="text-sm font-medium">Professional</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-sm text-gray-600">Next Billing:</span>
+                        <span className="text-sm">{new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString()}</span>
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <div className="flex justify-between">
+                        <span className="text-sm text-gray-600">Commission Processing:</span>
+                        <Badge variant="secondary" className="bg-blue-100 text-blue-700">Automated</Badge>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-sm text-gray-600">Lead Priority:</span>
+                        <span className="text-sm font-medium">High</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-sm text-gray-600">Profile Visibility:</span>
+                        <span className="text-sm font-medium">Enhanced</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="border-t pt-4">
+                    <Button 
+                      variant="destructive" 
+                      onClick={cancelSubscription}
+                      className="w-full"
+                    >
+                      Cancel Subscription
+                    </Button>
+                    <p className="text-xs text-gray-500 mt-2 text-center">
+                      Canceling will disable automated commission processing and reduce profile visibility.
+                    </p>
+                  </div>
                 </CardContent>
               </Card>
             </TabsContent>
@@ -1799,205 +1810,31 @@ const ContractorPortalEnhanced: React.FC = () => {
 
       {/* Bid Details Modal */}
       {viewingBidDetails && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="flex justify-between items-center p-6 border-b">
-              <h3 className="text-xl font-semibold">Bid Request Details</h3>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setViewingBidDetails(null)}
-                style={antiYellowInputStyles}
-              >
-                <X className="h-4 w-4" />
-              </Button>
-            </div>
-            
-            <div className="p-6 space-y-6">
-              {/* Customer Information */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-3">
-                  <h4 className="font-semibold text-lg border-b pb-2">Customer Information</h4>
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2">
-                      <span className="font-medium min-w-[80px]">Name:</span>
-                      <span>{viewingBidDetails.fullName}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Mail className="h-4 w-4 text-gray-500" />
-                      <span className="font-medium min-w-[80px]">Email:</span>
-                      <a href={`mailto:${viewingBidDetails.email}`} className="text-blue-600 hover:underline">
-                        {viewingBidDetails.email}
-                      </a>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Phone className="h-4 w-4 text-gray-500" />
-                      <span className="font-medium min-w-[80px]">Phone:</span>
-                      <a href={`tel:${viewingBidDetails.phone}`} className="text-blue-600 hover:underline">
-                        {viewingBidDetails.phone}
-                      </a>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <MapPin className="h-4 w-4 text-gray-500" />
-                      <span className="font-medium min-w-[80px]">Address:</span>
-                      <span>{viewingBidDetails.address}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="font-medium min-w-[80px]">Contact:</span>
-                      <span>{viewingBidDetails.preferredContactMethod || 'Email'}</span>
-                    </div>
-                  </div>
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="flex justify-between items-start mb-6">
+                <div>
+                  <h2 className="text-xl font-bold text-gray-900">Bid Request Details</h2>
+                  <p className="text-gray-600">Customer: {viewingBidDetails.customerInfo?.name}</p>
                 </div>
-
-                <div className="space-y-3">
-                  <h4 className="font-semibold text-lg border-b pb-2">Project Details</h4>
-                  <div className="space-y-2">
-                    <div>
-                      <span className="font-medium">Service:</span>
-                      <p className="mt-1">{viewingBidDetails.serviceRequested}</p>
-                    </div>
-                    <div>
-                      <span className="font-medium">Timeline:</span>
-                      <p className="mt-1">{viewingBidDetails.timeline}</p>
-                    </div>
-                    {viewingBidDetails.budget && (
-                      <div>
-                        <span className="font-medium">Budget:</span>
-                        <p className="mt-1">${viewingBidDetails.budget}</p>
-                      </div>
-                    )}
-                    <div>
-                      <span className="font-medium">Status:</span>
-                      <div className="mt-1">
-                        <Badge variant={
-                          viewingBidDetails.status === 'pending' ? 'outline' :
-                          viewingBidDetails.status === 'contacted' ? 'secondary' :
-                          viewingBidDetails.status === 'bid_sent' ? 'secondary' :
-                          viewingBidDetails.status === 'won' ? 'default' :
-                          viewingBidDetails.status === 'lost' ? 'destructive' : 'outline'
-                        }>
-                          {viewingBidDetails.status === 'bid_sent' ? 'Bid Sent' : viewingBidDetails.status.replace('_', ' ')}
-                        </Badge>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Project Description */}
-              <div className="space-y-3">
-                <h4 className="font-semibold text-lg border-b pb-2">Project Description</h4>
-                <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
-                  {viewingBidDetails.description}
-                </p>
-              </div>
-
-              {/* Timeline & Notes */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-3">
-                  <h4 className="font-semibold border-b pb-2">Timeline</h4>
-                  <div className="space-y-2 text-sm">
-                    <div className="flex justify-between">
-                      <span>Submitted:</span>
-                      <span>{new Date(viewingBidDetails.createdAt).toLocaleString()}</span>
-                    </div>
-                    {viewingBidDetails.lastUpdated && (
-                      <div className="flex justify-between">
-                        <span>Last Updated:</span>
-                        <span>{new Date(viewingBidDetails.lastUpdated).toLocaleString()}</span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                {viewingBidDetails.notes && (
-                  <div className="space-y-3">
-                    <h4 className="font-semibold border-b pb-2">Notes</h4>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
-                      {viewingBidDetails.notes}
-                    </p>
-                  </div>
-                )}
-              </div>
-
-              {/* Additional Information */}
-              {viewingBidDetails.additionalInformation && (
-                <div className="space-y-3">
-                  <h4 className="font-semibold border-b pb-2">Additional Information</h4>
-                  <div className="bg-gray-50 dark:bg-gray-700 p-3 rounded">
-                    <p className="text-sm">{viewingBidDetails.additionalInformation}</p>
-                  </div>
-                </div>
-              )}
-
-              {/* Action Buttons */}
-              <div className="flex flex-wrap gap-3 pt-4 border-t">
-                {viewingBidDetails.status === 'pending' && (
-                  <Button
-                    className="bg-blue-600 hover:bg-blue-700 text-white"
-                    onClick={() => {
-                      contactCustomerMutation.mutate(viewingBidDetails.id);
-                      setViewingBidDetails(null);
-                    }}
-                    disabled={contactCustomerMutation.isPending}
-                    style={antiYellowInputStyles}
-                  >
-                    <Phone className="h-4 w-4 mr-2" />
-                    Contact Customer
-                  </Button>
-                )}
-                
-                {(viewingBidDetails.status === 'contacted' || viewingBidDetails.status === 'pending') && (
-                  <Button
-                    className="bg-green-600 hover:bg-green-700 text-white"
-                    onClick={() => {
-                      sendBidMutation.mutate(viewingBidDetails.id);
-                      setViewingBidDetails(null);
-                    }}
-                    disabled={sendBidMutation.isPending}
-                    style={antiYellowInputStyles}
-                  >
-                    <FileText className="h-4 w-4 mr-2" />
-                    Send Bid
-                  </Button>
-                )}
-
-                {viewingBidDetails.status === 'bid_sent' && (
-                  <>
-                    <Button
-                      className="bg-green-600 hover:bg-green-700 text-white"
-                      onClick={() => {
-                        updateProjectStatusMutation.mutate({ requestId: viewingBidDetails.id, status: 'won' });
-                        setViewingBidDetails(null);
-                      }}
-                      disabled={updateProjectStatusMutation.isPending}
-                      style={antiYellowInputStyles}
-                    >
-                      <Star className="h-4 w-4 mr-2" />
-                      Won Project
-                    </Button>
-                    <Button
-                      variant="outline"
-                      className="text-orange-600 border-orange-300 hover:bg-orange-50"
-                      onClick={() => {
-                        updateProjectStatusMutation.mutate({ requestId: viewingBidDetails.id, status: 'lost' });
-                        setViewingBidDetails(null);
-                      }}
-                      disabled={updateProjectStatusMutation.isPending}
-                      style={antiYellowInputStyles}
-                    >
-                      Lost Project
-                    </Button>
-                  </>
-                )}
-                
                 <Button
                   variant="outline"
+                  size="sm"
                   onClick={() => setViewingBidDetails(null)}
                   style={antiYellowInputStyles}
                 >
                   Close
                 </Button>
+              </div>
+              
+              {/* Display bid details here */}
+              <div className="space-y-4">
+                <h4 className="font-semibold">Service: {viewingBidDetails.serviceCategory}</h4>
+                <p><strong>Details:</strong> {viewingBidDetails.description}</p>
+                <p><strong>Budget:</strong> {viewingBidDetails.budget}</p>
+                <p><strong>Timeline:</strong> {viewingBidDetails.timeline}</p>
+                <p><strong>Status:</strong> <Badge variant="outline">{viewingBidDetails.status}</Badge></p>
               </div>
             </div>
           </div>
@@ -2006,18 +1843,20 @@ const ContractorPortalEnhanced: React.FC = () => {
 
       {/* Media Viewer Modal */}
       {viewingMedia && (
-        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
-          <div className="relative max-w-4xl max-h-[90vh] w-full">
-            <Button
-              variant="ghost"
-              size="sm"
-              className="absolute top-2 right-2 z-10 bg-black/50 text-white hover:bg-black/70"
-              onClick={() => setViewingMedia(null)}
-            >
-              <X className="h-4 w-4" />
-            </Button>
+        <div className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50 p-4">
+          <div className="relative max-w-4xl w-full max-h-[90vh] bg-white dark:bg-gray-800 rounded-lg overflow-hidden">
+            <div className="absolute top-4 right-4 z-10">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setViewingMedia(null)}
+                className="bg-white/10 hover:bg-white/20 text-white"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
             
-            <div className="bg-white dark:bg-gray-900 rounded-lg overflow-hidden">
+            <div className="p-4">
               {viewingMedia.type === 'image' ? (
                 <img 
                   src={viewingMedia.url} 
