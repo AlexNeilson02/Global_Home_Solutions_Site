@@ -652,9 +652,6 @@ const ContractorPortalEnhanced: React.FC = () => {
 
       const data = await response.json();
 
-      console.log('Subscription response data:', data);
-      console.log('Client secret received:', data.clientSecret ? 'present' : 'missing');
-
       // Set client secret for embedded payment form
       setClientSecret(data.clientSecret);
       
@@ -1716,7 +1713,17 @@ const ContractorPortalEnhanced: React.FC = () => {
                               </CardDescription>
                             </CardHeader>
                             <CardContent>
-                              {stripePromise && (
+                              {/* Test Card Information */}
+                              <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border">
+                                <p className="text-sm font-medium text-blue-800 dark:text-blue-200 mb-2">Test Card Details:</p>
+                                <p className="text-xs text-blue-700 dark:text-blue-300">
+                                  Card: 4242 4242 4242 4242<br/>
+                                  Expiry: Any future date (e.g., 12/25)<br/>
+                                  CVC: Any 3 digits (e.g., 123)
+                                </p>
+                              </div>
+                              
+                              {stripePromise && clientSecret ? (
                                 <Elements 
                                   stripe={stripePromise} 
                                   options={{ 
@@ -1735,6 +1742,10 @@ const ContractorPortalEnhanced: React.FC = () => {
                                     onError={handlePaymentError}
                                   />
                                 </Elements>
+                              ) : (
+                                <div className="text-center py-4">
+                                  <p className="text-gray-600">Loading payment form...</p>
+                                </div>
                               )}
                               <Button 
                                 variant="outline"
