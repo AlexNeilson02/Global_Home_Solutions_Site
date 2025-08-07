@@ -1354,6 +1354,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const latestInvoice = subscription.latest_invoice as Stripe.Invoice;
       const paymentIntent = latestInvoice?.payment_intent as Stripe.PaymentIntent;
 
+      console.log('Subscription created:', subscription.id);
+      console.log('Latest invoice:', latestInvoice?.id);
+      console.log('Payment intent:', paymentIntent?.id);
+      console.log('Client secret:', paymentIntent?.client_secret ? 'present' : 'missing');
+
       res.json({
         subscriptionId: subscription.id,
         clientSecret: paymentIntent?.client_secret,

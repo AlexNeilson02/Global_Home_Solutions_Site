@@ -640,6 +640,9 @@ const ContractorPortalEnhanced: React.FC = () => {
 
       const data = await response.json();
 
+      console.log('Subscription response data:', data);
+      console.log('Client secret received:', data.clientSecret ? 'present' : 'missing');
+
       // Set client secret for embedded payment form
       setClientSecret(data.clientSecret);
       
