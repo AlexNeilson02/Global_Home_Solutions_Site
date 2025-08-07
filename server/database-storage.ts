@@ -465,6 +465,13 @@ export class DatabaseStorage implements IStorage {
   async getAllServiceCategories(): Promise<ServiceCategory[]> {
     return db.select().from(serviceCategories).where(eq(serviceCategories.isActive, true));
   }
+
+  async getServiceCategoryByName(name: string): Promise<ServiceCategory | null> {
+    const [category] = await db.select().from(serviceCategories)
+      .where(and(eq(serviceCategories.name, name), eq(serviceCategories.isActive, true)))
+      .limit(1);
+    return category || null;
+  }
   
   // Bid Request methods
   async createBidRequest(bidRequest: InsertBidRequest): Promise<BidRequest> {

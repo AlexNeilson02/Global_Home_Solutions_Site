@@ -626,11 +626,50 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Log but don't fail the bid request creation
       }
 
-      // Get contractor details for notification
+      // Get contractor details for notification and commission charging
       const contractor = await storage.getContractor(Number(contractorId));
       if (contractor) {
         const contractorUser = await storage.getUser(contractor.userId);
         console.log(`Bid request sent to contractor: ${contractor.companyName} (ID: ${contractorId})`);
+        
+        // Charge commission automatically if contractor has payment method
+        if (contractor.paymentMethodAdded && contractor.paymentMethodId) {
+          try {
+            // Get service category details for commission calculation
+            const serviceCategory = await storage.getServiceCategoryByName(serviceRequested || "General Services");
+            const baseCommissionAmount = serviceCategory?.baseCost || 50; // Default $50 if no category found
+            
+            // Calculate commission based on service category
+            const commissionAmount = baseCommissionAmount * 0.15; // 15% commission rate
+            
+            // Charge commission to contractor's payment method
+            const chargeSuccess = await chargeCommissionToContractor(
+              Number(contractorId),
+              commissionAmount,
+              `Bid request for ${serviceRequested || 'General Services'} - ${finalFullName}`
+            );
+            
+            if (chargeSuccess) {
+              console.log(`✅ Commission charged: $${commissionAmount} for bid request ${bidRequest.id}`);
+              
+              // Create commission payment record for tracking
+              await storage.createCommissionPayment({
+                type: 'bid_request_fee',
+                amount: commissionAmount * 100, // Store in cents
+                contractorId: Number(contractorId),
+                bidRequestId: bidRequest.id,
+                status: 'processed',
+                description: `Commission charge for bid request: ${serviceRequested || 'General Services'}`
+              });
+            } else {
+              console.error(`❌ Failed to charge commission for bid request ${bidRequest.id}`);
+            }
+          } catch (commissionChargeError) {
+            console.error('Error charging commission:', commissionChargeError);
+          }
+        } else {
+          console.log(`⚠️ Cannot charge commission - contractor ${contractorId} missing payment method`);
+        }
         
         // Here you could send email notification to contractor
         // await sendContractorNotification(contractorUser, bidRequest);
@@ -1753,6 +1792,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
     } catch (error) {
       console.error("Error processing commission payments:", error);
+    }
+  }
+
+  // Function to charge commission to contractor's payment method
+  async function chargeCommissionToContractor(contractorId: number, commissionAmount: number, description: string): Promise<boolean> {
+    try {
+      const contractor = await storage.getContractor(contractorId);
+      if (!contractor || !contractor.stripeCustomerId || !contractor.paymentMethodId) {
+        console.error(`Cannot charge commission: contractor ${contractorId} missing Stripe details`);
+        return false;
+      }
+
+      // Create payment intent with the contractor's saved payment method
+      const paymentIntent = await stripe.paymentIntents.create({
+        amount: Math.round(commissionAmount * 100), // Convert to cents
+        currency: 'usd',
+        customer: contractor.stripeCustomerId,
+        payment_method: contractor.paymentMethodId,
+        confirm: true,
+        description: `Commission charge: ${description}`,
+        metadata: {
+          contractor_id: contractorId.toString(),
+          charge_type: 'commission'
+        }
+      });
+
+      if (paymentIntent.status === 'succeeded') {
+        console.log(`Successfully charged $${commissionAmount} commission to contractor ${contractorId}`);
+        return true;
+      } else {
+        console.error(`Commission charge failed for contractor ${contractorId}: ${paymentIntent.status}`);
+        return false;
+      }
+    } catch (error) {
+      console.error(`Error charging commission to contractor ${contractorId}:`, error);
+      return false;
     }
   }
 

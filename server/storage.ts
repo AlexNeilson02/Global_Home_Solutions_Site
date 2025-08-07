@@ -54,6 +54,7 @@ export interface IStorage {
   createServiceCategory(serviceCategory: InsertServiceCategory): Promise<ServiceCategory>;
   updateServiceCategory(id: number, serviceCategory: Partial<ServiceCategory>): Promise<ServiceCategory | undefined>;
   getAllServiceCategories(): Promise<ServiceCategory[]>;
+  getServiceCategoryByName(name: string): Promise<ServiceCategory | null>;
   
   // Project methods
   getProject(id: number): Promise<Project | undefined>;
