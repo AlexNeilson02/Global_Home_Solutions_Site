@@ -228,13 +228,17 @@ const ContractorPortalEnhanced: React.FC = () => {
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     
-    if (urlParams.get('setup_success') === 'true') {
+    if (urlParams.get('setup_success') === 'true' && contractor?.id) {
       // Mark payment method as added and refresh data
       const markPaymentMethodAdded = async () => {
         try {
-          await apiRequest('POST', '/api/mark-payment-method-added', {
+          console.log('Attempting to mark payment method as added for contractor:', contractor?.id);
+          
+          const response = await apiRequest('POST', '/api/mark-payment-method-added', {
             contractorId: contractor?.id
           });
+          
+          console.log('Payment method API response:', response);
           
           // Refresh user data to get updated payment status
           queryClient.invalidateQueries({ queryKey: ['/api/users/me'] });
@@ -1768,6 +1772,35 @@ const ContractorPortalEnhanced: React.FC = () => {
                             Add Payment Method Securely
                           </>
                         )}
+                      </Button>
+                      
+                      {/* Temporary test button - remove after testing */}
+                      <Button 
+                        onClick={async () => {
+                          try {
+                            console.log('Testing payment method save for contractor:', contractor?.id);
+                            const response = await apiRequest('POST', '/api/mark-payment-method-added', {
+                              contractorId: contractor?.id
+                            });
+                            console.log('Test API response:', response);
+                            queryClient.invalidateQueries({ queryKey: ['/api/users/me'] });
+                            toast({
+                              title: "Test Successful!",
+                              description: "Payment method status updated successfully.",
+                            });
+                          } catch (error) {
+                            console.error('Test error:', error);
+                            toast({
+                              title: "Test Failed",
+                              description: "Error updating payment method status.",
+                              variant: "destructive",
+                            });
+                          }
+                        }}
+                        variant="outline"
+                        className="w-full"
+                      >
+                        🧪 Test Payment Method Save
                       </Button>
                     </div>
                   )}
