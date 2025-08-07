@@ -1332,36 +1332,62 @@ export async function registerRoutes(app: Express): Promise<Server> {
         product: product.id
       });
 
-      // Create subscription
+      // Create subscription with payment required immediately
       const subscription = await stripe.subscriptions.create({
         customer: customerId,
         items: [{
           price: price.id
         }],
         payment_behavior: 'default_incomplete',
-        expand: ['latest_invoice.payment_intent'],
+        payment_settings: {
+          payment_method_types: ['card'],
+          save_default_payment_method: 'on_subscription'
+        },
+        expand: ['latest_invoice.payment_intent', 'pending_setup_intent'],
         metadata: {
           contractorId: contractorId.toString(),
           type: type || 'monthly'
         }
       });
 
+      let clientSecret = null;
+
+      // Check for payment intent first
+      const latestInvoice = subscription.latest_invoice as Stripe.Invoice;
+      if (latestInvoice?.payment_intent) {
+        const paymentIntent = latestInvoice.payment_intent as Stripe.PaymentIntent;
+        clientSecret = paymentIntent.client_secret;
+      } 
+      // If no payment intent, check for setup intent (for future payments)
+      else if (subscription.pending_setup_intent) {
+        const setupIntent = subscription.pending_setup_intent as Stripe.SetupIntent;
+        clientSecret = setupIntent.client_secret;
+      }
+      // If neither, create a setup intent manually
+      else {
+        const setupIntent = await stripe.setupIntents.create({
+          customer: customerId,
+          payment_method_types: ['card'],
+          usage: 'off_session',
+          metadata: {
+            subscription_id: subscription.id,
+            contractor_id: contractorId.toString()
+          }
+        });
+        clientSecret = setupIntent.client_secret;
+      }
+
       // Store subscription ID
       await storage.updateContractorStripeInfo(contractorId, { 
         stripeSubscriptionId: subscription.id 
       });
 
-      const latestInvoice = subscription.latest_invoice as Stripe.Invoice;
-      const paymentIntent = latestInvoice?.payment_intent as Stripe.PaymentIntent;
-
       console.log('Subscription created:', subscription.id);
-      console.log('Latest invoice:', latestInvoice?.id);
-      console.log('Payment intent:', paymentIntent?.id);
-      console.log('Client secret:', paymentIntent?.client_secret ? 'present' : 'missing');
+      console.log('Client secret:', clientSecret ? 'present' : 'missing');
 
       res.json({
         subscriptionId: subscription.id,
-        clientSecret: paymentIntent?.client_secret,
+        clientSecret: clientSecret,
         status: subscription.status
       });
 

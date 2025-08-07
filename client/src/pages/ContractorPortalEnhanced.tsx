@@ -71,7 +71,8 @@ function SubscriptionForm({ contractorId, onSuccess, onError }: SubscriptionForm
         return;
       }
 
-      const { error, paymentIntent } = await stripe.confirmPayment({
+      // Try to confirm payment first, if that fails, try setup intent
+      let result = await stripe.confirmPayment({
         elements,
         confirmParams: {
           return_url: `${window.location.origin}/contractor-portal-enhanced?subscription_success=true`,
@@ -79,9 +80,20 @@ function SubscriptionForm({ contractorId, onSuccess, onError }: SubscriptionForm
         redirect: 'if_required',
       });
 
-      if (error) {
-        onError(error.message || 'Payment failed');
-      } else if (paymentIntent && paymentIntent.status === 'succeeded') {
+      // If payment confirmation failed, try setup intent confirmation
+      if (result.error && result.error.type === 'invalid_request_error') {
+        result = await stripe.confirmSetup({
+          elements,
+          confirmParams: {
+            return_url: `${window.location.origin}/contractor-portal-enhanced?subscription_success=true`,
+          },
+          redirect: 'if_required',
+        });
+      }
+
+      if (result.error) {
+        onError(result.error.message || 'Payment failed');
+      } else if (result.paymentIntent?.status === 'succeeded' || result.setupIntent?.status === 'succeeded') {
         toast({
           title: "Subscription Active!",
           description: "Your monthly subscription has been successfully activated.",
