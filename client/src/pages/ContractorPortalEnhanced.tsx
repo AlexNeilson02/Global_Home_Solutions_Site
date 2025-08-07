@@ -639,10 +639,6 @@ const ContractorPortalEnhanced: React.FC = () => {
       });
 
       const data = await response.json();
-      
-      if (!response.ok) {
-        throw new Error(data.message || 'Failed to create subscription');
-      }
 
       // Set client secret for embedded payment form
       setClientSecret(data.clientSecret);
