@@ -1823,13 +1823,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return false;
       }
 
-      // Create payment intent with the contractor's saved payment method
-      const paymentIntent = await stripe.paymentIntents.create({
+      // Create direct charge using the contractor's saved payment method
+      const charge = await stripe.charges.create({
         amount: Math.round(commissionAmount * 100), // Convert to cents
         currency: 'usd',
         customer: contractor.stripeCustomerId,
-        payment_method: contractor.paymentMethodId,
-        confirm: true,
+        source: contractor.paymentMethodId,
         description: `Commission charge: ${description}`,
         metadata: {
           contractor_id: contractorId.toString(),
@@ -1837,11 +1836,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       });
 
-      if (paymentIntent.status === 'succeeded') {
-        console.log(`Successfully charged $${commissionAmount} commission to contractor ${contractorId}`);
+      if (charge.status === 'succeeded') {
+        console.log(`✅ Successfully charged $${commissionAmount} commission to contractor ${contractorId} (Charge ID: ${charge.id})`);
         return true;
       } else {
-        console.error(`Commission charge failed for contractor ${contractorId}: ${paymentIntent.status}`);
+        console.error(`❌ Commission charge failed for contractor ${contractorId}: ${charge.status}`);
         return false;
       }
     } catch (error) {
