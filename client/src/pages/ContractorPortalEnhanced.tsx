@@ -224,6 +224,30 @@ const ContractorPortalEnhanced: React.FC = () => {
     }
   }, [contractor?.monthlySpendCap]);
 
+  // Handle Stripe checkout results
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    
+    if (urlParams.get('setup_success') === 'true') {
+      toast({
+        title: "Payment Method Added!",
+        description: "Your payment method has been successfully verified and saved.",
+      });
+      // Clean up URL
+      window.history.replaceState({}, document.title, window.location.pathname);
+      // Switch to subscription tab if not already there
+      setActiveTab("subscription");
+    } else if (urlParams.get('setup_cancelled') === 'true') {
+      toast({
+        title: "Setup Cancelled",
+        description: "Payment method setup was cancelled. You can try again anytime.",
+        variant: "destructive",
+      });
+      // Clean up URL
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  }, [toast]);
+
   // Get contractor's projects
   const { data: projectsData } = useQuery({
     queryKey: ['/api/projects'],
@@ -652,22 +676,17 @@ const ContractorPortalEnhanced: React.FC = () => {
   const handleSubscriptionPayment = async () => {
     setIsProcessingPayment(true);
     try {
-      if (subscriptionStatus === 'active') {
-        // If already subscribed, create setup intent to update payment method
-        const response = await apiRequest('POST', '/api/update-payment-method', {
-          contractorId: contractor?.id
-        });
-        const data = await response.json();
-        setClientSecret(data.clientSecret);
+      // Create Stripe Checkout session for payment method setup
+      const response = await apiRequest('POST', '/api/create-checkout-session', {
+        contractorId: contractor?.id
+      });
+      const data = await response.json();
+      
+      // Redirect to Stripe Checkout
+      if (data.url) {
+        window.location.href = data.url;
       } else {
-        // Create new subscription
-        const response = await apiRequest('POST', '/api/create-subscription', {
-          contractorId: contractor?.id,
-          amount: 10000, // $100 in cents
-          type: 'monthly'
-        });
-        const data = await response.json();
-        setClientSecret(data.clientSecret);
+        throw new Error('No checkout URL received');
       }
     } catch (error) {
       console.error('Error setting up payment:', error);
@@ -1647,112 +1666,52 @@ const ContractorPortalEnhanced: React.FC = () => {
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
-                  {!clientSecret ? (
-                    <div className="space-y-4">
-                      <div className="p-4 bg-gray-50 rounded-lg border">
-                        <div className="flex items-center gap-3">
-                          <CreditCard className="h-8 w-8 text-gray-400" />
-                          <div>
-                            <p className="font-medium text-gray-900">No Payment Method Added</p>
-                            <p className="text-sm text-gray-600">Add a payment method to manage your subscription</p>
-                          </div>
+                  <div className="space-y-4">
+                    <div className="p-4 bg-gray-50 rounded-lg border">
+                      <div className="flex items-center gap-3">
+                        <CreditCard className="h-8 w-8 text-gray-400" />
+                        <div>
+                          <p className="font-medium text-gray-900">Secure Payment Setup</p>
+                          <p className="text-sm text-gray-600">Add your payment method through Stripe's secure checkout</p>
                         </div>
                       </div>
-                      
-                      <Button 
-                        onClick={handleSubscriptionPayment}
-                        disabled={isProcessingPayment}
-                        className="w-full bg-blue-600 hover:bg-blue-700"
-                      >
-                        {isProcessingPayment ? (
-                          <>
-                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                            Loading payment form...
-                          </>
-                        ) : (
-                          'Add Payment Method'
-                        )}
-                      </Button>
                     </div>
-                  ) : (
-                    <div className="space-y-6">
-                      <div className="bg-gray-50 p-4 rounded-lg border">
-                        <h3 className="text-lg font-semibold text-gray-900 mb-4">Payment Information</h3>
-                        <p className="text-sm text-gray-600 mb-4">Enter your payment details to secure your subscription</p>
+                    
+                    <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                      <div className="flex items-start gap-3">
+                        <div className="flex-shrink-0">
+                          <svg className="w-5 h-5 text-blue-600 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                          </svg>
+                        </div>
+                        <div>
+                          <h4 className="text-sm font-medium text-blue-900">Secure Checkout</h4>
+                          <p className="text-sm text-blue-700 mt-1">
+                            You'll be redirected to Stripe's secure payment page to safely add your payment method. 
+                            Your card information is encrypted and never stored on our servers.
+                          </p>
+                        </div>
                       </div>
-                      
-                      {stripePromise && clientSecret ? (
-                        <Elements 
-                          stripe={stripePromise} 
-                          options={{ 
-                            clientSecret,
-                            appearance: {
-                              theme: 'stripe',
-                              variables: {
-                                colorPrimary: '#2563eb',
-                                colorBackground: '#ffffff',
-                                colorText: '#1f2937',
-                                colorDanger: '#ef4444',
-                                fontFamily: 'system-ui, sans-serif',
-                                spacingUnit: '6px',
-                                borderRadius: '8px',
-                              },
-                              rules: {
-                                '.Input': {
-                                  border: '1px solid #e5e7eb',
-                                  borderRadius: '8px',
-                                  padding: '12px',
-                                  fontSize: '16px',
-                                  backgroundColor: '#ffffff',
-                                },
-                                '.Input:focus': {
-                                  border: '2px solid #2563eb',
-                                  boxShadow: '0 0 0 3px rgba(37, 99, 235, 0.1)',
-                                },
-                                '.Label': {
-                                  fontSize: '14px',
-                                  fontWeight: '500',
-                                  color: '#374151',
-                                  marginBottom: '6px',
-                                },
-                              },
-                            },
-                          }}
-                        >
-                          <SubscriptionForm 
-                            contractorId={contractor?.id}
-                            onSuccess={() => {
-                              setClientSecret('');
-                              setIsProcessingPayment(false);
-                              toast({
-                                title: "Payment Method Added",
-                                description: "Your payment information has been successfully verified and saved.",
-                              });
-                            }}
-                            onError={handlePaymentError}
-                          />
-                        </Elements>
+                    </div>
+                    
+                    <Button 
+                      onClick={handleSubscriptionPayment}
+                      disabled={isProcessingPayment}
+                      className="w-full bg-blue-600 hover:bg-blue-700"
+                    >
+                      {isProcessingPayment ? (
+                        <>
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          Redirecting to Stripe...
+                        </>
                       ) : (
-                        <div className="text-center py-8">
-                          <Loader2 className="w-8 h-8 animate-spin mx-auto mb-2 text-blue-600" />
-                          <p className="text-gray-600">Preparing secure payment form...</p>
-                        </div>
+                        <>
+                          <CreditCard className="w-4 h-4 mr-2" />
+                          Add Payment Method Securely
+                        </>
                       )}
-                      
-                      <div className="flex gap-3">
-                        <Button 
-                          variant="outline"
-                          onClick={() => {
-                            setClientSecret('');
-                            setIsProcessingPayment(false);
-                          }}
-                          className="flex-1"
-                        >
-                          Cancel
-                        </Button>
-                      </div>
-                    </div>
-                  )}
+                    </Button>
+                  </div>
                 </CardContent>
               </Card>
 

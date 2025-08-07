@@ -1438,6 +1438,59 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Create Stripe Checkout session for payment method setup
+  apiRouter.post("/create-checkout-session", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      if (!stripe) {
+        return res.status(500).json({ message: "Payment processing unavailable" });
+      }
+
+      const user = req.user as User;
+      const { contractorId } = req.body;
+
+      const contractor = await storage.getContractor(contractorId);
+      if (!contractor || contractor.userId !== user.id) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+
+      // Create Stripe customer if not exists
+      let customerId = contractor.stripeCustomerId;
+      if (!customerId) {
+        const customer = await stripe.customers.create({
+          email: user.email,
+          name: contractor.companyName,
+          metadata: {
+            contractor_id: contractorId.toString()
+          }
+        });
+        customerId = customer.id;
+        await storage.updateContractor(contractorId, { stripeCustomerId: customerId });
+      }
+
+      // Create Checkout session for setup mode (to save payment method)
+      const session = await stripe.checkout.sessions.create({
+        customer: customerId,
+        payment_method_types: ['card'],
+        mode: 'setup',
+        success_url: `${req.headers.origin}/contractor-portal-enhanced?setup_success=true`,
+        cancel_url: `${req.headers.origin}/contractor-portal-enhanced?setup_cancelled=true`,
+        metadata: {
+          contractor_id: contractorId.toString(),
+          action: 'setup_payment_method'
+        }
+      });
+
+      res.json({
+        url: session.url,
+        sessionId: session.id
+      });
+
+    } catch (error) {
+      console.error("Error creating checkout session:", error);
+      res.status(500).json({ message: "Failed to create checkout session" });
+    }
+  });
+
   apiRouter.get("/subscription-status/:contractorId", isAuthenticated, async (req: Request, res: Response) => {
     try {
       const contractorId = parseInt(req.params.contractorId);
