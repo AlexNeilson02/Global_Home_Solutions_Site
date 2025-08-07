@@ -640,7 +640,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             const baseCommissionAmount = serviceCategory?.baseCost || 50; // Default $50 if no category found
             
             // Calculate commission based on service category
-            const commissionAmount = baseCommissionAmount * 0.15; // 15% commission rate
+            const commissionAmount = baseCommissionAmount; // Full base cost charged to contractor
             
             // Charge commission to contractor's payment method
             const chargeSuccess = await chargeCommissionToContractor(
@@ -652,15 +652,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
             if (chargeSuccess) {
               console.log(`✅ Commission charged: $${commissionAmount} for bid request ${bidRequest.id}`);
               
-              // Create commission payment record for tracking
+              // Calculate commission distribution
+              const salespersonCommission = commissionAmount * 0.50; // 50% to salesperson
+              const corpCommission = commissionAmount * 0.50; // 50% to corp (includes override)
+              
+              // Create commission payment for salesperson (if attributed)
+              if (salespersonId) {
+                await storage.createCommissionPayment({
+                  type: 'bid_request_fee',
+                  amount: salespersonCommission * 100, // Store in cents
+                  contractorId: Number(contractorId),
+                  salespersonId: Number(salespersonId),
+                  bidRequestId: bidRequest.id,
+                  status: 'processed',
+                  description: `Salesperson commission (50%) for bid request: ${serviceRequested || 'General Services'}`
+                });
+                console.log(`💰 Salesperson commission: $${salespersonCommission} to salesperson ${salespersonId}`);
+              }
+              
+              // Create commission payment for corp/admin (always)
               await storage.createCommissionPayment({
                 type: 'bid_request_fee',
-                amount: commissionAmount * 100, // Store in cents
+                amount: corpCommission * 100, // Store in cents
                 contractorId: Number(contractorId),
                 bidRequestId: bidRequest.id,
                 status: 'processed',
-                description: `Commission charge for bid request: ${serviceRequested || 'General Services'}`
+                description: `Corp commission (50%) for bid request: ${serviceRequested || 'General Services'}`
               });
+              console.log(`🏢 Corp commission: $${corpCommission} to admin/corp`);
             } else {
               console.error(`❌ Failed to charge commission for bid request ${bidRequest.id}`);
             }
