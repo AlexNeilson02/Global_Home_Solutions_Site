@@ -36,6 +36,39 @@ html::after {
   display: none !important;
 }
 
+/* Force remove any dialog/modal overlays that might interfere */
+[data-radix-popper-content-wrapper],
+[data-state="open"][role="dialog"],
+.fixed.inset-0.z-50.bg-black\/80,
+.fixed.inset-0.z-50.bg-black\/80.data-\[state\=open\]\:animate-in {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+}
+
+/* Ensure About Us page content is always visible */
+[data-page="about-us"] *,
+.about-us-page *,
+div[style*="backgroundColor: '#f8fafc'"] * {
+  visibility: visible !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+}
+
+/* Force disable backdrop-filter effects that might cause blur */
+* {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* Specifically target any potential overlay elements */
+.hero-content,
+[style*="backdrop-filter"],
+[style*="blur"] {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
 /* Remove any potential iframe or embedded content spacing */
 iframe[src*="replit"],
 div[id*="replit"],

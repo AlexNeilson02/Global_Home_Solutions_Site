@@ -4,13 +4,29 @@ import { ArrowLeft, MapPin, Phone, Mail, Users, Award, Home, Building2, Star, Cl
 import logoPath from "@/assets/global-home-solutions-logo.png";
 
 export default function AboutUs() {
+  // Force removal of any overlays
+  React.useEffect(() => {
+    // Remove any dialog overlays
+    const overlays = document.querySelectorAll('[role="dialog"], [data-state="open"], .fixed.inset-0');
+    overlays.forEach(overlay => {
+      const element = overlay as HTMLElement;
+      if (element.style.zIndex && parseInt(element.style.zIndex) > 1000) {
+        element.style.display = 'none';
+      }
+    });
+  }, []);
+
   return (
-    <div style={{ 
-      minHeight: '100vh', 
-      backgroundColor: '#f8fafc', 
-      position: 'relative',
-      zIndex: 1
-    }}>
+    <div 
+      data-page="about-us"
+      className="about-us-page"
+      style={{ 
+        minHeight: '100vh', 
+        backgroundColor: '#f8fafc', 
+        position: 'relative',
+        zIndex: 9999,
+        isolation: 'isolate'
+      }}>
       {/* Header with Back Button */}
       <header style={{
         backgroundColor: 'rgba(255, 255, 255, 0.95)',
