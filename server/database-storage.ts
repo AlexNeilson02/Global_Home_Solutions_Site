@@ -3,6 +3,7 @@ import { db } from "./db";
 import { 
   users, contractors, salespersons, projects, testimonials, serviceCategories, bidRequests, pageVisits,
   documents, projectMilestones, projectStatusUpdates, commissionRecords, commissionAdjustments, commissionPayments,
+  emailCommunications,
   type User, type InsertUser,
   type Contractor, type InsertContractor,
   type Salesperson, type InsertSalesperson,
@@ -16,7 +17,8 @@ import {
   type ProjectStatusUpdate, type InsertProjectStatusUpdate,
   type CommissionRecord, type InsertCommissionRecord,
   type CommissionAdjustment, type InsertCommissionAdjustment,
-  type CommissionPayment, type InsertCommissionPayment
+  type CommissionPayment, type InsertCommissionPayment,
+  type EmailCommunication, type InsertEmailCommunication
 } from "@shared/schema";
 import { IStorage } from "./storage";
 import { QRCodeService } from "./qr-service";
@@ -1154,10 +1156,41 @@ export class DatabaseStorage implements IStorage {
       .select()
       .from(commissionRecords)
       .where(and(
-        eq(commissionRecords.contractorId, contractorId),
         eq(commissionRecords.paymentStatus, 'pending')
       ));
     return records;
+  }
+
+  // Email communication methods
+  async createEmailCommunication(emailData: InsertEmailCommunication): Promise<EmailCommunication> {
+    const [email] = await db.insert(emailCommunications).values(emailData).returning();
+    return email;
+  }
+
+  async getEmailCommunicationsByContractorId(contractorId: number, limit: number = 10): Promise<EmailCommunication[]> {
+    return db
+      .select()
+      .from(emailCommunications)
+      .where(eq(emailCommunications.contractorId, contractorId))
+      .orderBy(desc(emailCommunications.createdAt))
+      .limit(limit);
+  }
+
+  async getEmailCommunicationsByBidRequestId(bidRequestId: number): Promise<EmailCommunication[]> {
+    return db
+      .select()
+      .from(emailCommunications)
+      .where(eq(emailCommunications.bidRequestId, bidRequestId))
+      .orderBy(desc(emailCommunications.createdAt));
+  }
+
+  async updateEmailCommunication(id: number, emailData: Partial<EmailCommunication>): Promise<EmailCommunication | undefined> {
+    const [email] = await db
+      .update(emailCommunications)
+      .set(emailData)
+      .where(eq(emailCommunications.id, id))
+      .returning();
+    return email;
   }
 }
 

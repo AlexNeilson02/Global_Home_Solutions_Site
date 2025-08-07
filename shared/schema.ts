@@ -64,6 +64,12 @@ export const contractors = pgTable("contractors", {
   monthlySpendCap: real("monthly_spend_cap").default(1000),
   paymentMethodAdded: boolean("payment_method_added").default(false),
   // Media files stored as JSON array with S3 URLs for performance
+  
+  // Gmail integration
+  gmailAccessToken: text("gmail_access_token"),
+  gmailRefreshToken: text("gmail_refresh_token"),
+  gmailTokenExpiry: timestamp("gmail_token_expiry"),
+  gmailConnected: boolean("gmail_connected").default(false),
 });
 
 // Salespersons table
@@ -265,6 +271,38 @@ export const commissionPayments = pgTable("commission_payments", {
   notes: text("notes"),
 });
 
+// Email communications table for Gmail integration
+export const emailCommunications = pgTable("email_communications", {
+  id: serial("id").primaryKey(),
+  contractorId: integer("contractor_id").notNull().references(() => contractors.id),
+  bidRequestId: integer("bid_request_id").references(() => bidRequests.id),
+  
+  // Email details
+  messageId: text("message_id").notNull(), // Gmail message ID
+  threadId: text("thread_id").notNull(), // Gmail thread ID
+  subject: text("subject").notNull(),
+  fromEmail: text("from_email").notNull(),
+  toEmail: text("to_email").notNull(),
+  ccEmails: text("cc_emails").array(),
+  bccEmails: text("bcc_emails").array(),
+  body: text("body").notNull(),
+  htmlBody: text("html_body"),
+  
+  // Status and metadata
+  direction: text("direction").notNull(), // 'sent', 'received'
+  status: text("status").notNull().default("delivered"), // delivered, failed, pending
+  isRead: boolean("is_read").default(false),
+  
+  // Timestamps
+  sentAt: timestamp("sent_at").notNull(),
+  receivedAt: timestamp("received_at").defaultNow(),
+  createdAt: timestamp("created_at").defaultNow(),
+  
+  // Attachments and labels
+  attachments: json("attachments").$type<{name: string, url: string, size: number}[]>().default([]),
+  gmailLabels: text("gmail_labels").array(),
+});
+
 // Insert schemas
 export const insertServiceCategorySchema = createInsertSchema(serviceCategories).omit({
   id: true,
@@ -349,6 +387,12 @@ export const insertCommissionPaymentSchema = createInsertSchema(commissionPaymen
   id: true,
   createdAt: true,
   processedAt: true,
+});
+
+export const insertEmailCommunicationSchema = createInsertSchema(emailCommunications).omit({
+  id: true,
+  receivedAt: true,
+  createdAt: true,
 });
 
 // Relations - these are required for Drizzle ORM
@@ -501,6 +545,17 @@ export const commissionPaymentsRelations = relations(commissionPayments, ({ one 
   }),
 }));
 
+export const emailCommunicationsRelations = relations(emailCommunications, ({ one }) => ({
+  contractor: one(contractors, {
+    fields: [emailCommunications.contractorId],
+    references: [contractors.id],
+  }),
+  bidRequest: one(bidRequests, {
+    fields: [emailCommunications.bidRequestId],
+    references: [bidRequests.id],
+  }),
+}));
+
 // Export types
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
@@ -543,6 +598,9 @@ export type InsertCommissionAdjustment = z.infer<typeof insertCommissionAdjustme
 
 export type CommissionPayment = typeof commissionPayments.$inferSelect;
 export type InsertCommissionPayment = z.infer<typeof insertCommissionPaymentSchema>;
+
+export type EmailCommunication = typeof emailCommunications.$inferSelect;
+export type InsertEmailCommunication = z.infer<typeof insertEmailCommunicationSchema>;
 
 // Extended schemas for login
 export const loginSchema = z.object({

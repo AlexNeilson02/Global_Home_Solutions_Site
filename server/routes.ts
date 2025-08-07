@@ -65,6 +65,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Import and use authentication routes
   const authRoutes = (await import("./auth-routes")).default;
   apiRouter.use("/auth", authRoutes);
+  
+  // Import and use Gmail routes
+  const gmailRoutes = (await import("./gmail-routes")).default;
+  apiRouter.use("/gmail", gmailRoutes);
 
   // WebSocket connections for real-time notifications
   const contractorConnections = new Map<number, WebSocket[]>();

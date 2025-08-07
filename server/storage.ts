@@ -9,7 +9,8 @@ import {
   PageVisit, InsertPageVisit,
   CommissionRecord, InsertCommissionRecord,
   CommissionAdjustment, InsertCommissionAdjustment,
-  CommissionPayment, InsertCommissionPayment
+  CommissionPayment, InsertCommissionPayment,
+  EmailCommunication, InsertEmailCommunication
 } from "@shared/schema";
 
 // Extend this interface with all required storage methods
@@ -127,6 +128,12 @@ export interface IStorage {
     corpTotal: number;
     totalRecords: number;
   }>;
+  
+  // Email communication methods
+  createEmailCommunication(email: InsertEmailCommunication): Promise<EmailCommunication>;
+  getEmailCommunicationsByContractorId(contractorId: number, limit?: number): Promise<EmailCommunication[]>;
+  getEmailCommunicationsByBidRequestId(bidRequestId: number): Promise<EmailCommunication[]>;
+  updateEmailCommunication(id: number, email: Partial<EmailCommunication>): Promise<EmailCommunication | undefined>;
 }
 
 // In-memory implementation of the storage interface
