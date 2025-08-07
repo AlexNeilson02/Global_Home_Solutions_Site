@@ -184,7 +184,7 @@ const ContractorPortalEnhanced: React.FC = () => {
   const [subscriptionStatus, setSubscriptionStatus] = useState<'active' | 'inactive' | 'loading'>('loading');
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const [clientSecret, setClientSecret] = useState<string>("");
-  const [monthlySpendCap, setMonthlySpendCap] = useState(contractor?.monthlySpendCap || 1000);
+  const [monthlySpendCap, setMonthlySpendCap] = useState(1000);
   
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -216,6 +216,13 @@ const ContractorPortalEnhanced: React.FC = () => {
   });
 
   const contractor = (userData as any)?.roleData;
+
+  // Initialize monthlySpendCap from contractor data when loaded
+  useEffect(() => {
+    if (contractor?.monthlySpendCap !== undefined) {
+      setMonthlySpendCap(contractor.monthlySpendCap);
+    }
+  }, [contractor?.monthlySpendCap]);
 
   // Get contractor's projects
   const { data: projectsData } = useQuery({
