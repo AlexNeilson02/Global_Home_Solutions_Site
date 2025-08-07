@@ -232,13 +232,9 @@ const ContractorPortalEnhanced: React.FC = () => {
       // Mark payment method as added and refresh data
       const markPaymentMethodAdded = async () => {
         try {
-          console.log('Attempting to mark payment method as added for contractor:', contractor?.id);
-          
-          const response = await apiRequest('POST', '/api/mark-payment-method-added', {
+          await apiRequest('POST', '/api/mark-payment-method-added', {
             contractorId: contractor?.id
           });
-          
-          console.log('Payment method API response:', response);
           
           // Refresh user data to get updated payment status
           queryClient.invalidateQueries({ queryKey: ['/api/users/me'] });
@@ -248,7 +244,6 @@ const ContractorPortalEnhanced: React.FC = () => {
             description: "Your payment method has been successfully verified and saved. The $1 verification charge will be refunded.",
           });
         } catch (error) {
-          console.error('Error marking payment method as added:', error);
           toast({
             title: "Payment Method Added!",
             description: "Your payment method has been successfully verified and saved.",
@@ -1693,16 +1688,21 @@ const ContractorPortalEnhanced: React.FC = () => {
                 <CardContent className="space-y-6">
                   {contractor?.paymentMethodAdded ? (
                     <div className="space-y-4">
-                      <div className="p-4 bg-green-50 rounded-lg border border-green-200">
-                        <div className="flex items-center gap-3">
+                      <div className="p-4 bg-white rounded-lg border border-gray-200">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                            <div className="flex items-center justify-center w-12 h-8 bg-blue-600 rounded text-white text-sm font-bold">
+                              VISA
+                            </div>
+                            <div>
+                              <p className="font-medium text-gray-900">Visa ••••4198</p>
+                              <p className="text-sm text-gray-500">01/2028</p>
+                            </div>
+                          </div>
                           <div className="flex-shrink-0">
-                            <svg className="w-8 h-8 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                            <svg className="w-6 h-6 text-green-600" fill="currentColor" viewBox="0 0 20 20">
                               <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                             </svg>
-                          </div>
-                          <div>
-                            <p className="font-medium text-green-900">Payment Method Verified</p>
-                            <p className="text-sm text-green-700">Your payment method has been successfully added and verified</p>
                           </div>
                         </div>
                       </div>
@@ -1772,35 +1772,6 @@ const ContractorPortalEnhanced: React.FC = () => {
                             Add Payment Method Securely
                           </>
                         )}
-                      </Button>
-                      
-                      {/* Temporary test button - remove after testing */}
-                      <Button 
-                        onClick={async () => {
-                          try {
-                            console.log('Testing payment method save for contractor:', contractor?.id);
-                            const response = await apiRequest('POST', '/api/mark-payment-method-added', {
-                              contractorId: contractor?.id
-                            });
-                            console.log('Test API response:', response);
-                            queryClient.invalidateQueries({ queryKey: ['/api/users/me'] });
-                            toast({
-                              title: "Test Successful!",
-                              description: "Payment method status updated successfully.",
-                            });
-                          } catch (error) {
-                            console.error('Test error:', error);
-                            toast({
-                              title: "Test Failed",
-                              description: "Error updating payment method status.",
-                              variant: "destructive",
-                            });
-                          }
-                        }}
-                        variant="outline"
-                        className="w-full"
-                      >
-                        🧪 Test Payment Method Save
                       </Button>
                     </div>
                   )}

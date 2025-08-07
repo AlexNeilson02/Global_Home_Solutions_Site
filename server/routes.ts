@@ -1520,36 +1520,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Mark payment method as added (for manual tracking when webhooks aren't available)
   apiRouter.post("/mark-payment-method-added", isAuthenticated, async (req: Request, res: Response) => {
     try {
-      console.log('API Request: POST /mark-payment-method-added - Body:', req.body);
-      
       const user = req.user as User;
       const { contractorId } = req.body;
 
-      console.log('User:', user.id, 'requesting to mark payment method for contractor:', contractorId);
-
       const contractor = await storage.getContractor(contractorId);
       if (!contractor) {
-        console.log('Contractor not found:', contractorId);
         return res.status(404).json({ message: "Contractor not found" });
       }
       
       if (contractor.userId !== user.id) {
-        console.log('Access denied - contractor userId:', contractor.userId, 'vs user id:', user.id);
         return res.status(403).json({ message: "Access denied" });
       }
 
       // Update contractor record to mark payment method as added
-      const updatedContractor = await storage.updateContractor(contractorId, { 
+      await storage.updateContractor(contractorId, { 
         paymentMethodAdded: true 
       });
 
-      console.log('Payment method marked as added for contractor:', contractorId);
-      console.log('Updated contractor payment status:', updatedContractor?.paymentMethodAdded);
-
       res.json({ 
         message: "Payment method status updated successfully",
-        paymentMethodAdded: true,
-        contractorId: contractorId
+        paymentMethodAdded: true
       });
 
     } catch (error) {
