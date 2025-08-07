@@ -1467,13 +1467,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
         await storage.updateContractor(contractorId, { stripeCustomerId: customerId });
       }
 
+      // Get the origin URL properly
+      const host = req.headers.host;
+      const protocol = req.headers['x-forwarded-proto'] || 'https';
+      const origin = req.headers.origin || `${protocol}://${host}`;
+      
+      console.log(`Creating Stripe checkout with origin: ${origin}`);
+      console.log(`Headers - host: ${host}, protocol: ${protocol}, origin: ${req.headers.origin}`);
+      
       // Create Checkout session for setup mode (to save payment method)
       const session = await stripe.checkout.sessions.create({
         customer: customerId,
         payment_method_types: ['card'],
         mode: 'setup',
-        success_url: `${req.headers.origin}/contractor-portal-enhanced?setup_success=true`,
-        cancel_url: `${req.headers.origin}/contractor-portal-enhanced?setup_cancelled=true`,
+        success_url: `${origin}/contractor-portal-enhanced?setup_success=true`,
+        cancel_url: `${origin}/contractor-portal-enhanced?setup_cancelled=true`,
         metadata: {
           contractor_id: contractorId.toString(),
           action: 'setup_payment_method'
