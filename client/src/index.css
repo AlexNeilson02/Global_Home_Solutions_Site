@@ -373,6 +373,89 @@ div[role="tabpanel"] * {
   color: black !important;
 }
 
+/* Tactic 16: Admin Portal Dialog Nuclear Yellow Removal */
+[data-radix-dialog-content],
+[data-radix-dialog-content] *,
+[data-radix-dialog-overlay],
+[data-radix-dialog-overlay] *,
+[data-radix-dialog-title],
+[data-radix-dialog-title] *,
+[data-radix-dialog-description],
+[data-radix-dialog-description] *,
+[role="dialog"],
+[role="dialog"] *,
+[role="alertdialog"],
+[role="alertdialog"] *,
+.dialog-content,
+.dialog-content *,
+[class*="dialog"],
+[class*="dialog"] * {
+  outline: none !important;
+  outline-color: transparent !important;
+  outline-width: 0 !important;
+  outline-style: none !important;
+  border-color: #e5e7eb !important;
+  background-color: white !important;
+  color: black !important;
+}
+
+/* Tactic 17: Admin Portal Form Input Nuclear Yellow Removal */
+[role="dialog"] input,
+[role="dialog"] input *,
+[role="dialog"] textarea,
+[role="dialog"] textarea *,
+[role="dialog"] select,
+[role="dialog"] select *,
+[role="alertdialog"] input,
+[role="alertdialog"] input *,
+[role="alertdialog"] textarea,
+[role="alertdialog"] textarea *,
+[role="alertdialog"] select,
+[role="alertdialog"] select *,
+.dialog-content input,
+.dialog-content input *,
+.dialog-content textarea,
+.dialog-content textarea *,
+.dialog-content select,
+.dialog-content select * {
+  outline: none !important;
+  outline-color: transparent !important;
+  outline-width: 0 !important;
+  outline-style: none !important;
+  border: 2px solid #e5e7eb !important;
+  background-color: white !important;
+  color: black !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  appearance: none !important;
+}
+
+/* Tactic 18: Admin Portal Label and Text Nuclear Yellow Removal */
+[role="dialog"] label,
+[role="dialog"] label *,
+[role="dialog"] p,
+[role="dialog"] p *,
+[role="dialog"] div,
+[role="dialog"] div *,
+[role="alertdialog"] label,
+[role="alertdialog"] label *,
+[role="alertdialog"] p,
+[role="alertdialog"] p *,
+[role="alertdialog"] div,
+[role="alertdialog"] div *,
+.dialog-content label,
+.dialog-content label *,
+.dialog-content p,
+.dialog-content p *,
+.dialog-content div,
+.dialog-content div * {
+  outline: none !important;
+  outline-color: transparent !important;
+  outline-width: 0 !important;
+  outline-style: none !important;
+  color: black !important;
+}
+
 /* Mobile Navigation Overrides */
 @media (max-width: 640px) {
   .mobile-nav-show {

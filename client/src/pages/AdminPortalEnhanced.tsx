@@ -1294,10 +1294,44 @@ export default function AdminPortalEnhanced() {
 
         {/* View Details Modal */}
         <Dialog open={viewDetailsOpen} onOpenChange={setViewDetailsOpen}>
-          <DialogContent className="sm:max-w-[600px]">
-            <DialogHeader>
-              <DialogTitle>Sales Representative Details</DialogTitle>
-              <DialogDescription>
+          <DialogContent 
+            className="sm:max-w-[600px] anti-yellow-nuclear"
+            style={{
+              outline: 'none',
+              outlineColor: 'transparent',
+              outlineWidth: '0',
+              outlineStyle: 'none',
+              backgroundColor: 'white',
+              color: 'black',
+              border: '1px solid #e5e7eb'
+            }}
+          >
+            <DialogHeader
+              className="anti-yellow-nuclear"
+              style={{
+                outline: 'none',
+                outlineColor: 'transparent',
+                color: 'black'
+              }}
+            >
+              <DialogTitle 
+                className="anti-yellow-nuclear"
+                style={{
+                  outline: 'none',
+                  outlineColor: 'transparent',
+                  color: 'black'
+                }}
+              >
+                Sales Representative Details
+              </DialogTitle>
+              <DialogDescription
+                className="anti-yellow-nuclear"
+                style={{
+                  outline: 'none',
+                  outlineColor: 'transparent',
+                  color: 'black'
+                }}
+              >
                 Complete information for {selectedSalesperson?.fullName || 'Sales Rep'}
               </DialogDescription>
             </DialogHeader>
@@ -1377,36 +1411,107 @@ export default function AdminPortalEnhanced() {
 
         {/* Edit Modal */}
         <Dialog open={editModalOpen} onOpenChange={setEditModalOpen}>
-          <DialogContent className="sm:max-w-[450px] max-w-[90vw]">
-            <DialogHeader>
-              <DialogTitle className="text-lg">Edit Sales Representative</DialogTitle>
-              <DialogDescription className="text-sm">
+          <DialogContent 
+            className="sm:max-w-[450px] max-w-[90vw] anti-yellow-nuclear"
+            style={{
+              outline: 'none',
+              outlineColor: 'transparent',
+              outlineWidth: '0',
+              outlineStyle: 'none',
+              backgroundColor: 'white',
+              color: 'black',
+              border: '1px solid #e5e7eb'
+            }}
+          >
+            <DialogHeader
+              className="anti-yellow-nuclear"
+              style={{
+                outline: 'none',
+                outlineColor: 'transparent',
+                color: 'black'
+              }}
+            >
+              <DialogTitle 
+                className="text-lg anti-yellow-nuclear"
+                style={{
+                  outline: 'none',
+                  outlineColor: 'transparent',
+                  color: 'black'
+                }}
+              >
+                Edit Sales Representative
+              </DialogTitle>
+              <DialogDescription 
+                className="text-sm anti-yellow-nuclear"
+                style={{
+                  outline: 'none',
+                  outlineColor: 'transparent',
+                  color: 'black'
+                }}
+              >
                 Update information for {selectedSalesperson?.fullName || 'Sales Rep'}
               </DialogDescription>
             </DialogHeader>
-            <div className="space-y-4 px-1">
+            <div 
+              className="space-y-4 px-1 anti-yellow-nuclear"
+              style={{
+                outline: 'none',
+                outlineColor: 'transparent',
+                color: 'black'
+              }}
+            >
               <div>
-                <label className="text-sm font-medium block mb-2">Full Name</label>
+                <label 
+                  className="text-sm font-medium block mb-2 anti-yellow-nuclear"
+                  style={{
+                    outline: 'none',
+                    outlineColor: 'transparent',
+                    color: 'black'
+                  }}
+                >
+                  Full Name
+                </label>
                 <Input
-                  className="w-full max-w-full"
+                  className="w-full max-w-full anti-yellow-nuclear"
+                  style={antiYellowInputStyles}
                   value={editFormData.fullName}
                   onChange={(e) => setEditFormData({...editFormData, fullName: e.target.value})}
                   placeholder="Enter full name"
                 />
               </div>
               <div>
-                <label className="text-sm font-medium block mb-2">Profile URL</label>
+                <label 
+                  className="text-sm font-medium block mb-2 anti-yellow-nuclear"
+                  style={{
+                    outline: 'none',
+                    outlineColor: 'transparent',
+                    color: 'black'
+                  }}
+                >
+                  Profile URL
+                </label>
                 <Input
-                  className="w-full max-w-full text-sm"
+                  className="w-full max-w-full text-sm anti-yellow-nuclear"
+                  style={antiYellowInputStyles}
                   value={editFormData.profileUrl}
                   onChange={(e) => setEditFormData({...editFormData, profileUrl: e.target.value})}
                   placeholder="Enter profile URL"
                 />
               </div>
               <div>
-                <label className="text-sm font-medium block mb-2">New Password (leave empty to keep current)</label>
+                <label 
+                  className="text-sm font-medium block mb-2 anti-yellow-nuclear"
+                  style={{
+                    outline: 'none',
+                    outlineColor: 'transparent',
+                    color: 'black'
+                  }}
+                >
+                  New Password (leave empty to keep current)
+                </label>
                 <Input
-                  className="w-full max-w-full"
+                  className="w-full max-w-full anti-yellow-nuclear"
+                  style={antiYellowInputStyles}
                   type="password"
                   value={editFormData.password}
                   onChange={(e) => setEditFormData({...editFormData, password: e.target.value})}
@@ -1414,9 +1519,19 @@ export default function AdminPortalEnhanced() {
                 />
               </div>
               <div>
-                <label className="text-sm font-medium block mb-2">Confirm New Password</label>
+                <label 
+                  className="text-sm font-medium block mb-2 anti-yellow-nuclear"
+                  style={{
+                    outline: 'none',
+                    outlineColor: 'transparent',
+                    color: 'black'
+                  }}
+                >
+                  Confirm New Password
+                </label>
                 <Input
-                  className="w-full max-w-full"
+                  className="w-full max-w-full anti-yellow-nuclear"
+                  style={antiYellowInputStyles}
                   type="password"
                   value={editFormData.confirmPassword}
                   onChange={(e) => setEditFormData({...editFormData, confirmPassword: e.target.value})}
@@ -1456,10 +1571,44 @@ export default function AdminPortalEnhanced() {
 
         {/* Contractor View Modal */}
         <Dialog open={contractorViewOpen} onOpenChange={setContractorViewOpen}>
-          <DialogContent className="sm:max-w-[600px] max-w-[90vw]">
-            <DialogHeader>
-              <DialogTitle className="text-lg">Contractor Details</DialogTitle>
-              <DialogDescription className="text-sm">
+          <DialogContent 
+            className="sm:max-w-[600px] max-w-[90vw] anti-yellow-nuclear"
+            style={{
+              outline: 'none',
+              outlineColor: 'transparent',
+              outlineWidth: '0',
+              outlineStyle: 'none',
+              backgroundColor: 'white',
+              color: 'black',
+              border: '1px solid #e5e7eb'
+            }}
+          >
+            <DialogHeader
+              className="anti-yellow-nuclear"
+              style={{
+                outline: 'none',
+                outlineColor: 'transparent',
+                color: 'black'
+              }}
+            >
+              <DialogTitle 
+                className="text-lg anti-yellow-nuclear"
+                style={{
+                  outline: 'none',
+                  outlineColor: 'transparent',
+                  color: 'black'
+                }}
+              >
+                Contractor Details
+              </DialogTitle>
+              <DialogDescription 
+                className="text-sm anti-yellow-nuclear"
+                style={{
+                  outline: 'none',
+                  outlineColor: 'transparent',
+                  color: 'black'
+                }}
+              >
                 Complete information for {selectedContractor?.companyName || 'Contractor'}
               </DialogDescription>
             </DialogHeader>
@@ -1524,10 +1673,44 @@ export default function AdminPortalEnhanced() {
 
         {/* Contractor Edit Modal */}
         <Dialog open={contractorEditOpen} onOpenChange={setContractorEditOpen}>
-          <DialogContent className="sm:max-w-[500px] max-w-[90vw]">
-            <DialogHeader>
-              <DialogTitle className="text-lg">Edit Contractor</DialogTitle>
-              <DialogDescription className="text-sm">
+          <DialogContent 
+            className="sm:max-w-[500px] max-w-[90vw] anti-yellow-nuclear"
+            style={{
+              outline: 'none',
+              outlineColor: 'transparent',
+              outlineWidth: '0',
+              outlineStyle: 'none',
+              backgroundColor: 'white',
+              color: 'black',
+              border: '1px solid #e5e7eb'
+            }}
+          >
+            <DialogHeader
+              className="anti-yellow-nuclear"
+              style={{
+                outline: 'none',
+                outlineColor: 'transparent',
+                color: 'black'
+              }}
+            >
+              <DialogTitle 
+                className="text-lg anti-yellow-nuclear"
+                style={{
+                  outline: 'none',
+                  outlineColor: 'transparent',
+                  color: 'black'
+                }}
+              >
+                Edit Contractor
+              </DialogTitle>
+              <DialogDescription 
+                className="text-sm anti-yellow-nuclear"
+                style={{
+                  outline: 'none',
+                  outlineColor: 'transparent',
+                  color: 'black'
+                }}
+              >
                 Update information for {selectedContractor?.companyName || 'Contractor'}
               </DialogDescription>
             </DialogHeader>
