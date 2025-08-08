@@ -193,7 +193,7 @@ const AnalyticsDashboard: React.FC<AnalyticsProps> = ({ userRole, userId }) => {
                   <DollarSign className="h-4 w-4 text-muted-foreground flex-shrink-0" />
                 </CardHeader>
                 <CardContent className="p-3 pt-0 sm:p-4 sm:pt-0">
-                  <div className="text-lg sm:text-2xl font-bold text-green-600">{formatCurrency(commissions?.totalCommissions || 0)}</div>
+                  <div className="text-lg sm:text-2xl font-bold">{formatCurrency(commissions?.totalCommissions || 0)}</div>
                   <p className="text-xs text-muted-foreground">
                     All commission earnings
                   </p>
