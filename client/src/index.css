@@ -1258,6 +1258,26 @@ html {
   width: 100% !important;
 }
 
+/* Ensure login modal buttons are highly visible */
+[data-component="login-form"] button[type="submit"] {
+  background-color: #2563eb !important;
+  color: white !important;
+  border: none !important;
+  font-weight: 600 !important;
+  padding: 12px 24px !important;
+  border-radius: 8px !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+}
+
+[data-component="login-form"] button[type="submit"]:hover {
+  background-color: #1d4ed8 !important;
+}
+
+[data-component="login-form"] button[type="submit"]:disabled {
+  background-color: #9ca3af !important;
+  cursor: not-allowed !important;
+}
+
 
 
 

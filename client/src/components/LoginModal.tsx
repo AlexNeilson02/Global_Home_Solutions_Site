@@ -130,11 +130,11 @@ export function LoginModal({ isOpen, onClose, portalType, onLoginSuccess }: Logi
             <div className="text-sm text-red-600 text-center">{error}</div>
           )}
           
-          <div className="flex gap-2">
+          <div className="flex gap-2 mt-6">
             <Button
               type="button"
               variant="outline"
-              className="flex-1"
+              className="flex-1 border-gray-300 text-gray-600 hover:bg-gray-50"
               onClick={onClose}
               disabled={isLoggingIn}
             >
@@ -142,7 +142,7 @@ export function LoginModal({ isOpen, onClose, portalType, onLoginSuccess }: Logi
             </Button>
             <Button
               type="submit"
-              className="flex-1"
+              className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 shadow-lg"
               disabled={isLoggingIn}
             >
               {isLoggingIn ? (
