@@ -294,6 +294,21 @@ Best regards,
 
 
 
+  const clearEmailForm = () => {
+    setEmailForm({
+      to: '',
+      subject: '',
+      body: ''
+    });
+  };
+
+  const handleNewCompose = () => {
+    clearEmailForm();
+    setShowCompose(true);
+    setShowInbox(false);
+    setSelectedEmail(null);
+  };
+
   const handleQuickCompose = (bidRequest: any) => {
     setEmailForm({
       to: bidRequest.email,
@@ -385,7 +400,7 @@ ${(contractor as any)?.companyName}`
               </div>
             </div>
             <Button 
-              onClick={() => setShowCompose(true)}
+              onClick={handleNewCompose}
               className="w-full bg-blue-600 hover:bg-blue-700"
             >
               <Plus className="h-4 w-4 mr-2" />
@@ -614,10 +629,7 @@ ${(contractor as any)?.companyName}`
                       Refresh
                     </Button>
                     <Button 
-                      onClick={() => {
-                        setShowCompose(true);
-                        setShowInbox(false);
-                      }}
+                      onClick={handleNewCompose}
                       className="bg-blue-600 hover:bg-blue-700"
                     >
                       <Plus className="h-4 w-4 mr-2" />
@@ -634,7 +646,10 @@ ${(contractor as any)?.companyName}`
                     <Button 
                       variant="ghost" 
                       size="sm"
-                      onClick={() => setShowCompose(false)}
+                      onClick={() => {
+                        clearEmailForm();
+                        setShowCompose(false);
+                      }}
                     >
                       <X className="h-4 w-4" />
                     </Button>
@@ -678,7 +693,10 @@ ${(contractor as any)?.companyName}`
                     <div className="flex items-center justify-between pt-4">
                       <Button 
                         variant="outline"
-                        onClick={() => setShowCompose(false)}
+                        onClick={() => {
+                          clearEmailForm();
+                          setShowCompose(false);
+                        }}
                       >
                         Cancel
                       </Button>
