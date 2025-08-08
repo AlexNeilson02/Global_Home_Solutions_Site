@@ -67,11 +67,11 @@ export default function Home() {
                 <div className="ml-4">
                   <p className="text-sm">Trusted by <span className="font-semibold">10,000+</span> homeowners</p>
                   <div className="flex items-center mt-1">
-                    <Star className="h-4 w-4 text-amber-400 fill-amber-400" />
-                    <Star className="h-4 w-4 text-amber-400 fill-amber-400" />
-                    <Star className="h-4 w-4 text-amber-400 fill-amber-400" />
-                    <Star className="h-4 w-4 text-amber-400 fill-amber-400" />
-                    <Star className="h-4 w-4 text-amber-400 fill-amber-400" />
+                    <Star className="h-4 w-4 text-yellow-400 fill-yellow-400" />
+                    <Star className="h-4 w-4 text-yellow-400 fill-yellow-400" />
+                    <Star className="h-4 w-4 text-yellow-400 fill-yellow-400" />
+                    <Star className="h-4 w-4 text-yellow-400 fill-yellow-400" />
+                    <Star className="h-4 w-4 text-yellow-400 fill-yellow-400" />
                     <span className="ml-1 text-sm">4.8/5</span>
                   </div>
                 </div>

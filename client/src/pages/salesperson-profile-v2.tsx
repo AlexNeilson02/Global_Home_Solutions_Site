@@ -298,7 +298,7 @@ export default function SalespersonProfileV2() {
                                 <div className="flex flex-col md:flex-row md:items-center md:justify-between">
                                   <h3 className="text-xl font-bold">{contractor.companyName}</h3>
                                   <div className="flex items-center mt-2 md:mt-0">
-                                    <Star className="h-4 w-4 text-amber-500 mr-1" />
+                                    <Star className="h-4 w-4 text-yellow-500 mr-1" />
                                     <span className="font-medium mr-1">{contractor.rating}</span>
                                     <span className="text-muted-foreground">({contractor.reviewCount} reviews)</span>
                                   </div>
