@@ -534,6 +534,34 @@ ${(contractor as any)?.phone ? `Phone: ${(contractor as any).phone}` : ''}`;
         <div className="w-80 border-r bg-gray-50 flex flex-col">
           {/* Header */}
           <div className="p-4 border-b bg-white">
+            {/* Gmail Profile Section */}
+            <div className="flex items-center gap-3 mb-3 p-2 bg-gray-50 rounded-lg">
+              <div className="relative">
+                <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white text-sm font-medium">
+                  {(contractor as any)?.email?.charAt(0).toUpperCase() || 'G'}
+                </div>
+                <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="text-sm font-medium text-gray-900 truncate">
+                  {(contractor as any)?.email || 'Gmail Connected'}
+                </div>
+                <div className="text-xs text-gray-500">Connected Account</div>
+              </div>
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => {
+                  if (confirm('Change Gmail account? This will disconnect your current account and require re-authentication.')) {
+                    disconnectGmailMutation.mutate();
+                  }
+                }}
+                className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+              >
+                <Edit3 className="h-3 w-3" />
+              </Button>
+            </div>
+            
             <div className="flex items-center justify-between mb-3">
               <h2 className="text-lg font-semibold text-gray-900">Gmail</h2>
               <div className="flex items-center gap-2">
