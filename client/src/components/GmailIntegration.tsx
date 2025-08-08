@@ -453,12 +453,24 @@ ${(contractor as any)?.phone ? `Phone: ${(contractor as any).phone}` : ''}`;
     );
   }
 
+  // Style object to remove yellow coloring - applying anti-yellow fix
+  const antiYellowStyles = {
+    backgroundColor: 'white',
+    color: 'black',
+    outline: 'none',
+    outlineColor: 'transparent',
+    outlineWidth: '0',
+    outlineStyle: 'none',
+    border: '1px solid #e5e7eb',
+    boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)'
+  } as const;
+
   if (!(contractor as any)?.gmailConnected) {
     return (
-      <Card>
+      <Card style={antiYellowStyles}>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <AlertCircle className="h-5 w-5 text-yellow-600" />
+            <AlertCircle className="h-5 w-5 text-blue-600" />
             Gmail Integration
           </CardTitle>
           <CardDescription>
@@ -470,6 +482,7 @@ ${(contractor as any)?.phone ? `Phone: ${(contractor as any).phone}` : ''}`;
             onClick={() => connectGmailMutation.mutate()}
             disabled={connectGmailMutation.isPending || isConnecting}
             className="bg-blue-600 hover:bg-blue-700"
+            style={antiYellowStyles}
           >
             {(connectGmailMutation.isPending || isConnecting) ? (
               <Loader2 className="h-4 w-4 mr-2 animate-spin" />
@@ -487,7 +500,7 @@ ${(contractor as any)?.phone ? `Phone: ${(contractor as any).phone}` : ''}`;
     <div className="space-y-6">
       {/* Uncontacted Leads - Quick Contact */}
       {(bidRequests as any)?.bidRequests?.length > 0 && (
-        <Card>
+        <Card style={antiYellowStyles}>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Mail className="h-5 w-5 text-blue-600" />
@@ -507,7 +520,7 @@ ${(contractor as any)?.phone ? `Phone: ${(contractor as any).phone}` : ''}`;
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
                       <div className="font-medium text-gray-900">{bid.fullName || bid.customerName}</div>
-                      <Badge variant="outline" className="text-xs bg-orange-50 text-orange-700 border-orange-200">
+                      <Badge variant="outline" className="text-xs bg-gray-50 text-gray-700 border-gray-200">
                         Uncontacted
                       </Badge>
                     </div>
@@ -536,6 +549,7 @@ ${(contractor as any)?.phone ? `Phone: ${(contractor as any).phone}` : ''}`;
                       size="sm"
                       onClick={() => handleContactLead(bid)}
                       className="bg-blue-600 hover:bg-blue-700"
+                      style={antiYellowStyles}
                     >
                       <Send className="h-4 w-4 mr-1" />
                       CONTACT
