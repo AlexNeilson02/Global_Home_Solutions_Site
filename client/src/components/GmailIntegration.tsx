@@ -57,6 +57,7 @@ interface EmailForm {
 const GmailIntegration: React.FC<GmailIntegrationProps> = ({ contractorId }) => {
   const [isConnecting, setIsConnecting] = useState(false);
   const [showCompose, setShowCompose] = useState(false);
+  const [showInbox, setShowInbox] = useState(true);
   const [selectedTemplate, setSelectedTemplate] = useState<string>('');
   const [emailForm, setEmailForm] = useState<EmailForm>({
     to: '',
@@ -516,20 +517,66 @@ ${(contractor as any)?.companyName}`
 
           {/* Main Content */}
           <div className="flex-1 p-6 overflow-y-auto">
-            {!showCompose ? (
-              <div className="max-w-2xl mx-auto text-center py-12">
-                <Mail className="h-16 w-16 mx-auto mb-4 text-gray-300" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">Ready to send emails</h3>
-                <p className="text-gray-600 mb-6">Your Gmail account is connected and ready to use. Send professional emails to your clients.</p>
-                <Button 
-                  onClick={() => setShowCompose(true)}
-                  className="bg-blue-600 hover:bg-blue-700"
-                >
-                  <Plus className="h-4 w-4 mr-2" />
-                  Compose Email
-                </Button>
+            {showInbox && !showCompose ? (
+              <div className="max-w-4xl mx-auto">
+                <h3 className="text-lg font-semibold mb-4">Inbox</h3>
+                {emailsLoading ? (
+                  <div className="flex items-center justify-center py-12">
+                    <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+                    <span className="ml-2 text-gray-600">Loading emails...</span>
+                  </div>
+                ) : recentEmails && (recentEmails as any).length > 0 ? (
+                  <div className="space-y-2">
+                    {(recentEmails as any).map((email: GmailMessage) => (
+                      <div key={email.id} className="bg-white border border-gray-200 rounded-lg p-4 hover:bg-gray-50 cursor-pointer">
+                        <div className="flex items-start justify-between mb-2">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-1">
+                              <span className="text-sm font-medium text-gray-900">
+                                {email.from.includes('<') 
+                                  ? email.from.split('<')[0].trim() 
+                                  : email.from}
+                              </span>
+                              <span className="text-xs text-gray-500">
+                                {new Date(email.sentAt).toLocaleDateString()} at {new Date(email.sentAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                              </span>
+                            </div>
+                            <h4 className="text-sm font-semibold text-gray-800 mb-2">{email.subject}</h4>
+                            <div className="text-sm text-gray-600 line-clamp-3">
+                              {email.body.replace(/<[^>]*>/g, '').trim() || 'No content'}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-12">
+                    <Mail className="h-16 w-16 mx-auto mb-4 text-gray-300" />
+                    <h3 className="text-lg font-medium text-gray-900 mb-2">No emails found</h3>
+                    <p className="text-gray-600 mb-6">Your inbox is empty or emails haven't loaded yet.</p>
+                    <Button 
+                      onClick={() => refetchEmails()}
+                      variant="outline"
+                      className="mr-2"
+                    >
+                      <RefreshCw className="h-4 w-4 mr-2" />
+                      Refresh
+                    </Button>
+                    <Button 
+                      onClick={() => {
+                        setShowCompose(true);
+                        setShowInbox(false);
+                      }}
+                      className="bg-blue-600 hover:bg-blue-700"
+                    >
+                      <Plus className="h-4 w-4 mr-2" />
+                      Compose Email
+                    </Button>
+                  </div>
+                )}
               </div>
-            ) : (
+            ) : showCompose ? (
               <div className="max-w-2xl mx-auto">
                 <div className="bg-white border rounded-lg p-6">
                   <div className="flex items-center justify-between mb-6">
@@ -615,7 +662,7 @@ ${(contractor as any)?.companyName}`
                   </div>
                 </div>
               </div>
-            )}
+            ) : null}
           </div>
         </div>
       </div>
