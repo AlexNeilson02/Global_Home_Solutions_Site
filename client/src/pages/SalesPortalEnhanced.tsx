@@ -297,7 +297,7 @@ const SalesPortalEnhanced: React.FC = () => {
   ];
 
   const profileUrl = salesperson?.profileUrl ? 
-    `${window.location.origin}/salesperson/${salesperson.profileUrl}` : '';
+    `${window.location.origin}/?ref=${salesperson.profileUrl}` : '';
 
   return (
     <div 
