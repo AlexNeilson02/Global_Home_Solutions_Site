@@ -77,9 +77,20 @@ const GmailIntegration: React.FC<GmailIntegrationProps> = ({ contractorId }) => 
 
   // Fetch recent emails
   const { data: recentEmails, isLoading: emailsLoading, refetch: refetchEmails } = useQuery({
-    queryKey: ['/api/gmail/emails'],
-    enabled: contractor?.gmailConnected,
+    queryKey: [`/api/gmail/emails/${contractor?.id}`],
+    enabled: Boolean(contractor?.gmailConnected && contractor?.id),
   });
+
+  // Debug logging
+  useEffect(() => {
+    if (recentEmails) {
+      console.log('Frontend received emails:', {
+        data: recentEmails,
+        emailsArray: (recentEmails as any)?.emails,
+        count: (recentEmails as any)?.emails?.length || 0
+      });
+    }
+  }, [recentEmails]);
 
   // Fetch pending bid requests for quick email composition
   const { data: bidRequests } = useQuery({
@@ -465,9 +476,9 @@ ${(contractor as any)?.companyName}`
               <div className="flex items-center justify-center py-8">
                 <Loader2 className="h-6 w-6 animate-spin" />
               </div>
-            ) : recentEmails && (recentEmails as any).length > 0 ? (
+            ) : recentEmails && (recentEmails as any).emails && (recentEmails as any).emails.length > 0 ? (
               <div className="space-y-px">
-                {(recentEmails as any).slice(0, 10).map((email: GmailMessage) => (
+                {(recentEmails as any).emails.slice(0, 10).map((email: GmailMessage) => (
                   <div key={email.id} className="px-4 py-3 hover:bg-gray-100 cursor-pointer border-l-2 border-transparent hover:border-blue-500">
                     <div className="flex items-start justify-between">
                       <div className="flex-1 min-w-0">
@@ -525,9 +536,9 @@ ${(contractor as any)?.companyName}`
                     <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
                     <span className="ml-2 text-gray-600">Loading emails...</span>
                   </div>
-                ) : recentEmails && (recentEmails as any).length > 0 ? (
+                ) : recentEmails && (recentEmails as any).emails && (recentEmails as any).emails.length > 0 ? (
                   <div className="space-y-2">
-                    {(recentEmails as any).map((email: GmailMessage) => (
+                    {(recentEmails as any).emails.map((email: GmailMessage) => (
                       <div key={email.id} className="bg-white border border-gray-200 rounded-lg p-4 hover:bg-gray-50 cursor-pointer">
                         <div className="flex items-start justify-between mb-2">
                           <div className="flex-1">

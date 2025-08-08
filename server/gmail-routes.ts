@@ -179,6 +179,16 @@ router.get('/emails/:contractorId', isAuthenticated, async (req: Request, res: R
 
     const emails = await GmailService.getRecentEmails(contractorId, maxResults);
     
+    console.log('Gmail emails fetched:', {
+      count: emails.length,
+      firstEmail: emails[0] ? {
+        id: emails[0].id,
+        subject: emails[0].subject,
+        from: emails[0].from,
+        bodyLength: emails[0].body?.length || 0
+      } : null
+    });
+    
     res.json({ emails });
   } catch (error) {
     console.error('Get emails error:', error);
