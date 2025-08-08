@@ -655,13 +655,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Charge commission automatically if contractor has payment method
         if (contractor.paymentMethodAdded && contractor.paymentMethodId) {
           try {
-            // Get service category details for commission calculation
-            const primaryService = finalServicesRequested[0] || "General Services";
-            const serviceCategory = await storage.getServiceCategoryByName(primaryService);
-            const baseCommissionAmount = serviceCategory?.baseCost || 50; // Default $50 if no category found
+            // Calculate total commission for all selected services
+            let totalCommissionAmount = 0;
+            const serviceCommissions: {service: string, amount: number}[] = [];
             
-            // Calculate commission based on service category
-            const commissionAmount = baseCommissionAmount; // Full base cost charged to contractor
+            for (const serviceName of finalServicesRequested) {
+              const serviceCategory = await storage.getServiceCategoryByName(serviceName);
+              const serviceCommissionAmount = serviceCategory?.baseCost || 50; // Default $50 if no category found
+              totalCommissionAmount += serviceCommissionAmount;
+              serviceCommissions.push({
+                service: serviceName,
+                amount: serviceCommissionAmount
+              });
+              console.log(`Service: ${serviceName}, Commission: $${serviceCommissionAmount}`);
+            }
+            
+            console.log(`Total commission for ${finalServicesRequested.length} services: $${totalCommissionAmount}`);
+            const commissionAmount = totalCommissionAmount;
             
             // Charge commission to contractor's payment method
             const chargeResult = await chargeCommissionToContractor(
@@ -683,6 +693,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
               
               // Create commission payment for salesperson (if attributed)
               if (salespersonId && salespersonUser) {
+                const serviceDetails = serviceCommissions.map(sc => `${sc.service} ($${sc.amount})`).join(', ');
                 await storage.createCommissionPayment({
                   recipientId: salespersonUser.userId,
                   recipientType: 'salesperson',
@@ -692,15 +703,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
                   status: 'completed',
                   sourceContractorId: Number(contractorId),
                   sourceBidRequestId: bidRequest.id,
-                  sourceServiceType: primaryService,
+                  sourceServiceType: finalServicesRequested.join(', '),
                   stripePaymentIntentId: chargeResult.paymentIntentId,
-                  notes: `Salesperson commission (50%) for bid request: ${finalServicesRequested.join(', ')}`
+                  notes: `Salesperson commission (50%) for ${finalServicesRequested.length} services: ${serviceDetails}`
                 });
                 console.log(`💰 Salesperson commission: $${salespersonCommission} to user ${salespersonUser.userId}`);
               }
               
               // Create commission payment for corp/admin (always)
               if (adminUser) {
+                const serviceDetails = serviceCommissions.map(sc => `${sc.service} ($${sc.amount})`).join(', ');
                 await storage.createCommissionPayment({
                   recipientId: adminUser.id,
                   recipientType: 'corp',
@@ -710,9 +722,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
                   status: 'completed',
                   sourceContractorId: Number(contractorId),
                   sourceBidRequestId: bidRequest.id,
-                  sourceServiceType: primaryService,
+                  sourceServiceType: finalServicesRequested.join(', '),
                   stripePaymentIntentId: chargeResult.paymentIntentId,
-                  notes: `Corp commission (50%) for bid request: ${finalServicesRequested.join(', ')}`
+                  notes: `Corp commission (50%) for ${finalServicesRequested.length} services: ${serviceDetails}`
                 });
                 console.log(`🏢 Corp commission: $${corpCommission} to admin user ${adminUser.id}`);
               }

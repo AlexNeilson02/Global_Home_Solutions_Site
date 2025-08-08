@@ -59,14 +59,9 @@ export default function BidRequestForm({ isOpen, onClose, contractor }: BidReque
   const [filePreviewUrls, setFilePreviewUrls] = useState<string[]>([]);
   const [dialogReady, setDialogReady] = useState(false);
 
-  // Debug logging for modal state
+  // Prevent immediate closing on open
   React.useEffect(() => {
-    console.log('BidRequestForm - isOpen changed:', isOpen);
-    console.log('BidRequestForm - contractor:', contractor);
-    console.log('BidRequestForm - contractor specialties:', contractor?.specialties);
-    
     if (isOpen) {
-      // Add small delay to allow click event to complete
       const timer = setTimeout(() => {
         setDialogReady(true);
       }, 100);
@@ -74,7 +69,7 @@ export default function BidRequestForm({ isOpen, onClose, contractor }: BidReque
     } else {
       setDialogReady(false);
     }
-  }, [isOpen, contractor]);
+  }, [isOpen]);
   
   // Simple check for salesperson commission assignment
   const shouldAssignCommission = () => {
@@ -94,14 +89,7 @@ export default function BidRequestForm({ isOpen, onClose, contractor }: BidReque
     contractor.specialties?.includes(service.name)
   );
   
-  // Debug logging for services
-  React.useEffect(() => {
-    if (isOpen) {
-      console.log('All services:', allServices);
-      console.log('Contractor specialties:', contractor.specialties);
-      console.log('Filtered contractor services:', contractorServices);
-    }
-  }, [isOpen, allServices, contractor.specialties, contractorServices]);
+
 
   const form = useForm<BidRequestForm>({
     resolver: zodResolver(bidRequestSchema),
@@ -286,9 +274,7 @@ export default function BidRequestForm({ isOpen, onClose, contractor }: BidReque
     <Dialog 
       open={isOpen} 
       onOpenChange={(open) => {
-        console.log('Dialog onOpenChange called with:', open);
         if (!open) {
-          console.log('Closing bid request form');
           onClose();
         }
       }}
@@ -297,23 +283,30 @@ export default function BidRequestForm({ isOpen, onClose, contractor }: BidReque
         className="sm:max-w-[425px] max-h-[90vh] overflow-y-auto bid-request-form dialog-no-yellow" 
         data-component="bid-request-form"
         onInteractOutside={(e) => {
-          console.log('Dialog onInteractOutside triggered - always preventing');
+          // Prevent closing on outside clicks to avoid accidental closure
           e.preventDefault();
           e.stopPropagation();
         }}
         onEscapeKeyDown={(e) => {
-          console.log('Dialog onEscapeKeyDown triggered');
-          e.preventDefault();
+          // Allow escape key to close
+          onClose();
         }}
       >
-        <DialogHeader>
-          <DialogTitle>Request Bid from {contractor.companyName}</DialogTitle>
-          <DialogDescription>
-            Fill out the form below to request a bid for your project. 
-            {contractor.companyName} specializes in: {contractor.specialties?.join(", ")}
-          </DialogDescription>
-          
-
+        <DialogHeader className="flex flex-row items-start justify-between space-y-0 pb-2">
+          <div className="space-y-1.5">
+            <DialogTitle>Request Bid from {contractor.companyName}</DialogTitle>
+            <DialogDescription>
+              Fill out the form below to request a bid for your project. 
+              {contractor.companyName} specializes in: {contractor.specialties?.join(", ")}
+            </DialogDescription>
+          </div>
+          <button
+            onClick={onClose}
+            className="rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none"
+          >
+            <X className="h-4 w-4" />
+            <span className="sr-only">Close</span>
+          </button>
         </DialogHeader>
         
         <Form {...form}>
