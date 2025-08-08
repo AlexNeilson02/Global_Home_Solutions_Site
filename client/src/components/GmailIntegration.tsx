@@ -56,12 +56,12 @@ interface EmailForm {
 const GmailIntegration: React.FC<GmailIntegrationProps> = ({ contractorId }) => {
   const [isConnecting, setIsConnecting] = useState(false);
   const [showCompose, setShowCompose] = useState(false);
+  const [selectedTemplate, setSelectedTemplate] = useState<string>('');
   const [emailForm, setEmailForm] = useState<EmailForm>({
     to: '',
     subject: '',
     body: ''
   });
-  const [selectedTemplate, setSelectedTemplate] = useState<string>('');
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -112,9 +112,10 @@ const GmailIntegration: React.FC<GmailIntegrationProps> = ({ contractorId }) => 
   // Disconnect Gmail mutation
   const disconnectGmailMutation = useMutation({
     mutationFn: async () => {
-      return await apiRequest(`/api/gmail/disconnect/${contractor?.id}`, {
+      const response = await fetch(`/api/gmail/disconnect/${contractor?.id}`, {
         method: 'POST'
       });
+      return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/users/me'] });
@@ -135,11 +136,12 @@ const GmailIntegration: React.FC<GmailIntegrationProps> = ({ contractorId }) => 
   // Send email mutation
   const sendEmailMutation = useMutation({
     mutationFn: async (emailData: EmailForm) => {
-      return await apiRequest(`/api/gmail/send/${contractor?.id}`, {
+      const response = await fetch(`/api/gmail/send/${contractor?.id}`, {
         method: 'POST',
         body: JSON.stringify(emailData),
         headers: { 'Content-Type': 'application/json' }
       });
+      return response.json();
     },
     onSuccess: () => {
       toast({
@@ -255,17 +257,92 @@ Best regards,
     }
   };
 
-  const handleTemplateSelect = (templateKey: string) => {
-    const template = emailTemplates[templateKey as keyof typeof emailTemplates];
+  const handleTemplateSelect = (templateType: string) => {
+    setSelectedTemplate(templateType);
+    
+    const templates = {
+      'introduction': {
+        subject: 'Professional Home Services - Your Project Quote',
+        body: `Hello,
+
+Thank you for your interest in our professional home services. We're excited to help you with your project.
+
+We specialize in high-quality work and customer satisfaction. I'd love to schedule a consultation to discuss your specific needs and provide you with a detailed proposal.
+
+Our services include:
+• Free consultation and estimate
+• Licensed and insured professionals
+• Competitive pricing
+• Quality guarantee on all work
+
+Would you be available for a brief call this week to discuss your project?
+
+Best regards,
+[Your Company Name]`
+      },
+      'followup': {
+        subject: 'Following Up - Your Home Services Project',
+        body: `Hello,
+
+I wanted to follow up on our previous conversation regarding your home services project.
+
+We're still very interested in helping you with your project and would love to provide you with a detailed proposal. 
+
+If you have any questions or would like to schedule a consultation, please don't hesitate to reach out.
+
+Looking forward to hearing from you soon.
+
+Best regards,
+[Your Company Name]`
+      },
+      'scheduling': {
+        subject: 'Let\'s Schedule Your Consultation',
+        body: `Hello,
+
+Thank you for your interest in our services. I'd like to schedule a consultation to discuss your project in detail and provide you with an accurate estimate.
+
+Please let me know what times work best for you this week. I'm available:
+• Monday - Friday: 8 AM - 6 PM
+• Saturday: 9 AM - 3 PM
+
+The consultation typically takes 30-45 minutes and is completely free with no obligation.
+
+Looking forward to meeting with you!
+
+Best regards,
+[Your Company Name]`
+      },
+      'thankyou': {
+        subject: 'Thank You - Next Steps for Your Project',
+        body: `Hello,
+
+Thank you for choosing us for your home services project. We're excited to get started!
+
+Next steps:
+1. We'll send you a detailed contract within 24 hours
+2. Once signed, we'll schedule your project start date
+3. Our team will arrive on time and complete your project professionally
+
+If you have any questions before we begin, please don't hesitate to contact me directly.
+
+We appreciate your trust in our services!
+
+Best regards,
+[Your Company Name]`
+      }
+    };
+
+    const template = templates[templateType as keyof typeof templates];
     if (template) {
       setEmailForm(prev => ({
         ...prev,
         subject: template.subject,
         body: template.body
       }));
-      setSelectedTemplate(templateKey);
     }
   };
+
+
 
   const handleQuickCompose = (bidRequest: any) => {
     setEmailForm({
@@ -490,7 +567,7 @@ ${(contractor as any)?.companyName}`
                     {/* Email Templates */}
                     <div>
                       <label className="block text-sm font-medium mb-2">Use Template</label>
-                      <Select onValueChange={setSelectedTemplate}>
+                      <Select onValueChange={handleTemplateSelect}>
                         <SelectTrigger className="w-full">
                           <SelectValue placeholder="Select a template" />
                         </SelectTrigger>
