@@ -12,7 +12,7 @@ import AdminPortalEnhanced from "@/pages/AdminPortalEnhanced";
 
 import ContractorRegistration from "@/pages/ContractorRegistration";
 import SalespersonProfile from "@/pages/SalespersonProfile";
-import Login from "@/pages/Login";
+import Login from "@/pages/login";
 import Portals from "@/pages/Portals";
 import Checkout from "@/pages/checkout";
 import Subscribe from "@/pages/subscribe";

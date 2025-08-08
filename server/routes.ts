@@ -280,7 +280,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         } catch (cleanupError) {
           console.error('Failed to cleanup user after contractor error:', cleanupError);
         }
-        throw new Error(`Contractor profile creation failed: ${contractorError.message}`);
+        throw new Error(`Contractor profile creation failed: ${contractorError instanceof Error ? contractorError.message : 'Unknown error'}`);
       }
 
       const responseData = { 
@@ -298,8 +298,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(200).json(responseData);
     } catch (error) {
       console.error('Error creating contractor:', error);
-      console.error('Error stack:', error.stack);
-      res.status(500).json({ message: "Failed to create contractor", error: error.message });
+      console.error('Error stack:', error instanceof Error ? error.stack : 'No stack trace');
+      res.status(500).json({ message: "Failed to create contractor", error: error instanceof Error ? error.message : 'Unknown error' });
     }
   });
 
@@ -505,10 +505,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error) {
       console.error("Detailed error tracking visit:", error);
-      console.error("Error stack:", error.stack);
+      console.error("Error stack:", error instanceof Error ? error.stack : 'No stack trace');
       res.status(500).json({ 
         message: "Error tracking visit",
-        error: error.message 
+        error: error instanceof Error ? error.message : 'Unknown error'
       });
     }
   });
@@ -1021,7 +1021,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         recentLeads: repBids.slice(0, 10).map(bid => ({
           id: bid.id,
           customerName: bid.fullName,
-          service: bid.serviceRequested,
+          service: bid.servicesRequested?.[0] || 'Unknown Service',
           status: bid.status,
           submittedAt: bid.createdAt,
           projectValue: bid.budget
@@ -1462,7 +1462,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Check for payment intent first
       const latestInvoice = subscription.latest_invoice as Stripe.Invoice;
-      if (latestInvoice?.payment_intent) {
+      if (latestInvoice && typeof latestInvoice === 'object' && 'payment_intent' in latestInvoice && latestInvoice.payment_intent) {
         const paymentIntent = latestInvoice.payment_intent as Stripe.PaymentIntent;
         clientSecret = paymentIntent.client_secret;
       } 
@@ -1644,7 +1644,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       let cardDetails = null;
       if (contractor.stripeCustomerId) {
         try {
-          const paymentMethods = await stripe.paymentMethods.list({
+          const paymentMethods = await stripe!.paymentMethods.list({
             customer: contractor.stripeCustomerId,
             type: 'card',
           });
@@ -1762,7 +1762,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         event = stripe.webhooks.constructEvent(req.body, sig as string, process.env.STRIPE_WEBHOOK_SECRET || "");
       } catch (err) {
         console.error('Webhook signature verification failed:', err);
-        return res.status(400).send(`Webhook Error: ${err.message}`);
+        return res.status(400).send(`Webhook Error: ${err instanceof Error ? err.message : 'Unknown error'}`);
       }
 
       // Handle verification payment success - save payment method and refund
@@ -1798,7 +1798,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Handle successful subscription payments
       if (event.type === 'invoice.payment_succeeded') {
         const invoice = event.data.object as Stripe.Invoice;
-        const subscriptionId = invoice.subscription as string;
+        const subscriptionId = typeof invoice.subscription === 'string' ? invoice.subscription : (invoice.subscription as Stripe.Subscription)?.id;
 
         // Find contractor by subscription ID
         const contractor = await storage.getContractorByStripeSubscriptionId(subscriptionId);
@@ -1889,7 +1889,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Create payment intent for off-session payment (no customer interaction needed)
-      const paymentIntent = await stripe.paymentIntents.create({
+      const paymentIntent = await stripe!.paymentIntents.create({
         amount: Math.round(commissionAmount * 100), // Convert to cents
         currency: 'usd',
         customer: contractor.stripeCustomerId,

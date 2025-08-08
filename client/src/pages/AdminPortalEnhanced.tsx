@@ -282,7 +282,7 @@ export default function AdminPortalEnhanced() {
       try {
         const response = await apiRequest('POST', '/api/contractors', contractorData);
         console.log('Frontend: Got response:', response.status, response.statusText);
-        console.log('Frontend: Response headers:', [...response.headers.entries()]);
+        console.log('Frontend: Response headers:', Array.from(response.headers.entries()));
         
         // Check if response is actually JSON
         const contentType = response.headers.get('content-type');

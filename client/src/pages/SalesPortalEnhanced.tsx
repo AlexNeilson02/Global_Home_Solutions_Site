@@ -104,8 +104,8 @@ const SalesPortalEnhanced: React.FC = () => {
     enabled: true
   });
 
-  const salesperson = userData?.roleData;
-  const user = userData;
+  const salesperson = userData?.roleData || {};
+  const user = userData || {};
 
   // Get salesperson analytics
   const { data: analyticsData } = useQuery({
@@ -137,16 +137,16 @@ const SalesPortalEnhanced: React.FC = () => {
     enabled: !!salesperson?.id
   });
 
-  const analytics = analyticsData?.analytics;
+  const analytics = analyticsData?.analytics || {};
   const bidRequests = bidRequestsData?.bidRequests || [];
   const recentBidRequests = analyticsData?.recentBidRequests || [];
-  const visitStats = analyticsData?.visitStats;
+  const visitStats = analyticsData?.visitStats || {};
   
   // Set QR code and landing page data
   useEffect(() => {
-    if (qrCodeResponse) {
+    if (qrCodeResponse?.qrCode) {
       setQrCodeData(qrCodeResponse.qrCode);
-      setLandingPageUrl(qrCodeResponse.landingPageUrl);
+      setLandingPageUrl(qrCodeResponse.landingPageUrl || '');
     }
   }, [qrCodeResponse]);
 
@@ -158,8 +158,8 @@ const SalesPortalEnhanced: React.FC = () => {
         specialties: salesperson.specialties || [],
         certifications: salesperson.certifications || [],
         yearsExperience: salesperson.yearsExperience || 0,
-        phone: user.phone || '',
-        email: user.email || ''
+        phone: (user as any)?.phone || '',
+        email: (user as any)?.email || ''
       });
     }
   }, [salesperson, user]);
@@ -209,8 +209,8 @@ const SalesPortalEnhanced: React.FC = () => {
         specialties: salesperson.specialties || [],
         certifications: salesperson.certifications || [],
         yearsExperience: salesperson.yearsExperience || 0,
-        phone: user.phone || '',
-        email: user.email || ''
+        phone: (user as any)?.phone || '',
+        email: (user as any)?.email || ''
       });
     }
   };
@@ -279,14 +279,14 @@ const SalesPortalEnhanced: React.FC = () => {
   };
 
   // Calculate key metrics using real data
-  const totalVisits = salesAnalytics?.personalMetrics?.totalQrScans || analytics?.totalVisits || 0;
-  const totalConversions = salesAnalytics?.personalMetrics?.totalConversions || analytics?.conversions || 0;
+  const totalVisits = salesAnalytics?.personalMetrics?.totalQrScans || (analytics as any)?.totalVisits || 0;
+  const totalConversions = salesAnalytics?.personalMetrics?.totalConversions || (analytics as any)?.conversions || 0;
   const conversionRate = totalVisits > 0 && !isNaN(totalConversions) ? ((totalConversions / totalVisits) * 100).toFixed(1) : '0.0';
-  const totalLeads = salesAnalytics?.personalMetrics?.totalLeads || salesperson?.totalLeads || 0;
-  const commissionEarnings = commissionData?.totalEarned || 0;
+  const totalLeads = salesAnalytics?.personalMetrics?.totalLeads || (salesperson as any)?.totalLeads || 0;
+  const commissionEarnings = (commissionData as any)?.totalEarned || 0;
 
   // Real performance data from analytics
-  const performanceData = salesAnalytics?.performanceHistory || [
+  const performanceData = (salesAnalytics as any)?.performanceHistory || [
     { month: 'Current', visits: totalVisits, conversions: totalConversions, leads: totalLeads }
   ];
 
@@ -319,7 +319,7 @@ const SalesPortalEnhanced: React.FC = () => {
                 Sales Portal
               </h1>
               <p className="text-gray-600 dark:text-gray-300 mt-1">
-                Welcome back, {user?.fullName || 'Sales Representative'}
+                Welcome back, {(user as any)?.fullName || 'Sales Representative'}
               </p>
             </div>
             <Button onClick={() => logoutMutation.mutate()} variant="outline" disabled={logoutMutation.isPending}>
@@ -649,11 +649,11 @@ const SalesPortalEnhanced: React.FC = () => {
                           <div className="space-y-2">
                             <div className="flex items-center">
                               <Phone className="h-4 w-4 mr-2 text-gray-400" />
-                              <span>{user?.phone || 'No phone number'}</span>
+                              <span>{(user as any)?.phone || 'No phone number'}</span>
                             </div>
                             <div className="flex items-center">
                               <Mail className="h-4 w-4 mr-2 text-gray-400" />
-                              <span>{user?.email || 'No email'}</span>
+                              <span>{(user as any)?.email || 'No email'}</span>
                             </div>
                           </div>
                         </div>
