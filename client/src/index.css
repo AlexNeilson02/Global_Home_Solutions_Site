@@ -1289,6 +1289,18 @@ html {
       background-color: transparent !important;
       background: transparent !important;
     }
+
+    /* Preserve Large Monitor Card Styling */
+    .contractor-portal-main [data-radix-card],
+    .contractor-portal-main .card,
+    .contractor-portal-main [class*="card"],
+    .contractor-portal-main [class*="Card"] {
+      background-color: white !important;
+      background: white !important;
+      border: 1px solid #e5e7eb !important;
+      border-radius: 0.5rem !important;
+      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1) !important;
+    }
   }
   
   /* Media query overrides for mobile devices */
@@ -1401,9 +1413,21 @@ html {
     [style*="background-color: yellow"],
     [style*="background: yellow"],
     [class*="bg-yellow"],
-    [class*="yellow"] {
+    [class*="yellow"]:not(.card):not([class*="card"]):not([data-radix-card]) {
       background-color: transparent !important;
       background: transparent !important;
+    }
+
+    /* Preserve Mobile Card Styling */
+    .contractor-portal-main [data-radix-card],
+    .contractor-portal-main .card,
+    .contractor-portal-main [class*="card"],
+    .contractor-portal-main [class*="Card"] {
+      background-color: white !important;
+      background: white !important;
+      border: 1px solid #e5e7eb !important;
+      border-radius: 0.5rem !important;
+      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1) !important;
     }
   }
   
@@ -1474,6 +1498,18 @@ html {
     div[role="tabpanel"] {
       background-color: transparent !important;
       background: transparent !important;
+    }
+
+    /* Preserve Tablet Card Styling */
+    .contractor-portal-main [data-radix-card],
+    .contractor-portal-main .card,
+    .contractor-portal-main [class*="card"],
+    .contractor-portal-main [class*="Card"] {
+      background-color: white !important;
+      background: white !important;
+      border: 1px solid #e5e7eb !important;
+      border-radius: 0.5rem !important;
+      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1) !important;
     }
   }
 
@@ -1597,25 +1633,32 @@ html {
     background: transparent !important;
   }
 
-  /* Nuclear Option - Contractor Portal Complete Yellow Elimination */
-  .contractor-portal-main,
-  .contractor-portal-main *,
-  .contractor-portal-main *:before,
-  .contractor-portal-main *:after {
-    /* Remove any yellow backgrounds regardless of source */
-    background-color: var(--background) !important;
+  /* Targeted Yellow Background Elimination - Only Remove Yellow */
+  .contractor-portal-main {
+    background-color: #f9fafb !important;
     background-image: none !important;
-    border: none !important;
-    outline: none !important;
-    box-shadow: none !important;
   }
 
-  /* Preserve only white card backgrounds */
+  /* Preserve All Card Backgrounds and Styling */
   .contractor-portal-main [data-radix-card],
   .contractor-portal-main .card,
-  .contractor-portal-main [role="dialog"] {
+  .contractor-portal-main [class*="card"],
+  .contractor-portal-main [role="dialog"],
+  .contractor-portal-main [class*="Card"] {
     background-color: white !important;
     background: white !important;
+    border: 1px solid #e5e7eb !important;
+    border-radius: 0.5rem !important;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06) !important;
+  }
+
+  /* Specifically target only yellow elements */
+  .contractor-portal-main [style*="background: yellow"],
+  .contractor-portal-main [style*="background-color: yellow"],
+  .contractor-portal-main [style*="background: #ffff"],
+  .contractor-portal-main [style*="background-color: #ffff"] {
+    background-color: transparent !important;
+    background: transparent !important;
   }
 }
 
