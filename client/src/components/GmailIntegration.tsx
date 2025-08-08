@@ -298,38 +298,151 @@ ${(contractor as any)?.companyName}`
     );
   }
 
-  return (
-    <div className="space-y-6">
-      {/* Connection Status */}
+  if (!(contractor as any)?.gmailConnected) {
+    return (
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Mail className="h-5 w-5" />
-              Gmail Connection Status
+          <CardTitle className="flex items-center gap-2">
+            <AlertCircle className="h-5 w-5 text-yellow-600" />
+            Gmail Integration
+          </CardTitle>
+          <CardDescription>
+            Connect your Gmail account to send emails to clients
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Button 
+            onClick={() => connectGmailMutation.mutate()}
+            disabled={connectGmailMutation.isPending || isConnecting}
+            className="bg-blue-600 hover:bg-blue-700"
+          >
+            {(connectGmailMutation.isPending || isConnecting) ? (
+              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+            ) : (
+              <ExternalLink className="h-4 w-4 mr-2" />
+            )}
+            {isConnecting ? 'Connecting...' : 'Connect Gmail'}
+          </Button>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Email Client Interface */}
+      <div className="h-[700px] bg-white rounded-lg border overflow-hidden flex">
+        {/* Email Sidebar */}
+        <div className="w-80 border-r bg-gray-50 flex flex-col">
+          {/* Header */}
+          <div className="p-4 border-b bg-white">
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="text-lg font-semibold text-gray-900">Gmail</h2>
+              <div className="flex items-center gap-2">
+                <Button 
+                  size="sm"
+                  variant="outline"
+                  onClick={() => refetchEmails()}
+                  disabled={emailsLoading}
+                >
+                  <RefreshCw className={`h-4 w-4 ${emailsLoading ? 'animate-spin' : ''}`} />
+                </Button>
+                <Button 
+                  size="sm"
+                  variant="outline"
+                  onClick={() => disconnectGmailMutation.mutate()}
+                  disabled={disconnectGmailMutation.isPending}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
-            {(contractor as any)?.gmailConnected ? (
+            <Button 
+              onClick={() => setShowCompose(true)}
+              className="w-full bg-blue-600 hover:bg-blue-700"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Compose
+            </Button>
+          </div>
+
+          {/* Navigation */}
+          <div className="px-4 py-2">
+            <div className="space-y-1">
+              <button className="w-full flex items-center gap-3 px-3 py-2 text-sm font-medium bg-blue-100 text-blue-700 rounded-lg">
+                <Mail className="h-4 w-4" />
+                Inbox
+              </button>
+              <button className="w-full flex items-center gap-3 px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-lg">
+                <Send className="h-4 w-4" />
+                Sent
+              </button>
+            </div>
+          </div>
+
+          {/* Email List */}
+          <div className="flex-1 overflow-y-auto">
+            {emailsLoading ? (
+              <div className="flex items-center justify-center py-8">
+                <Loader2 className="h-6 w-6 animate-spin" />
+              </div>
+            ) : recentEmails && (recentEmails as any).length > 0 ? (
+              <div className="space-y-px">
+                {(recentEmails as any).slice(0, 10).map((email: GmailMessage) => (
+                  <div key={email.id} className="px-4 py-3 hover:bg-gray-100 cursor-pointer border-l-2 border-transparent hover:border-blue-500">
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="text-sm font-medium text-gray-900 truncate">
+                            {email.from.split('<')[0].trim() || email.from}
+                          </span>
+                          <span className="text-xs text-gray-500">
+                            {new Date(email.sentAt).toLocaleDateString()}
+                          </span>
+                        </div>
+                        <div className="text-sm font-medium text-gray-700 truncate mb-1">
+                          {email.subject}
+                        </div>
+                        <div className="text-xs text-gray-500 line-clamp-2">
+                          {email.body.replace(/<[^>]*>/g, '').substring(0, 100)}...
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="px-4 py-8 text-center text-gray-500">
+                <Mail className="h-8 w-8 mx-auto mb-2 text-gray-300" />
+                <p className="text-sm">No emails found</p>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Main Content Area */}
+        <div className="flex-1 flex flex-col bg-white">
+          {/* Main Header */}
+          <div className="p-6 border-b">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-xl font-semibold text-gray-900">Your Email Center</h3>
+                <p className="text-gray-600 mt-1">Manage professional communications with clients</p>
+              </div>
               <Badge variant="default" className="bg-green-100 text-green-800 hover:bg-green-100">
                 <CheckCircle className="h-3 w-3 mr-1" />
                 Connected
               </Badge>
-            ) : (
-              <Badge variant="secondary" className="bg-red-100 text-red-800">
-                <AlertCircle className="h-3 w-3 mr-1" />
-                Not Connected
-              </Badge>
-            )}
-          </CardTitle>
-          <CardDescription>
-            {(contractor as any)?.gmailConnected 
-              ? "Your Gmail account is connected and ready to use" 
-              : "Connect your Gmail account to send emails to clients"}
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          {(contractor as any)?.gmailConnected ? (
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
+            </div>
+          </div>
+
+          {/* Main Content */}
+          <div className="flex-1 p-6 overflow-y-auto">
+            {!showCompose ? (
+              <div className="max-w-2xl mx-auto text-center py-12">
+                <Mail className="h-16 w-16 mx-auto mb-4 text-gray-300" />
+                <h3 className="text-lg font-medium text-gray-900 mb-2">Ready to send emails</h3>
+                <p className="text-gray-600 mb-6">Your Gmail account is connected and ready to use. Send professional emails to your clients.</p>
                 <Button 
                   onClick={() => setShowCompose(true)}
                   className="bg-blue-600 hover:bg-blue-700"
@@ -337,47 +450,100 @@ ${(contractor as any)?.companyName}`
                   <Plus className="h-4 w-4 mr-2" />
                   Compose Email
                 </Button>
-                <Button 
-                  variant="outline"
-                  onClick={() => refetchEmails()}
-                  disabled={emailsLoading}
-                >
-                  <RefreshCw className={`h-4 w-4 mr-2 ${emailsLoading ? 'animate-spin' : ''}`} />
-                  Refresh Emails
-                </Button>
               </div>
-              <Button 
-                variant="destructive"
-                onClick={() => disconnectGmailMutation.mutate()}
-                disabled={disconnectGmailMutation.isPending}
-              >
-                {disconnectGmailMutation.isPending ? (
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                ) : (
-                  <Trash2 className="h-4 w-4 mr-2" />
-                )}
-                Disconnect
-              </Button>
-            </div>
-          ) : (
-            <Button 
-              onClick={() => connectGmailMutation.mutate()}
-              disabled={connectGmailMutation.isPending || isConnecting}
-              className="bg-blue-600 hover:bg-blue-700"
-            >
-              {(connectGmailMutation.isPending || isConnecting) ? (
-                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-              ) : (
-                <ExternalLink className="h-4 w-4 mr-2" />
-              )}
-              {isConnecting ? 'Connecting...' : 'Connect Gmail'}
-            </Button>
-          )}
-        </CardContent>
-      </Card>
+            ) : (
+              <div className="max-w-2xl mx-auto">
+                <div className="bg-white border rounded-lg p-6">
+                  <div className="flex items-center justify-between mb-6">
+                    <h3 className="text-lg font-semibold">Compose Email</h3>
+                    <Button 
+                      variant="ghost" 
+                      size="sm"
+                      onClick={() => setShowCompose(false)}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium mb-2">To</label>
+                      <Input
+                        type="email"
+                        value={emailForm.to}
+                        onChange={(e) => setEmailForm({...emailForm, to: e.target.value})}
+                        placeholder="recipient@email.com"
+                        className="w-full"
+                      />
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-medium mb-2">Subject</label>
+                      <Input
+                        value={emailForm.subject}
+                        onChange={(e) => setEmailForm({...emailForm, subject: e.target.value})}
+                        placeholder="Email subject"
+                        className="w-full"
+                      />
+                    </div>
+                    
+                    {/* Email Templates */}
+                    <div>
+                      <label className="block text-sm font-medium mb-2">Use Template</label>
+                      <Select onValueChange={setSelectedTemplate}>
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Select a template" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="introduction">Introduction & Quote</SelectItem>
+                          <SelectItem value="followup">Follow-up Email</SelectItem>
+                          <SelectItem value="scheduling">Schedule Consultation</SelectItem>
+                          <SelectItem value="thankyou">Thank You & Next Steps</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-medium mb-2">Message</label>
+                      <Textarea
+                        value={emailForm.body}
+                        onChange={(e) => setEmailForm({...emailForm, body: e.target.value})}
+                        placeholder="Write your email message..."
+                        rows={8}
+                        className="w-full"
+                      />
+                    </div>
+                    
+                    <div className="flex items-center justify-between pt-4">
+                      <Button 
+                        variant="outline"
+                        onClick={() => setShowCompose(false)}
+                      >
+                        Cancel
+                      </Button>
+                      <Button 
+                        onClick={() => sendEmailMutation.mutate(emailForm)}
+                        disabled={sendEmailMutation.isPending || !emailForm.to || !emailForm.subject}
+                        className="bg-blue-600 hover:bg-blue-700"
+                      >
+                        {sendEmailMutation.isPending ? (
+                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        ) : (
+                          <Send className="h-4 w-4 mr-2" />
+                        )}
+                        Send Email
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
 
-      {/* Quick Actions for Bid Requests */}
-      {(contractor as any)?.gmailConnected && (bidRequests as any)?.bidRequests?.length > 0 && (
+      {/* Quick Actions for Bid Requests - Keep this section as you liked it */}
+      {(bidRequests as any)?.bidRequests?.length > 0 && (
         <Card>
           <CardHeader>
             <CardTitle>Quick Email Actions</CardTitle>
@@ -412,152 +578,6 @@ ${(contractor as any)?.companyName}`
         </Card>
       )}
 
-      {/* Compose Email Modal/Form */}
-      {showCompose && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Send className="h-5 w-5" />
-                Compose Email
-              </div>
-              <Button 
-                variant="ghost" 
-                size="sm"
-                onClick={() => setShowCompose(false)}
-              >
-                ✕
-              </Button>
-            </CardTitle>
-            <CardDescription>
-              Send a professional email to your clients
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {/* Template Selection */}
-            <div>
-              <label className="block text-sm font-medium mb-2">Email Template</label>
-              <Select value={selectedTemplate} onValueChange={handleTemplateSelect}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Choose a template (optional)" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="initial_contact">Initial Contact</SelectItem>
-                  <SelectItem value="follow_up">Follow Up</SelectItem>
-                  <SelectItem value="proposal_sent">Proposal Sent</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Email Form */}
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium mb-2">To</label>
-                <Input
-                  type="email"
-                  value={emailForm.to}
-                  onChange={(e) => setEmailForm({...emailForm, to: e.target.value})}
-                  placeholder="client@example.com"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-2">Subject</label>
-                <Input
-                  value={emailForm.subject}
-                  onChange={(e) => setEmailForm({...emailForm, subject: e.target.value})}
-                  placeholder="Enter email subject"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-2">Message</label>
-                <Textarea
-                  value={emailForm.body}
-                  onChange={(e) => setEmailForm({...emailForm, body: e.target.value})}
-                  placeholder="Enter your message"
-                  rows={12}
-                  required
-                />
-              </div>
-
-              <div className="flex gap-2">
-                <Button 
-                  onClick={() => sendEmailMutation.mutate(emailForm)}
-                  disabled={sendEmailMutation.isPending || !emailForm.to || !emailForm.subject || !emailForm.body}
-                  className="bg-blue-600 hover:bg-blue-700"
-                >
-                  {sendEmailMutation.isPending ? (
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  ) : (
-                    <Send className="h-4 w-4 mr-2" />
-                  )}
-                  Send Email
-                </Button>
-                <Button 
-                  variant="outline"
-                  onClick={() => setShowCompose(false)}
-                >
-                  Cancel
-                </Button>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Recent Emails */}
-      {(contractor as any)?.gmailConnected && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Mail className="h-5 w-5" />
-              Recent Sent Emails
-            </CardTitle>
-            <CardDescription>
-              View your recent email communications with clients
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {emailsLoading ? (
-              <div className="flex items-center justify-center py-8">
-                <Loader2 className="h-8 w-8 animate-spin" />
-              </div>
-            ) : (recentEmails as any)?.emails?.length > 0 ? (
-              <div className="space-y-4">
-                {(recentEmails as any).emails.slice(0, 10).map((email: GmailMessage) => (
-                  <div key={email.id} className="border rounded-lg p-4">
-                    <div className="flex items-start justify-between mb-2">
-                      <div className="flex-1">
-                        <div className="font-medium">{email.subject}</div>
-                        <div className="text-sm text-gray-600">To: {email.to}</div>
-                        <div className="text-sm text-gray-500">
-                          <Calendar className="h-3 w-3 inline mr-1" />
-                          {new Date(email.sentAt).toLocaleString()}
-                        </div>
-                      </div>
-                    </div>
-                    <div className="text-sm text-gray-700 bg-gray-50 rounded p-3 mt-2">
-                      {email.body.length > 200 
-                        ? `${email.body.substring(0, 200)}...`
-                        : email.body
-                      }
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-8 text-gray-500">
-                <Mail className="h-12 w-12 mx-auto mb-3 text-gray-400" />
-                <p>No sent emails found</p>
-                <p className="text-sm">Your sent emails will appear here</p>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      )}
     </div>
   );
 };
