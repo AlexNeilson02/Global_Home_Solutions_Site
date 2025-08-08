@@ -1,4 +1,4 @@
-import { eq, and, desc, sql, asc, count, avg, max, lt, gt, between, ne } from "drizzle-orm";
+import { eq, and, desc, sql, asc, count, avg, max, lt, gt, between, ne, getTableColumns } from "drizzle-orm";
 import { db } from "./db";
 import { 
   users, contractors, salespersons, projects, testimonials, serviceCategories, bidRequests, pageVisits,
@@ -516,11 +516,22 @@ export class DatabaseStorage implements IStorage {
   }
   
   async getRecentBidRequests(limit: number): Promise<BidRequest[]> {
-    return db
-      .select()
+    const results = await db
+      .select({
+        ...getTableColumns(bidRequests),
+        salesperson: {
+          id: salespersons.id,
+          fullName: users.fullName,
+          profileUrl: salespersons.profileUrl,
+        }
+      })
       .from(bidRequests)
+      .leftJoin(salespersons, eq(bidRequests.salespersonId, salespersons.id))
+      .leftJoin(users, eq(salespersons.userId, users.id))
       .orderBy(desc(bidRequests.createdAt))
       .limit(limit);
+    
+    return results as any[];
   }
   
   async updateBidRequestStatus(id: number, status: string): Promise<BidRequest | undefined> {
