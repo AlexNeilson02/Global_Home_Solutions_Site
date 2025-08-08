@@ -339,6 +339,7 @@ Best regards,
   };
 
   const handleQuickCompose = (bidRequest: any) => {
+    console.log('handleQuickCompose called:', bidRequest);
     setEmailForm({
       to: bidRequest.email,
       subject: `Professional ${bidRequest.serviceType} Services - Proposal`,
@@ -363,6 +364,7 @@ ${(contractor as any)?.companyName}`
 
   // Function to handle quick template emails
   const handleQuickTemplate = (bid: any, templateType: string) => {
+    console.log('handleQuickTemplate called:', { bid, templateType });
     let subject = '';
     let body = '';
     
@@ -564,28 +566,28 @@ Phone: ${(contractor as any)?.phone || '[Your Phone]'}`;
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="w-56">
                         <DropdownMenuItem 
-                          onClick={() => handleQuickTemplate(bid, 'introduction')}
+                          onSelect={() => handleQuickTemplate(bid, 'introduction')}
                           className="cursor-pointer"
                         >
                           <Users className="h-4 w-4 mr-2" />
                           Introduction & Services
                         </DropdownMenuItem>
                         <DropdownMenuItem 
-                          onClick={() => handleQuickTemplate(bid, 'quote')}
+                          onSelect={() => handleQuickTemplate(bid, 'quote')}
                           className="cursor-pointer"
                         >
                           <FileText className="h-4 w-4 mr-2" />
                           Quote Request
                         </DropdownMenuItem>
                         <DropdownMenuItem 
-                          onClick={() => handleQuickTemplate(bid, 'followup')}
+                          onSelect={() => handleQuickTemplate(bid, 'followup')}
                           className="cursor-pointer"
                         >
                           <Clock className="h-4 w-4 mr-2" />
                           Follow-up
                         </DropdownMenuItem>
                         <DropdownMenuItem 
-                          onClick={() => handleQuickTemplate(bid, 'schedule')}
+                          onSelect={() => handleQuickTemplate(bid, 'schedule')}
                           className="cursor-pointer"
                         >
                           <Calendar className="h-4 w-4 mr-2" />
@@ -627,7 +629,7 @@ Phone: ${(contractor as any)?.phone || '[Your Phone]'}`;
       )}
 
       {/* Email Client Interface */}
-      <div className="h-[700px] bg-white rounded-lg border overflow-hidden flex">
+      <div className="min-h-[700px] max-h-[700px] bg-white rounded-lg border overflow-hidden flex">
         {/* Email Sidebar */}
         <div className="w-80 border-r bg-gray-50 flex flex-col">
           {/* Header */}
