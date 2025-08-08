@@ -33,9 +33,12 @@ Preferred communication style: Simple, everyday language.
 - **Yellow Styling Removal**: Comprehensive elimination of yellow UI elements completed across all components including bid request forms, login modals, star ratings, and admin portal dialogs. Applied nuclear CSS tactics with 18+ targeting strategies including CSS variable overrides, webkit autofill fixes, dialog-specific rules, and inline style objects. All yellow borders, backgrounds, and outlines replaced with neutral alternatives while maintaining accessibility and dialog visibility.
 
 ### Data Flow Highlights
-- **Lead Generation**: QR code scans attribute leads to salespeople, enabling customers to submit bid requests. Contractors are assigned based on service type and availability, and the bid progresses through a defined status pipeline, automatically creating commission records.
+- **Lead Generation**: QR code scans attribute leads to salespeople using ?ref={profileUrl} parameter, all directing to homepage with unique tracking. Customers submit bid requests, and contractors are assigned based on service type and availability. The bid progresses through a defined status pipeline, automatically creating commission records.
 - **Authentication**: Secure session creation and persistence, with role-based access to features.
 - **Commission Calculation**: Based on service category and conversion, with automated distribution and comprehensive audit trails including source contractor, bid request, service type, and Stripe payment intent IDs.
+
+### Recent Changes (January 2025)
+- **QR Code System Redesign**: Modified QR code generation to direct all salespeople to homepage with unique ?ref={profileUrl} tracking parameter instead of individual landing pages (/sales/{profileUrl}). This maintains lead attribution while providing a unified customer experience. Updated Sales Portal UI to reflect "Tracking URL" terminology and improved instructions for QR code usage.
 
 ## External Dependencies
 

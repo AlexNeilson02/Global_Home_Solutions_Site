@@ -360,7 +360,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Salesperson not found" });
       }
       
-      // Construct the URL for the homepage with sales rep tracking
+      // All QR codes now point to homepage with unique salesperson tracking
       const baseUrl = process.env.BASE_URL || `${req.protocol}://${req.get('host')}`;
       const landingPageUrl = `${baseUrl}/?ref=${salesperson.profileUrl}`;
       
@@ -377,7 +377,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.json({
         qrCode: qrCodeDataUrl,
-        landingPageUrl
+        landingPageUrl,
+        profileUrl: salesperson.profileUrl
       });
     } catch (error) {
       console.error("Error generating QR code:", error);

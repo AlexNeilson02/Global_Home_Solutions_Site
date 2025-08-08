@@ -817,7 +817,7 @@ const SalesPortalEnhanced: React.FC = () => {
                       <QrCode className="h-5 w-5" />
                       Your QR Code
                     </CardTitle>
-                    <CardDescription>Use this QR code for quick access to your landing page</CardDescription>
+                    <CardDescription>Use this QR code to direct customers to our services with your unique tracking</CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     {qrCodeData ? (
@@ -853,18 +853,18 @@ const SalesPortalEnhanced: React.FC = () => {
                   </CardContent>
                 </Card>
 
-                {/* Profile URL Card */}
+                {/* Tracking URL Card */}
                 <Card style={antiYellowStyles}>
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <ExternalLink className="h-5 w-5" />
-                      Landing Page
+                      Tracking URL & Tools
                     </CardTitle>
-                    <CardDescription>Your personalized landing page for lead generation</CardDescription>
+                    <CardDescription>Your unique tracking links for lead attribution and NFC technology</CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div>
-                      <label className="block text-sm font-medium mb-2">Profile URL</label>
+                      <label className="block text-sm font-medium mb-2">Tracking URL</label>
                       <div className="flex gap-2">
                         <Input 
                           value={profileUrl} 
@@ -873,7 +873,7 @@ const SalesPortalEnhanced: React.FC = () => {
                           style={antiYellowInputStyles}
                         />
                         <Button 
-                          onClick={() => copyToClipboard(profileUrl, 'Profile URL')}
+                          onClick={() => copyToClipboard(profileUrl, 'Tracking URL')}
                           variant="outline"
                           size="sm"
                           style={antiYellowInputStyles}
@@ -911,7 +911,7 @@ const SalesPortalEnhanced: React.FC = () => {
                           style={antiYellowInputStyles}
                         >
                           <ExternalLink className="h-4 w-4 mr-2" />
-                          Preview Landing Page
+                          Test Tracking URL
                         </Button>
                       </div>
                     )}
@@ -930,14 +930,14 @@ const SalesPortalEnhanced: React.FC = () => {
                       <QrCode className="h-12 w-12 text-blue-500 mx-auto mb-3" />
                       <h4 className="font-medium mb-2">QR Code</h4>
                       <p className="text-sm text-gray-600 dark:text-gray-300">
-                        Print and display your QR code at events, on business cards, or marketing materials for instant access.
+                        Print and display your QR code at events, on business cards, or marketing materials. Each scan will be tracked to you.
                       </p>
                     </div>
                     <div className="text-center">
                       <ExternalLink className="h-12 w-12 text-green-500 mx-auto mb-3" />
-                      <h4 className="font-medium mb-2">Landing Page</h4>
+                      <h4 className="font-medium mb-2">Tracking URL</h4>
                       <p className="text-sm text-gray-600 dark:text-gray-300">
-                        Share your personalized URL via text, email, or social media to direct prospects to your landing page.
+                        Share your unique tracking URL via text, email, or social media to direct prospects with your attribution.
                       </p>
                     </div>
                     <div className="text-center">
