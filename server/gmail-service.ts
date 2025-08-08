@@ -122,6 +122,18 @@ export class GmailService {
     try {
       const gmail = await this.getGmailClient(contractorId);
       
+      // Convert plain text body to HTML if needed
+      let htmlContent = emailData.htmlBody;
+      if (!htmlContent && emailData.body) {
+        // Convert plain text to HTML with proper line breaks
+        htmlContent = `<html><body><div style="font-family: Arial, sans-serif; font-size: 14px; line-height: 1.6;">${
+          emailData.body
+            .replace(/\n\n/g, '</p><p>')
+            .replace(/\n/g, '<br>')
+            .replace(/^(.*)$/, '<p>$1</p>')
+        }</div></body></html>`;
+      }
+
       // Build email message
       const emailLines = [
         `To: ${emailData.to}`,
@@ -131,8 +143,15 @@ export class GmailService {
         'MIME-Version: 1.0',
         'Content-Type: text/html; charset=UTF-8',
         '',
-        emailData.htmlBody || emailData.body
+        htmlContent || emailData.body
       ].filter(Boolean).join('\n');
+
+      // Log the email content for debugging
+      console.log('Raw email content:', {
+        originalBody: emailData.body,
+        htmlContent: htmlContent,
+        emailLines: emailLines.substring(0, 500) + '...' // First 500 chars
+      });
 
       const encodedMessage = Buffer.from(emailLines).toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 

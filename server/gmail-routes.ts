@@ -109,6 +109,15 @@ router.post('/send/:contractorId', isAuthenticated, async (req: Request, res: Re
 
     // Validate request body
     const emailData = sendEmailSchema.parse(req.body);
+    
+    // Add detailed logging
+    console.log('Email data received:', {
+      to: emailData.to,
+      subject: emailData.subject,
+      bodyLength: emailData.body?.length || 0,
+      htmlBodyLength: emailData.htmlBody?.length || 0,
+      body: emailData.body
+    });
 
     // Verify contractor exists and user has access
     const contractor = await storage.getContractor(contractorId);
