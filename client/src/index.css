@@ -36,11 +36,11 @@ html::after {
   display: none !important;
 }
 
-/* Force remove any dialog/modal overlays that might interfere, except bid request form */
+/* Force remove any dialog/modal overlays that might interfere, except bid request form and login forms */
 [data-radix-popper-content-wrapper],
-[data-state="open"][role="dialog"]:not([data-component="bid-request-form"]),
-.fixed.inset-0.z-50.bg-black\/80:not(.bid-request-overlay),
-.fixed.inset-0.z-50.bg-black\/80.data-\[state\=open\]\:animate-in:not(.bid-request-overlay) {
+[data-state="open"][role="dialog"]:not([data-component="bid-request-form"]):not([data-component="login-form"]),
+.fixed.inset-0.z-50.bg-black\/80:not(.bid-request-overlay):not(.login-overlay),
+.fixed.inset-0.z-50.bg-black\/80.data-\[state\=open\]\:animate-in:not(.bid-request-overlay):not(.login-overlay) {
   display: none !important;
   visibility: hidden !important;
   opacity: 0 !important;
