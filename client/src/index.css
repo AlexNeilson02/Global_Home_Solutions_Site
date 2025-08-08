@@ -1227,24 +1227,35 @@ html {
   outline: none !important;
 }
 
-/* Targeted yellow border removal for portal login forms - Only affect form elements inside dialogs */
-[data-radix-dialog-content] form,
-[data-radix-dialog-content] .login-portal,
-[data-radix-dialog-content] .dialog-no-yellow {
-  border: 1px solid #e5e7eb !important;
-  outline: none !important;
-  outline-color: transparent !important;
-  outline-width: 0 !important;
-  outline-style: none !important;
+/* Simple yellow border fix for login forms - minimal approach */
+[data-radix-dialog-content].login-portal {
+  border-color: #e5e7eb !important;
 }
 
-/* Remove yellow focus rings from form elements inside portal login dialogs */
-[data-radix-dialog-content] form:focus,
-[data-radix-dialog-content] input:focus,
-[data-radix-dialog-content] button:focus {
-  border-color: #3b82f6 !important;
-  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2) !important;
-  outline: none !important;
+[data-radix-dialog-content].dialog-no-yellow {
+  border-color: #e5e7eb !important;
+}
+
+/* Ensure login modal visibility - override any conflicting styles */
+[data-radix-dialog-overlay] {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 50 !important;
+  background-color: rgba(0, 0, 0, 0.8) !important;
+}
+
+[data-radix-dialog-content] {
+  position: fixed !important;
+  left: 50% !important;
+  top: 50% !important;
+  z-index: 51 !important;
+  transform: translate(-50%, -50%) !important;
+  background-color: white !important;
+  padding: 1.5rem !important;
+  border-radius: 0.5rem !important;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+  max-width: 425px !important;
+  width: 100% !important;
 }
 
 
