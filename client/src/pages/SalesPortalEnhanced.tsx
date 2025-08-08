@@ -301,11 +301,13 @@ const SalesPortalEnhanced: React.FC = () => {
 
   return (
     <div 
-      className="min-h-screen bg-gray-50 dark:bg-gray-900"
+      className="min-h-screen bg-gray-50 dark:bg-gray-900 sales-portal-enhanced anti-yellow-nuclear"
       style={{ 
         backgroundColor: 'rgb(249 250 251)', 
         outline: 'none',
-        outlineColor: 'transparent'
+        outlineColor: 'transparent',
+        outlineWidth: '0',
+        outlineStyle: 'none'
       }}
     >
       <div className="container mx-auto px-4 py-8">
@@ -325,15 +327,88 @@ const SalesPortalEnhanced: React.FC = () => {
             </Button>
           </div>
 
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6 pb-20 sm:pb-0">
+          <Tabs 
+            value={activeTab} 
+            onValueChange={setActiveTab} 
+            className="space-y-6 pb-20 sm:pb-0 anti-yellow-nuclear"
+            style={{
+              outline: 'none',
+              outlineColor: 'transparent',
+              outlineWidth: '0',
+              outlineStyle: 'none'
+            }}
+          >
             {/* Desktop/Tablet Navigation - Hidden on mobile */}
-            <TabsList className="hidden sm:grid w-full grid-cols-6">
-              <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
-              <TabsTrigger value="profile">Profile</TabsTrigger>
-              <TabsTrigger value="qr-tools">QR & Tools</TabsTrigger>
-              <TabsTrigger value="leads">My Leads</TabsTrigger>
-              <TabsTrigger value="commissions">Commissions</TabsTrigger>
-              <TabsTrigger value="analytics">Analytics</TabsTrigger>
+            <TabsList 
+              className="hidden sm:grid w-full grid-cols-6 anti-yellow-nuclear"
+              style={{
+                outline: 'none',
+                outlineColor: 'transparent',
+                outlineWidth: '0',
+                outlineStyle: 'none',
+                border: '1px solid #e5e7eb'
+              }}
+            >
+              <TabsTrigger 
+                value="dashboard" 
+                className="anti-yellow-nuclear"
+                style={{
+                  outline: 'none',
+                  outlineColor: 'transparent',
+                  outlineWidth: '0',
+                  outlineStyle: 'none'
+                }}
+              >Dashboard</TabsTrigger>
+              <TabsTrigger 
+                value="profile" 
+                className="anti-yellow-nuclear"
+                style={{
+                  outline: 'none',
+                  outlineColor: 'transparent',
+                  outlineWidth: '0',
+                  outlineStyle: 'none'
+                }}
+              >Profile</TabsTrigger>
+              <TabsTrigger 
+                value="qr-tools" 
+                className="anti-yellow-nuclear"
+                style={{
+                  outline: 'none',
+                  outlineColor: 'transparent',
+                  outlineWidth: '0',
+                  outlineStyle: 'none'
+                }}
+              >QR & Tools</TabsTrigger>
+              <TabsTrigger 
+                value="leads" 
+                className="anti-yellow-nuclear"
+                style={{
+                  outline: 'none',
+                  outlineColor: 'transparent',
+                  outlineWidth: '0',
+                  outlineStyle: 'none'
+                }}
+              >My Leads</TabsTrigger>
+              <TabsTrigger 
+                value="commissions" 
+                className="anti-yellow-nuclear"
+                style={{
+                  outline: 'none',
+                  outlineColor: 'transparent',
+                  outlineWidth: '0',
+                  outlineStyle: 'none'
+                }}
+              >Commissions</TabsTrigger>
+              <TabsTrigger 
+                value="analytics" 
+                className="anti-yellow-nuclear"
+                style={{
+                  outline: 'none',
+                  outlineColor: 'transparent',
+                  outlineWidth: '0',
+                  outlineStyle: 'none'
+                }}
+              >Analytics</TabsTrigger>
             </TabsList>
 
             {/* Mobile Navigation - Fixed bottom bar, shown only on mobile */}
@@ -499,23 +574,71 @@ const SalesPortalEnhanced: React.FC = () => {
             </TabsContent>
 
             {/* Profile Tab */}
-            <TabsContent value="profile" className="space-y-6">
-              <Card style={antiYellowStyles}>
-                <CardHeader className="flex flex-row items-center justify-between">
+            <TabsContent 
+              value="profile" 
+              className="space-y-6"
+              style={{
+                outline: 'none',
+                outlineColor: 'transparent',
+                outlineWidth: '0',
+                outlineStyle: 'none',
+                border: 'none',
+                borderColor: 'transparent'
+              }}
+            >
+              <Card 
+                style={{
+                  ...antiYellowStyles,
+                  outline: 'none',
+                  outlineColor: 'transparent',
+                  outlineWidth: '0',
+                  outlineStyle: 'none',
+                  border: '1px solid #e5e7eb',
+                  borderColor: '#e5e7eb'
+                }}
+                className="anti-yellow-nuclear"
+              >
+                <CardHeader 
+                  className="flex flex-row items-center justify-between"
+                  style={{
+                    outline: 'none',
+                    outlineColor: 'transparent',
+                    border: 'none',
+                    borderBottom: '1px solid #f3f4f6'
+                  }}
+                >
                   <div>
-                    <CardTitle>Sales Profile</CardTitle>
-                    <CardDescription>Manage your professional information and credentials</CardDescription>
+                    <CardTitle style={{ outline: 'none', outlineColor: 'transparent' }}>Sales Profile</CardTitle>
+                    <CardDescription style={{ outline: 'none', outlineColor: 'transparent' }}>Manage your professional information and credentials</CardDescription>
                   </div>
                   <Button
                     onClick={() => setIsEditingProfile(!isEditingProfile)}
                     variant={isEditingProfile ? "outline" : "default"}
-                    style={antiYellowInputStyles}
+                    style={{
+                      ...antiYellowInputStyles,
+                      outline: 'none',
+                      outlineColor: 'transparent',
+                      outlineWidth: '0',
+                      outlineStyle: 'none'
+                    }}
+                    className="anti-yellow-button"
                   >
                     <Edit3 className="h-4 w-4 mr-2" />
                     {isEditingProfile ? "Cancel" : "Edit Profile"}
                   </Button>
                 </CardHeader>
-                <CardContent className="space-y-6">
+                <CardContent 
+                  className="space-y-6 anti-yellow-content"
+                  style={{
+                    outline: 'none',
+                    outlineColor: 'transparent',
+                    outlineWidth: '0',
+                    outlineStyle: 'none',
+                    border: 'none',
+                    borderColor: 'transparent',
+                    backgroundColor: 'white'
+                  }}
+                >
                   {!isEditingProfile ? (
                     // Display Mode
                     <div className="space-y-6">

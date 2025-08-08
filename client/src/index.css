@@ -115,6 +115,192 @@ html {
 @tailwind components;
 @tailwind utilities;
 
+/* ========================================= */
+/* NUCLEAR YELLOW REMOVAL TACTICS */
+/* ========================================= */
+
+/* Tactic 1: CSS Variable Overrides */
+:root {
+  --yellow-override: transparent;
+  --focus-color: #3b82f6;
+  --focus-ring: 0 0 0 2px rgba(59, 130, 246, 0.5);
+  --border-neutral: #e5e7eb;
+}
+
+/* Tactic 2: Webkit Autofill Fixes */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active,
+textarea:-webkit-autofill,
+textarea:-webkit-autofill:hover,
+textarea:-webkit-autofill:focus,
+textarea:-webkit-autofill:active,
+select:-webkit-autofill,
+select:-webkit-autofill:hover,
+select:-webkit-autofill:focus,
+select:-webkit-autofill:active {
+  background-color: white !important;
+  color: black !important;
+  -webkit-box-shadow: 0 0 0 1000px white inset !important;
+  -webkit-text-fill-color: black !important;
+  transition: background-color 5000s ease-in-out 0s !important;
+  outline: none !important;
+  border: 1px solid #e5e7eb !important;
+}
+
+/* Tactic 3: Component CSS Classes */
+.anti-yellow-nuclear,
+.anti-yellow-nuclear *,
+.anti-yellow-content,
+.anti-yellow-content *,
+.anti-yellow-button,
+.anti-yellow-button * {
+  outline: none !important;
+  outline-color: transparent !important;
+  outline-width: 0 !important;
+  outline-style: none !important;
+  border-color: #e5e7eb !important;
+  background-color: white !important;
+  color: black !important;
+}
+
+.anti-yellow-nuclear:focus,
+.anti-yellow-nuclear *:focus,
+.anti-yellow-content:focus,
+.anti-yellow-content *:focus,
+.anti-yellow-button:focus,
+.anti-yellow-button *:focus {
+  outline: none !important;
+  outline-color: transparent !important;
+  outline-width: 0 !important;
+  outline-style: none !important;
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5) !important;
+}
+
+/* Tactic 4: Media Query Responsive Fixes */
+@media (min-width: 768px) {
+  .anti-yellow-nuclear,
+  .anti-yellow-content,
+  .anti-yellow-button {
+    outline: none !important;
+    outline-color: transparent !important;
+    border-color: #e5e7eb !important;
+  }
+}
+
+@media (max-width: 767px) {
+  .anti-yellow-nuclear,
+  .anti-yellow-content,
+  .anti-yellow-button {
+    outline: none !important;
+    outline-color: transparent !important;
+    border-color: #e5e7eb !important;
+  }
+}
+
+/* Tactic 5: Universal Outline Removal */
+*:focus,
+*:focus-visible,
+*:focus-within {
+  outline: none !important;
+  outline-color: transparent !important;
+  outline-width: 0 !important;
+  outline-style: none !important;
+}
+
+/* Tactic 6: Element-Specific Targeting for Profile Section */
+[data-radix-tabs-content],
+[data-radix-tabs-content] *,
+[role="tabpanel"],
+[role="tabpanel"] * {
+  outline: none !important;
+  outline-color: transparent !important;
+  border-color: #e5e7eb !important;
+}
+
+/* Tactic 7: Card Component Targeting */
+[data-card-component],
+[data-card-component] *,
+.card,
+.card *,
+[class*="card"],
+[class*="card"] * {
+  outline: none !important;
+  outline-color: transparent !important;
+  border-color: #e5e7eb !important;
+}
+
+/* Tactic 8: Tab Content Specific */
+[value="profile"],
+[value="profile"] *,
+.space-y-6,
+.space-y-6 * {
+  outline: none !important;
+  outline-color: transparent !important;
+  border-color: #e5e7eb !important;
+}
+
+/* Tactic 9: Sales Portal Specific */
+.sales-portal *,
+.sales-portal-enhanced *,
+[class*="sales"],
+[class*="sales"] * {
+  outline: none !important;
+  outline-color: transparent !important;
+  border-color: #e5e7eb !important;
+}
+
+/* Tactic 10: Radix UI Components Targeting */
+[data-radix-tabs-root],
+[data-radix-tabs-root] *,
+[data-radix-tabs-list],
+[data-radix-tabs-list] *,
+[data-radix-tabs-trigger],
+[data-radix-tabs-trigger] *,
+[data-radix-tabs-content],
+[data-radix-tabs-content] * {
+  outline: none !important;
+  outline-color: transparent !important;
+  outline-width: 0 !important;
+  outline-style: none !important;
+  border-color: #e5e7eb !important;
+}
+
+/* Tactic 11: Specific Tab Component Override */
+[role="tablist"],
+[role="tablist"] *,
+[role="tab"],
+[role="tab"] *,
+[role="tabpanel"],
+[role="tabpanel"] *,
+button[role="tab"],
+button[role="tab"] *,
+div[role="tabpanel"],
+div[role="tabpanel"] * {
+  outline: none !important;
+  outline-color: transparent !important;
+  outline-width: 0 !important;
+  outline-style: none !important;
+  border-color: #e5e7eb !important;
+}
+
+/* Tactic 12: Profile Tab Specific Targeting */
+[value="profile"],
+[value="profile"] *,
+[data-state="active"][value="profile"],
+[data-state="active"][value="profile"] *,
+[data-state="inactive"][value="profile"],
+[data-state="inactive"][value="profile"] * {
+  outline: none !important;
+  outline-color: transparent !important;
+  outline-width: 0 !important;
+  outline-style: none !important;
+  border-color: #e5e7eb !important;
+  background-color: white !important;
+}
+
 /* Mobile Navigation Overrides */
 @media (max-width: 640px) {
   .mobile-nav-show {
