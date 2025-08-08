@@ -1300,15 +1300,15 @@ html {
       border: 1px solid #e5e7eb !important;
       border-radius: 0.5rem !important;
       box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1) !important;
-      padding: 1rem !important;
-      margin-bottom: 0.75rem !important;
+      padding: 0.5rem !important;
+      margin-bottom: 0.25rem !important;
     }
 
     /* Large Monitor Container Spacing */
     .contractor-portal-main {
       background-color: #f9fafb !important;
       background: #f9fafb !important;
-      padding: 1rem !important;
+      padding: 0.25rem !important;
       min-height: 100vh !important;
     }
   }
@@ -1438,15 +1438,15 @@ html {
       border: 1px solid #e5e7eb !important;
       border-radius: 0.5rem !important;
       box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1) !important;
-      padding: 0.875rem !important;
-      margin-bottom: 0.5rem !important;
+      padding: 0.5rem !important;
+      margin-bottom: 0.25rem !important;
     }
 
     /* Mobile Container Spacing */
     .contractor-portal-main {
       background-color: #f9fafb !important;
       background: #f9fafb !important;
-      padding: 0.75rem 0.5rem !important;
+      padding: 0.25rem !important;
       min-height: 100vh !important;
     }
   }
@@ -1530,15 +1530,15 @@ html {
       border: 1px solid #e5e7eb !important;
       border-radius: 0.5rem !important;
       box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1) !important;
-      padding: 1rem !important;
-      margin-bottom: 0.75rem !important;
+      padding: 0.5rem !important;
+      margin-bottom: 0.25rem !important;
     }
 
     /* Tablet Container Spacing */
     .contractor-portal-main {
       background-color: #f9fafb !important;
       background: #f9fafb !important;
-      padding: 1rem !important;
+      padding: 0.25rem !important;
       min-height: 100vh !important;
     }
   }
@@ -1706,7 +1706,7 @@ html {
     background: #f9fafb !important;
   }
 
-  /* Balanced card styling */
+  /* Minimal card styling */
   .contractor-portal-main .card,
   .contractor-portal-main [data-radix-card],
   .contractor-portal-main [class*="card"],
@@ -1718,24 +1718,24 @@ html {
     border: 1px solid #e5e7eb !important;
     border-radius: 0.5rem !important;
     box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1) !important;
-    padding: 1rem !important;
-    margin-bottom: 0.75rem !important;
+    padding: 0.5rem !important;
+    margin-bottom: 0.25rem !important;
   }
 
-  /* Balanced spacing for main container */
+  /* Minimal spacing for main container */
   .contractor-portal-main {
     background-color: #f9fafb !important;
     background: #f9fafb !important;
-    padding: 1rem !important;
+    padding: 0.25rem !important;
     min-height: 100vh !important;
   }
 
-  /* Minimal tab content spacing */
+  /* No extra tab content spacing */
   .contractor-portal-main [data-radix-tabs-content],
   .contractor-portal-main div[role="tabpanel"] {
     background-color: transparent !important;
     background: transparent !important;
-    padding-top: 0.5rem !important;
+    padding: 0 !important;
   }
 
   /* Preserve All Card Backgrounds and Styling */
