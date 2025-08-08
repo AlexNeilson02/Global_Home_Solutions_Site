@@ -143,7 +143,12 @@ export default function ContractorProfileDB() {
                   Ready to get started? Request a personalized quote for your project and get connected with our professional team.
                 </p>
                 <button 
-                  onClick={() => setShowBidForm(true)}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log('Button clicked - opening bid form');
+                    setShowBidForm(true);
+                  }}
                   className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold py-4 px-8 rounded-xl transition-all duration-200 transform hover:scale-105 shadow-lg text-lg"
                 >
                   Request Free Quote

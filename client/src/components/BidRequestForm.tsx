@@ -57,6 +57,13 @@ export default function BidRequestForm({ isOpen, onClose, contractor }: BidReque
   const { salespersonId } = useSalesperson();
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
   const [filePreviewUrls, setFilePreviewUrls] = useState<string[]>([]);
+
+  // Debug logging for modal state
+  React.useEffect(() => {
+    console.log('BidRequestForm - isOpen changed:', isOpen);
+    console.log('BidRequestForm - contractor:', contractor);
+    console.log('BidRequestForm - contractor specialties:', contractor?.specialties);
+  }, [isOpen, contractor]);
   
   // Simple check for salesperson commission assignment
   const shouldAssignCommission = () => {
@@ -75,6 +82,15 @@ export default function BidRequestForm({ isOpen, onClose, contractor }: BidReque
   const contractorServices = allServices.filter(service => 
     contractor.specialties?.includes(service.name)
   );
+  
+  // Debug logging for services
+  React.useEffect(() => {
+    if (isOpen) {
+      console.log('All services:', allServices);
+      console.log('Contractor specialties:', contractor.specialties);
+      console.log('Filtered contractor services:', contractorServices);
+    }
+  }, [isOpen, allServices, contractor.specialties, contractorServices]);
 
   const form = useForm<BidRequestForm>({
     resolver: zodResolver(bidRequestSchema),
