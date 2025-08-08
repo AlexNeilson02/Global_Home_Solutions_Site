@@ -6,6 +6,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { 
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 
 import { 
@@ -25,7 +31,14 @@ import {
   Reply,
   ArrowLeft,
   Inbox,
-  Edit3
+  Edit3,
+  Zap,
+  Phone,
+  MessageSquare,
+  ChevronDown,
+  Users,
+  FileText,
+  Clock
 } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -348,6 +361,113 @@ ${(contractor as any)?.companyName}`
     setShowCompose(true);
   };
 
+  // Function to handle quick template emails
+  const handleQuickTemplate = (bid: any, templateType: string) => {
+    let subject = '';
+    let body = '';
+    
+    switch (templateType) {
+      case 'introduction':
+        subject = `Professional ${bid.serviceType} Services - ${(contractor as any)?.companyName || 'Our Company'}`;
+        body = `Dear ${bid.customerName},
+
+Thank you for your interest in ${bid.serviceType.toLowerCase()} services. We are a licensed and insured contractor with extensive experience in this field.
+
+Our services include:
+• Professional consultation and assessment
+• High-quality materials and workmanship
+• Competitive pricing and flexible scheduling
+• Full warranty on all work performed
+
+Budget Range: $${bid.budget?.toLocaleString() || 'To be determined'}
+
+I'd love to schedule a free consultation to discuss your project in detail. Are you available this week for a brief meeting?
+
+Best regards,
+${(contractor as any)?.companyName || '[Your Company]'}
+${(contractor as any)?.phone || '[Your Phone]'}`;
+        break;
+        
+      case 'quote':
+        subject = `Quote Request - ${bid.serviceType} Project`;
+        body = `Dear ${bid.customerName},
+
+Thank you for considering our services for your ${bid.serviceType.toLowerCase()} project.
+
+To provide you with an accurate quote, I'll need to:
+• Schedule a brief site visit/consultation
+• Assess the scope of work required
+• Discuss your specific preferences and timeline
+• Review any special requirements
+
+Project Details:
+• Service: ${bid.serviceType}
+• Budget Range: $${bid.budget?.toLocaleString() || 'To be determined'}
+
+I'm available for a consultation this week. Would you prefer a morning or afternoon appointment?
+
+Best regards,
+${(contractor as any)?.companyName || '[Your Company]'}`;
+        break;
+        
+      case 'followup':
+        subject = `Following Up - ${bid.serviceType} Project`;
+        body = `Dear ${bid.customerName},
+
+I wanted to follow up on your ${bid.serviceType.toLowerCase()} project inquiry. 
+
+I understand you're likely considering multiple contractors, and I'd be happy to answer any questions you might have about:
+• Our experience and credentials
+• Project timeline and process
+• Pricing and payment options
+• Previous client references
+
+No pressure - just wanted to make sure you have all the information you need to make the best decision for your project.
+
+Is there anything specific you'd like to know about our services?
+
+Best regards,
+${(contractor as any)?.companyName || '[Your Company]'}`;
+        break;
+        
+      case 'schedule':
+        subject = `Schedule Consultation - ${bid.serviceType} Project`;
+        body = `Dear ${bid.customerName},
+
+I'd like to schedule a convenient time to discuss your ${bid.serviceType.toLowerCase()} project in detail.
+
+I'm available:
+• This week: [Please specify your availability]
+• Next week: [Please specify your availability]
+
+The consultation will take approximately 30-45 minutes and will include:
+• Project assessment and scope review
+• Discussion of your preferences and timeline
+• Preliminary cost estimates
+• Answers to any questions you may have
+
+Please let me know what works best for your schedule.
+
+Best regards,
+${(contractor as any)?.companyName || '[Your Company]'}
+Phone: ${(contractor as any)?.phone || '[Your Phone]'}`;
+        break;
+        
+      default:
+        subject = `Re: ${bid.serviceType} Service Request`;
+        body = `Dear ${bid.customerName},\n\nThank you for your interest in our ${bid.serviceType.toLowerCase()} services.\n\nBest regards,\n[Your Name]`;
+    }
+    
+    setEmailForm({
+      to: bid.email,
+      subject,
+      body
+    });
+    setShowCompose(true);
+    setShowInbox(false);
+    setSelectedEmail(null);
+  };
+
   if (!contractor) {
     return (
       <div className="flex items-center justify-center py-8">
@@ -388,37 +508,119 @@ ${(contractor as any)?.companyName}`
 
   return (
     <div className="space-y-6">
-      {/* Quick Actions for Bid Requests - Moved to top as requested */}
+      {/* Enhanced Quick Email Actions */}
       {(bidRequests as any)?.bidRequests?.length > 0 && (
         <Card>
           <CardHeader>
-            <CardTitle>Quick Email Actions</CardTitle>
+            <CardTitle className="flex items-center gap-2">
+              <Zap className="h-5 w-5 text-blue-600" />
+              Quick Email Actions
+            </CardTitle>
             <CardDescription>
-              Send emails to clients from your pending bid requests
+              Send professional emails to clients from your pending bid requests with templates
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="grid gap-4">
               {(bidRequests as any).bidRequests
                 .filter((bid: any) => bid.status === 'pending')
-                .slice(0, 3)
+                .slice(0, 5)
                 .map((bid: any) => (
-                <div key={bid.id} className="flex items-center justify-between p-4 border rounded-lg">
+                <div key={bid.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 transition-colors">
                   <div className="flex-1">
-                    <div className="font-medium">{bid.customerName}</div>
-                    <div className="text-sm text-gray-600">{bid.serviceType} • ${bid.budget}</div>
-                    <div className="text-sm text-gray-500">{bid.email}</div>
+                    <div className="flex items-center gap-2 mb-1">
+                      <div className="font-medium text-gray-900">{bid.customerName}</div>
+                      <Badge variant="outline" className="text-xs">
+                        {bid.status === 'pending' ? 'New Lead' : bid.status}
+                      </Badge>
+                    </div>
+                    <div className="text-sm text-gray-600 mb-1">
+                      <span className="font-medium">{bid.serviceType}</span> • 
+                      <span className="text-green-600 font-medium"> ${bid.budget?.toLocaleString() || 'Budget TBD'}</span>
+                    </div>
+                    <div className="text-sm text-gray-500 flex items-center gap-2">
+                      <Mail className="h-3 w-3" />
+                      {bid.email}
+                    </div>
+                    {bid.phone && (
+                      <div className="text-sm text-gray-500 flex items-center gap-2 mt-1">
+                        <Phone className="h-3 w-3" />
+                        {bid.phone}
+                      </div>
+                    )}
                   </div>
-                  <Button 
-                    size="sm"
-                    onClick={() => handleQuickCompose(bid)}
-                    className="bg-blue-600 hover:bg-blue-700"
-                  >
-                    <Send className="h-4 w-4 mr-1" />
-                    Email
-                  </Button>
+                  <div className="flex items-center gap-2 ml-4">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button 
+                          size="sm"
+                          variant="outline"
+                          className="border-blue-200 text-blue-700 hover:bg-blue-50"
+                        >
+                          <MessageSquare className="h-4 w-4 mr-1" />
+                          Template
+                          <ChevronDown className="h-3 w-3 ml-1" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-56">
+                        <DropdownMenuItem 
+                          onClick={() => handleQuickTemplate(bid, 'introduction')}
+                          className="cursor-pointer"
+                        >
+                          <Users className="h-4 w-4 mr-2" />
+                          Introduction & Services
+                        </DropdownMenuItem>
+                        <DropdownMenuItem 
+                          onClick={() => handleQuickTemplate(bid, 'quote')}
+                          className="cursor-pointer"
+                        >
+                          <FileText className="h-4 w-4 mr-2" />
+                          Quote Request
+                        </DropdownMenuItem>
+                        <DropdownMenuItem 
+                          onClick={() => handleQuickTemplate(bid, 'followup')}
+                          className="cursor-pointer"
+                        >
+                          <Clock className="h-4 w-4 mr-2" />
+                          Follow-up
+                        </DropdownMenuItem>
+                        <DropdownMenuItem 
+                          onClick={() => handleQuickTemplate(bid, 'schedule')}
+                          className="cursor-pointer"
+                        >
+                          <Calendar className="h-4 w-4 mr-2" />
+                          Schedule Meeting
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                    <Button 
+                      size="sm"
+                      onClick={() => handleQuickCompose(bid)}
+                      className="bg-blue-600 hover:bg-blue-700"
+                    >
+                      <Send className="h-4 w-4 mr-1" />
+                      Custom
+                    </Button>
+                  </div>
                 </div>
               ))}
+              
+              {(bidRequests as any).bidRequests.filter((bid: any) => bid.status === 'pending').length > 5 && (
+                <div className="text-center pt-2">
+                  <Button variant="ghost" size="sm" className="text-blue-600 hover:text-blue-700">
+                    View {(bidRequests as any).bidRequests.filter((bid: any) => bid.status === 'pending').length - 5} more leads
+                    <ChevronDown className="h-4 w-4 ml-1" />
+                  </Button>
+                </div>
+              )}
+              
+              {(bidRequests as any).bidRequests.filter((bid: any) => bid.status === 'pending').length === 0 && (
+                <div className="text-center py-8 text-gray-500">
+                  <Mail className="h-12 w-12 mx-auto mb-3 text-gray-300" />
+                  <h3 className="font-medium text-gray-900 mb-1">No pending leads</h3>
+                  <p className="text-sm">New bid requests will appear here for quick email actions</p>
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>
