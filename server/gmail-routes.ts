@@ -196,6 +196,53 @@ router.get('/emails/:contractorId', isAuthenticated, async (req: Request, res: R
   }
 });
 
+// Get sent emails for contractor
+router.get('/sent/:contractorId', isAuthenticated, async (req: Request, res: Response) => {
+  try {
+    const contractorId = parseInt(req.params.contractorId);
+    const maxResults = parseInt(req.query.limit as string) || 10;
+    
+    if (isNaN(contractorId)) {
+      return res.status(400).json({ error: 'Invalid contractor ID' });
+    }
+
+    // Verify contractor exists and user has access
+    const contractor = await storage.getContractor(contractorId);
+    if (!contractor) {
+      return res.status(404).json({ error: 'Contractor not found' });
+    }
+
+    // Check if user has access to this contractor
+    const user = (req as any).user;
+    if (user.role !== 'admin' && contractor.userId !== user.id) {
+      return res.status(403).json({ error: 'Unauthorized access to contractor' });
+    }
+
+    // Check if Gmail is connected
+    const isConnected = await GmailService.isGmailConnected(contractorId);
+    if (!isConnected) {
+      return res.status(400).json({ error: 'Gmail not connected for this contractor' });
+    }
+
+    const emails = await GmailService.getSentEmails(contractorId, maxResults);
+    
+    console.log('Gmail sent emails fetched:', {
+      count: emails.length,
+      firstEmail: emails[0] ? {
+        id: emails[0].id,
+        subject: emails[0].subject,
+        to: emails[0].to,
+        bodyLength: emails[0].body?.length || 0
+      } : null
+    });
+    
+    res.json({ emails });
+  } catch (error) {
+    console.error('Get sent emails error:', error);
+    res.status(500).json({ error: 'Failed to fetch sent emails' });
+  }
+});
+
 // Get stored email communications from database
 router.get('/communications/:contractorId', isAuthenticated, async (req: Request, res: Response) => {
   try {

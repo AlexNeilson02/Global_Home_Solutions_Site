@@ -63,6 +63,7 @@ const GmailIntegration: React.FC<GmailIntegrationProps> = ({ contractorId }) => 
   const [isConnecting, setIsConnecting] = useState(false);
   const [showCompose, setShowCompose] = useState(false);
   const [showInbox, setShowInbox] = useState(true);
+  const [currentView, setCurrentView] = useState<'inbox' | 'sent'>('inbox');
 
   const [selectedEmail, setSelectedEmail] = useState<GmailMessage | null>(null);
   const [emailForm, setEmailForm] = useState<EmailForm>({
@@ -81,10 +82,16 @@ const GmailIntegration: React.FC<GmailIntegrationProps> = ({ contractorId }) => 
 
   const contractor = (userData as any)?.roleData;
 
-  // Fetch recent emails
+  // Fetch recent emails (inbox)
   const { data: recentEmails, isLoading: emailsLoading, refetch: refetchEmails } = useQuery({
     queryKey: [`/api/gmail/emails/${contractor?.id}`],
-    enabled: Boolean(contractor?.gmailConnected && contractor?.id),
+    enabled: Boolean(contractor?.gmailConnected && contractor?.id && currentView === 'inbox'),
+  });
+
+  // Fetch sent emails
+  const { data: sentEmails, isLoading: sentEmailsLoading, refetch: refetchSentEmails } = useQuery({
+    queryKey: [`/api/gmail/sent/${contractor?.id}`],
+    enabled: Boolean(contractor?.gmailConnected && contractor?.id && currentView === 'sent'),
   });
 
   // Debug logging
@@ -107,6 +114,14 @@ const GmailIntegration: React.FC<GmailIntegrationProps> = ({ contractorId }) => 
 
   // Function to go back to inbox
   const handleBackToInbox = () => {
+    setSelectedEmail(null);
+    setShowInbox(true);
+    setShowCompose(false);
+  };
+
+  // Function to switch views
+  const handleViewSwitch = (view: 'inbox' | 'sent') => {
+    setCurrentView(view);
     setSelectedEmail(null);
     setShowInbox(true);
     setShowCompose(false);
@@ -184,6 +199,7 @@ const GmailIntegration: React.FC<GmailIntegrationProps> = ({ contractorId }) => 
       setShowCompose(false);
       setEmailForm({ to: '', subject: '', body: '' });
       refetchEmails();
+      refetchSentEmails();
     },
     onError: (error: any) => {
       toast({
@@ -411,11 +427,25 @@ ${(contractor as any)?.companyName}`
           {/* Navigation */}
           <div className="px-4 py-2">
             <div className="space-y-1">
-              <button className="w-full flex items-center gap-3 px-3 py-2 text-sm font-medium bg-blue-100 text-blue-700 rounded-lg">
+              <button 
+                onClick={() => handleViewSwitch('inbox')}
+                className={`w-full flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg ${
+                  currentView === 'inbox' 
+                    ? 'bg-blue-100 text-blue-700' 
+                    : 'text-gray-600 hover:bg-gray-100'
+                }`}
+              >
                 <Mail className="h-4 w-4" />
                 Inbox
               </button>
-              <button className="w-full flex items-center gap-3 px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-lg">
+              <button 
+                onClick={() => handleViewSwitch('sent')}
+                className={`w-full flex items-center gap-3 px-3 py-2 text-sm rounded-lg ${
+                  currentView === 'sent' 
+                    ? 'bg-blue-100 text-blue-700 font-medium' 
+                    : 'text-gray-600 hover:bg-gray-100'
+                }`}
+              >
                 <Send className="h-4 w-4" />
                 Sent
               </button>
@@ -424,41 +454,49 @@ ${(contractor as any)?.companyName}`
 
           {/* Email List */}
           <div className="flex-1 overflow-y-auto">
-            {emailsLoading ? (
+            {(emailsLoading || sentEmailsLoading) ? (
               <div className="flex items-center justify-center py-8">
                 <Loader2 className="h-6 w-6 animate-spin" />
               </div>
-            ) : recentEmails && (recentEmails as any).emails && (recentEmails as any).emails.length > 0 ? (
-              <div className="space-y-px">
-                {(recentEmails as any).emails.slice(0, 10).map((email: GmailMessage) => (
-                  <div key={email.id} className="px-4 py-3 hover:bg-gray-100 cursor-pointer border-l-2 border-transparent hover:border-blue-500" onClick={() => handleOpenEmail(email)}>
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className="text-sm font-medium text-gray-900 truncate">
-                            {email.from.split('<')[0].trim() || email.from}
-                          </span>
-                          <span className="text-xs text-gray-500">
-                            {new Date(email.sentAt).toLocaleDateString()}
-                          </span>
-                        </div>
-                        <div className="text-sm font-medium text-gray-700 truncate mb-1">
-                          {email.subject}
-                        </div>
-                        <div className="text-xs text-gray-500 line-clamp-2">
-                          {email.body.replace(/<[^>]*>/g, '').substring(0, 100)}...
+            ) : (() => {
+              const currentEmails = currentView === 'inbox' ? recentEmails : sentEmails;
+              const emails = (currentEmails as any)?.emails || [];
+              
+              return emails.length > 0 ? (
+                <div className="space-y-px">
+                  {emails.slice(0, 10).map((email: GmailMessage) => (
+                    <div key={email.id} className="px-4 py-3 hover:bg-gray-100 cursor-pointer border-l-2 border-transparent hover:border-blue-500" onClick={() => handleOpenEmail(email)}>
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="text-sm font-medium text-gray-900 truncate">
+                              {currentView === 'sent' 
+                                ? `To: ${email.to.split('<')[0].trim() || email.to}`
+                                : (email.from.split('<')[0].trim() || email.from)
+                              }
+                            </span>
+                            <span className="text-xs text-gray-500">
+                              {new Date(email.sentAt).toLocaleDateString()}
+                            </span>
+                          </div>
+                          <div className="text-sm font-medium text-gray-700 truncate mb-1">
+                            {email.subject}
+                          </div>
+                          <div className="text-xs text-gray-500 line-clamp-2">
+                            {email.body.replace(/<[^>]*>/g, '').substring(0, 100)}...
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="px-4 py-8 text-center text-gray-500">
-                <Mail className="h-8 w-8 mx-auto mb-2 text-gray-300" />
-                <p className="text-sm">No emails found</p>
-              </div>
-            )}
+                  ))}
+                </div>
+              ) : (
+                <div className="px-4 py-8 text-center text-gray-500">
+                  {currentView === 'sent' ? <Send className="h-8 w-8 mx-auto mb-2 text-gray-300" /> : <Mail className="h-8 w-8 mx-auto mb-2 text-gray-300" />}
+                  <p className="text-sm">No {currentView === 'sent' ? 'sent emails' : 'emails'} found</p>
+                </div>
+              );
+            })()}
           </div>
         </div>
 
@@ -582,61 +620,83 @@ ${(contractor as any)?.companyName}`
                 )}
               </div>
             ) : showInbox ? (
-              /* Inbox List */
+              /* Email List View */
               <div className="max-w-4xl mx-auto">
-                <h3 className="text-lg font-semibold mb-4">Inbox</h3>
-                {emailsLoading ? (
-                  <div className="flex items-center justify-center py-12">
-                    <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
-                    <span className="ml-2 text-gray-600">Loading emails...</span>
-                  </div>
-                ) : recentEmails && (recentEmails as any).emails && (recentEmails as any).emails.length > 0 ? (
-                  <div className="space-y-2">
-                    {(recentEmails as any).emails.map((email: GmailMessage) => (
-                      <div key={email.id} className="bg-white border border-gray-200 rounded-lg p-4 hover:bg-gray-50 cursor-pointer" onClick={() => handleOpenEmail(email)}>
-                        <div className="flex items-start justify-between mb-2">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-1">
-                              <span className="text-sm font-medium text-gray-900">
-                                {email.from.includes('<') 
-                                  ? email.from.split('<')[0].trim() 
-                                  : email.from}
-                              </span>
-                              <span className="text-xs text-gray-500">
-                                {new Date(email.sentAt).toLocaleDateString()} at {new Date(email.sentAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
-                              </span>
-                            </div>
-                            <h4 className="text-sm font-semibold text-gray-800 mb-2">{email.subject}</h4>
-                            <div className="text-sm text-gray-600 line-clamp-3">
-                              {email.body.replace(/<[^>]*>/g, '').trim() || 'No content'}
+                <h3 className="text-lg font-semibold mb-4">
+                  {currentView === 'inbox' ? 'Inbox' : 'Sent Mail'}
+                </h3>
+                {(() => {
+                  const isLoading = currentView === 'inbox' ? emailsLoading : sentEmailsLoading;
+                  const currentEmails = currentView === 'inbox' ? recentEmails : sentEmails;
+                  const emails = (currentEmails as any)?.emails || [];
+                  
+                  if (isLoading) {
+                    return (
+                      <div className="flex items-center justify-center py-12">
+                        <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+                        <span className="ml-2 text-gray-600">Loading {currentView === 'inbox' ? 'emails' : 'sent emails'}...</span>
+                      </div>
+                    );
+                  }
+                  
+                  if (emails.length > 0) {
+                    return (
+                      <div className="space-y-2">
+                        {emails.map((email: GmailMessage) => (
+                          <div key={email.id} className="bg-white border border-gray-200 rounded-lg p-4 hover:bg-gray-50 cursor-pointer" onClick={() => handleOpenEmail(email)}>
+                            <div className="flex items-start justify-between mb-2">
+                              <div className="flex-1">
+                                <div className="flex items-center gap-2 mb-1">
+                                  <span className="text-sm font-medium text-gray-900">
+                                    {currentView === 'sent' 
+                                      ? `To: ${email.to.includes('<') ? email.to.split('<')[0].trim() : email.to}`
+                                      : (email.from.includes('<') ? email.from.split('<')[0].trim() : email.from)
+                                    }
+                                  </span>
+                                  <span className="text-xs text-gray-500">
+                                    {new Date(email.sentAt).toLocaleDateString()} at {new Date(email.sentAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                                  </span>
+                                </div>
+                                <h4 className="text-sm font-semibold text-gray-800 mb-2">{email.subject}</h4>
+                                <div className="text-sm text-gray-600 line-clamp-3">
+                                  {email.body.replace(/<[^>]*>/g, '').trim() || 'No content'}
+                                </div>
+                              </div>
                             </div>
                           </div>
-                        </div>
+                        ))}
                       </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-center py-12">
-                    <Mail className="h-16 w-16 mx-auto mb-4 text-gray-300" />
-                    <h3 className="text-lg font-medium text-gray-900 mb-2">No emails found</h3>
-                    <p className="text-gray-600 mb-6">Your inbox is empty or emails haven't loaded yet.</p>
-                    <Button 
-                      onClick={() => refetchEmails()}
-                      variant="outline"
-                      className="mr-2"
-                    >
-                      <RefreshCw className="h-4 w-4 mr-2" />
-                      Refresh
-                    </Button>
-                    <Button 
-                      onClick={handleNewCompose}
-                      className="bg-blue-600 hover:bg-blue-700"
-                    >
-                      <Plus className="h-4 w-4 mr-2" />
-                      Compose Email
-                    </Button>
-                  </div>
-                )}
+                    );
+                  }
+                  
+                  return (
+                    <div className="text-center py-12">
+                      {currentView === 'sent' ? <Send className="h-16 w-16 mx-auto mb-4 text-gray-300" /> : <Mail className="h-16 w-16 mx-auto mb-4 text-gray-300" />}
+                      <h3 className="text-lg font-medium text-gray-900 mb-2">No {currentView === 'sent' ? 'sent emails' : 'emails'} found</h3>
+                      <p className="text-gray-600 mb-6">
+                        {currentView === 'sent' 
+                          ? 'You haven\'t sent any emails yet.' 
+                          : 'Your inbox is empty or emails haven\'t loaded yet.'
+                        }
+                      </p>
+                      <Button 
+                        onClick={() => currentView === 'inbox' ? refetchEmails() : refetchSentEmails()}
+                        variant="outline"
+                        className="mr-2"
+                      >
+                        <RefreshCw className="h-4 w-4 mr-2" />
+                        Refresh
+                      </Button>
+                      <Button 
+                        onClick={handleNewCompose}
+                        className="bg-blue-600 hover:bg-blue-700"
+                      >
+                        <Plus className="h-4 w-4 mr-2" />
+                        Compose Email
+                      </Button>
+                    </div>
+                  );
+                })()}
               </div>
             ) : showCompose ? (
               <div className="max-w-2xl mx-auto">

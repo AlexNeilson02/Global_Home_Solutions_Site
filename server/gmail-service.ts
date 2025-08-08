@@ -188,17 +188,17 @@ export class GmailService {
   }
 
   /**
-   * Get recent emails for contractor
+   * Get recent emails for contractor (inbox)
    */
   static async getRecentEmails(contractorId: number, maxResults: number = 10): Promise<GmailMessage[]> {
     try {
       const gmail = await this.getGmailClient(contractorId);
       
-      // Get list of messages
+      // Get list of messages from inbox
       const messagesResponse = await gmail.users.messages.list({
         userId: 'me',
         maxResults,
-        q: 'in:inbox OR in:sent'
+        q: 'in:inbox'
       });
 
       const messages = messagesResponse.data.messages || [];
@@ -252,6 +252,75 @@ export class GmailService {
       return emailMessages;
     } catch (error) {
       console.error('Error getting recent emails:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get sent emails for contractor
+   */
+  static async getSentEmails(contractorId: number, maxResults: number = 10): Promise<GmailMessage[]> {
+    try {
+      const gmail = await this.getGmailClient(contractorId);
+      
+      // Get list of messages from sent folder
+      const messagesResponse = await gmail.users.messages.list({
+        userId: 'me',
+        maxResults,
+        q: 'in:sent'
+      });
+
+      const messages = messagesResponse.data.messages || [];
+      const emailMessages: GmailMessage[] = [];
+
+      // Get details for each message
+      for (const message of messages) {
+        try {
+          const messageDetails = await gmail.users.messages.get({
+            userId: 'me',
+            id: message.id!
+          });
+
+          const headers = messageDetails.data.payload?.headers || [];
+          const getHeader = (name: string) => headers.find(h => h.name?.toLowerCase() === name.toLowerCase())?.value || '';
+
+          // Extract email body
+          let body = '';
+          let htmlBody = '';
+          
+          if (messageDetails.data.payload?.body?.data) {
+            body = Buffer.from(messageDetails.data.payload.body.data, 'base64').toString();
+          } else if (messageDetails.data.payload?.parts) {
+            for (const part of messageDetails.data.payload.parts) {
+              if (part.mimeType === 'text/plain' && part.body?.data) {
+                body = Buffer.from(part.body.data, 'base64').toString();
+              } else if (part.mimeType === 'text/html' && part.body?.data) {
+                htmlBody = Buffer.from(part.body.data, 'base64').toString();
+              }
+            }
+          }
+
+          emailMessages.push({
+            id: messageDetails.data.id!,
+            threadId: messageDetails.data.threadId!,
+            subject: getHeader('subject'),
+            from: getHeader('from'),
+            to: getHeader('to'),
+            cc: getHeader('cc') ? getHeader('cc').split(',').map(e => e.trim()) : undefined,
+            bcc: getHeader('bcc') ? getHeader('bcc').split(',').map(e => e.trim()) : undefined,
+            body: body || htmlBody,
+            htmlBody,
+            sentAt: new Date(parseInt(messageDetails.data.internalDate!) || Date.now()),
+            labels: messageDetails.data.labelIds || undefined
+          });
+        } catch (error) {
+          console.error(`Error getting message ${message.id}:`, error);
+        }
+      }
+
+      return emailMessages;
+    } catch (error) {
+      console.error('Error getting sent emails:', error);
       throw error;
     }
   }
