@@ -760,10 +760,45 @@ export default function AdminPortalEnhanced() {
                         <span className="sm:hidden">Add</span>
                       </Button>
                     </DialogTrigger>
-                    <DialogContent className="sm:max-w-[600px]">
-                      <DialogHeader className="pb-6">
-                        <DialogTitle className="text-2xl font-bold">Create New Salesperson</DialogTitle>
-                        <DialogDescription className="text-base">
+                    <DialogContent 
+                      className="sm:max-w-[600px] anti-yellow-nuclear admin-portal-overlay"
+                      data-component="admin-portal-dialog"
+                      style={{
+                        outline: 'none',
+                        outlineColor: 'transparent',
+                        outlineWidth: '0',
+                        outlineStyle: 'none',
+                        backgroundColor: 'white',
+                        color: 'black',
+                        border: '1px solid #e5e7eb'
+                      }}
+                    >
+                      <DialogHeader 
+                        className="pb-6 anti-yellow-nuclear"
+                        style={{
+                          outline: 'none',
+                          outlineColor: 'transparent',
+                          color: 'black'
+                        }}
+                      >
+                        <DialogTitle 
+                          className="text-2xl font-bold anti-yellow-nuclear"
+                          style={{
+                            outline: 'none',
+                            outlineColor: 'transparent',
+                            color: 'black'
+                          }}
+                        >
+                          Create New Salesperson
+                        </DialogTitle>
+                        <DialogDescription 
+                          className="text-base anti-yellow-nuclear"
+                          style={{
+                            outline: 'none',
+                            outlineColor: 'transparent',
+                            color: 'black'
+                          }}
+                        >
                           Add a new sales representative to the team
                         </DialogDescription>
                       </DialogHeader>
@@ -933,10 +968,45 @@ export default function AdminPortalEnhanced() {
                         <span className="sm:hidden">Add</span>
                       </Button>
                     </DialogTrigger>
-                    <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto">
-                      <DialogHeader className="pb-6">
-                        <DialogTitle className="text-2xl font-bold">Create New Contractor</DialogTitle>
-                        <DialogDescription className="text-base">
+                    <DialogContent 
+                      className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto anti-yellow-nuclear admin-portal-overlay"
+                      data-component="admin-portal-dialog"
+                      style={{
+                        outline: 'none',
+                        outlineColor: 'transparent',
+                        outlineWidth: '0',
+                        outlineStyle: 'none',
+                        backgroundColor: 'white',
+                        color: 'black',
+                        border: '1px solid #e5e7eb'
+                      }}
+                    >
+                      <DialogHeader 
+                        className="pb-6 anti-yellow-nuclear"
+                        style={{
+                          outline: 'none',
+                          outlineColor: 'transparent',
+                          color: 'black'
+                        }}
+                      >
+                        <DialogTitle 
+                          className="text-2xl font-bold anti-yellow-nuclear"
+                          style={{
+                            outline: 'none',
+                            outlineColor: 'transparent',
+                            color: 'black'
+                          }}
+                        >
+                          Create New Contractor
+                        </DialogTitle>
+                        <DialogDescription 
+                          className="text-base anti-yellow-nuclear"
+                          style={{
+                            outline: 'none',
+                            outlineColor: 'transparent',
+                            color: 'black'
+                          }}
+                        >
                           Add a new contractor to the platform
                         </DialogDescription>
                       </DialogHeader>
@@ -1295,7 +1365,8 @@ export default function AdminPortalEnhanced() {
         {/* View Details Modal */}
         <Dialog open={viewDetailsOpen} onOpenChange={setViewDetailsOpen}>
           <DialogContent 
-            className="sm:max-w-[600px] anti-yellow-nuclear"
+            className="sm:max-w-[600px] anti-yellow-nuclear admin-portal-overlay"
+            data-component="admin-portal-dialog"
             style={{
               outline: 'none',
               outlineColor: 'transparent',
@@ -1412,7 +1483,8 @@ export default function AdminPortalEnhanced() {
         {/* Edit Modal */}
         <Dialog open={editModalOpen} onOpenChange={setEditModalOpen}>
           <DialogContent 
-            className="sm:max-w-[450px] max-w-[90vw] anti-yellow-nuclear"
+            className="sm:max-w-[450px] max-w-[90vw] anti-yellow-nuclear admin-portal-overlay"
+            data-component="admin-portal-dialog"
             style={{
               outline: 'none',
               outlineColor: 'transparent',
@@ -1572,7 +1644,8 @@ export default function AdminPortalEnhanced() {
         {/* Contractor View Modal */}
         <Dialog open={contractorViewOpen} onOpenChange={setContractorViewOpen}>
           <DialogContent 
-            className="sm:max-w-[600px] max-w-[90vw] anti-yellow-nuclear"
+            className="sm:max-w-[600px] max-w-[90vw] anti-yellow-nuclear admin-portal-overlay"
+            data-component="admin-portal-dialog"
             style={{
               outline: 'none',
               outlineColor: 'transparent',
@@ -1674,7 +1747,8 @@ export default function AdminPortalEnhanced() {
         {/* Contractor Edit Modal */}
         <Dialog open={contractorEditOpen} onOpenChange={setContractorEditOpen}>
           <DialogContent 
-            className="sm:max-w-[500px] max-w-[90vw] anti-yellow-nuclear"
+            className="sm:max-w-[500px] max-w-[90vw] anti-yellow-nuclear admin-portal-overlay"
+            data-component="admin-portal-dialog"
             style={{
               outline: 'none',
               outlineColor: 'transparent',
