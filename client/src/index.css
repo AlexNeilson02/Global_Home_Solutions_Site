@@ -1521,7 +1521,6 @@ div[role="tabpanel"] * {
 .contractor-portal-main [class*="bid"],
 .contractor-portal-main div[role="listitem"]:has([class*="bid"]),
 .contractor-portal-main div:has(h3):has(p):has(button) {
-  border: 1px solid #e5e7eb !important;
   outline: none !important;
   outline-color: transparent !important;
   outline-width: 0 !important;
@@ -1549,7 +1548,6 @@ div[role="tabpanel"] * {
 .contractor-portal-main div[role="listitem"]:has([class*="project"]),
 .contractor-portal-main div:has(h4):has(span):has(button),
 .contractor-portal-main [data-radix-tabs-content] > div > div {
-  border: 1px solid #e5e7eb !important;
   outline: none !important;
   outline-color: transparent !important;
   outline-width: 0 !important;

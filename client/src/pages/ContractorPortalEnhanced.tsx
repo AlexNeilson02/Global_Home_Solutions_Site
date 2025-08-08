@@ -135,19 +135,17 @@ const ContractorPortalEnhanced: React.FC = () => {
   const [activeTab, setActiveTab] = useState("dashboard");
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   
-  // Style object to remove yellow coloring with subtle borders - Solution #2
+  // Style object to remove yellow coloring without visible borders
   const antiYellowStyles = {
     backgroundColor: 'white',
     color: 'black',
     outline: 'none',
     outlineColor: 'transparent',
     outlineWidth: '0',
-    outlineStyle: 'none',
-    border: '1px solid #e5e7eb',
-    boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)'
+    outlineStyle: 'none'
   } as const;
 
-  // Enhanced style for inputs and interactive elements with subtle borders
+  // Enhanced style for inputs and interactive elements without visible borders
   const antiYellowInputStyles = {
     backgroundColor: 'white',
     color: 'black',
@@ -155,8 +153,6 @@ const ContractorPortalEnhanced: React.FC = () => {
     outlineColor: 'transparent',
     outlineWidth: '0',
     outlineStyle: 'none',
-    border: '1px solid #e5e7eb',
-    boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
     WebkitAppearance: 'none',
     MozAppearance: 'none',
     appearance: 'none'
