@@ -74,7 +74,7 @@ router.get('/callback', async (req: Request, res: Response) => {
     delete (req.session as any).gmailContractorId;
     
     // Redirect to contractor portal with success message
-    res.redirect(`${process.env.REPLIT_DEV_DOMAIN || 'http://localhost:5000'}/contractor/${contractorId}?gmail_connected=true`);
+    res.redirect(`https://${process.env.REPLIT_DEV_DOMAIN || 'localhost:5000'}/contractor-portal-enhanced?gmail_connected=true`);
   } catch (error) {
     console.error('Gmail callback error:', error);
     res.status(500).json({ error: 'Failed to connect Gmail account' });
