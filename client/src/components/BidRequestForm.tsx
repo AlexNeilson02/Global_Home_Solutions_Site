@@ -57,12 +57,23 @@ export default function BidRequestForm({ isOpen, onClose, contractor }: BidReque
   const { salespersonId } = useSalesperson();
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
   const [filePreviewUrls, setFilePreviewUrls] = useState<string[]>([]);
+  const [dialogReady, setDialogReady] = useState(false);
 
   // Debug logging for modal state
   React.useEffect(() => {
     console.log('BidRequestForm - isOpen changed:', isOpen);
     console.log('BidRequestForm - contractor:', contractor);
     console.log('BidRequestForm - contractor specialties:', contractor?.specialties);
+    
+    if (isOpen) {
+      // Add small delay to allow click event to complete
+      const timer = setTimeout(() => {
+        setDialogReady(true);
+      }, 100);
+      return () => clearTimeout(timer);
+    } else {
+      setDialogReady(false);
+    }
   }, [isOpen, contractor]);
   
   // Simple check for salesperson commission assignment
@@ -286,8 +297,12 @@ export default function BidRequestForm({ isOpen, onClose, contractor }: BidReque
         className="sm:max-w-[425px] max-h-[90vh] overflow-y-auto bid-request-form dialog-no-yellow" 
         data-component="bid-request-form"
         onInteractOutside={(e) => {
-          console.log('Dialog onInteractOutside triggered');
-          e.preventDefault();
+          console.log('Dialog onInteractOutside triggered, dialogReady:', dialogReady);
+          if (!dialogReady) {
+            console.log('Dialog not ready yet, preventing close');
+            e.preventDefault();
+            e.stopPropagation();
+          }
         }}
         onEscapeKeyDown={(e) => {
           console.log('Dialog onEscapeKeyDown triggered');
