@@ -1243,6 +1243,24 @@ html {
       background-color: white !important;
       color: black !important;
     }
+
+    /* Video Large Monitor Fixes */
+    .contractor-video-card,
+    .contractor-video,
+    .contractor-video-modal,
+    .no-yellow-border,
+    video {
+      outline: none !important;
+      outline-color: transparent !important;
+      outline-width: 0 !important;
+      outline-style: none !important;
+      border: none !important;
+      -webkit-appearance: none !important;
+      -moz-appearance: none !important;
+      appearance: none !important;
+      -webkit-focus-ring-color: transparent !important;
+      -webkit-highlight: transparent !important;
+    }
   }
   
   /* Media query overrides for mobile devices */
@@ -1303,6 +1321,25 @@ html {
       -moz-appearance: none !important;
       appearance: none !important;
     }
+
+    /* Video Mobile Fixes */
+    .contractor-video-card,
+    .contractor-video,
+    .contractor-video-modal,
+    .no-yellow-border,
+    video {
+      outline: none !important;
+      outline-color: transparent !important;
+      outline-width: 0 !important;
+      outline-style: none !important;
+      border: none !important;
+      -webkit-appearance: none !important;
+      -moz-appearance: none !important;
+      appearance: none !important;
+      -webkit-focus-ring-color: transparent !important;
+      -webkit-highlight: transparent !important;
+      -webkit-tap-highlight-color: rgba(0,0,0,0) !important;
+    }
   }
   
   /* Viewport-specific overrides */
@@ -1332,6 +1369,22 @@ html {
       background-color: white !important;
       box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
     }
+
+    /* Video Tablet Fixes */
+    .contractor-video-card,
+    .contractor-video,
+    .contractor-video-modal,
+    .no-yellow-border,
+    video {
+      outline: none !important;
+      outline-color: transparent !important;
+      outline-width: 0 !important;
+      outline-style: none !important;
+      border: none !important;
+      -webkit-appearance: none !important;
+      -moz-appearance: none !important;
+      appearance: none !important;
+    }
   }
 
   /* Nuclear Bid Request Form Override - All Screen Sizes */
@@ -1357,6 +1410,50 @@ html {
     appearance: none !important;
     -webkit-focus-ring-color: transparent !important;
     -webkit-highlight: transparent !important;
+  }
+
+  /* Contractor Video Yellow Border Elimination - Tactic 1: Component Classes */
+  .contractor-video-card,
+  .contractor-video-card *,
+  .contractor-video,
+  .contractor-video-enlarged,
+  .contractor-video-modal,
+  .contractor-video-modal *,
+  .no-yellow-border,
+  .no-yellow-border * {
+    outline: none !important;
+    outline-color: transparent !important;
+    outline-width: 0 !important;
+    outline-style: none !important;
+    outline-offset: 0 !important;
+    -webkit-outline: 0 !important;
+    -moz-outline: 0 !important;
+    border-color: #e5e7eb !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    appearance: none !important;
+    -webkit-focus-ring-color: transparent !important;
+    -webkit-highlight: transparent !important;
+    -webkit-tap-highlight-color: rgba(0,0,0,0) !important;
+  }
+
+  /* Contractor Video Yellow Border Elimination - Tactic 2: Video Elements */
+  video,
+  video:focus,
+  video:hover,
+  video:active {
+    outline: none !important;
+    outline-color: transparent !important;
+    outline-width: 0 !important;
+    outline-style: none !important;
+    outline-offset: 0 !important;
+    border: none !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    appearance: none !important;
+    -webkit-focus-ring-color: transparent !important;
+    -webkit-highlight: transparent !important;
+    -webkit-tap-highlight-color: rgba(0,0,0,0) !important;
   }
 }
 

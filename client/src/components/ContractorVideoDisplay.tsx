@@ -63,13 +63,53 @@ export const ContractorVideoDisplay: React.FC<ContractorVideoDisplayProps> = ({
 
   return (
     <>
-      <Card className={`overflow-hidden ${className}`}>
-        <CardContent className="p-0">
-          <div className="relative group">
+      <Card 
+        className={`overflow-hidden contractor-video-card no-yellow-border ${className}`}
+        style={{
+          outline: 'none',
+          outlineColor: 'transparent',
+          outlineWidth: '0',
+          outlineStyle: 'none',
+          border: '2px solid #e5e7eb',
+          backgroundColor: 'white',
+          boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)',
+          WebkitAppearance: 'none',
+          MozAppearance: 'none',
+          appearance: 'none'
+        }}
+      >
+        <CardContent 
+          className="p-0 no-yellow-border"
+          style={{
+            outline: 'none',
+            outlineColor: 'transparent',
+            border: 'none',
+            backgroundColor: 'white'
+          }}
+        >
+          <div 
+            className="relative group no-yellow-border"
+            style={{
+              outline: 'none',
+              outlineColor: 'transparent',
+              border: 'none'
+            }}
+          >
             <video
               ref={videoRef}
               src={videoUrl}
-              className="w-full h-48 object-cover cursor-pointer"
+              className="w-full h-48 object-cover cursor-pointer contractor-video no-yellow-border"
+              style={{
+                outline: 'none',
+                outlineColor: 'transparent',
+                outlineWidth: '0',
+                outlineStyle: 'none',
+                border: 'none',
+                backgroundColor: 'black',
+                WebkitAppearance: 'none',
+                MozAppearance: 'none',
+                appearance: 'none'
+              }}
               poster="" 
               muted={isMuted}
               autoPlay={autoplay}
@@ -125,12 +165,40 @@ export const ContractorVideoDisplay: React.FC<ContractorVideoDisplayProps> = ({
 
       {/* Enlarged Video Modal */}
       <Dialog open={isEnlarged} onOpenChange={setIsEnlarged}>
-        <DialogContent className="max-w-4xl w-full p-0">
-          <div className="relative bg-black">
+        <DialogContent 
+          className="max-w-4xl w-full p-0 no-yellow-border contractor-video-modal"
+          style={{
+            outline: 'none',
+            outlineColor: 'transparent',
+            outlineWidth: '0',
+            outlineStyle: 'none',
+            border: '2px solid #374151',
+            backgroundColor: 'black',
+            boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.3)'
+          }}
+        >
+          <div 
+            className="relative bg-black no-yellow-border"
+            style={{
+              outline: 'none',
+              border: 'none'
+            }}
+          >
             <video
               ref={enlargedVideoRef}
               src={videoUrl}
-              className="w-full h-auto max-h-[80vh]"
+              className="w-full h-auto max-h-[80vh] contractor-video-enlarged no-yellow-border"
+              style={{
+                outline: 'none',
+                outlineColor: 'transparent',
+                outlineWidth: '0',
+                outlineStyle: 'none',
+                border: 'none',
+                backgroundColor: 'black',
+                WebkitAppearance: 'none',
+                MozAppearance: 'none',
+                appearance: 'none'
+              }}
               controls
               autoPlay
               muted={isMuted}
