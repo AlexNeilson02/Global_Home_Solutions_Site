@@ -1237,13 +1237,18 @@ html {
 .contractor-login,
 .sales-login,
 .admin-login,
-div[role="dialog"]:has(form),
-.modal-content:has(form) {
+[data-radix-dialog-content].login-portal,
+[data-radix-dialog-content].dialog-no-yellow,
+[data-radix-dialog-content][data-component="login-form"] {
   border: 1px solid #e5e7eb !important;
   outline: none !important;
   outline-color: transparent !important;
   outline-width: 0 !important;
   outline-style: none !important;
+  /* Preserve modal display properties */
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
 }
 
 /* Remove yellow focus rings from portal login elements */
