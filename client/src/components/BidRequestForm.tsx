@@ -272,8 +272,28 @@ export default function BidRequestForm({ isOpen, onClose, contractor }: BidReque
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[425px] max-h-[90vh] overflow-y-auto bid-request-form dialog-no-yellow" data-component="bid-request-form">
+    <Dialog 
+      open={isOpen} 
+      onOpenChange={(open) => {
+        console.log('Dialog onOpenChange called with:', open);
+        if (!open) {
+          console.log('Closing bid request form');
+          onClose();
+        }
+      }}
+    >
+      <DialogContent 
+        className="sm:max-w-[425px] max-h-[90vh] overflow-y-auto bid-request-form dialog-no-yellow" 
+        data-component="bid-request-form"
+        onInteractOutside={(e) => {
+          console.log('Dialog onInteractOutside triggered');
+          e.preventDefault();
+        }}
+        onEscapeKeyDown={(e) => {
+          console.log('Dialog onEscapeKeyDown triggered');
+          e.preventDefault();
+        }}
+      >
         <DialogHeader>
           <DialogTitle>Request Bid from {contractor.companyName}</DialogTitle>
           <DialogDescription>
