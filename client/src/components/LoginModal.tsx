@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useQueryClient } from "@tanstack/react-query";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -92,6 +92,9 @@ export function LoginModal({ isOpen, onClose, portalType, onLoginSuccess }: Logi
       <DialogContent className="sm:max-w-[425px] login-portal dialog-no-yellow" data-component="login-form">
         <DialogHeader>
           <DialogTitle className="text-center">{getPortalTitle()}</DialogTitle>
+          <DialogDescription className="text-center text-gray-600">
+            Please enter your credentials to access the {portalType} portal.
+          </DialogDescription>
         </DialogHeader>
         
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
