@@ -38,6 +38,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import DocumentManager from "@/components/DocumentManager";
 import ProjectTimeline from "@/components/ProjectTimeline";
 import AnalyticsDashboard from "@/components/AnalyticsDashboard";
+import GmailIntegration from "@/components/GmailIntegration";
 
 // Initialize Stripe
 const stripePublicKey = import.meta.env.VITE_STRIPE_PUBLIC_KEY;
@@ -852,12 +853,13 @@ const ContractorPortalEnhanced: React.FC = () => {
             }}
           >
             {/* Desktop/Tablet Navigation - Hidden on mobile */}
-            <TabsList className="hidden sm:grid w-full grid-cols-7">
+            <TabsList className="hidden sm:grid w-full grid-cols-8">
               <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
               <TabsTrigger value="profile">Company Profile</TabsTrigger>
               <TabsTrigger value="projects">Sent Bids</TabsTrigger>
               <TabsTrigger value="bids">Bid Requests</TabsTrigger>
               <TabsTrigger value="documents">Documents</TabsTrigger>
+              <TabsTrigger value="email">Email</TabsTrigger>
               <TabsTrigger value="subscription">Subscription</TabsTrigger>
               <TabsTrigger value="analytics">Analytics</TabsTrigger>
             </TabsList>
@@ -909,6 +911,15 @@ const ContractorPortalEnhanced: React.FC = () => {
                 >
                   <FileText className="h-4 w-4" />
                   <span>Docs</span>
+                </button>
+                <button
+                  onClick={() => setActiveTab("email")}
+                  className={`flex flex-col items-center justify-center gap-1 text-xs hover:bg-gray-100 dark:hover:bg-gray-800 px-4 min-w-[80px] flex-shrink-0 ${
+                    activeTab === "email" ? "text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950" : ""
+                  }`}
+                >
+                  <Mail className="h-4 w-4" />
+                  <span>Email</span>
                 </button>
                 <button
                   onClick={() => setActiveTab("subscription")}
@@ -1655,7 +1666,23 @@ const ContractorPortalEnhanced: React.FC = () => {
               </Card>
             </TabsContent>
 
-
+            {/* Email Tab */}
+            <TabsContent value="email" className="space-y-6">
+              <Card style={antiYellowStyles}>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Mail className="h-5 w-5" />
+                    Gmail Integration
+                  </CardTitle>
+                  <CardDescription>
+                    Connect your Gmail account to send professional emails to potential clients directly from your contractor portal
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <GmailIntegration contractorId={contractor?.id} />
+                </CardContent>
+              </Card>
+            </TabsContent>
 
             {/* Subscription Tab */}
             <TabsContent value="subscription" className="space-y-6">
