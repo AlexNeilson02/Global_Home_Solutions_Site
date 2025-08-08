@@ -77,23 +77,7 @@ export default function HomePage() {
         >
           Find a Contractor
         </button>
-        {salespersonId && (
-          <div style={{
-            position: 'absolute',
-            top: '20px',
-            right: '20px',
-            backgroundColor: 'rgba(34, 197, 94, 0.9)',
-            color: 'white',
-            padding: '8px 16px',
-            borderRadius: '20px',
-            fontSize: '14px',
-            fontWeight: '600',
-            boxShadow: '0 4px 12px rgba(34, 197, 94, 0.3)',
-            zIndex: 1000
-          }}>
-            Commission Tracking Active (ID: {salespersonId})
-          </div>
-        )}
+
       </div>
     </div>
   );
