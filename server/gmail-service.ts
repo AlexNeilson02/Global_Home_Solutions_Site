@@ -134,17 +134,18 @@ export class GmailService {
         }</div></body></html>`;
       }
 
-      // Build email message
-      const emailLines = [
+      // Build email message with proper RFC 2822 format
+      const headers = [
         `To: ${emailData.to}`,
         emailData.cc ? `Cc: ${emailData.cc.join(', ')}` : null,
         emailData.bcc ? `Bcc: ${emailData.bcc.join(', ')}` : null,
         `Subject: ${emailData.subject}`,
         'MIME-Version: 1.0',
-        'Content-Type: text/html; charset=UTF-8',
-        '',
-        htmlContent || emailData.body
+        'Content-Type: text/html; charset=UTF-8'
       ].filter(Boolean).join('\n');
+
+      // Combine headers, blank line, and body
+      const emailLines = headers + '\n\n' + (htmlContent || emailData.body);
 
       // Log the email content for debugging
       console.log('Raw email content:', {
