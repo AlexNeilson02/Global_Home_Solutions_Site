@@ -297,12 +297,9 @@ export default function BidRequestForm({ isOpen, onClose, contractor }: BidReque
         className="sm:max-w-[425px] max-h-[90vh] overflow-y-auto bid-request-form dialog-no-yellow" 
         data-component="bid-request-form"
         onInteractOutside={(e) => {
-          console.log('Dialog onInteractOutside triggered, dialogReady:', dialogReady);
-          if (!dialogReady) {
-            console.log('Dialog not ready yet, preventing close');
-            e.preventDefault();
-            e.stopPropagation();
-          }
+          console.log('Dialog onInteractOutside triggered - always preventing');
+          e.preventDefault();
+          e.stopPropagation();
         }}
         onEscapeKeyDown={(e) => {
           console.log('Dialog onEscapeKeyDown triggered');
