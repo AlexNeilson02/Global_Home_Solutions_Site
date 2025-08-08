@@ -1026,7 +1026,20 @@ const ContractorPortalEnhanced: React.FC = () => {
                         </div>
                       </div>
 
-                      <Separator />
+                      <Separator 
+                        className="contractor-separator no-yellow-border"
+                        style={{
+                          backgroundColor: '#e5e7eb',
+                          border: 'none',
+                          borderTop: '1px solid #e5e7eb',
+                          outline: 'none',
+                          outlineColor: 'transparent',
+                          height: '1px',
+                          WebkitAppearance: 'none',
+                          MozAppearance: 'none',
+                          appearance: 'none'
+                        }}
+                      />
 
                       {/* Specialties */}
                       <div>
