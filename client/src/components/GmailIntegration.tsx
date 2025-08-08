@@ -388,6 +388,42 @@ ${(contractor as any)?.companyName}`
 
   return (
     <div className="space-y-6">
+      {/* Quick Actions for Bid Requests - Moved to top as requested */}
+      {(bidRequests as any)?.bidRequests?.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Quick Email Actions</CardTitle>
+            <CardDescription>
+              Send emails to clients from your pending bid requests
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid gap-4">
+              {(bidRequests as any).bidRequests
+                .filter((bid: any) => bid.status === 'pending')
+                .slice(0, 3)
+                .map((bid: any) => (
+                <div key={bid.id} className="flex items-center justify-between p-4 border rounded-lg">
+                  <div className="flex-1">
+                    <div className="font-medium">{bid.customerName}</div>
+                    <div className="text-sm text-gray-600">{bid.serviceType} • ${bid.budget}</div>
+                    <div className="text-sm text-gray-500">{bid.email}</div>
+                  </div>
+                  <Button 
+                    size="sm"
+                    onClick={() => handleQuickCompose(bid)}
+                    className="bg-blue-600 hover:bg-blue-700"
+                  >
+                    <Send className="h-4 w-4 mr-1" />
+                    Email
+                  </Button>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Email Client Interface */}
       <div className="h-[700px] bg-white rounded-lg border overflow-hidden flex">
         {/* Email Sidebar */}
@@ -783,41 +819,7 @@ ${(contractor as any)?.companyName}`
 
 
 
-      {/* Quick Actions for Bid Requests - Keep this section as you liked it */}
-      {(bidRequests as any)?.bidRequests?.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Quick Email Actions</CardTitle>
-            <CardDescription>
-              Send emails to clients from your pending bid requests
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid gap-4">
-              {(bidRequests as any).bidRequests
-                .filter((bid: any) => bid.status === 'pending')
-                .slice(0, 3)
-                .map((bid: any) => (
-                <div key={bid.id} className="flex items-center justify-between p-4 border rounded-lg">
-                  <div className="flex-1">
-                    <div className="font-medium">{bid.customerName}</div>
-                    <div className="text-sm text-gray-600">{bid.serviceType} • ${bid.budget}</div>
-                    <div className="text-sm text-gray-500">{bid.email}</div>
-                  </div>
-                  <Button 
-                    size="sm"
-                    onClick={() => handleQuickCompose(bid)}
-                    className="bg-blue-600 hover:bg-blue-700"
-                  >
-                    <Send className="h-4 w-4 mr-1" />
-                    Email
-                  </Button>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      )}
+
 
     </div>
   );
