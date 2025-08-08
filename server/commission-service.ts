@@ -64,108 +64,82 @@ export class CommissionService {
         console.log(`ℹ️  No salesperson attribution - processing as general lead (no sales commission)`);
       }
       
-      // Get service category to determine commission amounts
+      // Get service categories to determine commission amounts
       const serviceCategories = await storage.getAllServiceCategories();
-      
-      // First try exact match
-      let serviceCategory = serviceCategories.find(
-        cat => cat.name.toLowerCase() === bidRequest.serviceRequested.toLowerCase()
-      );
+      let totalCommissionAmount = 0;
+      const serviceCommissions = [];
 
-      // If no exact match, try partial matches for common variations
-      if (!serviceCategory) {
-        const requestedService = bidRequest.serviceRequested.toLowerCase();
-        serviceCategory = serviceCategories.find(cat => {
-          const categoryName = cat.name.toLowerCase();
-          // Check if the requested service is contained in the category name or vice versa
-          return categoryName.includes(requestedService) || requestedService.includes(categoryName.split('&')[0].trim());
+      // Process each requested service
+      for (const requestedServiceName of bidRequest.servicesRequested) {
+        console.log(`Processing commission for service: ${requestedServiceName}`);
+
+        // Find matching service category
+        let serviceCategory = serviceCategories.find(
+          cat => cat.name.toLowerCase() === requestedServiceName.toLowerCase()
+        );
+
+        // If no exact match, try partial matches
+        if (!serviceCategory) {
+          const serviceLower = requestedServiceName.toLowerCase();
+          serviceCategory = serviceCategories.find(cat => {
+            const categoryName = cat.name.toLowerCase();
+            return categoryName.includes(serviceLower) || serviceLower.includes(categoryName.split('&')[0].trim());
+          });
+        }
+
+        if (!serviceCategory) {
+          console.warn(`No commission rates found for service: ${requestedServiceName}`);
+          continue;
+        }
+
+        const commissionAmounts = this.calculateCommissionAmounts(serviceCategory);
+        totalCommissionAmount += commissionAmounts.totalCommission;
+        
+        serviceCommissions.push({
+          serviceName: requestedServiceName,
+          category: serviceCategory,
+          commission: commissionAmounts.totalCommission
         });
-      }
 
-      // If still no match, try keyword matching for common service types
-      if (!serviceCategory) {
-        const requestedService = bidRequest.serviceRequested.toLowerCase();
-        const serviceKeywords = {
-          'flooring': ['flooring & hardwood', 'epoxy flooring'],
-          'electrical': ['electrical'],
-          'plumbing': ['plumbing'],
-          'roofing': ['roofing'],
-          'painting': ['painting interior & exterior'],
-          'hvac': ['heating & cooling', 'hvac'],
-          'kitchen': ['kitchen remodeling'],
-          'bathroom': ['reglazing (bath & countertop)', 'walk-in tubs'],
-          'concrete': ['concrete patio/drive walk', 'concrete polishing'],
-          'pool': ['swimming pools', 'pool service'],
-          'handyman': ['handyman', 'handy man service'],
-          'windows': ['windows & doors', 'window and door install'],
-          'siding': ['siding'],
-          'fence': ['fencing', 'block wall/ fence'],
-          'landscaping': ['landscaping', 'landscape design'],
-          'solar': ['solar'],
-          'foundation': ['foundation repair']
+        console.log(`Service: ${requestedServiceName}, Commission: $${commissionAmounts.totalCommission}`);
+
+        // Create commission record for this service
+        const commissionRecord: InsertCommissionRecord = {
+          bidRequestId: bidRequest.id,
+          salespersonId: salespersonId || null,
+          overrideManagerId: overrideManagerId || null,
+          serviceCategory: requestedServiceName,
+          totalCommission: commissionAmounts.totalCommission,
+          salesmanAmount: salespersonId ? commissionAmounts.salesmanAmount : 0, // No salesperson = $0
+          overrideAmount: commissionAmounts.overrideAmount,
+          corpAmount: salespersonId ? commissionAmounts.corpAmount : commissionAmounts.totalCommission, // If no salesperson, all goes to corp
+          status: 'pending',
+          paymentStatus: 'unpaid'
         };
 
-        for (const [keyword, categories] of Object.entries(serviceKeywords)) {
-          if (requestedService.includes(keyword)) {
-            serviceCategory = serviceCategories.find(cat => 
-              categories.some(catName => cat.name.toLowerCase().includes(catName))
-            );
-            if (serviceCategory) break;
-          }
-        }
+        const createdRecord = await storage.createCommissionRecord(commissionRecord);
+        await this.processCommissionPayment(createdRecord.id);
       }
 
-      if (!serviceCategory) {
-        console.warn(`No commission rates found for service: ${bidRequest.serviceRequested}. Available categories:`, 
-          serviceCategories.map(cat => cat.name).join(', '));
-        return;
-      }
+      console.log(`Total commission for ${serviceCommissions.length} services: $${totalCommissionAmount}`);
 
-      console.log(`Matched service "${bidRequest.serviceRequested}" to category "${serviceCategory.name}"`)
-
-      const commissionAmounts = this.calculateCommissionAmounts(serviceCategory);
-
-      // Commission rule: If no salesperson reference, assign commission to admin
-      let isAdminCommission = false;
-      
+      // If no salesperson, log that all commission goes to corporate
       if (!salespersonId) {
-        isAdminCommission = true;
-        console.log(`No salesperson reference - commission will be assigned to admin`);
-      }
-
-      const commissionRecord: InsertCommissionRecord = {
-        bidRequestId: bidRequest.id,
-        salespersonId: salespersonId || null, // null for admin commissions
-        overrideManagerId: overrideManagerId || null,
-        serviceCategory: bidRequest.serviceRequested,
-        totalCommission: commissionAmounts.totalCommission,
-        salesmanAmount: commissionAmounts.salesmanAmount,
-        overrideAmount: commissionAmounts.overrideAmount,
-        corpAmount: commissionAmounts.corpAmount,
-        status: 'pending',
-        paymentStatus: 'unpaid'
-      };
-
-      const createdRecord = await storage.createCommissionRecord(commissionRecord);
-
-      // Update commission totals - either for salesperson or admin
-      if (isAdminCommission) {
-        // For admin, we could track this separately or just log it
-        console.log(`Admin commission earned: $${commissionAmounts.salesmanAmount} from unattributed lead`);
+        console.log(`🏢 No salesperson - entire commission ($${totalCommissionAmount}) assigned to corporate`);
       } else {
         // Update salesperson commission total
         const salesperson = await storage.getSalesperson(salespersonId!);
         if (salesperson) {
+          const salesCommissionTotal = serviceCommissions.reduce((sum, sc) => {
+            const commissionAmounts = this.calculateCommissionAmounts(sc.category);
+            return sum + commissionAmounts.salesmanAmount;
+          }, 0);
+          
           await storage.updateSalesperson(salespersonId!, {
-            commissions: (salesperson.commissions || 0) + commissionAmounts.salesmanAmount
+            commissions: (salesperson.commissions || 0) + salesCommissionTotal
           });
         }
       }
-
-      // Process immediate payment (since your requirement is immediate payout)
-      await this.processCommissionPayment(createdRecord.id);
-
-      console.log(`Commission created for bid request ${bidRequest.id}: $${commissionAmounts.salesmanAmount} to salesperson`);
     } catch (error) {
       console.error('Error creating commission:', error);
     }
@@ -187,13 +161,16 @@ export class CommissionService {
       );
 
       // Create payment records for each recipient
-      const recipients = [
-        {
+      const recipients = [];
+
+      // Add salesperson payment only if there's a salesperson and amount > 0
+      if (commissionRecord.salespersonId && commissionRecord.salesmanAmount > 0) {
+        recipients.push({
           recipientId: commissionRecord.salespersonId,
           recipientType: 'salesperson',
           amount: commissionRecord.salesmanAmount
-        }
-      ];
+        });
+      }
 
       // Add override manager if exists
       if (commissionRecord.overrideManagerId && commissionRecord.overrideAmount > 0) {

@@ -220,7 +220,7 @@ export const projectStatusUpdates = pgTable("project_status_updates", {
 export const commissionRecords = pgTable("commission_records", {
   id: serial("id").primaryKey(),
   bidRequestId: integer("bid_request_id").notNull().references(() => bidRequests.id),
-  salespersonId: integer("salesperson_id").notNull().references(() => salespersons.id),
+  salespersonId: integer("salesperson_id").references(() => salespersons.id), // Nullable for corporate-only commissions
   overrideManagerId: integer("override_manager_id").references(() => users.id), // Manager who gets override commission
   serviceCategory: text("service_category").notNull(),
   
