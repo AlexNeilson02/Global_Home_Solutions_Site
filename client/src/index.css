@@ -1198,6 +1198,35 @@ html {
   outline: none !important;
 }
 
+/* Targeted yellow border removal for sent bids/projects */
+.sent-bid-card,
+.project-card,
+.project-item,
+[data-component="project"],
+[data-component="sent-bid"],
+.contractor-portal-main [class*="project"],
+.contractor-portal-main div[role="listitem"]:has([class*="project"]),
+.contractor-portal-main div:has(h4):has(span):has(button),
+.contractor-portal-main [data-radix-tabs-content] > div > div {
+  border: 1px solid #e5e7eb !important;
+  outline: none !important;
+  outline-color: transparent !important;
+  outline-width: 0 !important;
+  outline-style: none !important;
+}
+
+/* Remove yellow focus rings from sent bid/project elements */
+.sent-bid-card:focus,
+.project-card:focus,
+.project-item:focus,
+[data-component="project"]:focus,
+[data-component="sent-bid"]:focus,
+.contractor-portal-main [class*="project"]:focus {
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2) !important;
+  outline: none !important;
+}
+
 
 
 
