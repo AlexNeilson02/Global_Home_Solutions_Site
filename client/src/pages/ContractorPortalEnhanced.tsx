@@ -266,6 +266,15 @@ const ContractorPortalEnhanced: React.FC = () => {
       });
       // Clean up URL
       window.history.replaceState({}, document.title, window.location.pathname);
+    } else if (urlParams.get('gmail_connected') === 'true') {
+      toast({
+        title: "Gmail Connected Successfully!",
+        description: "You can now send professional emails to clients directly from your contractor portal.",
+      });
+      // Clean up URL
+      window.history.replaceState({}, document.title, window.location.pathname);
+      // Switch to email tab
+      setActiveTab("email");
     }
   }, [toast, contractor?.id, queryClient]);
 
