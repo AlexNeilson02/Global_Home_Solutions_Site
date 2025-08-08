@@ -1173,6 +1173,31 @@ html {
   }
 }
 
+/* Targeted yellow border removal for bid requests */
+.bid-request-card,
+.bid-request-item,
+[data-component="bid-request"],
+.contractor-portal-main [class*="bid"],
+.contractor-portal-main div[role="listitem"]:has([class*="bid"]),
+.contractor-portal-main div:has(h3):has(p):has(button) {
+  border: 1px solid #e5e7eb !important;
+  outline: none !important;
+  outline-color: transparent !important;
+  outline-width: 0 !important;
+  outline-style: none !important;
+}
+
+/* Remove yellow focus rings from bid request elements */
+.bid-request-card:focus,
+.bid-request-item:focus,
+[data-component="bid-request"]:focus,
+.contractor-portal-main [class*="bid"]:focus,
+.contractor-portal-main div[role="listitem"]:focus {
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2) !important;
+  outline: none !important;
+}
+
 
 
 
