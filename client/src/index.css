@@ -1276,6 +1276,19 @@ html {
       -moz-appearance: none !important;
       appearance: none !important;
     }
+
+    /* Contractor Portal Large Monitor Background Fixes */
+    .contractor-portal-main {
+      background-color: #f9fafb !important;
+      background: #f9fafb !important;
+    }
+
+    /* Tab Content Large Monitor Fixes */
+    [data-radix-tabs-content],
+    div[role="tabpanel"] {
+      background-color: transparent !important;
+      background: transparent !important;
+    }
   }
   
   /* Media query overrides for mobile devices */
@@ -1370,6 +1383,28 @@ html {
       -moz-appearance: none !important;
       appearance: none !important;
     }
+
+    /* Contractor Portal Mobile Background Fixes */
+    .contractor-portal-main {
+      background-color: #f9fafb !important;
+      background: #f9fafb !important;
+    }
+
+    /* Tab Content Mobile Fixes */
+    [data-radix-tabs-content],
+    div[role="tabpanel"] {
+      background-color: transparent !important;
+      background: transparent !important;
+    }
+
+    /* Override Mobile Yellow Backgrounds */
+    [style*="background-color: yellow"],
+    [style*="background: yellow"],
+    [class*="bg-yellow"],
+    [class*="yellow"] {
+      background-color: transparent !important;
+      background: transparent !important;
+    }
   }
   
   /* Viewport-specific overrides */
@@ -1426,6 +1461,19 @@ html {
       border-top: 1px solid #e5e7eb !important;
       outline: none !important;
       height: 1px !important;
+    }
+
+    /* Contractor Portal Tablet Background Fixes */
+    .contractor-portal-main {
+      background-color: #f9fafb !important;
+      background: #f9fafb !important;
+    }
+
+    /* Tab Content Tablet Fixes */
+    [data-radix-tabs-content],
+    div[role="tabpanel"] {
+      background-color: transparent !important;
+      background: transparent !important;
     }
   }
 
@@ -1517,6 +1565,57 @@ html {
     appearance: none !important;
     -webkit-focus-ring-color: transparent !important;
     -webkit-highlight: transparent !important;
+  }
+
+  /* Contractor Portal Background Yellow Elimination - Tactic 4: Main Container Only */
+  .contractor-portal-main {
+    background-color: #f9fafb !important;
+    background: #f9fafb !important;
+    border: none !important;
+    outline: none !important;
+    outline-color: transparent !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    appearance: none !important;
+  }
+
+  /* Contractor Portal Tab Content Background Fix */
+  [data-radix-tabs-content],
+  div[role="tabpanel"] {
+    background-color: transparent !important;
+    background: transparent !important;
+    border: none !important;
+    outline: none !important;
+  }
+
+  /* Override Any Yellow Background in Portal */
+  .contractor-portal-main [style*="background-color: yellow"],
+  .contractor-portal-main [style*="background: yellow"],
+  .contractor-portal-main [class*="bg-yellow"],
+  .contractor-portal-main [class*="yellow"] {
+    background-color: transparent !important;
+    background: transparent !important;
+  }
+
+  /* Nuclear Option - Contractor Portal Complete Yellow Elimination */
+  .contractor-portal-main,
+  .contractor-portal-main *,
+  .contractor-portal-main *:before,
+  .contractor-portal-main *:after {
+    /* Remove any yellow backgrounds regardless of source */
+    background-color: var(--background) !important;
+    background-image: none !important;
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+  }
+
+  /* Preserve only white card backgrounds */
+  .contractor-portal-main [data-radix-card],
+  .contractor-portal-main .card,
+  .contractor-portal-main [role="dialog"] {
+    background-color: white !important;
+    background: white !important;
   }
 }
 

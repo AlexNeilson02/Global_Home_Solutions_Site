@@ -780,9 +780,39 @@ const ContractorPortalEnhanced: React.FC = () => {
   }, [contractor?.id]);
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <div className="container mx-auto px-4 py-8">
-        <div className="max-w-7xl mx-auto">
+    <div 
+      className="min-h-screen bg-gray-50 dark:bg-gray-900 contractor-portal-main no-yellow-border"
+      style={{
+        backgroundColor: '#f9fafb',
+        border: 'none',
+        outline: 'none',
+        outlineColor: 'transparent',
+        boxShadow: 'none',
+        WebkitAppearance: 'none',
+        MozAppearance: 'none',
+        appearance: 'none'
+      }}
+    >
+      <div 
+        className="container mx-auto px-4 py-8 contractor-portal-container no-yellow-border"
+        style={{
+          backgroundColor: 'transparent',
+          border: 'none',
+          outline: 'none',
+          outlineColor: 'transparent',
+          boxShadow: 'none'
+        }}
+      >
+        <div 
+          className="max-w-7xl mx-auto contractor-portal-content no-yellow-border"
+          style={{
+            backgroundColor: 'transparent',
+            border: 'none',
+            outline: 'none',
+            outlineColor: 'transparent',
+            boxShadow: 'none'
+          }}
+        >
           {/* Header */}
           <div className="flex justify-between items-center mb-8">
             <div>
@@ -798,7 +828,21 @@ const ContractorPortalEnhanced: React.FC = () => {
             </Button>
           </div>
 
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6 pb-20 sm:pb-0">
+          <Tabs 
+            value={activeTab} 
+            onValueChange={setActiveTab} 
+            className="space-y-6 pb-20 sm:pb-0 contractor-portal-tabs no-yellow-border"
+            style={{
+              backgroundColor: 'transparent',
+              border: 'none',
+              outline: 'none',
+              outlineColor: 'transparent',
+              boxShadow: 'none',
+              WebkitAppearance: 'none',
+              MozAppearance: 'none',
+              appearance: 'none'
+            }}
+          >
             {/* Desktop/Tablet Navigation - Hidden on mobile */}
             <TabsList className="hidden sm:grid w-full grid-cols-7">
               <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
