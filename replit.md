@@ -30,7 +30,7 @@ Preferred communication style: Simple, everyday language.
 - **File Management**: Leverages AWS S3 for scalable media storage (images and videos), supporting direct client-to-S3 uploads with progressive progress tracking.
 - **Payment Processing**: Integrated Stripe for subscription management and automated commission charging to contractors.
 - **Email Services**: Utilizes SendGrid for transactional emails.
-- **Yellow Styling Removal**: Systematic removal of yellow UI elements completed across bid request forms, login modals, and star ratings. All yellow borders, backgrounds, and outlines replaced with neutral alternatives while maintaining accessibility.
+- **Yellow Styling Removal**: Comprehensive elimination of yellow UI elements completed across all components including bid request forms, login modals, star ratings, and admin portal dialogs. Applied nuclear CSS tactics with 18+ targeting strategies including CSS variable overrides, webkit autofill fixes, dialog-specific rules, and inline style objects. All yellow borders, backgrounds, and outlines replaced with neutral alternatives while maintaining accessibility and dialog visibility.
 
 ### Data Flow Highlights
 - **Lead Generation**: QR code scans attribute leads to salespeople, enabling customers to submit bid requests. Contractors are assigned based on service type and availability, and the bid progresses through a defined status pipeline, automatically creating commission records.
