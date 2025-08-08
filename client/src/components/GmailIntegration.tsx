@@ -237,6 +237,30 @@ const GmailIntegration: React.FC<GmailIntegrationProps> = ({ contractorId }) => 
     }
   });
 
+  // Mark bid request as contacted mutation
+  const markBidContactedMutation = useMutation({
+    mutationFn: async (bidRequestId: number) => {
+      return apiRequest(`/contractors/${contractor?.id}/bid-requests/${bidRequestId}/contact`, {
+        method: 'POST'
+      });
+    },
+    onSuccess: () => {
+      // Refresh bid requests to update the UI
+      queryClient.invalidateQueries({ queryKey: [`/api/contractors/${contractor?.id}/bid-requests`] });
+      toast({
+        title: "Lead Contacted",
+        description: "Bid request marked as contacted and removed from uncontacted leads.",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Update Failed", 
+        description: error.message || "Failed to mark bid as contacted",
+        variant: "destructive",
+      });
+    }
+  });
+
   // Poll connection status after authorization
   const pollConnectionStatus = () => {
     setIsConnecting(true);
@@ -379,6 +403,10 @@ ${(contractor as any)?.companyName}`
   // Function to handle contacting a lead
   const handleContactLead = (bid: any) => {
     console.log('handleContactLead called:', bid);
+    
+    // Mark bid as contacted immediately when CONTACT button is pressed
+    markBidContactedMutation.mutate(bid.id);
+    
     const serviceType = bid.servicesRequested?.[0] || bid.serviceType || 'your service request';
     const customerName = bid.fullName || bid.customerName || 'there';
     

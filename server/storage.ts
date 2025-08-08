@@ -461,6 +461,7 @@ export class MemStorage implements IStorage {
     const updatedBidRequest = {
       ...bidRequest,
       emailSent: true,
+      status: 'contacted',
       lastUpdated: new Date()
     };
     
