@@ -783,7 +783,13 @@ html {
   .form-no-yellow,
   .form-no-yellow *,
   .input-no-yellow,
-  .input-no-yellow * {
+  .input-no-yellow *,
+  .bid-request-form,
+  .bid-request-form *,
+  [data-component="bid-request-form"],
+  [data-component="bid-request-form"] *,
+  [data-radix-dialog-content],
+  [data-radix-dialog-content] * {
     outline: none !important;
     outline-color: transparent !important;
     outline-width: 0 !important;
@@ -791,14 +797,59 @@ html {
     -webkit-appearance: none !important;
     -moz-appearance: none !important;
     appearance: none !important;
+    border: none !important;
+    box-shadow: none !important;
+    background-image: none !important;
   }
 
   .dialog-no-yellow input:focus,
   .form-no-yellow input:focus,
-  .input-no-yellow:focus {
+  .input-no-yellow:focus,
+  .bid-request-form input:focus,
+  .bid-request-form textarea:focus,
+  .bid-request-form select:focus,
+  [data-component="bid-request-form"] input:focus,
+  [data-component="bid-request-form"] textarea:focus,
+  [data-component="bid-request-form"] select:focus,
+  [data-radix-dialog-content] input:focus,
+  [data-radix-dialog-content] textarea:focus,
+  [data-radix-dialog-content] select:focus {
     outline: none !important;
     border-color: #3b82f6 !important;
     box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1) !important;
+    background-color: white !important;
+  }
+
+  /* Bid Request Form Specific Targeting - Tactic 1: Dialog Container */
+  .bid-request-form,
+  [data-component="bid-request-form"],
+  [data-radix-dialog-overlay],
+  [data-radix-dialog-content],
+  .dialog-no-yellow {
+    outline: none !important;
+    outline-color: transparent !important;
+    outline-width: 0 !important;
+    outline-style: none !important;
+    border: 2px solid #e5e7eb !important;
+    background-color: white !important;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    appearance: none !important;
+  }
+
+  /* Bid Request Form Specific Targeting - Tactic 2: All Nested Elements */
+  .bid-request-form *,
+  [data-component="bid-request-form"] *,
+  [data-radix-dialog-content] *,
+  .dialog-no-yellow * {
+    outline: none !important;
+    outline-color: transparent !important;
+    outline-width: 0 !important;
+    outline-style: none !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    appearance: none !important;
   }
 
   /* Nuclear option: Override all possible yellow styling */
@@ -1235,6 +1286,23 @@ html {
       outline-color: transparent !important;
       border-color: #d1d5db !important;
     }
+
+    /* Bid Request Form Mobile Fixes */
+    .bid-request-form,
+    [data-component="bid-request-form"],
+    [data-radix-dialog-content],
+    .dialog-no-yellow {
+      outline: none !important;
+      outline-color: transparent !important;
+      outline-width: 0 !important;
+      outline-style: none !important;
+      border: 2px solid #e5e7eb !important;
+      background-color: white !important;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
+      -webkit-appearance: none !important;
+      -moz-appearance: none !important;
+      appearance: none !important;
+    }
   }
   
   /* Viewport-specific overrides */
@@ -1250,6 +1318,45 @@ html {
       background-color: white !important;
       color: black !important;
     }
+
+    /* Bid Request Form Tablet Fixes */
+    .bid-request-form,
+    [data-component="bid-request-form"],
+    [data-radix-dialog-content],
+    .dialog-no-yellow {
+      outline: none !important;
+      outline-color: transparent !important;
+      outline-width: 0 !important;
+      outline-style: none !important;
+      border: 2px solid #e5e7eb !important;
+      background-color: white !important;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
+    }
+  }
+
+  /* Nuclear Bid Request Form Override - All Screen Sizes */
+  .bid-request-form,
+  .bid-request-form *,
+  [data-component="bid-request-form"],
+  [data-component="bid-request-form"] *,
+  [data-radix-dialog-content],
+  [data-radix-dialog-content] *,
+  .dialog-no-yellow,
+  .dialog-no-yellow * {
+    outline: none !important;
+    outline-color: transparent !important;
+    outline-width: 0 !important;
+    outline-style: none !important;
+    outline-offset: 0 !important;
+    -webkit-outline: 0 !important;
+    -moz-outline: 0 !important;
+    border-color: #e5e7eb !important;
+    background-color: white !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    appearance: none !important;
+    -webkit-focus-ring-color: transparent !important;
+    -webkit-highlight: transparent !important;
   }
 }
 

@@ -282,6 +282,18 @@ export default function BidRequestForm({ isOpen, onClose, contractor }: BidReque
       <DialogContent 
         className="sm:max-w-[425px] max-h-[90vh] overflow-y-auto bid-request-form dialog-no-yellow" 
         data-component="bid-request-form"
+        style={{
+          outline: 'none',
+          outlineColor: 'transparent',
+          outlineWidth: '0',
+          outlineStyle: 'none',
+          border: '2px solid #e5e7eb',
+          backgroundColor: 'white',
+          boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+          WebkitAppearance: 'none',
+          MozAppearance: 'none',
+          appearance: 'none'
+        }}
         onInteractOutside={(e) => {
           // Prevent closing on outside clicks to avoid accidental closure
           e.preventDefault();
