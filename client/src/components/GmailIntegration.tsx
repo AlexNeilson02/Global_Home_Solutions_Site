@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { 
   Mail, 
   Send, 
@@ -20,7 +21,11 @@ import {
   User,
   Calendar,
   Eye,
-  X
+  X,
+  Reply,
+  ArrowLeft,
+  Inbox,
+  Edit3
 } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -59,6 +64,8 @@ const GmailIntegration: React.FC<GmailIntegrationProps> = ({ contractorId }) => 
   const [showCompose, setShowCompose] = useState(false);
   const [showInbox, setShowInbox] = useState(true);
   const [selectedTemplate, setSelectedTemplate] = useState<string>('');
+  const [selectedEmail, setSelectedEmail] = useState<GmailMessage | null>(null);
+  const [showEmailModal, setShowEmailModal] = useState(false);
   const [emailForm, setEmailForm] = useState<EmailForm>({
     to: '',
     subject: '',
@@ -91,6 +98,18 @@ const GmailIntegration: React.FC<GmailIntegrationProps> = ({ contractorId }) => 
       });
     }
   }, [recentEmails]);
+
+  // Function to handle opening an email
+  const handleOpenEmail = (email: GmailMessage) => {
+    setSelectedEmail(email);
+    setShowEmailModal(true);
+  };
+
+  // Function to close email modal
+  const handleCloseEmail = () => {
+    setSelectedEmail(null);
+    setShowEmailModal(false);
+  };
 
   // Fetch pending bid requests for quick email composition
   const { data: bidRequests } = useQuery({
@@ -479,7 +498,7 @@ ${(contractor as any)?.companyName}`
             ) : recentEmails && (recentEmails as any).emails && (recentEmails as any).emails.length > 0 ? (
               <div className="space-y-px">
                 {(recentEmails as any).emails.slice(0, 10).map((email: GmailMessage) => (
-                  <div key={email.id} className="px-4 py-3 hover:bg-gray-100 cursor-pointer border-l-2 border-transparent hover:border-blue-500">
+                  <div key={email.id} className="px-4 py-3 hover:bg-gray-100 cursor-pointer border-l-2 border-transparent hover:border-blue-500" onClick={() => handleOpenEmail(email)}>
                     <div className="flex items-start justify-between">
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
@@ -539,7 +558,7 @@ ${(contractor as any)?.companyName}`
                 ) : recentEmails && (recentEmails as any).emails && (recentEmails as any).emails.length > 0 ? (
                   <div className="space-y-2">
                     {(recentEmails as any).emails.map((email: GmailMessage) => (
-                      <div key={email.id} className="bg-white border border-gray-200 rounded-lg p-4 hover:bg-gray-50 cursor-pointer">
+                      <div key={email.id} className="bg-white border border-gray-200 rounded-lg p-4 hover:bg-gray-50 cursor-pointer" onClick={() => handleOpenEmail(email)}>
                         <div className="flex items-start justify-between mb-2">
                           <div className="flex-1">
                             <div className="flex items-center gap-2 mb-1">
@@ -677,6 +696,126 @@ ${(contractor as any)?.companyName}`
           </div>
         </div>
       </div>
+
+      {/* Email Reading Modal */}
+      <Dialog open={showEmailModal} onOpenChange={setShowEmailModal}>
+        <DialogContent className="max-w-4xl max-h-[80vh] overflow-hidden">
+          <DialogHeader className="pb-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={handleCloseEmail}
+                  className="hover:bg-gray-100"
+                >
+                  <ArrowLeft className="h-4 w-4" />
+                </Button>
+                <DialogTitle className="text-lg font-semibold">
+                  {selectedEmail?.subject || 'Email'}
+                </DialogTitle>
+              </div>
+              <div className="flex items-center gap-2">
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => {
+                    if (selectedEmail) {
+                      setEmailForm({
+                        to: selectedEmail.from.includes('<') 
+                          ? selectedEmail.from.match(/<(.+)>/)?.[1] || selectedEmail.from
+                          : selectedEmail.from,
+                        subject: selectedEmail.subject.startsWith('Re: ') 
+                          ? selectedEmail.subject 
+                          : `Re: ${selectedEmail.subject}`,
+                        body: `\n\n---\nOn ${new Date(selectedEmail.sentAt).toLocaleString()}, ${selectedEmail.from} wrote:\n${selectedEmail.body}`
+                      });
+                      setShowEmailModal(false);
+                      setShowCompose(true);
+                      setShowInbox(false);
+                    }
+                  }}
+                  className="text-blue-600 border-blue-200 hover:bg-blue-50"
+                >
+                  <Reply className="h-4 w-4 mr-1" />
+                  Reply
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={handleCloseEmail}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          </DialogHeader>
+          
+          {selectedEmail && (
+            <div className="overflow-y-auto flex-1">
+              {/* Email Header */}
+              <div className="bg-gray-50 rounded-lg p-4 mb-4">
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <span className="text-sm font-medium text-gray-700">From:</span>
+                      <span className="text-sm text-gray-900 ml-2">
+                        {selectedEmail.from.includes('<') 
+                          ? selectedEmail.from.split('<')[0].trim() + ' ' + selectedEmail.from.match(/<(.+)>/)?.[0]
+                          : selectedEmail.from}
+                      </span>
+                    </div>
+                    <div className="text-sm text-gray-500">
+                      {new Date(selectedEmail.sentAt).toLocaleString()}
+                    </div>
+                  </div>
+                  <div>
+                    <span className="text-sm font-medium text-gray-700">To:</span>
+                    <span className="text-sm text-gray-900 ml-2">{selectedEmail.to}</span>
+                  </div>
+                  {selectedEmail.cc && selectedEmail.cc.length > 0 && (
+                    <div>
+                      <span className="text-sm font-medium text-gray-700">CC:</span>
+                      <span className="text-sm text-gray-900 ml-2">{selectedEmail.cc.join(', ')}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Email Body */}
+              <div className="bg-white border rounded-lg p-6">
+                <div 
+                  className="prose prose-sm max-w-none text-gray-800 leading-relaxed"
+                  style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}
+                >
+                  {selectedEmail.htmlBody ? (
+                    <div dangerouslySetInnerHTML={{ __html: selectedEmail.htmlBody }} />
+                  ) : (
+                    <div className="whitespace-pre-wrap">
+                      {selectedEmail.body.replace(/\r\n/g, '\n').replace(/\r/g, '\n')}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Attachments */}
+              {selectedEmail.attachments && selectedEmail.attachments.length > 0 && (
+                <div className="mt-4">
+                  <h4 className="text-sm font-medium text-gray-700 mb-2">Attachments</h4>
+                  <div className="space-y-2">
+                    {selectedEmail.attachments.map((attachment, index) => (
+                      <div key={index} className="flex items-center gap-2 p-2 bg-gray-50 rounded">
+                        <span className="text-sm text-gray-900">{attachment.name}</span>
+                        <span className="text-xs text-gray-500">({(attachment.size / 1024).toFixed(1)} KB)</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
 
       {/* Quick Actions for Bid Requests - Keep this section as you liked it */}
       {(bidRequests as any)?.bidRequests?.length > 0 && (
