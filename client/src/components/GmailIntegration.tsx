@@ -66,27 +66,29 @@ const GmailIntegration: React.FC<GmailIntegrationProps> = ({ contractorId }) => 
   const queryClient = useQueryClient();
 
   // Check Gmail connection status
-  const { data: contractor, isLoading: contractorLoading } = useQuery({
-    queryKey: ['/api/contractors', contractorId],
-    enabled: !!contractorId
+  const { data: userData } = useQuery({
+    queryKey: ['/api/users/me'],
+    enabled: true
   });
+
+  const contractor = (userData as any)?.roleData;
 
   // Fetch recent emails
   const { data: recentEmails, isLoading: emailsLoading, refetch: refetchEmails } = useQuery({
-    queryKey: ['/api/gmail/emails', contractorId],
-    enabled: !!contractorId && (contractor as any)?.gmailConnected,
+    queryKey: ['/api/gmail/emails'],
+    enabled: contractor?.gmailConnected,
   });
 
   // Fetch pending bid requests for quick email composition
   const { data: bidRequests } = useQuery({
-    queryKey: ['/api/bid-requests', contractorId],
-    enabled: !!contractorId,
+    queryKey: [`/api/contractors/${contractor?.id}/bid-requests`],
+    enabled: !!contractor?.id,
   });
 
   // Connect Gmail mutation
   const connectGmailMutation = useMutation({
     mutationFn: async () => {
-      const response = await fetch(`/api/gmail/auth/${contractorId}`, {
+      const response = await fetch(`/api/gmail/auth/${contractor?.id}`, {
         method: 'GET'
       });
       return response.json();
@@ -110,12 +112,12 @@ const GmailIntegration: React.FC<GmailIntegrationProps> = ({ contractorId }) => 
   // Disconnect Gmail mutation
   const disconnectGmailMutation = useMutation({
     mutationFn: async () => {
-      return await apiRequest(`/api/gmail/disconnect/${contractorId}`, {
+      return await apiRequest(`/api/gmail/disconnect/${contractor?.id}`, {
         method: 'POST'
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/contractors', contractorId] });
+      queryClient.invalidateQueries({ queryKey: ['/api/users/me'] });
       toast({
         title: "Gmail Disconnected",
         description: "Your Gmail account has been disconnected successfully.",
@@ -133,7 +135,7 @@ const GmailIntegration: React.FC<GmailIntegrationProps> = ({ contractorId }) => 
   // Send email mutation
   const sendEmailMutation = useMutation({
     mutationFn: async (emailData: EmailForm) => {
-      return await apiRequest(`/api/gmail/send/${contractorId}`, {
+      return await apiRequest(`/api/gmail/send/${contractor?.id}`, {
         method: 'POST',
         body: JSON.stringify(emailData),
         headers: { 'Content-Type': 'application/json' }
@@ -162,8 +164,8 @@ const GmailIntegration: React.FC<GmailIntegrationProps> = ({ contractorId }) => 
     setIsConnecting(true);
     const pollInterval = setInterval(async () => {
       try {
-        await queryClient.invalidateQueries({ queryKey: ['/api/contractors', contractorId] });
-        const updatedContractor = queryClient.getQueryData(['/api/contractors', contractorId]) as any;
+        await queryClient.invalidateQueries({ queryKey: ['/api/users/me'] });
+        const updatedContractor = queryClient.getQueryData(['/api/users/me']) as any;
         if (updatedContractor && updatedContractor.gmailConnected) {
           clearInterval(pollInterval);
           setIsConnecting(false);
@@ -288,7 +290,7 @@ ${(contractor as any)?.companyName}`
     setShowCompose(true);
   };
 
-  if (contractorLoading) {
+  if (!contractor) {
     return (
       <div className="flex items-center justify-center py-8">
         <Loader2 className="h-8 w-8 animate-spin" />
