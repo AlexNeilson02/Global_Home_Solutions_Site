@@ -1633,10 +1633,63 @@ html {
     background: transparent !important;
   }
 
-  /* Targeted Yellow Background Elimination - Only Remove Yellow */
+  /* Targeted Yellow Background Elimination - Multiple Approaches */
   .contractor-portal-main {
     background-color: #f9fafb !important;
     background-image: none !important;
+    background: #f9fafb !important;
+  }
+
+  /* Override any potential yellow from body or html */
+  body.contractor-portal,
+  html.contractor-portal {
+    background-color: #f9fafb !important;
+    background: #f9fafb !important;
+  }
+
+  /* Target specific selectors that might have yellow */
+  .contractor-portal-main,
+  .contractor-portal-main > *,
+  .contractor-portal-main [data-radix-tabs-content],
+  .contractor-portal-main div[role="tabpanel"] {
+    background-color: transparent !important;
+    background-image: none !important;
+  }
+
+  /* Override any inline yellow styles */
+  .contractor-portal-main [style*="background"] {
+    background-color: transparent !important;
+  }
+
+  /* Nuclear Yellow Elimination - All Possible Selectors */
+  .contractor-portal-main *,
+  .contractor-portal-main *::before,
+  .contractor-portal-main *::after {
+    /* Remove yellow from backgrounds only, keep other styling */
+    background-color: transparent !important;
+    background-image: none !important;
+  }
+
+  /* Re-apply main container background */
+  .contractor-portal-main {
+    background-color: #f9fafb !important;
+    background: #f9fafb !important;
+  }
+
+  /* Re-apply card styling more aggressively */
+  .contractor-portal-main .card,
+  .contractor-portal-main [data-radix-card],
+  .contractor-portal-main [class*="card"],
+  .contractor-portal-main [class*="Card"],
+  .contractor-portal-main div[class*="bg-white"],
+  .contractor-portal-main div[class*="border"] {
+    background-color: white !important;
+    background: white !important;
+    border: 1px solid #e5e7eb !important;
+    border-radius: 0.5rem !important;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1) !important;
+    padding: 1rem !important;
+    margin-bottom: 1rem !important;
   }
 
   /* Preserve All Card Backgrounds and Styling */

@@ -268,6 +268,14 @@ const ContractorPortalEnhanced: React.FC = () => {
     }
   }, [toast, contractor?.id, queryClient]);
 
+  // Add contractor-portal class to body for CSS targeting
+  useEffect(() => {
+    document.body.classList.add('contractor-portal');
+    return () => {
+      document.body.classList.remove('contractor-portal');
+    };
+  }, []);
+
   // Get contractor's projects
   const { data: projectsData } = useQuery({
     queryKey: ['/api/projects'],
