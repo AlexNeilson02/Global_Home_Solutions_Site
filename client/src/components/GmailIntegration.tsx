@@ -204,11 +204,25 @@ const GmailIntegration: React.FC<GmailIntegrationProps> = ({ contractorId }) => 
       });
       return response.json();
     },
-    onSuccess: () => {
+    onSuccess: async (data, variables) => {
       toast({
         title: "Email Sent",
         description: "Your email has been sent successfully.",
       });
+      
+      // If this email was sent to a bid request, mark it as contacted
+      if (variables.bidRequestId) {
+        try {
+          await apiRequest(`/contractors/${contractor?.id}/bid-requests/${variables.bidRequestId}/contact`, {
+            method: 'POST'
+          });
+          // Refresh bid requests to update the UI
+          queryClient.invalidateQueries({ queryKey: [`/api/contractors/${contractor?.id}/bid-requests`] });
+        } catch (error) {
+          console.error('Failed to mark bid as contacted:', error);
+        }
+      }
+      
       setShowCompose(false);
       setEmailForm({ to: '', subject: '', body: '' });
       refetchEmails();
@@ -362,108 +376,41 @@ ${(contractor as any)?.companyName}`
     setShowCompose(true);
   };
 
-  // Function to handle quick template emails
-  const handleQuickTemplate = (bid: any, templateType: string) => {
-    console.log('handleQuickTemplate called:', { bid, templateType });
-    let subject = '';
-    let body = '';
+  // Function to handle contacting a lead
+  const handleContactLead = (bid: any) => {
+    console.log('handleContactLead called:', bid);
+    const serviceType = bid.servicesRequested?.[0] || bid.serviceType || 'your service request';
+    const customerName = bid.fullName || bid.customerName || 'there';
     
-    switch (templateType) {
-      case 'introduction':
-        subject = `Professional ${bid.serviceType} Services - ${(contractor as any)?.companyName || 'Our Company'}`;
-        body = `Dear ${bid.customerName},
+    const subject = `Professional ${serviceType} Services - ${(contractor as any)?.companyName || 'Our Company'}`;
+    const body = `Dear ${customerName},
 
-Thank you for your interest in ${bid.serviceType.toLowerCase()} services. We are a licensed and insured contractor with extensive experience in this field.
+Thank you for your interest in ${serviceType.toLowerCase()} services. I received your request and I'm excited to help you with your project.
 
-Our services include:
-• Professional consultation and assessment
-• High-quality materials and workmanship
+About us:
+• Licensed and insured contractor
+• Extensive experience in ${serviceType.toLowerCase()}
+• Quality workmanship with warranty
 • Competitive pricing and flexible scheduling
-• Full warranty on all work performed
 
-Budget Range: $${bid.budget?.toLocaleString() || 'To be determined'}
+${bid.description ? `Regarding your project: "${bid.description}"` : 'I\'d love to learn more about your specific needs.'}
 
-I'd love to schedule a free consultation to discuss your project in detail. Are you available this week for a brief meeting?
+${bid.budget ? `Budget Range: $${bid.budget.toLocaleString()}` : ''}
 
-Best regards,
-${(contractor as any)?.companyName || '[Your Company]'}
-${(contractor as any)?.phone || '[Your Phone]'}`;
-        break;
-        
-      case 'quote':
-        subject = `Quote Request - ${bid.serviceType} Project`;
-        body = `Dear ${bid.customerName},
+I'd be happy to schedule a free consultation to discuss your project in detail and provide you with a personalized quote.
 
-Thank you for considering our services for your ${bid.serviceType.toLowerCase()} project.
-
-To provide you with an accurate quote, I'll need to:
-• Schedule a brief site visit/consultation
-• Assess the scope of work required
-• Discuss your specific preferences and timeline
-• Review any special requirements
-
-Project Details:
-• Service: ${bid.serviceType}
-• Budget Range: $${bid.budget?.toLocaleString() || 'To be determined'}
-
-I'm available for a consultation this week. Would you prefer a morning or afternoon appointment?
-
-Best regards,
-${(contractor as any)?.companyName || '[Your Company]'}`;
-        break;
-        
-      case 'followup':
-        subject = `Following Up - ${bid.serviceType} Project`;
-        body = `Dear ${bid.customerName},
-
-I wanted to follow up on your ${bid.serviceType.toLowerCase()} project inquiry. 
-
-I understand you're likely considering multiple contractors, and I'd be happy to answer any questions you might have about:
-• Our experience and credentials
-• Project timeline and process
-• Pricing and payment options
-• Previous client references
-
-No pressure - just wanted to make sure you have all the information you need to make the best decision for your project.
-
-Is there anything specific you'd like to know about our services?
-
-Best regards,
-${(contractor as any)?.companyName || '[Your Company]'}`;
-        break;
-        
-      case 'schedule':
-        subject = `Schedule Consultation - ${bid.serviceType} Project`;
-        body = `Dear ${bid.customerName},
-
-I'd like to schedule a convenient time to discuss your ${bid.serviceType.toLowerCase()} project in detail.
-
-I'm available:
-• This week: [Please specify your availability]
-• Next week: [Please specify your availability]
-
-The consultation will take approximately 30-45 minutes and will include:
-• Project assessment and scope review
-• Discussion of your preferences and timeline
-• Preliminary cost estimates
-• Answers to any questions you may have
-
-Please let me know what works best for your schedule.
+Are you available for a brief call this week to get started?
 
 Best regards,
 ${(contractor as any)?.companyName || '[Your Company]'}
-Phone: ${(contractor as any)?.phone || '[Your Phone]'}`;
-        break;
-        
-      default:
-        subject = `Re: ${bid.serviceType} Service Request`;
-        body = `Dear ${bid.customerName},\n\nThank you for your interest in our ${bid.serviceType.toLowerCase()} services.\n\nBest regards,\n[Your Name]`;
-    }
+${(contractor as any)?.phone ? `Phone: ${(contractor as any).phone}` : ''}`;
     
+    // Store the bid ID to mark as contacted after email is sent
     setEmailForm({
       to: bid.email,
       subject,
-      body
+      body,
+      bidRequestId: bid.id // Add bidRequestId to track which lead this email is for
     });
     setShowCompose(true);
     setShowInbox(false);
@@ -510,35 +457,40 @@ Phone: ${(contractor as any)?.phone || '[Your Phone]'}`;
 
   return (
     <div className="space-y-6">
-      {/* Enhanced Quick Email Actions */}
+      {/* Uncontacted Leads - Quick Contact */}
       {(bidRequests as any)?.bidRequests?.length > 0 && (
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Zap className="h-5 w-5 text-blue-600" />
-              Quick Email Actions
+              <Mail className="h-5 w-5 text-blue-600" />
+              Uncontacted Leads
             </CardTitle>
             <CardDescription>
-              Send professional emails to clients from your pending bid requests with templates
+              Contact new clients who haven't been reached yet
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="grid gap-4">
+            <div className="grid gap-3">
               {(bidRequests as any).bidRequests
-                .filter((bid: any) => bid.status === 'pending')
+                .filter((bid: any) => bid.status === 'pending' && !bid.emailSent)
                 .slice(0, 5)
                 .map((bid: any) => (
                 <div key={bid.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 transition-colors">
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
-                      <div className="font-medium text-gray-900">{bid.customerName}</div>
-                      <Badge variant="outline" className="text-xs">
-                        {bid.status === 'pending' ? 'New Lead' : bid.status}
+                      <div className="font-medium text-gray-900">{bid.fullName || bid.customerName}</div>
+                      <Badge variant="outline" className="text-xs bg-orange-50 text-orange-700 border-orange-200">
+                        Uncontacted
                       </Badge>
                     </div>
                     <div className="text-sm text-gray-600 mb-1">
-                      <span className="font-medium">{bid.serviceType}</span> • 
-                      <span className="text-green-600 font-medium"> ${bid.budget?.toLocaleString() || 'Budget TBD'}</span>
+                      <span className="font-medium">{bid.servicesRequested?.[0] || bid.serviceType}</span>
+                      {bid.budget && (
+                        <>
+                          {' • '}
+                          <span className="text-green-600 font-medium">${bid.budget?.toLocaleString()}</span>
+                        </>
+                      )}
                     </div>
                     <div className="text-sm text-gray-500 flex items-center gap-2">
                       <Mail className="h-3 w-3" />
@@ -551,76 +503,24 @@ Phone: ${(contractor as any)?.phone || '[Your Phone]'}`;
                       </div>
                     )}
                   </div>
-                  <div className="flex items-center gap-2 ml-4">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button 
-                          size="sm"
-                          variant="outline"
-                          className="border-blue-200 text-blue-700 hover:bg-blue-50"
-                        >
-                          <MessageSquare className="h-4 w-4 mr-1" />
-                          Template
-                          <ChevronDown className="h-3 w-3 ml-1" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="w-56">
-                        <DropdownMenuItem 
-                          onSelect={() => handleQuickTemplate(bid, 'introduction')}
-                          className="cursor-pointer"
-                        >
-                          <Users className="h-4 w-4 mr-2" />
-                          Introduction & Services
-                        </DropdownMenuItem>
-                        <DropdownMenuItem 
-                          onSelect={() => handleQuickTemplate(bid, 'quote')}
-                          className="cursor-pointer"
-                        >
-                          <FileText className="h-4 w-4 mr-2" />
-                          Quote Request
-                        </DropdownMenuItem>
-                        <DropdownMenuItem 
-                          onSelect={() => handleQuickTemplate(bid, 'followup')}
-                          className="cursor-pointer"
-                        >
-                          <Clock className="h-4 w-4 mr-2" />
-                          Follow-up
-                        </DropdownMenuItem>
-                        <DropdownMenuItem 
-                          onSelect={() => handleQuickTemplate(bid, 'schedule')}
-                          className="cursor-pointer"
-                        >
-                          <Calendar className="h-4 w-4 mr-2" />
-                          Schedule Meeting
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+                  <div className="ml-4">
                     <Button 
                       size="sm"
-                      onClick={() => handleQuickCompose(bid)}
+                      onClick={() => handleContactLead(bid)}
                       className="bg-blue-600 hover:bg-blue-700"
                     >
                       <Send className="h-4 w-4 mr-1" />
-                      Custom
+                      CONTACT
                     </Button>
                   </div>
                 </div>
               ))}
               
-              {(bidRequests as any).bidRequests.filter((bid: any) => bid.status === 'pending').length > 5 && (
-                <div className="text-center pt-2">
-                  <Button variant="ghost" size="sm" className="text-blue-600 hover:text-blue-700">
-                    View {(bidRequests as any).bidRequests.filter((bid: any) => bid.status === 'pending').length - 5} more leads
-                    <ChevronDown className="h-4 w-4 ml-1" />
-                  </Button>
-                </div>
-              )}
-              
-              {(bidRequests as any).bidRequests.filter((bid: any) => bid.status === 'pending').length === 0 && (
+              {(bidRequests as any).bidRequests.filter((bid: any) => bid.status === 'pending' && !bid.emailSent).length === 0 && (
                 <div className="text-center py-8 text-gray-500">
-                  <Mail className="h-12 w-12 mx-auto mb-3 text-gray-300" />
-                  <h3 className="font-medium text-gray-900 mb-1">No pending leads</h3>
-                  <p className="text-sm">New bid requests will appear here for quick email actions</p>
+                  <CheckCircle className="h-12 w-12 mx-auto mb-3 text-green-300" />
+                  <h3 className="font-medium text-gray-900 mb-1">All leads contacted</h3>
+                  <p className="text-sm">Great job! You've reached out to all pending leads</p>
                 </div>
               )}
             </div>

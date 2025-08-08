@@ -85,6 +85,7 @@ export interface IStorage {
   updateBidRequestStatus(id: number, status: string): Promise<BidRequest | undefined>;
   updateBidRequestEmailSent(id: number, emailSent: boolean): Promise<BidRequest | undefined>;
   updateBidRequestNotes(id: number, notes: string): Promise<BidRequest | undefined>;
+  markBidRequestAsContacted(id: number): Promise<BidRequest | undefined>;
   
   // Page Visit methods
   createPageVisit(pageVisit: InsertPageVisit): Promise<PageVisit>;
@@ -444,6 +445,23 @@ export class MemStorage implements IStorage {
     const updatedBidRequest = {
       ...bidRequest,
       emailSent
+    };
+    
+    this.bidRequests.set(id, updatedBidRequest);
+    return updatedBidRequest;
+  }
+
+  async markBidRequestAsContacted(id: number): Promise<BidRequest | undefined> {
+    const bidRequest = this.bidRequests.get(id);
+    
+    if (!bidRequest) {
+      return undefined;
+    }
+    
+    const updatedBidRequest = {
+      ...bidRequest,
+      emailSent: true,
+      lastUpdated: new Date()
     };
     
     this.bidRequests.set(id, updatedBidRequest);

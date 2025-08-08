@@ -903,6 +903,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Mark bid request as contacted
+  apiRouter.post("/contractors/:contractorId/bid-requests/:bidId/contact", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const contractorId = Number(req.params.contractorId);
+      const bidId = Number(req.params.bidId);
+      
+      // Verify the user has access to this contractor's data
+      const user = req.session?.user;
+      if (!user) {
+        return res.status(401).json({ message: "Authentication required" });
+      }
+
+      // Check if user is admin or the contractor themselves
+      if (user.role !== 'admin' && user.roleData?.id !== contractorId) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+
+      // Update the bid request to mark as contacted (emailSent = true)
+      const result = await storage.markBidRequestAsContacted(bidId);
+      
+      if (!result) {
+        return res.status(404).json({ message: "Bid request not found" });
+      }
+
+      console.log(`Bid request ${bidId} marked as contacted by contractor ${contractorId}`);
+      res.json({ success: true, message: "Bid request marked as contacted successfully" });
+    } catch (error) {
+      console.error("Error marking bid request as contacted:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   // Enhanced analytics endpoints with real data calculations
   apiRouter.get("/analytics/admin/overview", isAuthenticated, requireRole(['admin']), async (req: Request, res: Response) => {
     try {
