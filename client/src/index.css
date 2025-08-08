@@ -1227,6 +1227,38 @@ html {
   outline: none !important;
 }
 
+/* Targeted yellow border removal for portal login forms */
+.portal-card,
+.login-form,
+.auth-form,
+.portal-login-card,
+[data-component="portal-login"],
+[data-component="auth-form"],
+.contractor-login,
+.sales-login,
+.admin-login,
+div[role="dialog"]:has(form),
+.modal-content:has(form) {
+  border: 1px solid #e5e7eb !important;
+  outline: none !important;
+  outline-color: transparent !important;
+  outline-width: 0 !important;
+  outline-style: none !important;
+}
+
+/* Remove yellow focus rings from portal login elements */
+.portal-card:focus,
+.login-form:focus,
+.auth-form:focus,
+.portal-login-card:focus,
+[data-component="portal-login"]:focus,
+[data-component="auth-form"]:focus,
+div[role="dialog"]:has(form):focus {
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2) !important;
+  outline: none !important;
+}
+
 
 
 
