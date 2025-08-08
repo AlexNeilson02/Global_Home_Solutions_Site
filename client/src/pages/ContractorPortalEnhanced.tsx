@@ -35,7 +35,6 @@ import { loadStripe } from "@stripe/stripe-js";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
-import DocumentManager from "@/components/DocumentManager";
 import ProjectTimeline from "@/components/ProjectTimeline";
 import AnalyticsDashboard from "@/components/AnalyticsDashboard";
 import GmailIntegration from "@/components/GmailIntegration";
@@ -858,12 +857,11 @@ const ContractorPortalEnhanced: React.FC = () => {
             }}
           >
             {/* Desktop/Tablet Navigation - Hidden on mobile */}
-            <TabsList className="hidden sm:grid w-full grid-cols-8">
+            <TabsList className="hidden sm:grid w-full grid-cols-7">
               <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
               <TabsTrigger value="profile">Company Profile</TabsTrigger>
               <TabsTrigger value="projects">Sent Bids</TabsTrigger>
               <TabsTrigger value="bids">Bid Requests</TabsTrigger>
-              <TabsTrigger value="documents">Documents</TabsTrigger>
               <TabsTrigger value="email">Email</TabsTrigger>
               <TabsTrigger value="subscription">Subscription</TabsTrigger>
               <TabsTrigger value="analytics">Analytics</TabsTrigger>
@@ -908,15 +906,7 @@ const ContractorPortalEnhanced: React.FC = () => {
                   <Mail className="h-5 w-5" />
                   <span>Bids</span>
                 </button>
-                <button
-                  onClick={() => setActiveTab("documents")}
-                  className={`flex flex-col items-center justify-center gap-1 text-xs hover:bg-gray-100 dark:hover:bg-gray-800 px-4 min-w-[80px] flex-shrink-0 ${
-                    activeTab === "documents" ? "text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950" : ""
-                  }`}
-                >
-                  <FileText className="h-4 w-4" />
-                  <span>Docs</span>
-                </button>
+
                 <button
                   onClick={() => setActiveTab("email")}
                   className={`flex flex-col items-center justify-center gap-1 text-xs hover:bg-gray-100 dark:hover:bg-gray-800 px-4 min-w-[80px] flex-shrink-0 ${
@@ -1651,25 +1641,7 @@ const ContractorPortalEnhanced: React.FC = () => {
               </Card>
             </TabsContent>
 
-            {/* Documents Tab */}
-            <TabsContent value="documents" className="space-y-6">
-              <Card style={antiYellowStyles}>
-                <CardHeader>
-                  <CardTitle>Document Management</CardTitle>
-                  <CardDescription>
-                    Organize and manage all your business documents, contracts, and project files
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <DocumentManager 
-                    category="portfolio"
-                    relatedId={contractor?.id}
-                    relatedType="contractor"
-                    showUpload={true}
-                  />
-                </CardContent>
-              </Card>
-            </TabsContent>
+
 
             {/* Email Tab */}
             <TabsContent value="email" className="space-y-6">
