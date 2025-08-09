@@ -14,6 +14,8 @@ export default function HomePage() {
   const { navigateWithSalesperson } = useSalespersonNavigation();
   const { salespersonId } = useSalesperson();
   const [isMobile, setIsMobile] = useState(false);
+  const [trackingComplete, setTrackingComplete] = useState(false);
+  const [trackingLoading, setTrackingLoading] = useState(false);
 
   useEffect(() => {
     const checkMobile = () => {
@@ -24,6 +26,59 @@ export default function HomePage() {
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
+
+  // Page visit tracking for ?ref=username
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const refParam = urlParams.get('ref');
+    
+    // Only track if we have ref parameter and haven't tracked yet
+    if (refParam && !trackingComplete && !trackingLoading) {
+      setTrackingLoading(true);
+      console.log('🔄 Starting page visit tracking for ref:', refParam);
+      
+      const trackVisit = async (retryCount = 0) => {
+        try {
+          console.log(`📡 Attempt ${retryCount + 1}: Making track-visit API call...`);
+          
+          const response = await apiRequest('POST', '/api/track-visit', {
+            salespersonProfileUrl: refParam,
+            userAgent: navigator.userAgent,
+            referrer: document.referrer
+          });
+          
+          if (response.ok) {
+            console.log('✅ Page visit tracked successfully for ref:', refParam);
+            setTrackingComplete(true);
+          } else {
+            throw new Error(`Track visit failed with status: ${response.status}`);
+          }
+        } catch (error) {
+          console.error(`❌ Track visit attempt ${retryCount + 1} failed:`, error);
+          
+          // Retry up to 2 times with exponential backoff
+          if (retryCount < 2) {
+            const delay = Math.pow(2, retryCount) * 1000;
+            console.log(`🔄 Retrying in ${delay}ms...`);
+            setTimeout(() => trackVisit(retryCount + 1), delay);
+          } else {
+            console.error('❌ All tracking attempts failed for ref:', refParam);
+            setTrackingComplete(true); // Allow page to work without tracking
+          }
+        } finally {
+          if (retryCount === 0) {
+            setTrackingLoading(false);
+          }
+        }
+      };
+      
+      trackVisit();
+    } else if (!refParam) {
+      // No ref parameter, mark tracking as complete
+      console.log('ℹ️ No ref parameter found - no visit tracking needed');
+      setTrackingComplete(true);
+    }
+  }, [trackingComplete, trackingLoading]);
 
   const currentHeroImage = isMobile ? mobileHeroImage : heroBackgroundImage;
 
