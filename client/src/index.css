@@ -1623,7 +1623,7 @@ div[class*="bg-white"]:not(.dialog-content):not(.card):not(.sheet):not(.modal):n
 }
 
 /* Nuclear Option 2: Make main app containers transparent on ALL pages */
-.homepage-container,
+.homepage-container:not(.service-selection-page),
 .about-us-page,
 .contractor-portal-main,
 .salesperson-portal-main,
@@ -1639,6 +1639,12 @@ main,
 [data-page] {
   background: transparent !important;
   background-color: transparent !important;
+}
+
+/* Services page specific fix - restore visibility */
+.service-selection-page {
+  background: rgba(255, 255, 255, 0.95) !important;
+  background-color: rgba(255, 255, 255, 0.95) !important;
 }
 
 /* Nuclear Option 3: Target common white rectangle sources */

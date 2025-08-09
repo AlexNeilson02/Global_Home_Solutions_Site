@@ -84,7 +84,7 @@ const ServiceSelection = () => {
   const filteredContractors = getFilteredContractors();
 
   return (
-    <div className="homepage-container" style={{ 
+    <div className="homepage-container service-selection-page" style={{ 
       display: 'flex', 
       flexDirection: 'column', 
       alignItems: 'center', 
