@@ -262,7 +262,7 @@ ${(contractor as any)?.phone ? `Phone: ${(contractor as any).phone}` : ''}`;
       // If this email was sent to a bid request, mark it as contacted
       if (variables.bidRequestId) {
         try {
-          await apiRequest('POST', `/api/contractors/${contractor?.id}/bid-requests/${variables.bidRequestId}/contact`, {});
+          await apiRequest('PATCH', `/api/bid-requests/${variables.bidRequestId}/status`, { status: 'contacted' });
           // Refresh bid requests to update the UI
           queryClient.invalidateQueries({ queryKey: [`/api/contractors/${contractor?.id}/bid-requests`] });
         } catch (error) {
@@ -287,7 +287,7 @@ ${(contractor as any)?.phone ? `Phone: ${(contractor as any).phone}` : ''}`;
   // Mark bid request as contacted mutation
   const markBidContactedMutation = useMutation({
     mutationFn: async (bidRequestId: number) => {
-      return apiRequest('POST', `/api/contractors/${contractor?.id}/bid-requests/${bidRequestId}/contact`, {});
+      return apiRequest('PATCH', `/api/bid-requests/${bidRequestId}/status`, { status: 'contacted' });
     },
     onSuccess: () => {
       // Refresh bid requests to update the UI
@@ -449,8 +449,7 @@ ${(contractor as any)?.companyName}`
   const handleContactLead = (bid: any) => {
     console.log('handleContactLead called:', bid);
     
-    // Mark bid as contacted immediately when CONTACT button is pressed
-    markBidContactedMutation.mutate(bid.id);
+    // DO NOT mark bid as contacted immediately - only mark as contacted when email is actually sent
     
     const serviceType = bid.servicesRequested?.[0] || bid.serviceType || 'your service request';
     const customerName = bid.fullName || bid.customerName || 'there';
@@ -478,7 +477,7 @@ Best regards,
 ${(contractor as any)?.companyName || '[Your Company]'}
 ${(contractor as any)?.phone ? `Phone: ${(contractor as any).phone}` : ''}`;
     
-    // Store the bid ID to mark as contacted after email is sent
+    // Store the bid ID to mark as contacted ONLY after email is sent
     setEmailForm({
       to: bid.email,
       subject,
