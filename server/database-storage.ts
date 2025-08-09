@@ -1129,23 +1129,43 @@ export class DatabaseStorage implements IStorage {
 
   async getCommissionSummaryBySalesperson(salespersonId: number, startDate?: Date, endDate?: Date): Promise<{
     totalEarned: number;
-    pendingCommissions: number;
-    paidCommissions: number;
-    totalRecords: number;
+    pendingEarnings: number;
+    totalDeals: number;
+    averageEarnings: number;
   }> {
-    let query = db.select().from(commissionRecords).where(eq(commissionRecords.salespersonId, salespersonId));
+    // Get all commission records for this salesperson
+    let commissionQuery = db.select().from(commissionRecords).where(eq(commissionRecords.salespersonId, salespersonId));
     
     if (startDate && endDate) {
-      query = query.where(between(commissionRecords.createdAt, startDate, endDate));
+      commissionQuery = commissionQuery.where(between(commissionRecords.createdAt, startDate, endDate));
     }
     
-    const records = await query;
+    const commissionRecordsData = await commissionQuery;
+    
+    // Get all bid requests attributed to this salesperson (these are the "deals made")
+    let bidQuery = db.select().from(bidRequests).where(eq(bidRequests.salespersonId, salespersonId));
+    
+    if (startDate && endDate) {
+      bidQuery = bidQuery.where(between(bidRequests.createdAt, startDate, endDate));
+    }
+    
+    const attributedBidRequests = await bidQuery;
+    
+    // Calculate totals from commission records
+    const totalEarned = commissionRecordsData.reduce((sum, r) => sum + (r.salesmanAmount || 0), 0);
+    const pendingEarnings = commissionRecordsData.filter(r => r.paymentStatus === 'pending').reduce((sum, r) => sum + (r.salesmanAmount || 0), 0);
+    
+    // Total deals = all bid requests attributed to this salesperson
+    const totalDeals = attributedBidRequests.length;
+    
+    // Average earnings per deal
+    const averageEarnings = totalDeals > 0 ? totalEarned / totalDeals : 0;
     
     return {
-      totalEarned: records.reduce((sum, r) => sum + (r.salesmanAmount || 0), 0),
-      pendingCommissions: records.filter(r => r.paymentStatus === 'pending').reduce((sum, r) => sum + (r.salesmanAmount || 0), 0),
-      paidCommissions: records.filter(r => r.paymentStatus === 'paid').reduce((sum, r) => sum + (r.salesmanAmount || 0), 0),
-      totalRecords: records.length
+      totalEarned,
+      pendingEarnings,
+      totalDeals,
+      averageEarnings
     };
   }
 
