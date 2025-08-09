@@ -336,18 +336,26 @@ const AnalyticsDashboard: React.FC<AnalyticsProps> = ({ userRole, userId, extern
               </div>
             </div>
             <div className="mt-6">
-              <h4 className="font-medium mb-3">Commission Trends</h4>
+              <h4 className="font-medium mb-3">Commission Distribution</h4>
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
-                  <span>This Month:</span>
-                  <span className="font-medium text-green-600">+15.2%</span>
+                  <span>Salesperson Commissions:</span>
+                  <span className="font-medium text-green-600">{formatCurrency(commissions?.salesmanTotal || 0)}</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span>Last Month:</span>
-                  <span className="font-medium">{formatCurrency((commissions?.totalCommissions || 0) * 0.3)}</span>
+                  <span>Override Commissions:</span>
+                  <span className="font-medium text-orange-600">{formatCurrency(commissions?.overrideTotal || 0)}</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span>Processing Time:</span>
+                  <span>Corporate Commission:</span>
+                  <span className="font-medium text-blue-600">{formatCurrency(commissions?.corpTotal || 0)}</span>
+                </div>
+                <div className="flex justify-between text-sm border-t pt-2">
+                  <span className="font-medium">Total Commission Records:</span>
+                  <span className="font-medium">{commissions?.totalRecords || 0} leads</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span>Processing Status:</span>
                   <span className="font-medium">2.1 days avg</span>
                 </div>
               </div>
