@@ -240,9 +240,13 @@ const GmailIntegration: React.FC<GmailIntegrationProps> = ({ contractorId, pendi
       // If this email was sent to a bid request, mark it as contacted
       if (variables.bidRequestId) {
         try {
-          await apiRequest(`/contractors/${contractor?.id}/bid-requests/${variables.bidRequestId}/contact`, {
-            method: 'POST'
+          const response = await fetch(`/api/bid-requests/${variables.bidRequestId}/status`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status: 'contacted' })
           });
+          if (!response.ok) throw new Error('Failed to update status');
+          
           // Refresh bid requests to update the UI
           queryClient.invalidateQueries({ queryKey: [`/api/contractors/${contractor?.id}/bid-requests`] });
         } catch (error) {
