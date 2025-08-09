@@ -53,42 +53,34 @@ html::after {
 
 /* Enhanced modal styling with prominent backdrop */
 [data-radix-dialog-overlay] {
-  background: rgba(0, 0, 0, 0.85) !important;
-  backdrop-filter: blur(20px) saturate(180%) !important;
-  -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
-  animation: backdropFadeIn 0.3s ease-out !important;
+  background: rgba(0, 0, 0, 0.65) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  animation: backdropFadeIn 0.2s ease-out !important;
 }
 
 /* Make dialog content more prominent */
 [data-radix-dialog-content] {
   box-shadow: 
-    0 0 0 1px rgba(59, 130, 246, 0.3),
-    0 32px 64px -12px rgba(0, 0, 0, 0.4),
-    0 0 100px 0 rgba(59, 130, 246, 0.2),
-    inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
-  border: 3px solid rgba(59, 130, 246, 0.4) !important;
+    0 0 0 1px rgba(59, 130, 246, 0.2),
+    0 20px 40px -12px rgba(0, 0, 0, 0.3),
+    0 0 20px 0 rgba(59, 130, 246, 0.1) !important;
+  border: 2px solid rgba(59, 130, 246, 0.3) !important;
   background: rgba(255, 255, 255, 0.98) !important;
-  transform: scale(1.05) !important;
-  animation: modalAppear 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+  transform: scale(1.02) !important;
+  animation: modalAppear 0.3s ease-out !important;
   position: relative !important;
   z-index: 9999 !important;
 }
 
 @keyframes modalAppear {
-  0% {
+  from {
     opacity: 0;
-    transform: scale(0.8) translate(-50%, -60%);
-    filter: blur(4px);
+    transform: scale(0.95) translate(-50%, -48%);
   }
-  50% {
-    opacity: 0.8;
-    transform: scale(1.08) translate(-50%, -48%);
-    filter: blur(0px);
-  }
-  100% {
+  to {
     opacity: 1;
-    transform: scale(1.05) translate(-50%, -50%);
-    filter: blur(0px);
+    transform: scale(1.02) translate(-50%, -50%);
   }
 }
 
@@ -99,7 +91,7 @@ html::after {
   }
   to {
     opacity: 1;
-    backdrop-filter: blur(20px) saturate(180%);
+    backdrop-filter: blur(12px);
   }
 }
 
@@ -143,63 +135,14 @@ html::after {
   background: linear-gradient(135deg, #3b82f6, #2563eb, #1d4ed8) !important;
 }
 
-/* Add a subtle glow effect to the entire modal */
-[data-radix-dialog-content]::before {
-  content: '';
-  position: absolute;
-  top: -2px;
-  left: -2px;
-  right: -2px;
-  bottom: -2px;
-  background: linear-gradient(45deg, 
-    rgba(59, 130, 246, 0.3), 
-    rgba(139, 92, 246, 0.3), 
-    rgba(59, 130, 246, 0.3)) !important;
-  border-radius: inherit !important;
-  z-index: -1 !important;
-  opacity: 0.6 !important;
-  animation: modalGlow 2s ease-in-out infinite alternate !important;
-}
+/* Remove the glow effect for a cleaner look */
 
-@keyframes modalGlow {
-  from {
-    opacity: 0.3;
-    filter: blur(8px);
-  }
-  to {
-    opacity: 0.7;
-    filter: blur(12px);
-  }
-}
-
-/* Force modal to be above everything else */
-.fixed.inset-0.z-50[data-state="open"] {
-  z-index: 999999 !important;
-  position: fixed !important;
-  top: 0 !important;
-  left: 0 !important;
-  width: 100vw !important;
-  height: 100vh !important;
-  display: flex !important;
-  visibility: visible !important;
-  opacity: 1 !important;
-  background: rgba(0, 0, 0, 0.85) !important;
-  backdrop-filter: blur(20px) saturate(180%) !important;
-  -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
-}
-
-/* Ensure modal content appears with dramatic effect */
+/* Ensure modal content appears properly */
 [data-state="open"][role="dialog"] {
-  position: fixed !important;
-  z-index: 9999999 !important;
   display: block !important;
   visibility: visible !important;
   opacity: 1 !important;
   pointer-events: auto !important;
-  top: 50% !important;
-  left: 50% !important;
-  transform: translate(-50%, -50%) scale(1.1) !important;
-  filter: drop-shadow(0 0 50px rgba(59, 130, 246, 0.5)) !important;
 }
 
 /* Ensure About Us page content is always visible */
