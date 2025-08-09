@@ -176,6 +176,14 @@ const ContractorPortalEnhanced: React.FC = () => {
   const [viewingMedia, setViewingMedia] = useState<{url: string, type: 'image' | 'video', index: number, allMedia: any[]} | null>(null);
   const [newServiceArea, setNewServiceArea] = useState('');
   
+  // Email composition state
+  const [pendingEmailData, setPendingEmailData] = useState<{
+    to: string;
+    subject: string;
+    body: string;
+    bidRequestId: number;
+  } | null>(null);
+  
   // Subscription state
   const [subscriptionStatus, setSubscriptionStatus] = useState<'active' | 'inactive' | 'loading'>('loading');
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
@@ -309,7 +317,37 @@ const ContractorPortalEnhanced: React.FC = () => {
     console.error('Error fetching service categories:', servicesError);
   }
 
-  // Contact customer mutation
+  // Function to handle contact customer - navigate to email with prefilled data
+  const handleContactCustomer = (bid: any) => {
+    const emailSubject = `Re: ${bid.serviceRequested} Project - ${bid.address}`;
+    const emailBody = `Dear ${bid.customerName},
+
+Thank you for your interest in our ${bid.serviceRequested} services. I received your project request for ${bid.address} and would be happy to discuss your needs in detail.
+
+Based on your description: "${bid.description}"
+
+I would like to schedule a time to visit your property and provide you with a detailed estimate. Our team specializes in ${bid.serviceRequested} and we have extensive experience in your area.
+
+Please let me know when would be a convenient time for you, and I'll be happy to answer any questions you may have about the project.
+
+Best regards,
+${contractor?.companyName || 'Our Team'}
+${contractor?.phone || ''}
+${contractor?.email || ''}`;
+
+    // Set pending email data
+    setPendingEmailData({
+      to: bid.email,
+      subject: emailSubject,
+      body: emailBody,
+      bidRequestId: bid.id
+    });
+
+    // Navigate to email tab
+    setActiveTab("email");
+  };
+
+  // Contact customer mutation (now only used by email component after sending)
   const contactCustomerMutation = useMutation({
     mutationFn: async (requestId: number) => {
       const response = await fetch(`/api/bid-requests/${requestId}/status`, {
@@ -1594,8 +1632,7 @@ const ContractorPortalEnhanced: React.FC = () => {
                               <Button
                                 size="sm"
                                 className="bg-blue-600 hover:bg-blue-700 text-white"
-                                onClick={() => contactCustomerMutation.mutate(bid.id)}
-                                disabled={contactCustomerMutation.isPending}
+                                onClick={() => handleContactCustomer(bid)}
                                 style={antiYellowInputStyles}
                               >
                                 <Phone className="h-4 w-4 mr-1" />
@@ -1656,7 +1693,11 @@ const ContractorPortalEnhanced: React.FC = () => {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <GmailIntegration contractorId={contractor?.id} />
+                  <GmailIntegration 
+                    contractorId={contractor?.id} 
+                    pendingEmailData={pendingEmailData}
+                    onEmailDataProcessed={() => setPendingEmailData(null)}
+                  />
                 </CardContent>
               </Card>
             </TabsContent>

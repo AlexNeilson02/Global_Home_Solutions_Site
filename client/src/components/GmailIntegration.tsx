@@ -45,6 +45,13 @@ import { useToast } from "@/hooks/use-toast";
 
 interface GmailIntegrationProps {
   contractorId?: number;
+  pendingEmailData?: {
+    to: string;
+    subject: string;
+    body: string;
+    bidRequestId: number;
+  } | null;
+  onEmailDataProcessed?: () => void;
 }
 
 interface GmailMessage {
@@ -72,7 +79,7 @@ interface EmailForm {
   bidRequestId?: number;
 }
 
-const GmailIntegration: React.FC<GmailIntegrationProps> = ({ contractorId }) => {
+const GmailIntegration: React.FC<GmailIntegrationProps> = ({ contractorId, pendingEmailData, onEmailDataProcessed }) => {
   const [isConnecting, setIsConnecting] = useState(false);
   const [showCompose, setShowCompose] = useState(false);
   const [showInbox, setShowInbox] = useState(true);
@@ -106,6 +113,26 @@ const GmailIntegration: React.FC<GmailIntegrationProps> = ({ contractorId }) => 
     queryKey: [`/api/gmail/sent/${contractor?.id}`],
     enabled: Boolean(contractor?.gmailConnected && contractor?.id && currentView === 'sent'),
   });
+
+  // Handle pending email data from parent component
+  useEffect(() => {
+    if (pendingEmailData) {
+      setEmailForm({
+        to: pendingEmailData.to,
+        subject: pendingEmailData.subject,
+        body: pendingEmailData.body,
+        bidRequestId: pendingEmailData.bidRequestId
+      });
+      setShowCompose(true);
+      setShowInbox(false);
+      setSelectedEmail(null);
+      
+      // Clear pending data after processing
+      if (onEmailDataProcessed) {
+        onEmailDataProcessed();
+      }
+    }
+  }, [pendingEmailData, onEmailDataProcessed]);
 
   // Debug logging
   useEffect(() => {
