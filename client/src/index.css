@@ -69,6 +69,45 @@ div[style*="backgroundColor: '#f8fafc'"] * {
   -webkit-backdrop-filter: none !important;
 }
 
+/* Remove all borders from contractor portal elements */
+.contractor-portal-main *,
+.contractor-portal-container *,
+.contractor-portal-content *,
+.contractor-portal-tabs *,
+[data-state] *,
+[data-radix-tabs-content] *,
+[data-radix-accordion-content] *,
+[data-radix-dialog-content] *,
+.card *,
+.input *,
+.textarea *,
+.select *,
+.button * {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Specific overrides for shadcn components */
+.contractor-portal-main [role="tabpanel"],
+.contractor-portal-main [role="tab"],
+.contractor-portal-main [role="tablist"],
+.contractor-portal-main .bg-card,
+.contractor-portal-main .bg-background,
+.contractor-portal-main .bg-muted,
+.contractor-portal-main .bg-popover {
+  border: none !important;
+}
+
+/* Remove borders from Cards specifically */
+.contractor-portal-main .bg-white,
+.contractor-portal-main .bg-gray-50,
+.contractor-portal-main .rounded-lg,
+.contractor-portal-main .rounded {
+  border: none !important;
+  box-shadow: none !important;
+}
+
 /* Remove any potential iframe or embedded content spacing */
 iframe[src*="replit"],
 div[id*="replit"],

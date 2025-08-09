@@ -901,7 +901,7 @@ const ContractorPortalEnhanced: React.FC = () => {
             </TabsList>
 
             {/* Mobile Navigation - Fixed bottom bar, shown only on mobile */}
-            <div className="sm:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 z-50">
+            <div className="sm:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 z-50">
               <div className="flex h-16 overflow-x-auto scrollbar-hide">
                 <button
                   onClick={() => setActiveTab("dashboard")}
@@ -1200,7 +1200,7 @@ const ContractorPortalEnhanced: React.FC = () => {
                       <div>
                         <label className="block text-sm font-medium mb-2">Company Logo</label>
                         <div className="flex items-start space-x-4">
-                          <div className="w-32 h-32 bg-gray-100 dark:bg-gray-800 rounded-lg flex items-center justify-center overflow-hidden border-2 border-dashed border-gray-300 dark:border-gray-600">
+                          <div className="w-32 h-32 bg-gray-100 dark:bg-gray-800 rounded-lg flex items-center justify-center overflow-hidden">
                             {logoPreview ? (
                               <img src={logoPreview} alt="Logo Preview" className="w-full h-full object-cover" />
                             ) : (
@@ -1299,16 +1299,16 @@ const ContractorPortalEnhanced: React.FC = () => {
                         </div>
                         <div className="flex gap-2">
                           {servicesLoading ? (
-                            <div className="flex-1 p-2 text-sm text-gray-500 border rounded">
+                            <div className="flex-1 p-2 text-sm text-gray-500 bg-gray-50 rounded">
                               Loading service categories...
                             </div>
                           ) : servicesError ? (
-                            <div className="flex-1 p-2 text-sm text-red-500 border rounded">
+                            <div className="flex-1 p-2 text-sm text-red-500 bg-red-50 rounded">
                               Error loading categories
                             </div>
                           ) : (
                             <select
-                              className="flex-1 p-2 border border-gray-300 rounded-md bg-white dark:bg-gray-800 dark:border-gray-600 text-sm"
+                              className="flex-1 p-2 rounded-md bg-white dark:bg-gray-800 text-sm"
                               style={antiYellowInputStyles}
                               value=""
                               onChange={(e) => {
@@ -1407,7 +1407,7 @@ const ContractorPortalEnhanced: React.FC = () => {
                             </div>
                           ))}
                           <div 
-                            className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg aspect-square flex items-center justify-center cursor-pointer hover:border-gray-400 dark:hover:border-gray-500"
+                            className="bg-gray-100 dark:bg-gray-700 rounded-lg aspect-square flex items-center justify-center cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-600"
                             onClick={() => mediaInputRef.current?.click()}
                           >
                             <div className="text-center">
@@ -1460,7 +1460,7 @@ const ContractorPortalEnhanced: React.FC = () => {
                   <div className="space-y-4">
                     {bidRequests.filter((bid: any) => bid.status === 'bid_sent' || bid.status === 'won' || bid.status === 'lost').length > 0 ? (
                       bidRequests.filter((bid: any) => bid.status === 'bid_sent' || bid.status === 'won' || bid.status === 'lost').map((project: any) => (
-                        <div key={project.id} className="border rounded-lg p-4 bg-white dark:bg-gray-800">
+                        <div key={project.id} className="rounded-lg p-4 bg-white dark:bg-gray-800">
                           <div className="flex justify-between items-start mb-3">
                             <div className="flex-1">
                               <div className="flex items-center gap-2 mb-2">
@@ -1576,7 +1576,7 @@ const ContractorPortalEnhanced: React.FC = () => {
                   <div className="space-y-4">
                     {bidRequests.length > 0 ? (
                       bidRequests.filter((bid: any) => bid.status === 'pending' || bid.status === 'contacted').map((bid: any) => (
-                        <div key={bid.id} className="border rounded-lg p-4 bg-white dark:bg-gray-800">
+                        <div key={bid.id} className="rounded-lg p-4 bg-white dark:bg-gray-800">
                           <div className="flex justify-between items-start mb-3">
                             <div className="flex-1">
                               <div className="flex items-center gap-2 mb-2">
@@ -1818,7 +1818,7 @@ const ContractorPortalEnhanced: React.FC = () => {
                 <CardContent className="space-y-6">
                   {contractor?.paymentMethodAdded ? (
                     <div className="space-y-4">
-                      <div className="p-4 bg-white rounded-lg border border-gray-200">
+                      <div className="p-4 bg-white rounded-lg">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-3">
                             <div className={`flex items-center justify-center w-12 h-8 rounded text-white text-sm font-bold ${
@@ -1884,7 +1884,7 @@ const ContractorPortalEnhanced: React.FC = () => {
                         </div>
                       </div>
                   
-                      <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                      <div className="bg-blue-50 p-4 rounded-lg">
                         <div className="flex items-start gap-3">
                           <div className="flex-shrink-0">
                             <svg className="w-5 h-5 text-blue-600 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
@@ -1936,7 +1936,7 @@ const ContractorPortalEnhanced: React.FC = () => {
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
-                  <div className="flex items-center gap-3 p-4 bg-green-50 border border-green-200 rounded-lg">
+                  <div className="flex items-center gap-3 p-4 bg-green-50 rounded-lg">
                     <div className="flex-shrink-0">
                       <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
                         <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
@@ -1982,7 +1982,7 @@ const ContractorPortalEnhanced: React.FC = () => {
                     </div>
                   </div>
 
-                  <div className="border-t pt-4">
+                  <div className="pt-4">
                     <Button 
                       variant="destructive" 
                       onClick={cancelSubscription}
