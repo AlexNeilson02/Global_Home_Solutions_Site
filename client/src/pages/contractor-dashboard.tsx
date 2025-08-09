@@ -292,6 +292,8 @@ function ContractorDashboard() {
 
   // Handle contact customer - switches to email tab and prepares email
   const handleContactCustomer = (request: any) => {
+    console.log('🎯 handleContactCustomer called for bid request:', request.id);
+    
     // Extract email from contact string (format: "email | phone")
     const email = request.contact.split(' | ')[0];
     const customerName = request.customer;
@@ -307,11 +309,13 @@ function ContractorDashboard() {
       servicesRequested: [request.details]
     };
     
+    console.log('🎯 Switching to email tab for bid request:', request.id);
     // Switch to email tab first
     setActiveTab("email");
     
     // Set the pending contact email data with a slight delay to ensure tab switch
     setTimeout(() => {
+      console.log('🎯 Setting pending contact email for bid request:', request.id);
       setPendingContactEmail(emailData);
     }, 100);
   };

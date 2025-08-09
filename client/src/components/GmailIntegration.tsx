@@ -160,7 +160,7 @@ ${(contractor as any)?.phone ? `Phone: ${(contractor as any).phone}` : ''}`;
       setShowInbox(false);
       setSelectedEmail(null);
       
-      // Clear the pending email after handling
+      // Clear the pending email after handling (but don't trigger any other side effects)
       if (onEmailSent) {
         onEmailSent();
       }
@@ -296,6 +296,8 @@ ${(contractor as any)?.phone ? `Phone: ${(contractor as any).phone}` : ''}`;
   // Mark bid request as contacted mutation
   const markBidContactedMutation = useMutation({
     mutationFn: async (bidRequestId: number) => {
+      console.log('🔴 markBidContactedMutation called for bid ID:', bidRequestId);
+      console.trace('🔴 Call stack for markBidContactedMutation');
       const response = await fetch(`/api/bid-requests/${bidRequestId}/status`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
