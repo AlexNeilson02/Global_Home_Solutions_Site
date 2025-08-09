@@ -7,9 +7,9 @@ export default function AboutUs() {
   console.log('AboutUs main component rendered - checking for overlay issues');
 
   return (
-    <div className="about-us-page" style={{ 
+    <div style={{ 
       minHeight: '100vh', 
-      backgroundColor: 'transparent',
+      backgroundColor: '#ffffff',
       padding: '0',
       margin: '0',
       position: 'relative'
@@ -25,7 +25,7 @@ export default function AboutUs() {
         justifyContent: 'center',
         width: '50px',
         height: '50px',
-        backgroundColor: 'transparent',
+        backgroundColor: '#ffffff',
         borderRadius: '50%',
         boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
         color: '#3b82f6',
@@ -40,7 +40,7 @@ export default function AboutUs() {
         maxWidth: '1200px',
         margin: '0 auto',
         padding: '60px 20px 40px 20px',
-        backgroundColor: 'transparent'
+        backgroundColor: '#ffffff'
       }}>
         
         {/* Hero Section */}
