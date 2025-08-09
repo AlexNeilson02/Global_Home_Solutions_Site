@@ -1252,6 +1252,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Admin analytics endpoint
+  apiRouter.get("/admin/analytics", isAuthenticated, requireRole(["admin"]), async (req: Request, res: Response) => {
+    try {
+      // Get commission analytics which includes corporate commission totals
+      const commissionAnalytics = await storage.getCommissionAnalytics();
+      
+      // Get basic counts
+      const allUsers = await storage.getAllUsers();
+      const allSalespersons = await storage.getAllSalespersons();
+      const allContractors = await storage.getAllContractors();
+      const allBidRequests = await storage.getRecentBidRequests(5000);
+      
+      res.json({
+        analytics: {
+          totalUsers: allUsers.length,
+          totalSalespersons: allSalespersons.length,
+          totalContractors: allContractors.length,
+          totalBidRequests: allBidRequests.length,
+          corporateCommissions: commissionAnalytics.corpTotal || 0
+        }
+      });
+    } catch (error) {
+      console.error("Error fetching admin analytics:", error);
+      res.status(500).json({ message: "Failed to fetch admin analytics" });
+    }
+  });
+
   // Projects routes
   apiRouter.get("/projects", isAuthenticated, async (req: Request, res: Response) => {
     try {
