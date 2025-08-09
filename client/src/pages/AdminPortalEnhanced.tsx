@@ -487,18 +487,7 @@ export default function AdminPortalEnhanced() {
 
   const contractors = Array.isArray(contractorsData) ? contractorsData : [];
 
-  // Fetch projects
-  const { data: projectsData = [], isLoading: isLoadingProjects } = useQuery({
-    queryKey: ['/api/projects'],
-    queryFn: async () => {
-      const response = await fetch('/api/projects');
-      if (!response.ok) throw new Error('Failed to fetch projects');
-      const data = await response.json();
-      return data.projects || [];
-    }
-  });
 
-  const projects = Array.isArray(projectsData) ? projectsData : [];
 
   // Fetch bid requests
   const { data: bidRequestsData = [], isLoading: isLoadingBidRequests } = useQuery({
@@ -564,14 +553,11 @@ export default function AdminPortalEnhanced() {
   const activeSalespersons = salespersons?.filter((s: any) => s.isActive !== false)?.length || 0;
   const totalContractors = contractors?.length || 0;
   const activeContractors = contractors?.filter((c: any) => c.isActive !== false)?.length || 0;
-  const totalProjects = projects?.length || 0;
-  const completedProjects = projects?.filter((p: any) => p.status === 'completed')?.length || 0;
+
   const totalBidRequests = bidRequests?.length || 0;
   const pendingBidRequests = bidRequests?.filter((b: any) => b.status === 'pending')?.length || 0;
   
   // Calculate Total Revenue: Corporate commissions + contractor subscriptions
-  const completedProjectRevenue = projects?.filter((p: any) => p.status === 'completed')
-    ?.reduce((sum: number, p: any) => sum + (p.budget || 0), 0) || 0;
   
   // Corporate commissions from all successful bid requests (50% of commission structure)
   const corporateCommissions = analyticsData?.analytics?.corporateCommissions || 0;
@@ -584,7 +570,7 @@ export default function AdminPortalEnhanced() {
 
   // Real chart data from analytics
   const monthlyData = analyticsData?.monthlyPerformance || [
-    { name: 'Current', leads: totalBidRequests, conversions: completedProjects }
+    { name: 'Current', leads: totalBidRequests, conversions: 0 }
   ];
 
   const pieData = [
@@ -602,14 +588,12 @@ export default function AdminPortalEnhanced() {
     activeSalespersons,
     totalContractors,
     activeContractors,
-    totalProjects,
-    completedProjects,
     totalBidRequests,
     pendingBidRequests,
     totalRevenue
   };
 
-  if (isLoadingAnalytics || isLoadingUsers || isLoadingSalespersons || isLoadingContractors) {
+  if (isLoadingAnalytics || isLoadingUsers || isLoadingSalespersons || isLoadingContractors || isLoadingBidRequests) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">

@@ -1279,60 +1279,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Projects routes
-  apiRouter.get("/projects", isAuthenticated, async (req: Request, res: Response) => {
-    try {
-      const user = req.user as User;
-      let projects;
-      
-      if (user.role === "admin") {
-        projects = await storage.getAllProjects();
-      } else if (user.role === "contractor") {
-        const contractor = await storage.getContractorByUserId(user.id);
-        if (contractor) {
-          projects = await storage.getProjectsByContractorId(contractor.id);
-        }
-      } else if (user.role === "salesperson") {
-        const salesperson = await storage.getSalespersonByUserId(user.id);
-        if (salesperson) {
-          projects = await storage.getProjectsBySalespersonId(salesperson.id);
-        }
-      } else {
-        projects = await storage.getProjectsByHomeownerId(user.id);
-      }
-      
-      res.json({ projects: projects || [] });
-    } catch (error) {
-      console.error("Error fetching projects:", error);
-      res.status(500).json({ message: "Failed to fetch projects" });
-    }
-  });
 
-  apiRouter.get("/projects/recent", async (req: Request, res: Response) => {
-    try {
-      const limit = parseInt(req.query.limit as string) || 6;
-      const projects = await storage.getRecentProjects(limit);
-      res.json({ projects });
-    } catch (error) {
-      console.error("Error fetching recent projects:", error);
-      res.status(500).json({ message: "Failed to fetch recent projects" });
-    }
-  });
-
-  apiRouter.post("/projects", isAuthenticated, async (req: Request, res: Response) => {
-    try {
-      const user = req.user as User;
-      const data = insertProjectSchema.parse(req.body);
-      const project = await storage.createProject({
-        ...data,
-        homeownerId: user.id,
-      });
-      res.status(201).json({ message: "Project created successfully", project });
-    } catch (error) {
-      console.error("Error creating project:", error);
-      res.status(400).json({ message: "Invalid project data" });
-    }
-  });
 
   // Testimonials routes
   apiRouter.get("/testimonials/recent", async (req: Request, res: Response) => {
