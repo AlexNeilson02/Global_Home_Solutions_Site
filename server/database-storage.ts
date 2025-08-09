@@ -835,6 +835,12 @@ export class DatabaseStorage implements IStorage {
     };
 
     // Conversion funnel analysis
+    // Calculate conversions as bid requests / page visits with salesperson attribution
+    const pageVisitsWithSalesperson = allPageVisits.filter(visit => visit.salespersonId !== null);
+    const totalBidRequests = filteredBidRequests.length;
+    const conversionsPercentage = pageVisitsWithSalesperson.length > 0 ? 
+      (totalBidRequests / pageVisitsWithSalesperson.length * 100) : 0;
+
     const conversions = {
       pending: filteredBidRequests.filter(b => b.status === 'pending').length,
       contacted: filteredBidRequests.filter(b => ['contacted', 'bid_sent', 'won', 'lost'].includes(b.status)).length,
@@ -842,7 +848,11 @@ export class DatabaseStorage implements IStorage {
       won: filteredBidRequests.filter(b => b.status === 'won').length,
       lost: filteredBidRequests.filter(b => b.status === 'lost').length,
       conversionRate: filteredBidRequests.length > 0 ? 
-        (filteredBidRequests.filter(b => b.status === 'won').length / filteredBidRequests.length * 100) : 0
+        (filteredBidRequests.filter(b => b.status === 'won').length / filteredBidRequests.length * 100) : 0,
+      // New conversions percentage: bid requests / page visits with salesperson attribution
+      conversionsPercentage: conversionsPercentage,
+      totalPageVisitsWithSalesperson: pageVisitsWithSalesperson.length,
+      totalBidRequestsFromSalesperson: totalBidRequests
     };
 
     // Performance analysis by salesperson
