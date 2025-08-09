@@ -310,6 +310,21 @@ const ContractorPortalEnhanced: React.FC = () => {
   
   const serviceCategories = (servicesData as any)?.services || [];
   
+  // Get contractor analytics data
+  const { data: contractorAnalytics } = useQuery({
+    queryKey: [`/api/contractors/${contractor?.id}/analytics`],
+    enabled: !!contractor?.id
+  });
+  
+  // Calculate bid response time data
+  const bidResponseTimeData = contractorAnalytics?.responseTimeBreakdown || [
+    { timeRange: "< 24h", count: 0 },
+    { timeRange: "24-48h", count: 0 },
+    { timeRange: "2-3 days", count: 0 },
+    { timeRange: "3-7 days", count: 0 },
+    { timeRange: "> 7 days", count: 0 }
+  ];
+  
   // Log any errors for debugging
   if (servicesError) {
     console.error('Error fetching service categories:', servicesError);
@@ -1050,27 +1065,37 @@ const ContractorPortalEnhanced: React.FC = () => {
 
                 <Card style={antiYellowStyles}>
                   <CardHeader>
-                    <CardTitle>Bid Status Distribution</CardTitle>
+                    <CardTitle>Bid Response Time</CardTitle>
+                    <CardDescription>Time taken to respond to bid requests</CardDescription>
                   </CardHeader>
                   <CardContent>
                     <ResponsiveContainer width="100%" height={300}>
-                      <PieChart>
-                        <Pie
-                          data={statusDistribution}
-                          cx="50%"
-                          cy="50%"
-                          innerRadius={60}
-                          outerRadius={120}
-                          paddingAngle={5}
-                          dataKey="value"
-                        >
-                          {statusDistribution.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={entry.color} />
-                          ))}
-                        </Pie>
-                        <Tooltip />
-                      </PieChart>
+                      <BarChart data={bidResponseTimeData}>
+                        <XAxis 
+                          dataKey="timeRange" 
+                          angle={-45}
+                          textAnchor="end"
+                          height={80}
+                          fontSize={12}
+                        />
+                        <YAxis />
+                        <Tooltip 
+                          formatter={(value) => [value, 'Requests']}
+                          labelStyle={{ color: '#000' }}
+                          contentStyle={{ 
+                            backgroundColor: 'white', 
+                            border: '1px solid #e5e7eb',
+                            borderRadius: '6px'
+                          }}
+                        />
+                        <Bar dataKey="count" fill="#3b82f6" />
+                      </BarChart>
                     </ResponsiveContainer>
+                    <div className="mt-4 text-center">
+                      <p className="text-sm text-gray-600">
+                        Average response time: <span className="font-medium">{contractorAnalytics?.averageResponseTime?.toFixed(1) || '0.0'}h</span>
+                      </p>
+                    </div>
                   </CardContent>
                 </Card>
               </div>
