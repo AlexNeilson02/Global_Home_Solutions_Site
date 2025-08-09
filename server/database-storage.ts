@@ -838,7 +838,7 @@ export class DatabaseStorage implements IStorage {
         (filteredBidRequests.filter(b => b.status === 'won').length / filteredBidRequests.length * 100) : 0
     };
 
-    // Performance analysis by salesperson
+    // Performance analysis by salesperson - sorted by conversion rate for Top Performer
     const salespersonPerformance = await Promise.all(
       allSalespersons.map(async (salesperson) => {
         const repBids = filteredBidRequests.filter(bid => bid.salespersonId === salesperson.id);
@@ -864,7 +864,7 @@ export class DatabaseStorage implements IStorage {
     return {
       overview,
       conversions,
-      performance: salespersonPerformance.sort((a, b) => b.revenue - a.revenue),
+      performance: salespersonPerformance.sort((a, b) => b.conversionRate - a.conversionRate),
       trends
     };
   }
@@ -950,6 +950,19 @@ export class DatabaseStorage implements IStorage {
     const startDate = timeRange?.startDate || new Date(Date.now() - 365 * 24 * 60 * 60 * 1000);
     const endDate = timeRange?.endDate || new Date();
 
+    // Get commission data for the time period
+    const commissionData = await this.getCommissionAnalytics(startDate, endDate);
+    
+    // Get active contractors count
+    const activeContractors = await this.getAllContractors();
+    const activeContractorCount = activeContractors.filter(c => c.isActive).length;
+    
+    // Calculate monthly subscription revenue ($50/month per active contractor)
+    const monthlySubscriptionRevenue = activeContractorCount * 50;
+    
+    // Total Revenue = Commissions + Monthly Subscriptions per active contractor
+    const totalRevenue = commissionData.totalCommissions + monthlySubscriptionRevenue;
+
     const allBids = await this.getRecentBidRequests(2000);
     const wonBids = allBids.filter(bid => {
       if (bid.status !== 'won' || !bid.budget) return false;
@@ -962,7 +975,10 @@ export class DatabaseStorage implements IStorage {
     const revenueByContractor = await this.calculateRevenueByContractor(wonBids);
 
     return {
-      totalRevenue: wonBids.reduce((sum, bid) => sum + (parseFloat(bid.budget || '0') || 0), 0),
+      totalRevenue,
+      commissionsRevenue: commissionData.totalCommissions,
+      subscriptionRevenue: monthlySubscriptionRevenue,
+      activeContractorCount,
       averageProjectValue: wonBids.length > 0 ? 
         wonBids.reduce((sum, bid) => sum + (parseFloat(bid.budget || '0') || 0), 0) / wonBids.length : 0,
       projectCount: wonBids.length,
