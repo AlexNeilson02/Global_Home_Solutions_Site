@@ -308,8 +308,8 @@ const AnalyticsDashboard: React.FC<AnalyticsProps> = ({ userRole, userId, extern
       );
     }
 
-    // Contractor KPIs
-    const analytics = analyticsData;
+    // Contractor KPIs - access the nested analytics object
+    const contractorAnalytics = analyticsData?.analytics;
     return (
       <div className="grid grid-cols-2 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
         <Card style={antiYellowStyles}>
@@ -318,9 +318,9 @@ const AnalyticsDashboard: React.FC<AnalyticsProps> = ({ userRole, userId, extern
             <Target className="h-4 w-4 text-muted-foreground flex-shrink-0" />
           </CardHeader>
           <CardContent className="p-3 pt-0 sm:p-4 sm:pt-0">
-            <div className="text-lg sm:text-2xl font-bold">{analytics?.totalRequests || 0}</div>
+            <div className="text-lg sm:text-2xl font-bold">{contractorAnalytics?.totalRequests || 0}</div>
             <p className="text-xs text-muted-foreground">
-              {analytics?.responded || 0} responded to
+              {contractorAnalytics?.responded || 0} responded to
             </p>
           </CardContent>
         </Card>
@@ -331,9 +331,9 @@ const AnalyticsDashboard: React.FC<AnalyticsProps> = ({ userRole, userId, extern
             <TrendingUp className="h-4 w-4 text-muted-foreground flex-shrink-0" />
           </CardHeader>
           <CardContent className="p-3 pt-0 sm:p-4 sm:pt-0">
-            <div className="text-lg sm:text-2xl font-bold">{analytics?.won || 0}</div>
+            <div className="text-lg sm:text-2xl font-bold">{contractorAnalytics?.won || 0}</div>
             <p className="text-xs text-muted-foreground">
-              {analytics?.lost || 0} lost
+              {contractorAnalytics?.lost || 0} lost
             </p>
           </CardContent>
         </Card>
@@ -344,9 +344,9 @@ const AnalyticsDashboard: React.FC<AnalyticsProps> = ({ userRole, userId, extern
             <Target className="h-4 w-4 text-muted-foreground flex-shrink-0" />
           </CardHeader>
           <CardContent className="p-3 pt-0 sm:p-4 sm:pt-0">
-            <div className="text-lg sm:text-2xl font-bold">{analytics?.bidRequestVolume || 0}</div>
+            <div className="text-lg sm:text-2xl font-bold">{contractorAnalytics?.bidRequestVolume || 0}</div>
             <p className="text-xs text-muted-foreground">
-              {formatPercentage(analytics?.conversionRate || 0)} conversion rate
+              {formatPercentage(contractorAnalytics?.conversionRate || 0)} conversion rate
             </p>
           </CardContent>
         </Card>
@@ -357,7 +357,7 @@ const AnalyticsDashboard: React.FC<AnalyticsProps> = ({ userRole, userId, extern
             <PhoneCall className="h-4 w-4 text-muted-foreground flex-shrink-0" />
           </CardHeader>
           <CardContent className="p-3 pt-0 sm:p-4 sm:pt-0">
-            <div className="text-lg sm:text-2xl font-bold">{safeToFixed(analytics?.averageResponseTime)}h</div>
+            <div className="text-lg sm:text-2xl font-bold">{safeToFixed(contractorAnalytics?.averageResponseTime)}h</div>
             <p className="text-xs text-muted-foreground">
               Average response time
             </p>
@@ -551,7 +551,7 @@ const AnalyticsDashboard: React.FC<AnalyticsProps> = ({ userRole, userId, extern
                 </div>
                 <div className="flex items-center justify-between p-3 bg-green-50 rounded">
                   <span className="font-medium">Won</span>
-                  <Badge variant="default">{analyticsData?.analytics?.won || 0}</Badge>
+                  <Badge variant="outline" className="bg-green-100 text-black border-green-300">{analyticsData?.analytics?.won || 0}</Badge>
                 </div>
                 <div className="flex items-center justify-between p-3 bg-red-50 rounded">
                   <span className="font-medium">Lost</span>
