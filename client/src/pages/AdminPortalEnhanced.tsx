@@ -930,7 +930,7 @@ export default function AdminPortalEnhanced() {
                             </div>
                           </div>
                         </div>
-                        <Badge variant={salesperson.isActive ? "default" : "destructive"}>
+                        <Badge variant={salesperson.isActive ? "default" : "destructive"} className={salesperson.isActive ? "text-[#000000]" : ""}>
                           {salesperson.isActive ? "Active" : "Inactive"}
                         </Badge>
                       </div>
