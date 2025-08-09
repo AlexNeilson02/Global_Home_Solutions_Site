@@ -317,7 +317,13 @@ const ContractorPortalEnhanced: React.FC = () => {
   });
   
   // Calculate bid response time data
-  const bidResponseTimeData = contractorAnalytics?.responseTimeBreakdown || [
+  const bidResponseTimeData = contractorAnalytics?.responseTimeBreakdown ? [
+    { timeRange: "< 24h", count: contractorAnalytics.responseTimeBreakdown.under24h },
+    { timeRange: "24-48h", count: contractorAnalytics.responseTimeBreakdown.day1to2 },
+    { timeRange: "2-3 days", count: contractorAnalytics.responseTimeBreakdown.day2to3 },
+    { timeRange: "3-7 days", count: contractorAnalytics.responseTimeBreakdown.day3to7 },
+    { timeRange: "> 7 days", count: contractorAnalytics.responseTimeBreakdown.over7days }
+  ] : [
     { timeRange: "< 24h", count: 0 },
     { timeRange: "24-48h", count: 0 },
     { timeRange: "2-3 days", count: 0 },
