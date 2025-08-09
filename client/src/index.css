@@ -38,76 +38,13 @@ html::after {
 }
 
 /* Force remove any dialog/modal overlays that might interfere, except bid request form, login forms, and admin portal dialogs */
-[data-radix-popper-content-wrapper] {
+[data-radix-popper-content-wrapper],
+[data-state="open"][role="dialog"]:not([data-component="bid-request-form"]):not([data-component="login-form"]):not([data-component="admin-portal-dialog"]),
+.fixed.inset-0.z-50.bg-black\/80:not(.bid-request-overlay):not(.login-overlay):not(.admin-portal-overlay),
+.fixed.inset-0.z-50.bg-black\/80.data-\[state\=open\]\:animate-in:not(.bid-request-overlay):not(.login-overlay):not(.admin-portal-overlay) {
   display: none !important;
   visibility: hidden !important;
   opacity: 0 !important;
-}
-
-/* Allow admin portal dialogs to display properly */
-[data-state="open"][role="dialog"] {
-  display: block !important;
-  visibility: visible !important;
-  opacity: 1 !important;
-}
-
-/* Modal form border styling */
-[data-radix-dialog-content] {
-  border: 2px solid #3b82f6 !important;
-  border-radius: 8px !important;
-  padding: 24px !important;
-  background: white !important;
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1) !important;
-}
-
-/* Enhanced dialog title styling */
-[data-radix-dialog-content] h2 {
-  color: #1e40af !important;
-  font-weight: 700 !important;
-  text-shadow: 0 2px 4px rgba(30, 64, 175, 0.3) !important;
-  font-size: 1.5rem !important;
-  margin-bottom: 0.75rem !important;
-}
-
-/* Enhanced dialog description styling */
-[data-radix-dialog-content] p {
-  color: #64748b !important;
-  font-weight: 500 !important;
-}
-
-/* Enhanced button styling in modals */
-[data-radix-dialog-content] button[type="submit"],
-[data-radix-dialog-content] .bg-blue-600 {
-  background: linear-gradient(135deg, #2563eb, #1d4ed8, #1e40af) !important;
-  box-shadow: 
-    0 8px 25px 0 rgba(37, 99, 235, 0.5),
-    0 0 0 1px rgba(59, 130, 246, 0.3),
-    inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
-  border: none !important;
-  transform: translateY(0) scale(1) !important;
-  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
-  font-weight: 600 !important;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) !important;
-}
-
-[data-radix-dialog-content] button[type="submit"]:hover,
-[data-radix-dialog-content] .bg-blue-600:hover {
-  transform: translateY(-3px) scale(1.02) !important;
-  box-shadow: 
-    0 12px 35px 0 rgba(37, 99, 235, 0.6),
-    0 0 0 1px rgba(59, 130, 246, 0.4),
-    0 0 40px 0 rgba(59, 130, 246, 0.3) !important;
-  background: linear-gradient(135deg, #3b82f6, #2563eb, #1d4ed8) !important;
-}
-
-/* Remove the glow effect for a cleaner look */
-
-/* Ensure modal content appears properly */
-[data-state="open"][role="dialog"] {
-  display: block !important;
-  visibility: visible !important;
-  opacity: 1 !important;
-  pointer-events: auto !important;
 }
 
 /* Ensure About Us page content is always visible */

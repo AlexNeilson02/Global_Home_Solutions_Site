@@ -838,7 +838,7 @@ export class DatabaseStorage implements IStorage {
         (filteredBidRequests.filter(b => b.status === 'won').length / filteredBidRequests.length * 100) : 0
     };
 
-    // Performance analysis by salesperson - sorted by conversion rate for Top Performer
+    // Performance analysis by salesperson
     const salespersonPerformance = await Promise.all(
       allSalespersons.map(async (salesperson) => {
         const repBids = filteredBidRequests.filter(bid => bid.salespersonId === salesperson.id);
@@ -846,18 +846,14 @@ export class DatabaseStorage implements IStorage {
         const wonBids = repBids.filter(bid => bid.status === 'won');
         
         const user = await this.getUser(salesperson.userId);
-        // Conversion rate = leads generated from visits (how effective they are at converting visits to leads)
-        const visitsToLeadsRate = repVisits.length > 0 ? (repBids.length / repVisits.length * 100) : 0;
-        
         return {
           id: salesperson.id,
           name: user?.fullName || `Salesperson ${salesperson.id}`,
           totalVisits: repVisits.length,
           totalLeads: repBids.length,
           wonProjects: wonBids.length,
-          conversionRate: visitsToLeadsRate, // Changed to visits-to-leads conversion rate
-          revenue: wonBids.reduce((sum, bid) => sum + (parseFloat(bid.budget || '0') || 0), 0),
-          commissions: salesperson.commissions || 0 // Add actual commission earnings
+          conversionRate: repBids.length > 0 ? (wonBids.length / repBids.length * 100) : 0,
+          revenue: wonBids.reduce((sum, bid) => sum + (parseFloat(bid.budget || '0') || 0), 0)
         };
       })
     );
@@ -868,7 +864,7 @@ export class DatabaseStorage implements IStorage {
     return {
       overview,
       conversions,
-      performance: salespersonPerformance.sort((a, b) => b.conversionRate - a.conversionRate),
+      performance: salespersonPerformance.sort((a, b) => b.revenue - a.revenue),
       trends
     };
   }
@@ -954,19 +950,6 @@ export class DatabaseStorage implements IStorage {
     const startDate = timeRange?.startDate || new Date(Date.now() - 365 * 24 * 60 * 60 * 1000);
     const endDate = timeRange?.endDate || new Date();
 
-    // Get commission data for the time period
-    const commissionData = await this.getCommissionAnalytics(startDate, endDate);
-    
-    // Get active contractors count
-    const activeContractors = await this.getAllContractors();
-    const activeContractorCount = activeContractors.filter(c => c.isActive).length;
-    
-    // Calculate monthly subscription revenue ($100/month per active contractor)
-    const monthlySubscriptionRevenue = activeContractorCount * 100;
-    
-    // Total Revenue = Commissions + Monthly Subscriptions per active contractor
-    const totalRevenue = commissionData.totalCommissions + monthlySubscriptionRevenue;
-
     const allBids = await this.getRecentBidRequests(2000);
     const wonBids = allBids.filter(bid => {
       if (bid.status !== 'won' || !bid.budget) return false;
@@ -979,10 +962,7 @@ export class DatabaseStorage implements IStorage {
     const revenueByContractor = await this.calculateRevenueByContractor(wonBids);
 
     return {
-      totalRevenue,
-      commissionsRevenue: commissionData.totalCommissions,
-      subscriptionRevenue: monthlySubscriptionRevenue,
-      activeContractorCount,
+      totalRevenue: wonBids.reduce((sum, bid) => sum + (parseFloat(bid.budget || '0') || 0), 0),
       averageProjectValue: wonBids.length > 0 ? 
         wonBids.reduce((sum, bid) => sum + (parseFloat(bid.budget || '0') || 0), 0) / wonBids.length : 0,
       projectCount: wonBids.length,
@@ -1129,43 +1109,23 @@ export class DatabaseStorage implements IStorage {
 
   async getCommissionSummaryBySalesperson(salespersonId: number, startDate?: Date, endDate?: Date): Promise<{
     totalEarned: number;
-    pendingEarnings: number;
-    totalDeals: number;
-    averageEarnings: number;
+    pendingCommissions: number;
+    paidCommissions: number;
+    totalRecords: number;
   }> {
-    // Get all commission records for this salesperson
-    let commissionQuery = db.select().from(commissionRecords).where(eq(commissionRecords.salespersonId, salespersonId));
+    let query = db.select().from(commissionRecords).where(eq(commissionRecords.salespersonId, salespersonId));
     
     if (startDate && endDate) {
-      commissionQuery = commissionQuery.where(between(commissionRecords.createdAt, startDate, endDate));
+      query = query.where(between(commissionRecords.createdAt, startDate, endDate));
     }
     
-    const commissionRecordsData = await commissionQuery;
-    
-    // Get all bid requests attributed to this salesperson (these are the "deals made")
-    let bidQuery = db.select().from(bidRequests).where(eq(bidRequests.salespersonId, salespersonId));
-    
-    if (startDate && endDate) {
-      bidQuery = bidQuery.where(between(bidRequests.createdAt, startDate, endDate));
-    }
-    
-    const attributedBidRequests = await bidQuery;
-    
-    // Calculate totals from commission records
-    const totalEarned = commissionRecordsData.reduce((sum, r) => sum + (r.salesmanAmount || 0), 0);
-    const pendingEarnings = commissionRecordsData.filter(r => r.paymentStatus === 'pending').reduce((sum, r) => sum + (r.salesmanAmount || 0), 0);
-    
-    // Total deals = all bid requests attributed to this salesperson
-    const totalDeals = attributedBidRequests.length;
-    
-    // Average earnings per deal
-    const averageEarnings = totalDeals > 0 ? totalEarned / totalDeals : 0;
+    const records = await query;
     
     return {
-      totalEarned,
-      pendingEarnings,
-      totalDeals,
-      averageEarnings
+      totalEarned: records.reduce((sum, r) => sum + (r.salesmanAmount || 0), 0),
+      pendingCommissions: records.filter(r => r.paymentStatus === 'pending').reduce((sum, r) => sum + (r.salesmanAmount || 0), 0),
+      paidCommissions: records.filter(r => r.paymentStatus === 'paid').reduce((sum, r) => sum + (r.salesmanAmount || 0), 0),
+      totalRecords: records.length
     };
   }
 

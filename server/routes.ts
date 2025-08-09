@@ -468,10 +468,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Track page visit for QR/NFC attribution - public endpoint
+  // Track page visit for QR code attribution - public endpoint
   apiRouter.post("/track-visit", async (req: Request, res: Response) => {
     try {
-      const { salespersonProfileUrl, userAgent, referrer, source } = req.body;
+      const { salespersonProfileUrl, userAgent, referrer } = req.body;
       
       console.log('Track visit request received:', { 
         salespersonProfileUrl, 
@@ -486,9 +486,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Generate unique session tracking ID for this visit
-      const scanSource = source || 'qr_code'; // Default to QR if not specified
-      const sessionTrackingId = `${scanSource}_${salespersonProfileUrl}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-      console.log(`Generated session tracking ID for ${scanSource}:`, sessionTrackingId);
+      const sessionTrackingId = `qr_${salespersonProfileUrl}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      console.log('Generated session tracking ID:', sessionTrackingId);
 
       // Get salesperson by profile URL with improved error handling
       console.log('Looking up salesperson by profile URL:', salespersonProfileUrl);
@@ -521,7 +520,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         visitorIp: req.ip || null,
         // Mark as verified QR/NFC visit for commission eligibility
         isVerifiedQrNfcVisit: true,
-        qrNfcSource: scanSource, // 'qr_code' or 'nfc_tag' based on source
+        qrNfcSource: 'qr_code', // or 'nfc_tag' if coming from NFC
         sessionTrackingId: sessionTrackingId
       });
 
@@ -661,9 +660,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         if (salespersonId) {
           console.log(`💰 PROCESSING COMMISSION: Salesperson ${salespersonId} attributed to bid request ${bidRequest.id}`);
           
-          // Track conversion: visit from attributed link + bid request submission
+          // Increment the salesperson's successful conversions
           await storage.incrementSalespersonStats(Number(salespersonId), 'successfulConversions');
-          console.log(`✅ CONVERSION TRACKED: Salesperson ${salespersonId} - attributed visit + bid request submitted`);
           
           // Get salesperson and user details for notification
           const salesperson = await storage.getSalesperson(Number(salespersonId));
@@ -1551,7 +1549,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
 
       const price = await stripe.prices.create({
-        unit_amount: amount, // Amount in cents (e.g., 10000 for $100)
+        unit_amount: amount, // $100 in cents
         currency: 'usd',
         recurring: {
           interval: 'month'

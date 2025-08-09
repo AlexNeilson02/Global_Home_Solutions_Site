@@ -50,6 +50,7 @@ const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
           { id: 'dashboard', label: 'Home', icon: Home },
           { id: 'leads', label: 'Leads', icon: FileText },
           { id: 'commissions', label: 'Commissions', icon: DollarSign },
+          { id: 'analytics', label: 'Analytics', icon: TrendingUp },
           { id: 'profile', label: 'Profile', icon: User }
         ];
       default:

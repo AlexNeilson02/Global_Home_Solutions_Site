@@ -23,41 +23,18 @@ const HomePage: React.FC = () => {
           </p>
         </div>
 
-        {/* Big Find a Contractor Button */}
-        <div className="max-w-2xl mx-auto mb-16 text-center">
-          <button 
-            onClick={() => window.location.href = '/services'}
-            className="big-contractor-btn"
-            style={{
-              background: '#00aeef',
-              padding: window.innerWidth <= 768 ? '20px 40px' : '35px 80px',
-              fontSize: window.innerWidth <= 768 ? '24px' : '36px',
-              fontWeight: 'bold',
-              borderRadius: '20px',
-              color: 'white',
-              minWidth: window.innerWidth <= 768 ? '280px' : '350px',
-              textAlign: 'center',
-              letterSpacing: '2px',
-              textTransform: 'uppercase',
-              cursor: 'pointer',
-              border: 'none',
-              boxShadow: '0 12px 30px rgba(0,174,239,0.4)',
-              transition: 'all 0.3s ease',
-              display: 'inline-block'
-            }}
-            onMouseOver={(e) => {
-              e.target.style.background = '#0098d4';
-              e.target.style.transform = 'scale(1.05)';
-              e.target.style.boxShadow = '0 16px 40px rgba(0,174,239,0.5)';
-            }}
-            onMouseOut={(e) => {
-              e.target.style.background = '#00aeef';
-              e.target.style.transform = 'scale(1)';
-              e.target.style.boxShadow = '0 12px 30px rgba(0,174,239,0.4)';
-            }}
-          >
-            Find a Contractor
-          </button>
+        {/* Search Bar */}
+        <div className="max-w-2xl mx-auto mb-16">
+          <div className="flex gap-4">
+            <input
+              type="text"
+              placeholder="Find a Contractor"
+              className="flex-1 px-6 py-4 rounded-lg text-gray-800 text-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            <button className="px-8 py-4 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg transition-colors">
+              SEARCH
+            </button>
+          </div>
         </div>
 
         {/* Contractor Categories */}

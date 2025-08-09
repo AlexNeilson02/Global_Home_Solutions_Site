@@ -62,7 +62,7 @@ const SubscribeForm = () => {
       <CardHeader>
         <CardTitle>Subscribe to Premium</CardTitle>
         <CardDescription>
-          $100/month - Cancel anytime
+          $29.99/month - Cancel anytime
         </CardDescription>
       </CardHeader>
       <CardContent>

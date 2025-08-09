@@ -168,7 +168,7 @@ export function CommissionDashboard({ salespersonId }: CommissionDashboardProps)
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-green-600">
-              {formatCurrency(summary?.totalEarned || 0)}
+              {formatCurrency(summary?.totalEarnedCommissions || 0)}
             </div>
             <p className="text-xs text-muted-foreground">
               All time commission earnings
@@ -183,7 +183,7 @@ export function CommissionDashboard({ salespersonId }: CommissionDashboardProps)
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-orange-600">
-              {formatCurrency(summary?.pendingEarnings || 0)}
+              {formatCurrency(summary?.totalPendingCommissions || 0)}
             </div>
             <p className="text-xs text-muted-foreground">
               Awaiting payment processing
@@ -193,30 +193,30 @@ export function CommissionDashboard({ salespersonId }: CommissionDashboardProps)
 
         <Card style={antiYellowStyles}>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Deals Made</CardTitle>
+            <CardTitle className="text-sm font-medium">Commission Records</CardTitle>
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {summary?.totalDeals || 0}
+              {summary?.totalCommissionRecords || 0}
             </div>
             <p className="text-xs text-muted-foreground">
-              Total successful deals
+              Total commission records
             </p>
           </CardContent>
         </Card>
 
         <Card style={antiYellowStyles}>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Average Deal</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium">Paid Commissions</CardTitle>
+            <CheckCircle className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-blue-600">
-              {formatCurrency(summary?.averageEarnings || 0)}
+            <div className="text-2xl font-bold text-green-600">
+              {formatCurrency(summary?.totalEarnedCommissions || 0)}
             </div>
             <p className="text-xs text-muted-foreground">
-              Average commission per deal
+              Successfully processed
             </p>
           </CardContent>
         </Card>

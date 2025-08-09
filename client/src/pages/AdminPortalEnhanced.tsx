@@ -570,8 +570,8 @@ export default function AdminPortalEnhanced() {
   // Corporate commissions from all successful bid requests (50% of commission structure)
   const corporateCommissions = analyticsData?.analytics?.corporateCommissions || 0;
   
-  // Contractor monthly subscriptions (assuming $100/month per active contractor)
-  const contractorSubscriptionRevenue = activeContractors * 100;
+  // Contractor monthly subscriptions (assuming $29.99/month per active contractor)
+  const contractorSubscriptionRevenue = activeContractors * 29.99;
   
   // Total Revenue = Corporate commissions + Contractor subscriptions  
   const totalRevenue = corporateCommissions + contractorSubscriptionRevenue;
@@ -1366,11 +1366,47 @@ export default function AdminPortalEnhanced() {
         </Tabs>
 
         {/* View Details Modal */}
+        {console.log('Rendering with viewDetailsOpen:', viewDetailsOpen)}
         <Dialog open={viewDetailsOpen} onOpenChange={setViewDetailsOpen}>
-          <DialogContent className="sm:max-w-[600px]">
-            <DialogHeader>
-              <DialogTitle>Sales Representative Details</DialogTitle>
-              <DialogDescription>
+          <DialogContent 
+            className="sm:max-w-[600px] anti-yellow-nuclear admin-portal-overlay"
+            data-component="admin-portal-dialog"
+            style={{
+              outline: 'none',
+              outlineColor: 'transparent',
+              outlineWidth: '0',
+              outlineStyle: 'none',
+              backgroundColor: 'white',
+              color: 'black',
+              border: '1px solid #e5e7eb'
+            }}
+          >
+            <DialogHeader
+              className="anti-yellow-nuclear"
+              style={{
+                outline: 'none',
+                outlineColor: 'transparent',
+                color: 'black'
+              }}
+            >
+              <DialogTitle 
+                className="anti-yellow-nuclear"
+                style={{
+                  outline: 'none',
+                  outlineColor: 'transparent',
+                  color: 'black'
+                }}
+              >
+                Sales Representative Details
+              </DialogTitle>
+              <DialogDescription
+                className="anti-yellow-nuclear"
+                style={{
+                  outline: 'none',
+                  outlineColor: 'transparent',
+                  color: 'black'
+                }}
+              >
                 Complete information for {selectedSalesperson?.fullName || 'Sales Rep'}
               </DialogDescription>
             </DialogHeader>
@@ -1450,14 +1486,56 @@ export default function AdminPortalEnhanced() {
 
         {/* Edit Modal */}
         <Dialog open={editModalOpen} onOpenChange={setEditModalOpen}>
-          <DialogContent className="sm:max-w-[450px] max-w-[90vw]">
-            <DialogHeader>
-              <DialogTitle>Edit Sales Representative</DialogTitle>
-              <DialogDescription>
+          <DialogContent 
+            className="sm:max-w-[450px] max-w-[90vw] anti-yellow-nuclear admin-portal-overlay"
+            data-component="admin-portal-dialog"
+            style={{
+              outline: 'none',
+              outlineColor: 'transparent',
+              outlineWidth: '0',
+              outlineStyle: 'none',
+              backgroundColor: 'white',
+              color: 'black',
+              border: '1px solid #e5e7eb'
+            }}
+          >
+            <DialogHeader
+              className="anti-yellow-nuclear"
+              style={{
+                outline: 'none',
+                outlineColor: 'transparent',
+                color: 'black'
+              }}
+            >
+              <DialogTitle 
+                className="text-lg anti-yellow-nuclear"
+                style={{
+                  outline: 'none',
+                  outlineColor: 'transparent',
+                  color: 'black'
+                }}
+              >
+                Edit Sales Representative
+              </DialogTitle>
+              <DialogDescription 
+                className="text-sm anti-yellow-nuclear"
+                style={{
+                  outline: 'none',
+                  outlineColor: 'transparent',
+                  color: 'black'
+                }}
+              >
                 Update information for {selectedSalesperson?.fullName || 'Sales Rep'}
               </DialogDescription>
             </DialogHeader>
-            <div className="space-y-4 px-1">
+            <div 
+              className="space-y-4 px-1 anti-yellow-nuclear"
+              style={{
+                outline: 'none',
+                outlineColor: 'transparent',
+                color: 'black'
+              }}
+            >
               <div>
                 <label 
                   className="text-sm font-medium block mb-2 anti-yellow-nuclear"
@@ -1569,7 +1647,19 @@ export default function AdminPortalEnhanced() {
 
         {/* Contractor View Modal */}
         <Dialog open={contractorViewOpen} onOpenChange={setContractorViewOpen}>
-          <DialogContent className="sm:max-w-[600px] max-w-[90vw]">
+          <DialogContent 
+            className="sm:max-w-[600px] max-w-[90vw] anti-yellow-nuclear admin-portal-overlay"
+            data-component="admin-portal-dialog"
+            style={{
+              outline: 'none',
+              outlineColor: 'transparent',
+              outlineWidth: '0',
+              outlineStyle: 'none',
+              backgroundColor: 'white',
+              color: 'black',
+              border: '1px solid #e5e7eb'
+            }}
+          >
             <DialogHeader
               className="anti-yellow-nuclear"
               style={{
@@ -1660,7 +1750,19 @@ export default function AdminPortalEnhanced() {
 
         {/* Contractor Edit Modal */}
         <Dialog open={contractorEditOpen} onOpenChange={setContractorEditOpen}>
-          <DialogContent className="sm:max-w-[500px] max-w-[90vw]">
+          <DialogContent 
+            className="sm:max-w-[500px] max-w-[90vw] anti-yellow-nuclear admin-portal-overlay"
+            data-component="admin-portal-dialog"
+            style={{
+              outline: 'none',
+              outlineColor: 'transparent',
+              outlineWidth: '0',
+              outlineStyle: 'none',
+              backgroundColor: 'white',
+              color: 'black',
+              border: '1px solid #e5e7eb'
+            }}
+          >
             <DialogHeader
               className="anti-yellow-nuclear"
               style={{

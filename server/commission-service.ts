@@ -25,8 +25,8 @@ export class CommissionService {
   }
 
   /**
-   * Create commission record for every bid request
-   * Commission attribution depends on QR/NFC verification
+   * Create commission record when bid request is sent
+   * ONLY if the user arrived via verified QR/NFC code
    */
   static async createCommissionForBidRequest(
     bidRequest: BidRequest,
@@ -35,14 +35,33 @@ export class CommissionService {
   ): Promise<void> {
     try {
       // ========== COMMISSION ELIGIBILITY CHECK ==========
-      let isEligibleForSalesCommission = false;
-      
-      // If salesperson is attributed, they get commission
+      // Verify that this bid request came from a legitimate QR/NFC code scan
+      // Only pay commissions when users arrive via sales rep QR/NFC codes
       if (salespersonId) {
-        isEligibleForSalesCommission = true;
-        console.log(`✅ SALES COMMISSION ELIGIBLE: Salesperson ${salespersonId} attributed to bid request ${bidRequest.id}`);
+        if (!bidRequest.sessionTrackingId) {
+          console.warn(`❌ COMMISSION DENIED: Salesperson ${salespersonId} attributed but no session tracking ID provided`);
+          console.warn(`🚫 NO COMMISSION - Sales rep cannot receive commission without verified QR/NFC attribution`);
+          return; // Exit early - no commission will be created
+        }
+
+        if (!bidRequest.isCommissionEligible) {
+          console.warn(`❌ COMMISSION DENIED: Bid request ${bidRequest.id} marked as not commission eligible`);
+          console.warn(`🚫 NO COMMISSION - Sales rep attribution without verified QR/NFC scan`);
+          return; // Exit early - no commission will be created
+        }
+
+        // Double-check with page visit verification
+        const verifiedVisit = await storage.getVerifiedQrNfcVisit(bidRequest.sessionTrackingId, salespersonId);
+        
+        if (!verifiedVisit) {
+          console.warn(`❌ COMMISSION DENIED: No verified QR/NFC visit found for session ${bidRequest.sessionTrackingId}, salesperson ${salespersonId}`);
+          console.warn(`🚫 NO COMMISSION - Sales rep attribution without verified QR/NFC scan`);
+          return; // Exit early - no commission will be created
+        }
+        
+        console.log(`✅ COMMISSION ELIGIBLE: Verified QR/NFC visit found for session ${bidRequest.sessionTrackingId}, salesperson ${salespersonId}`);
       } else {
-        console.log(`ℹ️  No salesperson attribution - processing as general lead (corporate commission only)`);
+        console.log(`ℹ️  No salesperson attribution - processing as general lead (no sales commission)`);
       }
       
       // Get service categories to determine commission amounts
@@ -91,11 +110,9 @@ export class CommissionService {
           overrideManagerId: overrideManagerId || null,
           serviceCategory: requestedServiceName,
           totalCommission: commissionAmounts.totalCommission,
-          // Only pay salesperson if they have verified QR/NFC attribution
-          salesmanAmount: isEligibleForSalesCommission ? commissionAmounts.salesmanAmount : 0,
+          salesmanAmount: salespersonId ? commissionAmounts.salesmanAmount : 0, // No salesperson = $0
           overrideAmount: commissionAmounts.overrideAmount,
-          // If no eligible salesperson, all their portion goes to corp
-          corpAmount: isEligibleForSalesCommission ? commissionAmounts.corpAmount : (commissionAmounts.corpAmount + commissionAmounts.salesmanAmount),
+          corpAmount: salespersonId ? commissionAmounts.corpAmount : commissionAmounts.totalCommission, // If no salesperson, all goes to corp
           status: 'pending',
           paymentStatus: 'unpaid'
         };
@@ -106,8 +123,11 @@ export class CommissionService {
 
       console.log(`Total commission for ${serviceCommissions.length} services: $${totalCommissionAmount}`);
 
-      // Update salesperson commission total only if eligible for sales commission
-      if (isEligibleForSalesCommission && salespersonId) {
+      // If no salesperson, log that all commission goes to corporate
+      if (!salespersonId) {
+        console.log(`🏢 No salesperson - entire commission ($${totalCommissionAmount}) assigned to corporate`);
+      } else {
+        // Update salesperson commission total
         const salesperson = await storage.getSalesperson(salespersonId!);
         if (salesperson) {
           const salesCommissionTotal = serviceCommissions.reduce((sum, sc) => {
@@ -118,11 +138,7 @@ export class CommissionService {
           await storage.updateSalesperson(salespersonId!, {
             commissions: (salesperson.commissions || 0) + salesCommissionTotal
           });
-          
-          console.log(`💰 Salesperson ${salespersonId} earned $${salesCommissionTotal} commission from lead attribution`);
         }
-      } else {
-        console.log(`🏢 No salesperson - entire commission ($${totalCommissionAmount}) assigned to corporate`);
       }
     } catch (error) {
       console.error('Error creating commission:', error);
