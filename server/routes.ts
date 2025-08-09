@@ -347,13 +347,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
           ['bid_sent', 'won', 'lost'].includes(bid.status)
         ).length;
         
-        // Conversion rate = (bid requests sent / page visits) * 100
-        const conversionRate = pageVisits > 0 ? (bidRequestsSent / pageVisits) * 100 : 0;
+        // Conversion rate = (total leads generated / page visits) * 100
+        // This shows: of all people who visited via salesperson's link, how many sent a bid request
+        const conversionRate = pageVisits > 0 ? (totalLeads / pageVisits) * 100 : 0;
         
         // Commission total (use existing stored value as it's calculated by commission service)
         const commissions = salesperson.commissions || 0;
         
-        console.log(`Salesperson ${salesperson.fullName || salesperson.id}: pageVisits=${pageVisits}, totalLeads=${totalLeads}, bidRequestsSent=${bidRequestsSent}, conversionRate=${conversionRate.toFixed(2)}%`);
+        console.log(`Salesperson ${salesperson.fullName || salesperson.id}: pageVisits=${pageVisits}, totalLeads=${totalLeads}, bidRequestsSent=${bidRequestsSent}, conversionRate=${conversionRate.toFixed(2)}% (leads/visits)`);
         
         return {
           ...salesperson,
