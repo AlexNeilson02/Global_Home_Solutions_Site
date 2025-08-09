@@ -73,6 +73,23 @@ const AnalyticsDashboard: React.FC<AnalyticsProps> = ({ userRole, userId, extern
   // Use external data if provided, otherwise use internal query data
   const analyticsData = externalAnalyticsData || internalAnalyticsData;
 
+  // Debug: Log analytics data to verify real data connection
+  React.useEffect(() => {
+    if (analyticsData) {
+      console.log('📊 Analytics Data Connected:', {
+        hasOverview: !!analyticsData.overview,
+        hasConversions: !!analyticsData.conversions,
+        hasRevenue: !!analyticsData.revenue,
+        hasCommissions: !!analyticsData.commissions,
+        totalBidRequests: analyticsData.overview?.totalBidRequests,
+        totalRevenue: analyticsData.revenue?.totalRevenue,
+        totalCommissions: analyticsData.commissions?.totalCommissions,
+        activeContractors: analyticsData.overview?.activeContractors,
+        activeSalespersons: analyticsData.overview?.activeSalespersons
+      });
+    }
+  }, [analyticsData]);
+
   if (isLoading) {
     return (
       <div className="space-y-6">
@@ -179,32 +196,36 @@ const AnalyticsDashboard: React.FC<AnalyticsProps> = ({ userRole, userId, extern
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="p-4 bg-green-50 rounded-lg">
-                <p className="text-sm text-gray-600">Monthly Recurring</p>
-                <p className="text-2xl font-bold text-green-600">{formatCurrency(revenue?.monthlyRecurring || 0)}</p>
+                <p className="text-sm text-gray-600">Project Revenue</p>
+                <p className="text-2xl font-bold text-green-600">{formatCurrency(revenue?.totalRevenue || 0)}</p>
               </div>
               <div className="p-4 bg-blue-50 rounded-lg">
-                <p className="text-sm text-gray-600">Commission Revenue</p>
-                <p className="text-2xl font-bold text-blue-600">{formatCurrency(revenue?.commissionRevenue || 0)}</p>
+                <p className="text-sm text-gray-600">Commission Earned</p>
+                <p className="text-2xl font-bold text-blue-600">{formatCurrency(commissions?.totalCommissions || 0)}</p>
               </div>
               <div className="p-4 bg-purple-50 rounded-lg">
                 <p className="text-sm text-gray-600">Average Project Value</p>
                 <p className="text-2xl font-bold text-purple-600">{formatCurrency(revenue?.averageProjectValue || 0)}</p>
               </div>
               <div className="p-4 bg-orange-50 rounded-lg">
-                <p className="text-sm text-gray-600">Growth Rate</p>
-                <p className="text-2xl font-bold text-orange-600">+12.5%</p>
+                <p className="text-sm text-gray-600">Total Projects</p>
+                <p className="text-2xl font-bold text-orange-600">{revenue?.projectCount || 0}</p>
               </div>
             </div>
             <div className="mt-6">
               <h4 className="font-medium mb-3">Revenue Breakdown</h4>
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
-                  <span>Contractor Subscriptions:</span>
-                  <span className="font-medium">{formatCurrency((revenue?.totalRevenue || 0) * 0.6)}</span>
+                  <span>Total Project Value:</span>
+                  <span className="font-medium">{formatCurrency(revenue?.totalRevenue || 0)}</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span>Commission Fees:</span>
-                  <span className="font-medium">{formatCurrency((revenue?.totalRevenue || 0) * 0.4)}</span>
+                  <span>Total Commission Earned:</span>
+                  <span className="font-medium">{formatCurrency(commissions?.totalCommissions || 0)}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span>Projects Completed:</span>
+                  <span className="font-medium">{revenue?.projectCount || 0}</span>
                 </div>
               </div>
             </div>
@@ -333,36 +354,36 @@ const AnalyticsDashboard: React.FC<AnalyticsProps> = ({ userRole, userId, extern
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="p-4 bg-orange-50 rounded-lg">
-                <p className="text-sm text-gray-600">Awaiting Processing</p>
-                <p className="text-2xl font-bold text-orange-600">{formatCurrency(commissions?.pendingCommissions || 0)}</p>
+                <p className="text-sm text-gray-600">Sales Rep Commissions</p>
+                <p className="text-2xl font-bold text-orange-600">{formatCurrency(commissions?.salesmanTotal || 0)}</p>
               </div>
               <div className="p-4 bg-blue-50 rounded-lg">
-                <p className="text-sm text-gray-600">Expected Processing</p>
-                <p className="text-2xl font-bold text-blue-600">2-3 days</p>
+                <p className="text-sm text-gray-600">Corporate Commissions</p>
+                <p className="text-2xl font-bold text-blue-600">{formatCurrency(commissions?.corpTotal || 0)}</p>
               </div>
               <div className="p-4 bg-green-50 rounded-lg">
-                <p className="text-sm text-gray-600">This Month Paid</p>
-                <p className="text-2xl font-bold text-green-600">{formatCurrency((commissions?.totalCommissions || 0) * 0.4)}</p>
+                <p className="text-sm text-gray-600">Override Commissions</p>
+                <p className="text-2xl font-bold text-green-600">{formatCurrency(commissions?.overrideTotal || 0)}</p>
               </div>
               <div className="p-4 bg-purple-50 rounded-lg">
-                <p className="text-sm text-gray-600">Payment Method</p>
-                <p className="text-2xl font-bold text-purple-600">Stripe</p>
+                <p className="text-sm text-gray-600">Total Records</p>
+                <p className="text-2xl font-bold text-purple-600">{commissions?.totalRecords || 0}</p>
               </div>
             </div>
             <div className="mt-6">
-              <h4 className="font-medium mb-3">Payment Schedule</h4>
+              <h4 className="font-medium mb-3">Commission Breakdown</h4>
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
-                  <span>Next Payment Date:</span>
-                  <span className="font-medium">January 15th</span>
+                  <span>Total All Commissions:</span>
+                  <span className="font-medium">{formatCurrency(commissions?.totalCommissions || 0)}</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span>Payment Frequency:</span>
-                  <span className="font-medium">Bi-weekly</span>
+                  <span>Sales Rep Share:</span>
+                  <span className="font-medium">{formatPercentage(((commissions?.salesmanTotal || 0) / (commissions?.totalCommissions || 1)) * 100)}</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span>Minimum Threshold:</span>
-                  <span className="font-medium">$50.00</span>
+                  <span>Corporate Share:</span>
+                  <span className="font-medium">{formatPercentage(((commissions?.corpTotal || 0) / (commissions?.totalCommissions || 1)) * 100)}</span>
                 </div>
               </div>
             </div>
@@ -415,38 +436,37 @@ const AnalyticsDashboard: React.FC<AnalyticsProps> = ({ userRole, userId, extern
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="p-4 bg-green-50 rounded-lg">
-                <p className="text-sm text-gray-600">Top Earner</p>
-                <p className="text-2xl font-bold text-green-600">{commissions?.topEarner?.name || 'No data'}</p>
-                <p className="text-sm text-gray-500">{formatCurrency(commissions?.topEarner?.earnings || 0)}</p>
+                <p className="text-sm text-gray-600">Top Revenue Generator</p>
+                <p className="text-2xl font-bold text-green-600">{(analyticsData?.performance?.[0]?.name) || 'No data'}</p>
+                <p className="text-sm text-gray-500">{formatCurrency(analyticsData?.performance?.[0]?.revenue || 0)}</p>
               </div>
               <div className="p-4 bg-blue-50 rounded-lg">
-                <p className="text-sm text-gray-600">Transactions</p>
-                <p className="text-2xl font-bold text-blue-600">{commissions?.topEarner?.transactions || 0}</p>
+                <p className="text-sm text-gray-600">Their Lead Count</p>
+                <p className="text-2xl font-bold text-blue-600">{analyticsData?.performance?.[0]?.totalLeads || 0}</p>
               </div>
               <div className="p-4 bg-purple-50 rounded-lg">
-                <p className="text-sm text-gray-600">Average per Deal</p>
-                <p className="text-2xl font-bold text-purple-600">{formatCurrency((commissions?.topEarner?.earnings || 0) / (commissions?.topEarner?.transactions || 1))}</p>
+                <p className="text-sm text-gray-600">Their Won Projects</p>
+                <p className="text-2xl font-bold text-purple-600">{analyticsData?.performance?.[0]?.wonProjects || 0}</p>
               </div>
               <div className="p-4 bg-orange-50 rounded-lg">
-                <p className="text-sm text-gray-600">Success Rate</p>
-                <p className="text-2xl font-bold text-orange-600">87.5%</p>
+                <p className="text-sm text-gray-600">Their Conversion Rate</p>
+                <p className="text-2xl font-bold text-orange-600">{formatPercentage(analyticsData?.performance?.[0]?.conversionRate || 0)}</p>
               </div>
             </div>
             <div className="mt-6">
-              <h4 className="font-medium mb-3">Top 3 Performers This Month</h4>
+              <h4 className="font-medium mb-3">Top 3 Performers by Revenue</h4>
               <div className="space-y-2">
-                <div className="flex justify-between text-sm p-2 bg-gray-50 rounded">
-                  <span>1. {commissions?.topEarner?.name || 'No data'}</span>
-                  <span className="font-medium">{formatCurrency(commissions?.topEarner?.earnings || 0)}</span>
-                </div>
-                <div className="flex justify-between text-sm p-2 bg-gray-50 rounded">
-                  <span>2. Alex Johnson</span>
-                  <span className="font-medium">{formatCurrency((commissions?.topEarner?.earnings || 0) * 0.8)}</span>
-                </div>
-                <div className="flex justify-between text-sm p-2 bg-gray-50 rounded">
-                  <span>3. Sarah Williams</span>
-                  <span className="font-medium">{formatCurrency((commissions?.topEarner?.earnings || 0) * 0.6)}</span>
-                </div>
+                {(analyticsData?.performance || []).slice(0, 3).map((performer: any, index: number) => (
+                  <div key={performer.id} className="flex justify-between text-sm p-2 bg-gray-50 rounded">
+                    <span>{index + 1}. {performer.name}</span>
+                    <span className="font-medium">{formatCurrency(performer.revenue || 0)}</span>
+                  </div>
+                ))}
+                {(!analyticsData?.performance || analyticsData.performance.length === 0) && (
+                  <div className="flex justify-center text-sm p-2 bg-gray-50 rounded">
+                    <span className="text-gray-500">No performance data available</span>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -1007,7 +1027,7 @@ const AnalyticsDashboard: React.FC<AnalyticsProps> = ({ userRole, userId, extern
               {selectedCard === 'activeUsers' && 'User Analytics'}
               {selectedCard === 'pageVisits' && 'Traffic Analytics'}
               {selectedCard === 'totalCommissions' && 'Commission Analytics'}
-              {selectedCard === 'pendingCommissions' && 'Pending Commission Details'}
+              {selectedCard === 'pendingCommissions' && 'Commission Distribution Details'}
               {selectedCard === 'commissionRecords' && 'Commission Records Overview'}
               {selectedCard === 'topEarner' && 'Top Performer Analysis'}
             </DialogTitle>
