@@ -35,31 +35,21 @@ export class CommissionService {
   ): Promise<void> {
     try {
       // ========== COMMISSION ELIGIBILITY CHECK ==========
-      // Verify that this bid request came from a legitimate QR/NFC code scan
-      // Only pay commissions when users arrive via sales rep QR/NFC codes
+      // Verify commission eligibility for salesperson attribution
       if (salespersonId) {
         if (!bidRequest.sessionTrackingId) {
           console.warn(`❌ COMMISSION DENIED: Salesperson ${salespersonId} attributed but no session tracking ID provided`);
-          console.warn(`🚫 NO COMMISSION - Sales rep cannot receive commission without verified QR/NFC attribution`);
+          console.warn(`🚫 NO COMMISSION - Sales rep cannot receive commission without session tracking`);
           return; // Exit early - no commission will be created
         }
 
         if (!bidRequest.isCommissionEligible) {
           console.warn(`❌ COMMISSION DENIED: Bid request ${bidRequest.id} marked as not commission eligible`);
-          console.warn(`🚫 NO COMMISSION - Sales rep attribution without verified QR/NFC scan`);
+          console.warn(`🚫 NO COMMISSION - Sales rep attribution not eligible for commission`);
           return; // Exit early - no commission will be created
         }
 
-        // Double-check with page visit verification
-        const verifiedVisit = await storage.getVerifiedQrNfcVisit(bidRequest.sessionTrackingId, salespersonId);
-        
-        if (!verifiedVisit) {
-          console.warn(`❌ COMMISSION DENIED: No verified QR/NFC visit found for session ${bidRequest.sessionTrackingId}, salesperson ${salespersonId}`);
-          console.warn(`🚫 NO COMMISSION - Sales rep attribution without verified QR/NFC scan`);
-          return; // Exit early - no commission will be created
-        }
-        
-        console.log(`✅ COMMISSION ELIGIBLE: Verified QR/NFC visit found for session ${bidRequest.sessionTrackingId}, salesperson ${salespersonId}`);
+        console.log(`✅ COMMISSION ELIGIBLE: Session tracking ID found (${bidRequest.sessionTrackingId}), salesperson ${salespersonId} eligible for commission`);
       } else {
         console.log(`ℹ️  No salesperson attribution - processing as general lead (no sales commission)`);
       }

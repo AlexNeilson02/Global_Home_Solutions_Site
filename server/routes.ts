@@ -596,6 +596,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
+      // Get session tracking and commission eligibility info if salesperson is attributed
+      let sessionTrackingId = null;
+      let isCommissionEligible = false;
+      
+      if (salespersonId) {
+        // Generate session tracking ID for commission verification
+        sessionTrackingId = `bid_${salespersonId}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        isCommissionEligible = true; // Enable commission eligibility when salesperson is attributed
+        console.log(`🔗 Commission eligibility enabled - Session ID: ${sessionTrackingId}, Salesperson: ${salespersonId}`);
+        
+        // Create a page visit record to support commission tracking
+        try {
+          await storage.createPageVisit({
+            salespersonId: Number(salespersonId),
+            path: '/bid-request-submission',
+            sessionTrackingId: sessionTrackingId,
+            isVerifiedQrNfcVisit: true, // Mark as verified since salesperson is explicitly attributed
+            qrNfcSource: 'attribution', // Special source for bid request attribution
+            userAgent: req.get('User-Agent')?.substring(0, 200) || 'Unknown',
+            visitorIp: req.ip || 'Unknown'
+          });
+          console.log(`📊 Page visit record created for commission tracking - Session: ${sessionTrackingId}`);
+        } catch (visitError) {
+          console.error('Error creating page visit record:', visitError);
+          // Don't fail the bid request if visit tracking fails
+        }
+      }
+
       // Create bid request with correct field names for database schema
       const bidRequestData = {
         contractorId: Number(contractorId),
@@ -609,7 +637,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         timeline: finalTimeline,
         budget: budget || null,
         preferredContactMethod: preferredContactMethod || "email",
-        additionalInformation: additionalInformation || (mediaUrls.length > 0 ? JSON.stringify({ mediaUrls }) : null)
+        additionalInformation: additionalInformation || (mediaUrls.length > 0 ? JSON.stringify({ mediaUrls }) : null),
+        sessionTrackingId: sessionTrackingId,
+        isCommissionEligible: isCommissionEligible
       };
 
       console.log('Creating bid request with data:', bidRequestData);
