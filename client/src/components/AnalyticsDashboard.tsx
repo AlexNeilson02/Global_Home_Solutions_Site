@@ -373,23 +373,17 @@ const AnalyticsDashboard: React.FC<AnalyticsProps> = ({ userRole, userId }) => {
           <Card style={antiYellowStyles}>
             <CardHeader>
               <CardTitle>Performance Trends</CardTitle>
-              <CardDescription>Requests and revenue over time</CardDescription>
+              <CardDescription>Contractors signed on and bid requests over time</CardDescription>
             </CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={300}>
                 <LineChart data={trends || []}>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="week" />
-                  <YAxis yAxisId="left" orientation="left" />
-                  <YAxis yAxisId="right" orientation="right" />
-                  <Tooltip 
-                    formatter={(value, name) => [
-                      name === 'Revenue' ? formatCurrency(Number(value)) : value,
-                      name
-                    ]}
-                  />
-                  <Line yAxisId="left" type="monotone" dataKey="totalRequests" stroke="#3b82f6" name="Requests" />
-                  <Line yAxisId="right" type="monotone" dataKey="revenue" stroke="#10b981" name="Revenue" />
+                  <YAxis />
+                  <Tooltip />
+                  <Line type="monotone" dataKey="totalRequests" stroke="#3b82f6" name="Bid Requests" />
+                  <Line type="monotone" dataKey="contractorsSignedOn" stroke="#10b981" name="Contractors Signed On" />
                 </LineChart>
               </ResponsiveContainer>
             </CardContent>
