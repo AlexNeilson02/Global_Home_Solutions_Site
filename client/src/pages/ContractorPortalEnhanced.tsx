@@ -727,6 +727,39 @@ ${contractor?.email || ''}`;
     .filter((p: any) => p.status === 'completed')
     .reduce((sum: number, p: any) => sum + (p.budget || 0), 0);
 
+  // Calculate response time analytics from actual bid requests
+  const calculateResponseTimes = () => {
+    const sameDay = bidRequests.filter((bid: any) => {
+      if (bid.status === 'pending') return false;
+      const created = new Date(bid.createdAt);
+      const contacted = new Date(bid.contactedAt || bid.updatedAt);
+      const hoursDiff = (contacted.getTime() - created.getTime()) / (1000 * 60 * 60);
+      return hoursDiff <= 24;
+    }).length;
+
+    const twoDays = bidRequests.filter((bid: any) => {
+      if (bid.status === 'pending') return false;
+      const created = new Date(bid.createdAt);
+      const contacted = new Date(bid.contactedAt || bid.updatedAt);
+      const hoursDiff = (contacted.getTime() - created.getTime()) / (1000 * 60 * 60);
+      return hoursDiff > 24 && hoursDiff <= 72;
+    }).length;
+
+    const lateResponse = bidRequests.filter((bid: any) => {
+      if (bid.status === 'pending') return false;
+      const created = new Date(bid.createdAt);
+      const contacted = new Date(bid.contactedAt || bid.updatedAt);
+      const hoursDiff = (contacted.getTime() - created.getTime()) / (1000 * 60 * 60);
+      return hoursDiff > 72;
+    }).length;
+
+    const noResponse = bidRequests.filter((bid: any) => bid.status === 'pending').length;
+
+    return { sameDay, twoDays, lateResponse, noResponse };
+  };
+
+  const responseTimeData = calculateResponseTimes();
+
   // Chart data
   const projectData = [
     { month: 'Jan', completed: 8, active: 12, revenue: 45000 },
@@ -737,10 +770,11 @@ ${contractor?.email || ''}`;
     { month: 'Jun', completed: 22, active: 14, revenue: 95000 }
   ];
 
-  const statusDistribution = [
-    { name: 'Completed', value: completedProjects, color: '#10b981' },
-    { name: 'Active', value: activeProjects, color: '#3b82f6' },
-    { name: 'Pending', value: pendingBids, color: '#f59e0b' }
+  const responseTimeAnalytics = [
+    { name: 'Same Day', value: responseTimeData.sameDay, color: '#10b981' },
+    { name: '2-3 Days', value: responseTimeData.twoDays, color: '#3b82f6' },
+    { name: 'Late (3+ Days)', value: responseTimeData.lateResponse, color: '#f59e0b' },
+    { name: 'No Response', value: responseTimeData.noResponse, color: '#ef4444' }
   ];
 
   // Subscription management functions
@@ -1046,26 +1080,35 @@ ${contractor?.email || ''}`;
 
                 <Card style={antiYellowStyles}>
                   <CardHeader>
-                    <CardTitle>Bid Status Distribution</CardTitle>
+                    <CardTitle>Response Time Analytics</CardTitle>
+                    <CardDescription>How quickly you respond to bid requests</CardDescription>
                   </CardHeader>
                   <CardContent>
                     <ResponsiveContainer width="100%" height={300}>
-                      <PieChart>
-                        <Pie
-                          data={statusDistribution}
-                          cx="50%"
-                          cy="50%"
-                          innerRadius={60}
-                          outerRadius={120}
-                          paddingAngle={5}
-                          dataKey="value"
+                      <BarChart data={responseTimeAnalytics} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis 
+                          dataKey="name" 
+                          tick={{ fontSize: 12 }}
+                          angle={-45}
+                          textAnchor="end"
+                          height={80}
+                        />
+                        <YAxis />
+                        <Tooltip 
+                          formatter={(value, name) => [value, 'Bid Requests']}
+                          labelFormatter={(label) => `Response Time: ${label}`}
+                        />
+                        <Bar 
+                          dataKey="value" 
+                          fill="#3b82f6"
+                          radius={[4, 4, 0, 0]}
                         >
-                          {statusDistribution.map((entry, index) => (
+                          {responseTimeAnalytics.map((entry, index) => (
                             <Cell key={`cell-${index}`} fill={entry.color} />
                           ))}
-                        </Pie>
-                        <Tooltip />
-                      </PieChart>
+                        </Bar>
+                      </BarChart>
                     </ResponsiveContainer>
                   </CardContent>
                 </Card>
