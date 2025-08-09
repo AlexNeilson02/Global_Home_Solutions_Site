@@ -76,35 +76,11 @@ export default function HomePage() {
         bottom: '15%', 
         left: '50%', 
         transform: 'translateX(-50%)', 
-        zIndex: 999,
-        display: 'block',
-        visibility: 'visible',
-        opacity: 1,
-        pointerEvents: 'auto'
+        zIndex: 10 
       }}>
         <button 
           onClick={() => navigateWithSalesperson('/services')}
           className="find-contractor-btn"
-          style={{
-            background: '#00aeef',
-            backgroundColor: '#00aeef',
-            color: 'white',
-            border: 'none',
-            padding: isMobile ? (window.innerWidth <= 480 ? '12px 25px' : '15px 30px') : '25px 60px',
-            borderRadius: '15px',
-            fontSize: isMobile ? (window.innerWidth <= 480 ? '18px' : '20px') : '28px',
-            fontWeight: 'bold',
-            textTransform: 'uppercase',
-            letterSpacing: '1px',
-            cursor: 'pointer',
-            boxShadow: '0 8px 20px rgba(0,174,239,0.3)',
-            transition: 'all 0.3s ease',
-            display: 'inline-block',
-            visibility: 'visible',
-            opacity: 1,
-            pointerEvents: 'auto',
-            zIndex: 999
-          }}
         >
           Find a Contractor
         </button>

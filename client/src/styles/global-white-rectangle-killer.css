@@ -87,29 +87,16 @@ iframe[src*="replit"],
 }
 
 /* Nuclear option for any white rectangular elements with dimensions */
-*[style*="width"][style*="height"][style*="background: white"]:not(.find-contractor-btn):not(button),
-*[style*="width"][style*="height"][style*="background-color: white"]:not(.find-contractor-btn):not(button),
-*[style*="width"][style*="height"][style*="background: #fff"]:not(.find-contractor-btn):not(button),
-*[style*="width"][style*="height"][style*="background-color: #fff"]:not(.find-contractor-btn):not(button),
-*[style*="width"][style*="height"][style*="background: #ffffff"]:not(.find-contractor-btn):not(button),
-*[style*="width"][style*="height"][style*="background-color: #ffffff"]:not(.find-contractor-btn):not(button) {
+*[style*="width"][style*="height"][style*="background: white"],
+*[style*="width"][style*="height"][style*="background-color: white"],
+*[style*="width"][style*="height"][style*="background: #fff"],
+*[style*="width"][style*="height"][style*="background-color: #fff"],
+*[style*="width"][style*="height"][style*="background: #ffffff"],
+*[style*="width"][style*="height"][style*="background-color: #ffffff"] {
   background: transparent !important;
   background-color: transparent !important;
   border: none !important;
   box-shadow: none !important;
-}
-
-/* Force show find contractor button */
-.find-contractor-btn,
-button.find-contractor-btn,
-[class*="find-contractor"] {
-  background: #00aeef !important;
-  background-color: #00aeef !important;
-  display: inline-block !important;
-  visibility: visible !important;
-  opacity: 1 !important;
-  pointer-events: auto !important;
-  z-index: 999 !important;
 }
 
 /* Specific targeting for common overlay patterns */
