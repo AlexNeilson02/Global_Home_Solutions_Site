@@ -183,13 +183,12 @@ enhancedRouter.get('/admin/analytics', isAuthenticated, requireRole(['admin']), 
     const activeContractors = contractors.filter(c => c.isActive).length;
     const subscriptionRevenue = activeContractors * 100; // $100 per active contractor per month
     
-    // Get commission earnings for the corporation
+    // Get commission earnings for the corporation (Override + Corp commissions)
     let commissionRevenue = 0;
     try {
-      // For now, we'll calculate commission revenue from bid requests that have been completed
-      // This is a placeholder calculation since commission records may not be fully implemented
-      const completedBidRequests = bidRequests.filter(b => b.status === 'completed');
-      commissionRevenue = completedBidRequests.length * 50; // Estimated $50 commission per completed bid
+      const commissionAnalytics = await storage.getCommissionAnalytics();
+      // Revenue is Override + Corp commission amounts (what the company keeps)
+      commissionRevenue = (commissionAnalytics.overrideTotal || 0) + (commissionAnalytics.corpTotal || 0);
     } catch (error) {
       console.log('Commission calculation error:', error);
       commissionRevenue = 0;

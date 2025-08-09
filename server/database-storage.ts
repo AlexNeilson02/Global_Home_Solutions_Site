@@ -974,14 +974,31 @@ export class DatabaseStorage implements IStorage {
       return bidDate >= startDate && bidDate <= endDate;
     });
 
+    // Get subscription revenue from active contractors
+    const contractors = await this.getAllContractors();
+    const activeContractors = contractors.filter(c => c.isActive).length;
+    const subscriptionRevenue = activeContractors * 100; // $100 per active contractor per month
+
+    // Get commission revenue (Override + Corp commissions)
+    const commissionAnalytics = await this.getCommissionAnalytics(startDate, endDate);
+    const commissionRevenue = (commissionAnalytics.overrideTotal || 0) + (commissionAnalytics.corpTotal || 0);
+
+    // Total company revenue includes subscriptions and commissions
+    const totalCompanyRevenue = subscriptionRevenue + commissionRevenue;
+    
+    // Project revenue for analytics purposes (separate from company revenue)
+    const projectRevenue = wonBids.reduce((sum, bid) => sum + (parseFloat(bid.budget || '0') || 0), 0);
+
     const monthlyRevenue = this.calculateMonthlyRevenue(wonBids);
     const revenueByService = this.calculateRevenueByService(wonBids);
     const revenueByContractor = await this.calculateRevenueByContractor(wonBids);
 
     return {
-      totalRevenue: wonBids.reduce((sum, bid) => sum + (parseFloat(bid.budget || '0') || 0), 0),
-      averageProjectValue: wonBids.length > 0 ? 
-        wonBids.reduce((sum, bid) => sum + (parseFloat(bid.budget || '0') || 0), 0) / wonBids.length : 0,
+      totalRevenue: totalCompanyRevenue, // Company revenue = subscriptions + commissions
+      subscriptionRevenue,
+      commissionRevenue,
+      projectRevenue, // Customer project values for reference
+      averageProjectValue: wonBids.length > 0 ? projectRevenue / wonBids.length : 0,
       projectCount: wonBids.length,
       monthlyRevenue,
       revenueByService,
