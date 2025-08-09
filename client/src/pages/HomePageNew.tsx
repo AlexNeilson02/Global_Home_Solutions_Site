@@ -34,7 +34,8 @@ export default function HomePage() {
       style={{ 
         height: '100vh', 
         overflow: 'hidden', 
-        position: 'relative'
+        position: 'relative',
+        background: 'rgba(0,0,0,0.1)'
       }}
     >
       {/* About Us Link */}
@@ -71,15 +72,15 @@ export default function HomePage() {
           />
         </div>
       </header>
+      
+      {/* Big Find Contractor Button - Fixed Position */}
       <div style={{ 
-        position: 'absolute', 
-        bottom: '15%', 
+        position: 'fixed', 
+        top: '50%', 
         left: '50%', 
-        transform: 'translateX(-50%)', 
+        transform: 'translate(-50%, -50%)', 
         zIndex: 999999,
-        width: '100%',
-        display: 'flex',
-        justifyContent: 'center'
+        pointerEvents: 'auto'
       }}>
         <button 
           onClick={() => navigateWithSalesperson('/services')}
@@ -99,10 +100,11 @@ export default function HomePage() {
             border: '5px solid yellow',
             boxShadow: '0 12px 30px rgba(255,0,0,0.8)',
             zIndex: 999999,
-            position: 'relative'
+            position: 'relative',
+            display: 'block'
           }}
         >
-          Find a Contractor
+          🔴 HUGE TEST BUTTON 🔴
         </button>
       </div>
     </div>
