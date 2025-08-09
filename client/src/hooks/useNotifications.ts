@@ -85,9 +85,11 @@ export function useNotifications(contractorId: number | null) {
         console.log('WebSocket connection closed');
         setState(prev => ({ ...prev, isConnected: false }));
         
-        // Attempt to reconnect after 3 seconds
+        // Attempt to reconnect after 3 seconds (only if component is still mounted)
         reconnectTimeoutRef.current = setTimeout(() => {
-          connect();
+          if (reconnectTimeoutRef.current) {
+            connect();
+          }
         }, 3000);
       };
 

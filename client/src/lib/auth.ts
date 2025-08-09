@@ -45,7 +45,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       } catch (err) {
         console.error("Error parsing stored user:", err);
         // Invalid stored user data
-        localStorage.removeItem('authToken');
+        localStorage.removeItem('auth-token');
         localStorage.removeItem('user');
       }
     }

@@ -64,6 +64,7 @@ export default function HomePage() {
           } else {
             console.error('❌ All tracking attempts failed for ref:', refParam);
             setTrackingComplete(true); // Allow page to work without tracking
+            setTrackingLoading(false); // Clear loading state when all attempts fail
           }
         } finally {
           if (retryCount === 0) {

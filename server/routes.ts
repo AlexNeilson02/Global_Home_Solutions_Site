@@ -940,14 +940,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const bidId = Number(req.params.bidId);
       
       // Verify the user has access to this contractor's data
-      const user = req.session?.user;
+      const user = req.user as User;
       if (!user) {
         return res.status(401).json({ message: "Authentication required" });
       }
 
       // Check if user is admin or the contractor themselves
-      if (user.role !== 'admin' && user.roleData?.id !== contractorId) {
-        return res.status(403).json({ message: "Access denied" });
+      if (user.role !== 'admin') {
+        // For non-admin users, we need to check if they own this contractor record
+        const contractor = await storage.getContractor(contractorId);
+        if (!contractor || contractor.userId !== user.id) {
+          return res.status(403).json({ message: "Access denied" });
+        }
       }
 
       // Update the bid request to mark as contacted (emailSent = true)
@@ -1762,11 +1766,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const subscription = await stripe.subscriptions.retrieve(contractor.stripeSubscriptionId);
       
-      const nextBillingDate = subscription.current_period_end ? new Date(subscription.current_period_end * 1000).toISOString() : null;
+      const nextBillingDate = (subscription as any).current_period_end ? new Date((subscription as any).current_period_end * 1000).toISOString() : null;
       
       res.json({
         status: subscription.status === 'active' ? 'active' : 'inactive',
-        currentPeriodEnd: subscription.current_period_end,
+        currentPeriodEnd: (subscription as any).current_period_end,
         nextBilling: nextBillingDate
       });
 
@@ -1860,7 +1864,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Handle successful subscription payments
       if (event.type === 'invoice.payment_succeeded') {
         const invoice = event.data.object as Stripe.Invoice;
-        const subscriptionId = typeof invoice.subscription === 'string' ? invoice.subscription : (invoice.subscription as Stripe.Subscription)?.id;
+        const subscriptionId = typeof (invoice as any).subscription === 'string' ? (invoice as any).subscription : (invoice as any).subscription?.toString();
 
         // Find contractor by subscription ID
         const contractor = await storage.getContractorByStripeSubscriptionId(subscriptionId);
