@@ -903,7 +903,7 @@ const ContractorPortalEnhanced: React.FC = () => {
             </TabsList>
 
             {/* Mobile Navigation - Fixed bottom bar, shown only on mobile */}
-            <div className="sm:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 z-50">
+            <div className="sm:hidden fixed bottom-0 left-0 right-0 bg-transparent border-t border-gray-200 dark:border-gray-700 z-50 contractor-portal-mobile-nav">
               <div className="flex h-16 overflow-x-auto scrollbar-hide">
                 <button
                   onClick={() => setActiveTab("dashboard")}
@@ -1462,7 +1462,7 @@ const ContractorPortalEnhanced: React.FC = () => {
                   <div className="space-y-4">
                     {bidRequests.filter((bid: any) => bid.status === 'bid_sent' || bid.status === 'won' || bid.status === 'lost').length > 0 ? (
                       bidRequests.filter((bid: any) => bid.status === 'bid_sent' || bid.status === 'won' || bid.status === 'lost').map((project: any) => (
-                        <div key={project.id} className="border rounded-lg p-4 bg-white dark:bg-gray-800">
+                        <div key={project.id} className="border rounded-lg p-4 bg-white dark:bg-gray-800 card">
                           <div className="flex justify-between items-start mb-3">
                             <div className="flex-1">
                               <div className="flex items-center gap-2 mb-2">
@@ -1578,7 +1578,7 @@ const ContractorPortalEnhanced: React.FC = () => {
                   <div className="space-y-4">
                     {bidRequests.length > 0 ? (
                       bidRequests.filter((bid: any) => bid.status === 'pending' || bid.status === 'contacted').map((bid: any) => (
-                        <div key={bid.id} className="border rounded-lg p-4 bg-white dark:bg-gray-800">
+                        <div key={bid.id} className="border rounded-lg p-4 bg-white dark:bg-gray-800 card">
                           <div className="flex justify-between items-start mb-3">
                             <div className="flex-1">
                               <div className="flex items-center gap-2 mb-2">
@@ -1820,7 +1820,7 @@ const ContractorPortalEnhanced: React.FC = () => {
                 <CardContent className="space-y-6">
                   {contractor?.paymentMethodAdded ? (
                     <div className="space-y-4">
-                      <div className="p-4 bg-white rounded-lg border border-gray-200">
+                      <div className="p-4 bg-white rounded-lg border border-gray-200 card">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-3">
                             <div className={`flex items-center justify-center w-12 h-8 rounded text-white text-sm font-bold ${

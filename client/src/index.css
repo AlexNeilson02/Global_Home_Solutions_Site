@@ -23,7 +23,7 @@ html, body {
   margin: 0 !important;
   padding: 0 !important;
   height: 100%;
-  background: #ffffff;
+  background: transparent !important;
   position: relative;
   top: 0 !important;
 }
@@ -1597,6 +1597,119 @@ div[role="tabpanel"] * {
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
   max-width: 425px !important;
   width: 100% !important;
+}
+
+/* ========================================= */
+/* GLOBAL WHITE RECTANGLE KILLER - NUCLEAR APPROACH */
+/* Apply the same homepage fix to ALL pages across the entire site */
+/* ========================================= */
+
+/* Nuclear Option 1: Hide ALL white backgrounds that might be overlays */
+*[style*="background: white"],
+*[style*="background-color: white"],
+*[style*="background-color: #ffffff"],
+*[style*="background-color: #FFFFFF"],
+*[style*="background-color: rgb(255, 255, 255)"],
+*[style*="background-color: rgba(255, 255, 255"],
+div[style*="background"],
+div[class*="bg-white"]:not(.dialog-content):not(.card):not(.sheet):not(.modal):not([role="dialog"]):not([data-component]),
+.fixed:not(.dialog-overlay):not(.sheet-overlay):not([role="dialog"]):not([data-component]),
+.absolute:not(.dialog-overlay):not(.sheet-overlay):not([role="dialog"]):not([data-component]),
+*[style*="position: fixed"]:not(.dialog-overlay):not(.sheet-overlay):not([role="dialog"]):not([data-component]) {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/* Nuclear Option 2: Make main app containers transparent on ALL pages */
+.homepage-container,
+.about-us-page,
+.contractor-portal-main,
+.salesperson-portal-main,
+.admin-portal-main,
+.login-page,
+.profile-page,
+.contractor-profile-page,
+.salesperson-profile-page,
+main,
+.main-content,
+.page-container,
+.app-wrapper,
+[data-page] {
+  background: transparent !important;
+  background-color: transparent !important;
+}
+
+/* Nuclear Option 3: Target common white rectangle sources */
+.toast-container,
+.notification-banner,
+.status-message,
+.loading-overlay:not(.modal):not(.dialog),
+.spinner-overlay:not(.modal):not(.dialog),
+.replit-overlay,
+.dev-overlay,
+[id*="replit"]:not(.dialog):not(.modal),
+[class*="replit"]:not(.dialog):not(.modal),
+.fixed.bottom-0,
+.fixed.top-0:not(.dialog):not(.modal),
+.fixed.right-0:not(.dialog):not(.modal),
+.fixed.left-0:not(.dialog):not(.modal),
+.absolute.bottom-0,
+.absolute.top-0:not(.dialog):not(.modal) {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/* Nuclear Option 4: Hide mobile navigation that might appear as white rectangles */
+.mobile-nav:not(.main-nav),
+.mobile-menu-overlay,
+.mobile-bottom-nav,
+.sticky-nav:not(.main-nav),
+.floating-nav:not(.main-nav) {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+}
+
+/* Nuclear Option 5: Ensure ALL pages have transparent backgrounds */
+body, html {
+  background: transparent !important;
+  background-color: transparent !important;
+}
+
+/* Nuclear Option 6: Override any remaining white backgrounds */
+*:not(.card):not(.sheet):not(.dialog-content):not([role="dialog"]):not([data-component]):not(input):not(textarea):not(select):not(button) {
+  background-color: transparent !important;
+}
+
+/* Nuclear Option 7: Kill any remaining overlays with maximum specificity */
+div[style*="position: fixed"][style*="inset: 0"]:not(.dialog-overlay):not(.modal-overlay):not(.sheet-overlay),
+div[style*="position: absolute"][style*="inset: 0"]:not(.dialog-overlay):not(.modal-overlay):not(.sheet-overlay),
+.fixed.inset-0:not(.dialog-overlay):not(.modal-overlay):not(.sheet-overlay):not([role="dialog"]):not([data-component]),
+.absolute.inset-0:not(.dialog-overlay):not(.modal-overlay):not(.sheet-overlay):not([role="dialog"]):not([data-component]) {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  z-index: -9999 !important;
+}
+
+/* Final Nuclear Option: Ensure the main app wrapper is always transparent */
+.min-h-screen:not(.dialog):not(.modal):not(.sheet):not([role="dialog"]):not([data-component]) {
+  background: transparent !important;
+  background-color: transparent !important;
+}
+
+/* Apply the fix globally for all divs with min-height: 100vh */
+div[style*="minHeight: '100vh'"],
+div[style*="min-height: 100vh"],
+[style*="minHeight: '100vh'"],
+[style*="min-height: 100vh"] {
+  background: transparent !important;
+  background-color: transparent !important;
 }
 
 /* Ensure login modal buttons are highly visible */

@@ -42,6 +42,7 @@ Preferred communication style: Simple, everyday language.
 
 ### Recent Changes (August 2025)
 - **Contact Customer Workflow Enhancement**: Fixed the contractor portal's "Contact Customer" functionality to properly redirect users to the email tab with auto-composed emails before marking customers as contacted. The system now switches from the bid request tab to the email tab, automatically composes an email with customer details pre-filled, and only marks the bid request as "contacted" after the email is actually sent. Removed duplicate contractor-dashboard.tsx file - system now uses ContractorPortalEnhanced.tsx exclusively for contractor portal functionality.
+- **Global White Rectangle Elimination**: Applied comprehensive nuclear CSS approach to eliminate white rectangle overlays across the entire site, not just the homepage. Implemented 7 nuclear strategies including: hiding all white background overlays, making all main app containers transparent, targeting common white rectangle sources (toasts, notifications, mobile navigation), ensuring root and body elements are transparent, overriding remaining white backgrounds while preserving functional UI elements (cards, dialogs, inputs), and killing any fixed/absolute positioned overlays. This ensures the beautiful background images are visible throughout the site without white rectangle interference.
 
 ## External Dependencies
 
