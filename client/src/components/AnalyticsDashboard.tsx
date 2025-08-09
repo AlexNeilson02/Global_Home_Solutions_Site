@@ -551,7 +551,7 @@ const AnalyticsDashboard: React.FC<AnalyticsProps> = ({ userRole, userId, extern
                 </div>
                 <div className="flex items-center justify-between p-3 bg-green-50 rounded">
                   <span className="font-medium">Won</span>
-                  <Badge variant="outline" className="bg-green-100 text-black border-green-300">{analyticsData?.analytics?.won || 0}</Badge>
+                  <Badge variant="outline" className="text-black border-green-300 bg-[#ffffff]">{analyticsData?.analytics?.won || 0}</Badge>
                 </div>
                 <div className="flex items-center justify-between p-3 bg-red-50 rounded">
                   <span className="font-medium">Lost</span>
