@@ -760,15 +760,43 @@ ${contractor?.email || ''}`;
 
   const responseTimeData = calculateResponseTimes();
 
-  // Chart data
-  const projectData = [
-    { month: 'Jan', completed: 8, active: 12, revenue: 45000 },
-    { month: 'Feb', completed: 12, active: 15, revenue: 62000 },
-    { month: 'Mar', completed: 10, active: 18, revenue: 58000 },
-    { month: 'Apr', completed: 15, active: 20, revenue: 75000 },
-    { month: 'May', completed: 18, active: 16, revenue: 89000 },
-    { month: 'Jun', completed: 22, active: 14, revenue: 95000 }
-  ];
+  // Calculate bid performance data from actual bid requests
+  const calculateBidPerformance = () => {
+    // Group bid requests by month
+    const monthlyData: { [key: string]: { won: number; sent: number; total: number } } = {};
+    
+    bidRequests.forEach((bid: any) => {
+      const date = new Date(bid.createdAt);
+      const monthYear = date.toLocaleDateString('en-US', { month: 'short', year: '2-digit' });
+      
+      if (!monthlyData[monthYear]) {
+        monthlyData[monthYear] = { won: 0, sent: 0, total: 0 };
+      }
+      
+      monthlyData[monthYear].total++;
+      
+      if (bid.status === 'completed' || bid.status === 'won') {
+        monthlyData[monthYear].won++;
+      } else if (bid.status === 'bid_sent' || bid.status === 'contacted') {
+        monthlyData[monthYear].sent++;
+      }
+    });
+    
+    // Convert to array format for chart, sorted by date
+    return Object.entries(monthlyData)
+      .map(([month, data]) => ({
+        month,
+        won: data.won,
+        sent: data.sent,
+        total: data.total
+      }))
+      .sort((a, b) => {
+        // Simple sort by month name for now - in production you'd want proper date sorting
+        return a.month.localeCompare(b.month);
+      });
+  };
+
+  const bidPerformanceData = calculateBidPerformance();
 
   const responseTimeAnalytics = [
     { name: 'Same Day', value: responseTimeData.sameDay, color: '#10b981' },
@@ -1063,18 +1091,29 @@ ${contractor?.email || ''}`;
                 <Card style={antiYellowStyles}>
                   <CardHeader>
                     <CardTitle>Bid Performance Overview</CardTitle>
+                    <CardDescription>Monthly breakdown of won vs sent bids</CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <ResponsiveContainer width="100%" height={300}>
-                      <BarChart data={projectData}>
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="month" />
-                        <YAxis />
-                        <Tooltip />
-                        <Bar dataKey="completed" fill="#10b981" name="Won Bids" />
-                        <Bar dataKey="active" fill="#3b82f6" name="Sent Bids" />
-                      </BarChart>
-                    </ResponsiveContainer>
+                    {bidPerformanceData.length > 0 ? (
+                      <ResponsiveContainer width="100%" height={300}>
+                        <BarChart data={bidPerformanceData}>
+                          <CartesianGrid strokeDasharray="3 3" />
+                          <XAxis dataKey="month" />
+                          <YAxis />
+                          <Tooltip />
+                          <Bar dataKey="won" fill="#10b981" name="Won Bids" />
+                          <Bar dataKey="sent" fill="#3b82f6" name="Sent Bids" />
+                        </BarChart>
+                      </ResponsiveContainer>
+                    ) : (
+                      <div className="flex items-center justify-center h-[300px] text-muted-foreground">
+                        <div className="text-center">
+                          <BarChart3 className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                          <p>No bid data available yet</p>
+                          <p className="text-sm">Start receiving bid requests to see performance metrics</p>
+                        </div>
+                      </div>
+                    )}
                   </CardContent>
                 </Card>
 
