@@ -45,13 +45,6 @@ import { useToast } from "@/hooks/use-toast";
 
 interface GmailIntegrationProps {
   contractorId?: number;
-  pendingEmailData?: {
-    to: string;
-    subject: string;
-    body: string;
-    bidRequestId: number;
-  } | null;
-  onEmailDataProcessed?: () => void;
 }
 
 interface GmailMessage {
@@ -79,7 +72,7 @@ interface EmailForm {
   bidRequestId?: number;
 }
 
-const GmailIntegration: React.FC<GmailIntegrationProps> = ({ contractorId, pendingEmailData, onEmailDataProcessed }) => {
+const GmailIntegration: React.FC<GmailIntegrationProps> = ({ contractorId }) => {
   const [isConnecting, setIsConnecting] = useState(false);
   const [showCompose, setShowCompose] = useState(false);
   const [showInbox, setShowInbox] = useState(true);
@@ -113,26 +106,6 @@ const GmailIntegration: React.FC<GmailIntegrationProps> = ({ contractorId, pendi
     queryKey: [`/api/gmail/sent/${contractor?.id}`],
     enabled: Boolean(contractor?.gmailConnected && contractor?.id && currentView === 'sent'),
   });
-
-  // Handle pending email data from parent component
-  useEffect(() => {
-    if (pendingEmailData) {
-      setEmailForm({
-        to: pendingEmailData.to,
-        subject: pendingEmailData.subject,
-        body: pendingEmailData.body,
-        bidRequestId: pendingEmailData.bidRequestId
-      });
-      setShowCompose(true);
-      setShowInbox(false);
-      setSelectedEmail(null);
-      
-      // Clear pending data after processing
-      if (onEmailDataProcessed) {
-        onEmailDataProcessed();
-      }
-    }
-  }, [pendingEmailData, onEmailDataProcessed]);
 
   // Debug logging
   useEffect(() => {
@@ -240,13 +213,9 @@ const GmailIntegration: React.FC<GmailIntegrationProps> = ({ contractorId, pendi
       // If this email was sent to a bid request, mark it as contacted
       if (variables.bidRequestId) {
         try {
-          const response = await fetch(`/api/bid-requests/${variables.bidRequestId}/status`, {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ status: 'contacted' })
+          await apiRequest(`/contractors/${contractor?.id}/bid-requests/${variables.bidRequestId}/contact`, {
+            method: 'POST'
           });
-          if (!response.ok) throw new Error('Failed to update status');
-          
           // Refresh bid requests to update the UI
           queryClient.invalidateQueries({ queryKey: [`/api/contractors/${contractor?.id}/bid-requests`] });
         } catch (error) {
