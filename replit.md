@@ -37,7 +37,10 @@ Preferred communication style: Simple, everyday language.
 - **Authentication**: Secure session creation and persistence, with role-based access to features.
 - **Commission Calculation**: Based on service category and conversion, with automated distribution and comprehensive audit trails including source contractor, bid request, service type, and Stripe payment intent IDs.
 
-### Recent Changes (January 2025)
+### Recent Changes (August 2025)
+- **Homepage White Rectangle Removal (August 9, 2025)**: Successfully eliminated unwanted white rectangular overlay appearing on the homepage that was covering parts of the hero image. Applied comprehensive CSS fixes including: root background transparency, nuclear-level Toaster/Toast component hiding, fixed-element removal, mobile navigation targeting, and Replit UI overlay elimination. Created dedicated homepage-override.css with aggressive white-element removal tactics. Homepage now displays the full hero image without any visual interference.
+
+### Previous Changes (January 2025)
 - **QR Code System Redesign**: Modified QR code generation to direct all salespeople to homepage with unique ?ref={profileUrl} tracking parameter instead of individual landing pages (/sales/{profileUrl}). This maintains lead attribution while providing a unified customer experience. Updated Sales Portal UI to reflect "Tracking URL" terminology and improved instructions for QR code usage.
 
 ## External Dependencies
