@@ -39,12 +39,10 @@ interface CommissionRecord {
 }
 
 interface CommissionSummary {
-  totalEarnings: number;
-  pendingEarnings: number;
-  paidEarnings: number;
-  totalLeads: number;
-  conversionRate: number;
-  averageCommission: number;
+  totalEarned: number;
+  pendingCommissions: number;
+  paidCommissions: number;
+  totalRecords: number;
 }
 
 interface CommissionDashboardProps {
@@ -168,7 +166,7 @@ export function CommissionDashboard({ salespersonId }: CommissionDashboardProps)
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-green-600">
-              {formatCurrency(summary?.totalEarnedCommissions || 0)}
+              {formatCurrency(summary?.totalEarned || 0)}
             </div>
             <p className="text-xs text-muted-foreground">
               All time commission earnings
@@ -183,7 +181,7 @@ export function CommissionDashboard({ salespersonId }: CommissionDashboardProps)
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-orange-600">
-              {formatCurrency(summary?.totalPendingCommissions || 0)}
+              {formatCurrency(summary?.pendingCommissions || 0)}
             </div>
             <p className="text-xs text-muted-foreground">
               Awaiting payment processing
@@ -198,7 +196,7 @@ export function CommissionDashboard({ salespersonId }: CommissionDashboardProps)
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {summary?.totalCommissionRecords || 0}
+              {summary?.totalRecords || 0}
             </div>
             <p className="text-xs text-muted-foreground">
               Total commission records
@@ -213,7 +211,7 @@ export function CommissionDashboard({ salespersonId }: CommissionDashboardProps)
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-green-600">
-              {formatCurrency(summary?.totalEarnedCommissions || 0)}
+              {formatCurrency(summary?.paidCommissions || 0)}
             </div>
             <p className="text-xs text-muted-foreground">
               Successfully processed
