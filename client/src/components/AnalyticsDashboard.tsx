@@ -383,7 +383,7 @@ const AnalyticsDashboard: React.FC<AnalyticsProps> = ({ userRole, userId }) => {
                   <YAxis />
                   <Tooltip />
                   <Line type="monotone" dataKey="totalRequests" stroke="#3b82f6" name="Bid Requests" />
-                  <Line type="monotone" dataKey="contractorsSignedOn" stroke="#10b981" name="Contractors Signed On" />
+                  <Line type="monotone" dataKey="newContractors" stroke="#10b981" name="New Contractors" />
                 </LineChart>
               </ResponsiveContainer>
             </CardContent>

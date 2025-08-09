@@ -876,7 +876,7 @@ export class DatabaseStorage implements IStorage {
     );
 
     // Time-based trends (weekly breakdown)
-    const trends = this.calculateTimeTrends(filteredBidRequests, startDate, endDate);
+    const trends = await this.calculateTimeTrends(filteredBidRequests, startDate, endDate);
 
     return {
       overview,
@@ -886,15 +886,25 @@ export class DatabaseStorage implements IStorage {
     };
   }
 
-  private calculateTimeTrends(bidRequests: any[], startDate: Date, endDate: Date): any[] {
+  private async calculateTimeTrends(bidRequests: any[], startDate: Date, endDate: Date): Promise<any[]> {
     const weeks: any[] = [];
     const weekMs = 7 * 24 * 60 * 60 * 1000;
     
+    // Get all contractors to track new registrations
+    const allContractors = await this.getAllContractors();
+    
     for (let date = new Date(startDate); date <= endDate; date = new Date(date.getTime() + weekMs)) {
       const weekEnd = new Date(Math.min(date.getTime() + weekMs, endDate.getTime()));
+      
       const weekBids = bidRequests.filter(bid => {
         const bidDate = new Date(bid.createdAt);
         return bidDate >= date && bidDate < weekEnd;
+      });
+
+      // Count new contractors registered in this week
+      const newContractorsThisWeek = allContractors.filter(contractor => {
+        const contractorDate = new Date(contractor.createdAt || contractor.updatedAt);
+        return contractorDate >= date && contractorDate < weekEnd;
       });
 
       weeks.push({
@@ -904,7 +914,8 @@ export class DatabaseStorage implements IStorage {
         won: weekBids.filter(b => b.status === 'won').length,
         revenue: weekBids
           .filter(b => b.status === 'won')
-          .reduce((sum, bid) => sum + (parseFloat(bid.budget || '0') || 0), 0)
+          .reduce((sum, bid) => sum + (parseFloat(bid.budget || '0') || 0), 0),
+        newContractors: newContractorsThisWeek.length
       });
     }
 
