@@ -957,8 +957,8 @@ export class DatabaseStorage implements IStorage {
     const activeContractors = await this.getAllContractors();
     const activeContractorCount = activeContractors.filter(c => c.isActive).length;
     
-    // Calculate monthly subscription revenue ($50/month per active contractor)
-    const monthlySubscriptionRevenue = activeContractorCount * 50;
+    // Calculate monthly subscription revenue ($100/month per active contractor)
+    const monthlySubscriptionRevenue = activeContractorCount * 100;
     
     // Total Revenue = Commissions + Monthly Subscriptions per active contractor
     const totalRevenue = commissionData.totalCommissions + monthlySubscriptionRevenue;

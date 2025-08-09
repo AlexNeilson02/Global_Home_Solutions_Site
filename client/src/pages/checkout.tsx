@@ -90,7 +90,7 @@ const CheckoutForm = () => {
 
 export default function Checkout() {
   const [clientSecret, setClientSecret] = useState("");
-  const [amount, setAmount] = useState(2999); // $29.99 default
+  const [amount, setAmount] = useState(10000); // $100.00 default
   const { toast } = useToast();
 
   // If Stripe is not configured, show information message

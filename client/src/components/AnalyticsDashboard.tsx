@@ -231,7 +231,7 @@ const AnalyticsDashboard: React.FC<AnalyticsProps> = ({ userRole, userId, extern
                 </div>
                 <div className="flex justify-between text-sm">
                   <span>Active Contractors:</span>
-                  <span className="font-medium">{revenue?.activeContractorCount || 0} × $50/month</span>
+                  <span className="font-medium">{revenue?.activeContractorCount || 0} × $100/month</span>
                 </div>
               </div>
             </div>

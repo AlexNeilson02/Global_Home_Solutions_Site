@@ -570,8 +570,8 @@ export default function AdminPortalEnhanced() {
   // Corporate commissions from all successful bid requests (50% of commission structure)
   const corporateCommissions = analyticsData?.analytics?.corporateCommissions || 0;
   
-  // Contractor monthly subscriptions (assuming $29.99/month per active contractor)
-  const contractorSubscriptionRevenue = activeContractors * 29.99;
+  // Contractor monthly subscriptions (assuming $100/month per active contractor)
+  const contractorSubscriptionRevenue = activeContractors * 100;
   
   // Total Revenue = Corporate commissions + Contractor subscriptions  
   const totalRevenue = corporateCommissions + contractorSubscriptionRevenue;

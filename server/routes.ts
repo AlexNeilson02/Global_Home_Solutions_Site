@@ -1549,7 +1549,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
 
       const price = await stripe.prices.create({
-        unit_amount: amount, // $100 in cents
+        unit_amount: amount, // Amount in cents (e.g., 10000 for $100)
         currency: 'usd',
         recurring: {
           interval: 'month'
