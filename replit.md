@@ -42,6 +42,7 @@ Preferred communication style: Simple, everyday language.
 
 ### Recent Changes (August 2025)
 - **Contact Customer Workflow Enhancement**: Fixed the contractor portal's "Contact Customer" functionality to properly redirect users to the email tab with auto-composed emails before marking customers as contacted. The system now switches from the bid request tab to the email tab, automatically composes an email with customer details pre-filled, and only marks the bid request as "contacted" after the email is actually sent. Removed duplicate contractor-dashboard.tsx file - system now uses ContractorPortalEnhanced.tsx exclusively for contractor portal functionality.
+- **Bid Response Time Analytics**: Added comprehensive bid response time tracking chart to the contractor portal Dashboard tab, replacing the bid status distribution pie chart. The new chart displays response time breakdown in categories ("< 24h", "24-48h", "2-3 days", "3-7 days", "> 7 days") based on actual database timestamps between bid request creation and contractor first response. Includes average response time calculation and professional chart styling with rotated labels and enhanced tooltips. Analytics tab remains unchanged as requested.
 
 ## External Dependencies
 
