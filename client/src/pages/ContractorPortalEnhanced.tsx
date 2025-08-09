@@ -134,6 +134,7 @@ const ContractorPortalEnhanced: React.FC = () => {
   const [, navigate] = useLocation();
   const [activeTab, setActiveTab] = useState("dashboard");
   const [isEditingProfile, setIsEditingProfile] = useState(false);
+  const [pendingContactEmail, setPendingContactEmail] = useState<any>(null);
   
   // Style object to remove yellow coloring with subtle borders - Solution #2
   const antiYellowStyles = {
@@ -314,9 +315,37 @@ const ContractorPortalEnhanced: React.FC = () => {
     console.error('Error fetching service categories:', servicesError);
   }
 
-  // Contact customer mutation
+  // Handle contact customer - switches to email tab and prepares email
+  const handleContactCustomer = (bidRequest: any) => {
+    console.log('🎯 ContractorPortalEnhanced - handleContactCustomer called for bid request:', bidRequest.id);
+    
+    // Prepare email data for the Gmail component
+    const emailData = {
+      id: bidRequest.id,
+      email: bidRequest.email,
+      customerName: bidRequest.fullName,
+      fullName: bidRequest.fullName,
+      serviceType: bidRequest.serviceRequested,
+      description: bidRequest.description,
+      servicesRequested: [bidRequest.serviceRequested]
+    };
+    
+    console.log('🎯 ContractorPortalEnhanced - Switching to email tab for bid request:', bidRequest.id);
+    // Switch to email tab first
+    setActiveTab("email");
+    
+    // Set the pending contact email data with a slight delay to ensure tab switch
+    setTimeout(() => {
+      console.log('🎯 ContractorPortalEnhanced - Setting pending contact email for bid request:', bidRequest.id);
+      setPendingContactEmail(emailData);
+    }, 100);
+  };
+
+  // Contact customer mutation - REMOVED: This should only be called after email is sent
   const contactCustomerMutation = useMutation({
     mutationFn: async (requestId: number) => {
+      console.log('🔴 ContractorPortalEnhanced - contactCustomerMutation called for bid ID:', requestId);
+      console.trace('🔴 ContractorPortalEnhanced - Call stack for contactCustomerMutation');
       const response = await fetch(`/api/bid-requests/${requestId}/status`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
@@ -1608,8 +1637,7 @@ const ContractorPortalEnhanced: React.FC = () => {
                               <Button
                                 size="sm"
                                 className="bg-blue-600 hover:bg-blue-700 text-white"
-                                onClick={() => contactCustomerMutation.mutate(bid.id)}
-                                disabled={contactCustomerMutation.isPending}
+                                onClick={() => handleContactCustomer(bid)}
                                 style={antiYellowInputStyles}
                               >
                                 <Phone className="h-4 w-4 mr-1" />
@@ -1688,7 +1716,11 @@ const ContractorPortalEnhanced: React.FC = () => {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <GmailIntegration contractorId={contractor?.id} />
+                  <GmailIntegration 
+                    contractorId={contractor?.id}
+                    pendingContactEmail={pendingContactEmail}
+                    onEmailSent={() => setPendingContactEmail(null)}
+                  />
                 </CardContent>
               </Card>
             </TabsContent>
