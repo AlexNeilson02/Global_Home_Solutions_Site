@@ -40,20 +40,26 @@ const SalesPortal: React.FC = () => {
     logoutMutation.mutate();
   };
 
-  // Fetch sales data - using placeholder salesperson ID 1 for demo
-  const { data: salesperson } = useQuery({
-    queryKey: ['/api/salespersons', 1],
+  // Fetch current user data and their salesperson info
+  const { data: user } = useQuery({
+    queryKey: ['/api/users/me'],
     enabled: true
+  });
+
+  const { data: salesperson } = useQuery({
+    queryKey: ['/api/users/me'],
+    select: (userData) => userData?.salesperson,
+    enabled: !!user?.id
   });
 
   const { data: analytics } = useQuery({
-    queryKey: ['/api/salespersons/1/analytics'],
-    enabled: true
+    queryKey: [`/api/salespersons/${salesperson?.id}/analytics`],
+    enabled: !!salesperson?.id
   });
 
   const { data: bidRequests } = useQuery({
-    queryKey: ['/api/salespersons/1/bid-requests'],
-    enabled: true
+    queryKey: [`/api/salespersons/${salesperson?.id}/bid-requests`],
+    enabled: !!salesperson?.id
   });
 
   // Mock performance data for charts
@@ -79,7 +85,7 @@ const SalesPortal: React.FC = () => {
                 Sales Portal
               </h1>
               <p className="text-gray-600 dark:text-gray-300 mt-1">
-                Welcome back, {salesperson?.name || 'Sales Representative'}
+                Welcome back, {user?.fullName || 'Sales Representative'}
               </p>
             </div>
             <Button onClick={handleBackToPortals} variant="outline" disabled={logoutMutation.isPending}>
@@ -118,7 +124,7 @@ const SalesPortal: React.FC = () => {
                     <Eye className="h-4 w-4 text-muted-foreground" />
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">{(analytics as any)?.totalVisits || 0}</div>
+                    <div className="text-2xl font-bold">{user?.totalVisits || 0}</div>
                     <p className="text-xs text-muted-foreground">
                       <span className="text-green-600">+12.5%</span> from last month
                     </p>
@@ -263,7 +269,7 @@ const SalesPortal: React.FC = () => {
 
             {/* Commission Dashboard Tab */}
             <TabsContent value="commissions" className="space-y-6">
-              {salesperson?.id && <CommissionDashboard salespersonId={salesperson.id} />}
+              {user?.salesperson?.id && <CommissionDashboard salespersonId={user.salesperson.id} />}
             </TabsContent>
 
             {/* Profile Tab */}
