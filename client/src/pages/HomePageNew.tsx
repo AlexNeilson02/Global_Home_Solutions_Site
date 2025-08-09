@@ -9,6 +9,7 @@ import logoPath from "@/assets/global-home-solutions-logo.png";
 import heroBackgroundImage from "@/assets/ghs-office-front.png";
 import mobileHeroImage from "@assets/global home mobile 1_1754514857525.png";
 import "../styles/HomePage.css";
+import "../styles/homepage-override.css";
 
 export default function HomePage() {
   const { navigateWithSalesperson } = useSalespersonNavigation();
@@ -28,11 +29,17 @@ export default function HomePage() {
   const currentHeroImage = isMobile ? mobileHeroImage : heroBackgroundImage;
 
   return (
-    <div className="homepage-container" style={{ height: '100vh', overflow: 'hidden', position: 'relative' }}>
+    <div 
+      className="homepage-container" 
+      style={{ 
+        height: '100vh', 
+        overflow: 'hidden', 
+        position: 'relative'
+      }}
+    >
       {/* About Us Link */}
       <Link 
         href="/about"
-
         style={{
           position: 'absolute',
           top: '20px',
@@ -77,7 +84,6 @@ export default function HomePage() {
         >
           Find a Contractor
         </button>
-
       </div>
     </div>
   );

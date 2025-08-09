@@ -24,7 +24,7 @@ function App() {
     <Router>
       <SalespersonProvider>
         <TooltipProvider>
-          <div className="min-h-screen" style={{ marginTop: 0, paddingTop: 0, position: 'relative', top: 0 }}>
+          <div className="min-h-screen" style={{ marginTop: 0, paddingTop: 0, position: 'relative', top: 0, background: 'transparent' }}>
             <Toaster />
             <Route path="/" component={HomePage} />
             <Route path="/about" component={AboutUs} />

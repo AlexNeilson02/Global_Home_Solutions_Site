@@ -23,7 +23,7 @@ html, body {
   margin: 0 !important;
   padding: 0 !important;
   height: 100%;
-  background: #ffffff;
+  background: transparent;
   position: relative;
   top: 0 !important;
 }
@@ -112,7 +112,83 @@ html {
 }
 
 /* Hide Toaster on homepage to prevent white rectangle overlay */
-.homepage-container [data-radix-toast-viewport] {
+.homepage-container [data-radix-toast-viewport],
+.homepage-container [data-radix-toast-root],
+.homepage-container [role="status"],
+.homepage-container [role="alert"],
+.homepage-container .toast,
+.homepage-container [class*="toast"] {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+}
+
+/* Nuclear approach - hide ALL white backgrounds on homepage */
+.homepage-container *[style*="background: white"],
+.homepage-container *[style*="background-color: white"],
+.homepage-container *[style*="background: #ffffff"],
+.homepage-container *[style*="background-color: #ffffff"],
+.homepage-container *[style*="background: #fff"],
+.homepage-container *[style*="background-color: #fff"] {
+  background: transparent !important;
+  background-color: transparent !important;
+}
+
+/* Target any fixed positioned white elements on homepage */
+.homepage-container [class*="fixed"],
+.homepage-container [style*="position: fixed"],
+.homepage-container [style*="position:fixed"] {
+  background: transparent !important;
+  background-color: transparent !important;
+}
+
+/* Force hide ALL potential white overlays on homepage - NUCLEAR APPROACH */
+.homepage-container .fixed,
+.homepage-container [data-state],
+.homepage-container [role],
+.homepage-container .bg-white,
+.homepage-container [style*="bg-white"],
+.homepage-container [class*="white"],
+.homepage-container [class*="bg-white"] {
+  background: transparent !important;
+  background-color: transparent !important;
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+}
+
+/* Specifically target mobile bottom navigation that could be white */
+.homepage-container .sm\\:hidden.fixed.bottom-0,
+.homepage-container .lg\\:hidden.fixed.bottom-0 {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+}
+
+/* ULTIMATE NUCLEAR OPTION - Remove ALL possible white rectangles on homepage */
+body:has(.homepage-container) *:not(.homepage-container):not(.hero-background-image):not(.find-contractor-btn):not(.about-us-link) {
+  background: transparent !important;
+  background-color: transparent !important;
+}
+
+body:has(.homepage-container) .fixed,
+body:has(.homepage-container) [style*="position: fixed"],
+body:has(.homepage-container) [style*="background: white"],
+body:has(.homepage-container) [style*="background-color: white"],
+body:has(.homepage-container) [style*="background: #fff"],
+body:has(.homepage-container) [style*="background-color: #fff"],
+body:has(.homepage-container) .bg-white {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+}
+
+/* Target Replit specific UI overlays that might be causing the white rectangle */
+body:has(.homepage-container) [id*="replit"],
+body:has(.homepage-container) [class*="replit"],
+body:has(.homepage-container) iframe,
+body:has(.homepage-container) [data-overlay],
+body:has(.homepage-container) [data-portal] {
   display: none !important;
   visibility: hidden !important;
   opacity: 0 !important;
