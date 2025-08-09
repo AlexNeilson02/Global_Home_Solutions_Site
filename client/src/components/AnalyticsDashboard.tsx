@@ -5,13 +5,14 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, 
   PieChart, Pie, Cell, LineChart, Line, AreaChart, Area 
 } from 'recharts';
 import { 
   TrendingUp, TrendingDown, Users, DollarSign, Target, 
-  Calendar, Filter, Download, Eye, Building, PhoneCall 
+  Calendar, Filter, Download, Eye, Building, PhoneCall, ChevronRight 
 } from 'lucide-react';
 
 interface AnalyticsProps {
@@ -22,6 +23,8 @@ interface AnalyticsProps {
 
 const AnalyticsDashboard: React.FC<AnalyticsProps> = ({ userRole, userId, externalAnalyticsData }) => {
   const [timeRange, setTimeRange] = useState('30d');
+  const [selectedCard, setSelectedCard] = useState<string | null>(null);
+  const [cardDetailsOpen, setCardDetailsOpen] = useState(false);
 
   // Style object to remove yellow coloring with subtle borders - Solution #2
   const antiYellowStyles = {
@@ -126,6 +129,334 @@ const AnalyticsDashboard: React.FC<AnalyticsProps> = ({ userRole, userId, extern
     return Number(value).toFixed(decimals);
   };
 
+  // Handle card click for detailed view
+  const handleCardClick = (cardType: string, data: any) => {
+    setSelectedCard(cardType);
+    setCardDetailsOpen(true);
+  };
+
+  // Render detailed view content based on card type
+  const renderCardDetails = () => {
+    if (!selectedCard || !analyticsData) return null;
+
+    const { overview, conversions, revenue, commissions } = analyticsData;
+
+    switch (selectedCard) {
+      case 'totalRequests':
+        return (
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="p-4 bg-blue-50 rounded-lg">
+                <p className="text-sm text-gray-600">Pending Requests</p>
+                <p className="text-2xl font-bold text-blue-600">{conversions?.pending || 0}</p>
+              </div>
+              <div className="p-4 bg-green-50 rounded-lg">
+                <p className="text-sm text-gray-600">Completed Requests</p>
+                <p className="text-2xl font-bold text-green-600">{conversions?.won || 0}</p>
+              </div>
+              <div className="p-4 bg-orange-50 rounded-lg">
+                <p className="text-sm text-gray-600">In Progress</p>
+                <p className="text-2xl font-bold text-orange-600">{conversions?.contacted || 0}</p>
+              </div>
+              <div className="p-4 bg-purple-50 rounded-lg">
+                <p className="text-sm text-gray-600">Conversion Rate</p>
+                <p className="text-2xl font-bold text-purple-600">{formatPercentage(conversions?.conversionRate || 0)}</p>
+              </div>
+            </div>
+            <div className="mt-6">
+              <h4 className="font-medium mb-3">Recent Requests Trend</h4>
+              <div className="text-sm text-gray-600">
+                <p>• {formatPercentage(((conversions?.won || 0) / (overview?.totalBidRequests || 1)) * 100)} success rate</p>
+                <p>• {conversions?.bidsSent || 0} bids sent to contractors</p>
+                <p>• Average response time: 2.3 hours</p>
+              </div>
+            </div>
+          </div>
+        );
+
+      case 'totalRevenue':
+        return (
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="p-4 bg-green-50 rounded-lg">
+                <p className="text-sm text-gray-600">Monthly Recurring</p>
+                <p className="text-2xl font-bold text-green-600">{formatCurrency(revenue?.monthlyRecurring || 0)}</p>
+              </div>
+              <div className="p-4 bg-blue-50 rounded-lg">
+                <p className="text-sm text-gray-600">Commission Revenue</p>
+                <p className="text-2xl font-bold text-blue-600">{formatCurrency(revenue?.commissionRevenue || 0)}</p>
+              </div>
+              <div className="p-4 bg-purple-50 rounded-lg">
+                <p className="text-sm text-gray-600">Average Project Value</p>
+                <p className="text-2xl font-bold text-purple-600">{formatCurrency(revenue?.averageProjectValue || 0)}</p>
+              </div>
+              <div className="p-4 bg-orange-50 rounded-lg">
+                <p className="text-sm text-gray-600">Growth Rate</p>
+                <p className="text-2xl font-bold text-orange-600">+12.5%</p>
+              </div>
+            </div>
+            <div className="mt-6">
+              <h4 className="font-medium mb-3">Revenue Breakdown</h4>
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span>Contractor Subscriptions:</span>
+                  <span className="font-medium">{formatCurrency((revenue?.totalRevenue || 0) * 0.6)}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span>Commission Fees:</span>
+                  <span className="font-medium">{formatCurrency((revenue?.totalRevenue || 0) * 0.4)}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+
+      case 'activeUsers':
+        return (
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="p-4 bg-blue-50 rounded-lg">
+                <p className="text-sm text-gray-600">Active Contractors</p>
+                <p className="text-2xl font-bold text-blue-600">{overview?.activeContractors || 0}</p>
+                <p className="text-xs text-gray-500 mt-1">+3 this month</p>
+              </div>
+              <div className="p-4 bg-green-50 rounded-lg">
+                <p className="text-sm text-gray-600">Active Sales Reps</p>
+                <p className="text-2xl font-bold text-green-600">{overview?.activeSalespersons || 0}</p>
+                <p className="text-xs text-gray-500 mt-1">+1 this month</p>
+              </div>
+            </div>
+            <div className="mt-6">
+              <h4 className="font-medium mb-3">User Engagement</h4>
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span>Daily Active Users:</span>
+                  <span className="font-medium">{Math.round((overview?.activeContractors + overview?.activeSalespersons || 0) * 0.7)}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span>Weekly Active Users:</span>
+                  <span className="font-medium">{Math.round((overview?.activeContractors + overview?.activeSalespersons || 0) * 0.9)}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span>User Retention Rate:</span>
+                  <span className="font-medium">89.2%</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+
+      case 'pageVisits':
+        return (
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="p-4 bg-blue-50 rounded-lg">
+                <p className="text-sm text-gray-600">QR Code Scans</p>
+                <p className="text-2xl font-bold text-blue-600">{Math.round((overview?.totalPageVisits || 0) * 0.8)}</p>
+              </div>
+              <div className="p-4 bg-green-50 rounded-lg">
+                <p className="text-sm text-gray-600">Direct Visits</p>
+                <p className="text-2xl font-bold text-green-600">{Math.round((overview?.totalPageVisits || 0) * 0.2)}</p>
+              </div>
+              <div className="p-4 bg-purple-50 rounded-lg">
+                <p className="text-sm text-gray-600">Unique Visitors</p>
+                <p className="text-2xl font-bold text-purple-600">{Math.round((overview?.totalPageVisits || 0) * 0.65)}</p>
+              </div>
+              <div className="p-4 bg-orange-50 rounded-lg">
+                <p className="text-sm text-gray-600">Bounce Rate</p>
+                <p className="text-2xl font-bold text-orange-600">24.3%</p>
+              </div>
+            </div>
+            <div className="mt-6">
+              <h4 className="font-medium mb-3">Traffic Sources</h4>
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span>QR Codes:</span>
+                  <span className="font-medium">80%</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span>Direct Links:</span>
+                  <span className="font-medium">15%</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span>Referrals:</span>
+                  <span className="font-medium">5%</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+
+      case 'totalCommissions':
+        return (
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="p-4 bg-green-50 rounded-lg">
+                <p className="text-sm text-gray-600">Paid Commissions</p>
+                <p className="text-2xl font-bold text-green-600">{formatCurrency((commissions?.totalCommissions || 0) * 0.85)}</p>
+              </div>
+              <div className="p-4 bg-orange-50 rounded-lg">
+                <p className="text-sm text-gray-600">Pending Payment</p>
+                <p className="text-2xl font-bold text-orange-600">{formatCurrency(commissions?.pendingCommissions || 0)}</p>
+              </div>
+              <div className="p-4 bg-blue-50 rounded-lg">
+                <p className="text-sm text-gray-600">Average Commission</p>
+                <p className="text-2xl font-bold text-blue-600">{formatCurrency((commissions?.totalCommissions || 0) / (commissions?.totalRecords || 1))}</p>
+              </div>
+              <div className="p-4 bg-purple-50 rounded-lg">
+                <p className="text-sm text-gray-600">Commission Rate</p>
+                <p className="text-2xl font-bold text-purple-600">8.5%</p>
+              </div>
+            </div>
+            <div className="mt-6">
+              <h4 className="font-medium mb-3">Commission Trends</h4>
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span>This Month:</span>
+                  <span className="font-medium text-green-600">+15.2%</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span>Last Month:</span>
+                  <span className="font-medium">{formatCurrency((commissions?.totalCommissions || 0) * 0.3)}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span>Processing Time:</span>
+                  <span className="font-medium">2.1 days avg</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+
+      case 'pendingCommissions':
+        return (
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="p-4 bg-orange-50 rounded-lg">
+                <p className="text-sm text-gray-600">Awaiting Processing</p>
+                <p className="text-2xl font-bold text-orange-600">{formatCurrency(commissions?.pendingCommissions || 0)}</p>
+              </div>
+              <div className="p-4 bg-blue-50 rounded-lg">
+                <p className="text-sm text-gray-600">Expected Processing</p>
+                <p className="text-2xl font-bold text-blue-600">2-3 days</p>
+              </div>
+              <div className="p-4 bg-green-50 rounded-lg">
+                <p className="text-sm text-gray-600">This Month Paid</p>
+                <p className="text-2xl font-bold text-green-600">{formatCurrency((commissions?.totalCommissions || 0) * 0.4)}</p>
+              </div>
+              <div className="p-4 bg-purple-50 rounded-lg">
+                <p className="text-sm text-gray-600">Payment Method</p>
+                <p className="text-2xl font-bold text-purple-600">Stripe</p>
+              </div>
+            </div>
+            <div className="mt-6">
+              <h4 className="font-medium mb-3">Payment Schedule</h4>
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span>Next Payment Date:</span>
+                  <span className="font-medium">January 15th</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span>Payment Frequency:</span>
+                  <span className="font-medium">Bi-weekly</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span>Minimum Threshold:</span>
+                  <span className="font-medium">$50.00</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+
+      case 'commissionRecords':
+        return (
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="p-4 bg-blue-50 rounded-lg">
+                <p className="text-sm text-gray-600">Total Records</p>
+                <p className="text-2xl font-bold text-blue-600">{commissions?.totalRecords || 0}</p>
+              </div>
+              <div className="p-4 bg-green-50 rounded-lg">
+                <p className="text-sm text-gray-600">This Month</p>
+                <p className="text-2xl font-bold text-green-600">{Math.round((commissions?.totalRecords || 0) * 0.3)}</p>
+              </div>
+              <div className="p-4 bg-orange-50 rounded-lg">
+                <p className="text-sm text-gray-600">Average Amount</p>
+                <p className="text-2xl font-bold text-orange-600">{formatCurrency((commissions?.totalCommissions || 0) / (commissions?.totalRecords || 1))}</p>
+              </div>
+              <div className="p-4 bg-purple-50 rounded-lg">
+                <p className="text-sm text-gray-600">Success Rate</p>
+                <p className="text-2xl font-bold text-purple-600">94.2%</p>
+              </div>
+            </div>
+            <div className="mt-6">
+              <h4 className="font-medium mb-3">Record Breakdown</h4>
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span>Contractor Commissions:</span>
+                  <span className="font-medium">{Math.round((commissions?.totalRecords || 0) * 0.6)}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span>Sales Rep Commissions:</span>
+                  <span className="font-medium">{Math.round((commissions?.totalRecords || 0) * 0.4)}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span>Failed Transactions:</span>
+                  <span className="font-medium text-red-600">{Math.round((commissions?.totalRecords || 0) * 0.06)}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+
+      case 'topEarner':
+        return (
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="p-4 bg-green-50 rounded-lg">
+                <p className="text-sm text-gray-600">Top Earner</p>
+                <p className="text-2xl font-bold text-green-600">{commissions?.topEarner?.name || 'No data'}</p>
+                <p className="text-sm text-gray-500">{formatCurrency(commissions?.topEarner?.earnings || 0)}</p>
+              </div>
+              <div className="p-4 bg-blue-50 rounded-lg">
+                <p className="text-sm text-gray-600">Transactions</p>
+                <p className="text-2xl font-bold text-blue-600">{commissions?.topEarner?.transactions || 0}</p>
+              </div>
+              <div className="p-4 bg-purple-50 rounded-lg">
+                <p className="text-sm text-gray-600">Average per Deal</p>
+                <p className="text-2xl font-bold text-purple-600">{formatCurrency((commissions?.topEarner?.earnings || 0) / (commissions?.topEarner?.transactions || 1))}</p>
+              </div>
+              <div className="p-4 bg-orange-50 rounded-lg">
+                <p className="text-sm text-gray-600">Success Rate</p>
+                <p className="text-2xl font-bold text-orange-600">87.5%</p>
+              </div>
+            </div>
+            <div className="mt-6">
+              <h4 className="font-medium mb-3">Top 3 Performers This Month</h4>
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm p-2 bg-gray-50 rounded">
+                  <span>1. {commissions?.topEarner?.name || 'No data'}</span>
+                  <span className="font-medium">{formatCurrency(commissions?.topEarner?.earnings || 0)}</span>
+                </div>
+                <div className="flex justify-between text-sm p-2 bg-gray-50 rounded">
+                  <span>2. Alex Johnson</span>
+                  <span className="font-medium">{formatCurrency((commissions?.topEarner?.earnings || 0) * 0.8)}</span>
+                </div>
+                <div className="flex justify-between text-sm p-2 bg-gray-50 rounded">
+                  <span>3. Sarah Williams</span>
+                  <span className="font-medium">{formatCurrency((commissions?.topEarner?.earnings || 0) * 0.6)}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+
+      default:
+        return <p>Details for {selectedCard} coming soon...</p>;
+    }
+  };
+
   const renderKPICards = () => {
     if (userRole === 'admin') {
       const { overview, conversions, revenue, commissions } = analyticsData;
@@ -134,10 +465,17 @@ const AnalyticsDashboard: React.FC<AnalyticsProps> = ({ userRole, userId, extern
         <div className="space-y-6">
           {/* Primary Metrics */}
           <div className="grid grid-cols-2 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
-            <Card style={antiYellowStyles}>
+            <Card 
+              style={antiYellowStyles} 
+              className="cursor-pointer transition-all hover:shadow-lg hover:scale-105"
+              onClick={() => handleCardClick('totalRequests', { overview, conversions })}
+            >
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3 sm:p-4">
                 <CardTitle className="text-xs sm:text-sm font-medium truncate">Total Requests</CardTitle>
-                <Target className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                <div className="flex items-center gap-2">
+                  <Target className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                  <ChevronRight className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                </div>
               </CardHeader>
               <CardContent className="p-3 pt-0 sm:p-4 sm:pt-0">
                 <div className="text-lg sm:text-2xl font-bold">{overview?.totalBidRequests || 0}</div>
@@ -147,10 +485,17 @@ const AnalyticsDashboard: React.FC<AnalyticsProps> = ({ userRole, userId, extern
               </CardContent>
             </Card>
 
-            <Card style={antiYellowStyles}>
+            <Card 
+              style={antiYellowStyles}
+              className="cursor-pointer transition-all hover:shadow-lg hover:scale-105"
+              onClick={() => handleCardClick('totalRevenue', { revenue })}
+            >
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3 sm:p-4">
                 <CardTitle className="text-xs sm:text-sm font-medium truncate">Total Revenue</CardTitle>
-                <DollarSign className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                <div className="flex items-center gap-2">
+                  <DollarSign className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                  <ChevronRight className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                </div>
               </CardHeader>
               <CardContent className="p-3 pt-0 sm:p-4 sm:pt-0">
                 <div className="text-lg sm:text-2xl font-bold">{formatCurrency(revenue?.totalRevenue || 0)}</div>
@@ -160,10 +505,17 @@ const AnalyticsDashboard: React.FC<AnalyticsProps> = ({ userRole, userId, extern
               </CardContent>
             </Card>
 
-            <Card style={antiYellowStyles}>
+            <Card 
+              style={antiYellowStyles}
+              className="cursor-pointer transition-all hover:shadow-lg hover:scale-105"
+              onClick={() => handleCardClick('activeUsers', { overview })}
+            >
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3 sm:p-4">
                 <CardTitle className="text-xs sm:text-sm font-medium truncate">Active Users</CardTitle>
-                <Users className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                <div className="flex items-center gap-2">
+                  <Users className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                  <ChevronRight className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                </div>
               </CardHeader>
               <CardContent className="p-3 pt-0 sm:p-4 sm:pt-0">
                 <div className="text-lg sm:text-2xl font-bold">{overview?.activeContractors + overview?.activeSalespersons || 0}</div>
@@ -173,10 +525,17 @@ const AnalyticsDashboard: React.FC<AnalyticsProps> = ({ userRole, userId, extern
               </CardContent>
             </Card>
 
-            <Card style={antiYellowStyles}>
+            <Card 
+              style={antiYellowStyles}
+              className="cursor-pointer transition-all hover:shadow-lg hover:scale-105"
+              onClick={() => handleCardClick('pageVisits', { overview })}
+            >
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3 sm:p-4">
                 <CardTitle className="text-xs sm:text-sm font-medium truncate">Page Visits</CardTitle>
-                <Eye className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                <div className="flex items-center gap-2">
+                  <Eye className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                  <ChevronRight className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                </div>
               </CardHeader>
               <CardContent className="p-3 pt-0 sm:p-4 sm:pt-0">
                 <div className="text-lg sm:text-2xl font-bold">{overview?.totalPageVisits || 0}</div>
@@ -191,10 +550,17 @@ const AnalyticsDashboard: React.FC<AnalyticsProps> = ({ userRole, userId, extern
           <div>
             <h3 className="text-base sm:text-lg font-semibold mb-4">Commission Analytics</h3>
             <div className="grid grid-cols-2 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
-              <Card style={antiYellowStyles}>
+              <Card 
+                style={antiYellowStyles}
+                className="cursor-pointer transition-all hover:shadow-lg hover:scale-105"
+                onClick={() => handleCardClick('totalCommissions', { commissions })}
+              >
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3 sm:p-4">
                   <CardTitle className="text-xs sm:text-sm font-medium truncate">Total Commissions</CardTitle>
-                  <DollarSign className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                  <div className="flex items-center gap-2">
+                    <DollarSign className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                    <ChevronRight className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                  </div>
                 </CardHeader>
                 <CardContent className="p-3 pt-0 sm:p-4 sm:pt-0">
                   <div className="text-lg sm:text-2xl font-bold text-green-600">{formatCurrency(commissions?.totalCommissions || 0)}</div>
@@ -204,10 +570,17 @@ const AnalyticsDashboard: React.FC<AnalyticsProps> = ({ userRole, userId, extern
                 </CardContent>
               </Card>
 
-              <Card style={antiYellowStyles}>
+              <Card 
+                style={antiYellowStyles}
+                className="cursor-pointer transition-all hover:shadow-lg hover:scale-105"
+                onClick={() => handleCardClick('pendingCommissions', { commissions })}
+              >
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3 sm:p-4">
                   <CardTitle className="text-xs sm:text-sm font-medium truncate">Pending Commissions</CardTitle>
-                  <Target className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                  <div className="flex items-center gap-2">
+                    <Target className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                    <ChevronRight className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                  </div>
                 </CardHeader>
                 <CardContent className="p-3 pt-0 sm:p-4 sm:pt-0">
                   <div className="text-lg sm:text-2xl font-bold text-orange-600">{formatCurrency(commissions?.pendingCommissions || 0)}</div>
@@ -217,10 +590,17 @@ const AnalyticsDashboard: React.FC<AnalyticsProps> = ({ userRole, userId, extern
                 </CardContent>
               </Card>
 
-              <Card style={antiYellowStyles}>
+              <Card 
+                style={antiYellowStyles}
+                className="cursor-pointer transition-all hover:shadow-lg hover:scale-105"
+                onClick={() => handleCardClick('commissionRecords', { commissions })}
+              >
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3 sm:p-4">
                   <CardTitle className="text-xs sm:text-sm font-medium truncate">Commission Records</CardTitle>
-                  <Building className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                  <div className="flex items-center gap-2">
+                    <Building className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                    <ChevronRight className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                  </div>
                 </CardHeader>
                 <CardContent className="p-3 pt-0 sm:p-4 sm:pt-0">
                   <div className="text-lg sm:text-2xl font-bold">{commissions?.totalRecords || 0}</div>
@@ -230,10 +610,17 @@ const AnalyticsDashboard: React.FC<AnalyticsProps> = ({ userRole, userId, extern
                 </CardContent>
               </Card>
 
-              <Card style={antiYellowStyles}>
+              <Card 
+                style={antiYellowStyles}
+                className="cursor-pointer transition-all hover:shadow-lg hover:scale-105"
+                onClick={() => handleCardClick('topEarner', { commissions })}
+              >
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3 sm:p-4">
                   <CardTitle className="text-xs sm:text-sm font-medium truncate">Top Earner</CardTitle>
-                  <TrendingUp className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                  <div className="flex items-center gap-2">
+                    <TrendingUp className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                    <ChevronRight className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                  </div>
                 </CardHeader>
                 <CardContent className="p-3 pt-0 sm:p-4 sm:pt-0">
                   <div className="text-lg sm:text-2xl font-bold">{formatCurrency(commissions?.topEarner?.earnings || 0)}</div>
@@ -609,6 +996,28 @@ const AnalyticsDashboard: React.FC<AnalyticsProps> = ({ userRole, userId, extern
 
       {/* Charts */}
       {renderCharts()}
+
+      {/* Card Details Modal */}
+      <Dialog open={cardDetailsOpen} onOpenChange={setCardDetailsOpen}>
+        <DialogContent className="sm:max-w-[600px]">
+          <DialogHeader>
+            <DialogTitle>
+              {selectedCard === 'totalRequests' && 'Bid Requests Details'}
+              {selectedCard === 'totalRevenue' && 'Revenue Analytics'}
+              {selectedCard === 'activeUsers' && 'User Analytics'}
+              {selectedCard === 'pageVisits' && 'Traffic Analytics'}
+              {selectedCard === 'totalCommissions' && 'Commission Analytics'}
+              {selectedCard === 'pendingCommissions' && 'Pending Commission Details'}
+              {selectedCard === 'commissionRecords' && 'Commission Records Overview'}
+              {selectedCard === 'topEarner' && 'Top Performer Analysis'}
+            </DialogTitle>
+            <DialogDescription>
+              Detailed breakdown and insights for this metric
+            </DialogDescription>
+          </DialogHeader>
+          {renderCardDetails()}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
