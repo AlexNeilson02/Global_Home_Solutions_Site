@@ -51,11 +51,11 @@ html::after {
   opacity: 1 !important;
 }
 
-/* Enhanced modal styling with prominent backdrop */
+/* Enhanced modal styling with subtle backdrop */
 [data-radix-dialog-overlay] {
-  background: rgba(0, 0, 0, 0.65) !important;
-  backdrop-filter: blur(12px) !important;
-  -webkit-backdrop-filter: blur(12px) !important;
+  background: rgba(0, 0, 0, 0.4) !important;
+  backdrop-filter: blur(4px) !important;
+  -webkit-backdrop-filter: blur(4px) !important;
   animation: backdropFadeIn 0.2s ease-out !important;
 }
 
@@ -91,7 +91,7 @@ html::after {
   }
   to {
     opacity: 1;
-    backdrop-filter: blur(12px);
+    backdrop-filter: blur(4px);
   }
 }
 
