@@ -30,7 +30,6 @@ import {
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
-import AnalyticsDashboard from "@/components/AnalyticsDashboard";
 import { CommissionDashboard } from "@/components/CommissionDashboard";
 
 const SalesPortalEnhanced: React.FC = () => {
@@ -459,15 +458,7 @@ const SalesPortalEnhanced: React.FC = () => {
                   <DollarSign className="h-4 w-4" />
                   <span>Commission</span>
                 </button>
-                <button
-                  onClick={() => setActiveTab("analytics")}
-                  className={`flex flex-col items-center justify-center gap-1 text-xs hover:bg-gray-100 dark:hover:bg-gray-800 px-4 min-w-[80px] flex-shrink-0 ${
-                    activeTab === "analytics" ? "text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950" : ""
-                  }`}
-                >
-                  <TrendingUp className="h-4 w-4" />
-                  <span>Analytics</span>
-                </button>
+
               </div>
             </div>
 
@@ -1021,10 +1012,7 @@ const SalesPortalEnhanced: React.FC = () => {
               <CommissionDashboard salespersonId={salesperson?.id} />
             </TabsContent>
 
-            {/* Analytics Tab */}
-            <TabsContent value="analytics" className="space-y-6">
-              <AnalyticsDashboard userRole="salesperson" userId={salesperson?.id} />
-            </TabsContent>
+
           </Tabs>
         </div>
       </div>
