@@ -4,7 +4,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { SalespersonProvider } from "@/contexts/SalespersonContext";
-import HomePage from "@/pages/HomePageNew";
+import HomePage from "@/pages/HomePage";
 import ContractorProfile from "@/pages/ContractorProfileDB";
 import ContractorPortalEnhanced from "@/pages/ContractorPortalEnhanced";
 import SalesPortalEnhanced from "@/pages/SalesPortalEnhanced";
