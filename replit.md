@@ -38,6 +38,7 @@ Preferred communication style: Simple, everyday language.
 - **Commission Calculation**: Based on service category and conversion, with automated distribution and comprehensive audit trails including source contractor, bid request, service type, and Stripe payment intent IDs.
 
 ### Recent Changes (August 2025)
+- **Contact Customer Email Workflow Enhancement (August 9, 2025)**: Successfully implemented new email-first customer contact workflow in contractor portal. Modified "Contact Customer" button to navigate users to email tab with pre-filled professional email template containing customer details, project information, and company branding. Email sending now automatically marks bid requests as "contacted" only after successful email delivery, ensuring proper status tracking. Enhanced Gmail integration component to accept pending email data and auto-compose emails for seamless contractor communication workflow.
 - **Homepage White Rectangle Removal (August 9, 2025)**: Successfully eliminated unwanted white rectangular overlay appearing on the homepage that was covering parts of the hero image. Applied comprehensive CSS fixes including: root background transparency, nuclear-level Toaster/Toast component hiding, fixed-element removal, mobile navigation targeting, and Replit UI overlay elimination. Created dedicated homepage-override.css with aggressive white-element removal tactics. Homepage now displays the full hero image without any visual interference.
 
 ### Previous Changes (January 2025)
