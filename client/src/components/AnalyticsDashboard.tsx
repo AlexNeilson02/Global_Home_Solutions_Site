@@ -855,7 +855,7 @@ const AnalyticsDashboard: React.FC<AnalyticsProps> = ({ userRole, userId, extern
                 </div>
                 <div className="flex items-center justify-between p-3 bg-green-50 rounded">
                   <span className="font-medium">Won</span>
-                  <Badge variant="default" className="text-[#000000]">{conversions?.won || 0}</Badge>
+                  <Badge className="inline-flex items-center rounded-apple border px-3 py-1 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-primary hover:bg-primary/90 text-[#000000]">{conversions?.won || 0}</Badge>
                 </div>
               </div>
             </CardContent>
@@ -882,7 +882,7 @@ const AnalyticsDashboard: React.FC<AnalyticsProps> = ({ userRole, userId, extern
                     </div>
                     <div className="text-right">
                       <p className="font-medium">{formatPercentage(rep.conversionRate)}</p>
-                      <p className="text-sm text-gray-500">{formatCurrency(rep.revenue)}</p>
+                      <p className="text-sm text-gray-500">{formatCurrency(rep.commissions || 0)}</p>
                     </div>
                   </div>
                 ))}

@@ -856,7 +856,8 @@ export class DatabaseStorage implements IStorage {
           totalLeads: repBids.length,
           wonProjects: wonBids.length,
           conversionRate: visitsToLeadsRate, // Changed to visits-to-leads conversion rate
-          revenue: wonBids.reduce((sum, bid) => sum + (parseFloat(bid.budget || '0') || 0), 0)
+          revenue: wonBids.reduce((sum, bid) => sum + (parseFloat(bid.budget || '0') || 0), 0),
+          commissions: salesperson.commissions || 0 // Add actual commission earnings
         };
       })
     );
