@@ -729,27 +729,29 @@ ${contractor?.email || ''}`;
 
   // Calculate response time analytics from actual bid requests
   const calculateResponseTimes = () => {
-    const sameDay = bidRequests.filter((bid: any) => {
-      if (bid.status === 'pending') return false;
+    // Filter out pending bids and calculate response times for contacted bids
+    const respondedBids = bidRequests.filter((bid: any) => 
+      bid.status !== 'pending' && bid.createdAt && bid.lastUpdated
+    );
+
+    const sameDay = respondedBids.filter((bid: any) => {
       const created = new Date(bid.createdAt);
-      const contacted = new Date(bid.contactedAt || bid.updatedAt);
-      const hoursDiff = (contacted.getTime() - created.getTime()) / (1000 * 60 * 60);
+      const responded = new Date(bid.lastUpdated);
+      const hoursDiff = (responded.getTime() - created.getTime()) / (1000 * 60 * 60);
       return hoursDiff <= 24;
     }).length;
 
-    const twoDays = bidRequests.filter((bid: any) => {
-      if (bid.status === 'pending') return false;
+    const twoDays = respondedBids.filter((bid: any) => {
       const created = new Date(bid.createdAt);
-      const contacted = new Date(bid.contactedAt || bid.updatedAt);
-      const hoursDiff = (contacted.getTime() - created.getTime()) / (1000 * 60 * 60);
+      const responded = new Date(bid.lastUpdated);
+      const hoursDiff = (responded.getTime() - created.getTime()) / (1000 * 60 * 60);
       return hoursDiff > 24 && hoursDiff <= 72;
     }).length;
 
-    const lateResponse = bidRequests.filter((bid: any) => {
-      if (bid.status === 'pending') return false;
+    const lateResponse = respondedBids.filter((bid: any) => {
       const created = new Date(bid.createdAt);
-      const contacted = new Date(bid.contactedAt || bid.updatedAt);
-      const hoursDiff = (contacted.getTime() - created.getTime()) / (1000 * 60 * 60);
+      const responded = new Date(bid.lastUpdated);
+      const hoursDiff = (responded.getTime() - created.getTime()) / (1000 * 60 * 60);
       return hoursDiff > 72;
     }).length;
 
