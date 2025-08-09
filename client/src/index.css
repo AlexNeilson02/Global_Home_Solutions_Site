@@ -38,13 +38,17 @@ html::after {
 }
 
 /* Force remove any dialog/modal overlays that might interfere, except bid request form, login forms, and admin portal dialogs */
-[data-radix-popper-content-wrapper],
-[data-state="open"][role="dialog"]:not([data-component="bid-request-form"]):not([data-component="login-form"]):not([data-component="admin-portal-dialog"]),
-.fixed.inset-0.z-50.bg-black\/80:not(.bid-request-overlay):not(.login-overlay):not(.admin-portal-overlay),
-.fixed.inset-0.z-50.bg-black\/80.data-\[state\=open\]\:animate-in:not(.bid-request-overlay):not(.login-overlay):not(.admin-portal-overlay) {
+[data-radix-popper-content-wrapper] {
   display: none !important;
   visibility: hidden !important;
   opacity: 0 !important;
+}
+
+/* Allow admin portal dialogs to display properly */
+[data-state="open"][role="dialog"] {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
 }
 
 /* Ensure About Us page content is always visible */
