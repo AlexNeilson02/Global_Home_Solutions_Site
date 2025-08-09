@@ -846,13 +846,16 @@ export class DatabaseStorage implements IStorage {
         const wonBids = repBids.filter(bid => bid.status === 'won');
         
         const user = await this.getUser(salesperson.userId);
+        // Conversion rate = leads generated from visits (how effective they are at converting visits to leads)
+        const visitsToLeadsRate = repVisits.length > 0 ? (repBids.length / repVisits.length * 100) : 0;
+        
         return {
           id: salesperson.id,
           name: user?.fullName || `Salesperson ${salesperson.id}`,
           totalVisits: repVisits.length,
           totalLeads: repBids.length,
           wonProjects: wonBids.length,
-          conversionRate: repBids.length > 0 ? (wonBids.length / repBids.length * 100) : 0,
+          conversionRate: visitsToLeadsRate, // Changed to visits-to-leads conversion rate
           revenue: wonBids.reduce((sum, bid) => sum + (parseFloat(bid.budget || '0') || 0), 0)
         };
       })
