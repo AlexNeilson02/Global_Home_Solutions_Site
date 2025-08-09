@@ -336,13 +336,13 @@ const AnalyticsDashboard: React.FC<AnalyticsProps> = ({ userRole, userId }) => {
 
         <Card style={antiYellowStyles}>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3 sm:p-4">
-            <CardTitle className="text-xs sm:text-sm font-medium truncate">Revenue</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+            <CardTitle className="text-xs sm:text-sm font-medium truncate">Total Bids Sent</CardTitle>
+            <Target className="h-4 w-4 text-muted-foreground flex-shrink-0" />
           </CardHeader>
           <CardContent className="p-3 pt-0 sm:p-4 sm:pt-0">
-            <div className="text-lg sm:text-2xl font-bold">{formatCurrency(analytics?.revenue || 0)}</div>
+            <div className="text-lg sm:text-2xl font-bold">{analytics?.totalBidsSent || 0}</div>
             <p className="text-xs text-muted-foreground">
-              From won projects
+              Bids submitted to customers
             </p>
           </CardContent>
         </Card>

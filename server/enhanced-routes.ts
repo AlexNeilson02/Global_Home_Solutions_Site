@@ -315,6 +315,7 @@ enhancedRouter.get('/contractors/:id/analytics', isAuthenticated, async (req: Re
       // Basic metrics
       totalRequests: bidRequests.length,
       responded: bidRequests.filter(b => b.lastUpdated).length,
+      totalBidsSent: bidRequests.filter(b => b.status === 'bid_sent' || b.status === 'won' || b.status === 'lost' || b.status === 'completed').length,
       won: bidRequests.filter(b => b.status === 'completed').length,
       lost: bidRequests.filter(b => b.status === 'declined').length,
       revenue: projects
