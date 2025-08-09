@@ -935,6 +935,80 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Contractor analytics endpoint
+  apiRouter.get("/contractors/:id/analytics", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const contractorId = parseInt(req.params.id);
+      const user = req.user as User;
+      
+      // Verify access - user must be the contractor or admin
+      if (user.role !== 'admin') {
+        const contractor = await storage.getContractorByUserId(user.id);
+        if (!contractor || contractor.id !== contractorId) {
+          return res.status(403).json({ message: "Access denied" });
+        }
+      }
+
+      // Get all bid requests for this contractor
+      const bidRequests = await storage.getBidRequestsByContractorId(contractorId);
+      
+      // Calculate analytics from real data
+      const totalRequests = bidRequests.length;
+      const responded = bidRequests.filter(bid => bid.status !== 'pending').length;
+      const won = bidRequests.filter(bid => bid.status === 'completed' || bid.status === 'won').length;
+      const lost = bidRequests.filter(bid => bid.status === 'declined' || bid.status === 'lost').length;
+      
+      // Calculate average response time from actual timestamps
+      const respondedBids = bidRequests.filter(bid => 
+        bid.status !== 'pending' && bid.createdAt && bid.lastUpdated
+      );
+      
+      let totalResponseTime = 0;
+      let responseTimes: number[] = [];
+      
+      respondedBids.forEach(bid => {
+        const created = new Date(bid.createdAt);
+        const responded = new Date(bid.lastUpdated);
+        const hours = (responded.getTime() - created.getTime()) / (1000 * 60 * 60);
+        responseTimes.push(hours);
+        totalResponseTime += hours;
+      });
+      
+      const averageResponseTime = responseTimes.length > 0 ? 
+        (totalResponseTime / responseTimes.length) : 0;
+      
+      // Calculate conversion rate
+      const conversionRate = totalRequests > 0 ? (won / totalRequests * 100) : 0;
+      
+      // Calculate response time distribution
+      const sameDay = responseTimes.filter(hours => hours <= 24).length;
+      const twoDays = responseTimes.filter(hours => hours > 24 && hours <= 72).length;
+      const lateResponse = responseTimes.filter(hours => hours > 72).length;
+      const noResponse = bidRequests.filter(bid => bid.status === 'pending').length;
+
+      res.json({
+        analytics: {
+          totalRequests,
+          responded,
+          won,
+          lost,
+          averageResponseTime: Number(averageResponseTime.toFixed(1)),
+          conversionRate: Number(conversionRate.toFixed(1)),
+          bidRequestVolume: totalRequests,
+          responseTimeDistribution: {
+            sameDay,
+            twoDays,
+            lateResponse,
+            noResponse
+          }
+        }
+      });
+    } catch (error) {
+      console.error("Error fetching contractor analytics:", error);
+      res.status(500).json({ message: "Failed to fetch contractor analytics" });
+    }
+  });
+
   // Enhanced analytics endpoints with real data calculations
   apiRouter.get("/analytics/admin/overview", isAuthenticated, requireRole(['admin']), async (req: Request, res: Response) => {
     try {

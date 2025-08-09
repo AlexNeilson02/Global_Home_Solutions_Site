@@ -305,6 +305,12 @@ const ContractorPortalEnhanced: React.FC = () => {
 
   const bidRequests = (bidRequestsData as any)?.bidRequests || [];
 
+  // Get contractor analytics
+  const { data: analyticsData } = useQuery({
+    queryKey: [`/api/contractors/${contractor?.id}/analytics`],
+    enabled: !!contractor?.id
+  });
+
   // Get service categories for specialties dropdown
   const { data: servicesData, error: servicesError, isLoading: servicesLoading } = useQuery({
     queryKey: ["/api/service-categories"],
@@ -2064,7 +2070,7 @@ ${contractor?.email || ''}`;
 
             {/* Analytics Tab */}
             <TabsContent value="analytics" className="space-y-6">
-              <AnalyticsDashboard userRole="contractor" userId={contractor?.id} />
+              <AnalyticsDashboard userRole="contractor" userId={contractor?.id} externalAnalyticsData={analyticsData} />
             </TabsContent>
           </Tabs>
         </div>
