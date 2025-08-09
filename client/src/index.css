@@ -111,6 +111,13 @@ html {
   padding-top: 0 !important;
 }
 
+/* Hide Toaster on homepage to prevent white rectangle overlay */
+.homepage-container [data-radix-toast-viewport] {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
