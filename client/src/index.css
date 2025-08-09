@@ -230,18 +230,30 @@ html {
 }
 
 /* ULTIMATE NUCLEAR OPTION - Remove ALL possible white rectangles on homepage */
-body:has(.homepage-container) *:not(.homepage-container):not(.hero-background-image):not(.find-contractor-btn):not(.about-us-link) {
+body:has(.homepage-container) *:not(.homepage-container):not(.hero-background-image):not(.find-contractor-btn):not(button):not(.about-us-link):not([href="/about"]) {
   background: transparent !important;
   background-color: transparent !important;
 }
 
-body:has(.homepage-container) .fixed,
-body:has(.homepage-container) [style*="position: fixed"],
-body:has(.homepage-container) [style*="background: white"],
-body:has(.homepage-container) [style*="background-color: white"],
-body:has(.homepage-container) [style*="background: #fff"],
-body:has(.homepage-container) [style*="background-color: #fff"],
-body:has(.homepage-container) .bg-white {
+/* Force show Find Contractor button */
+.find-contractor-btn,
+button.find-contractor-btn,
+[class*="find-contractor"],
+[onclick*="services"] {
+  display: inline-block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  z-index: 999 !important;
+}
+
+body:has(.homepage-container) .fixed:not(.find-contractor-btn):not(button):not([href="/about"]),
+body:has(.homepage-container) [style*="position: fixed"]:not(.find-contractor-btn):not(button):not([href="/about"]),
+body:has(.homepage-container) [style*="background: white"]:not(.find-contractor-btn):not(button):not([href="/about"]),
+body:has(.homepage-container) [style*="background-color: white"]:not(.find-contractor-btn):not(button):not([href="/about"]),
+body:has(.homepage-container) [style*="background: #fff"]:not(.find-contractor-btn):not(button):not([href="/about"]),
+body:has(.homepage-container) [style*="background-color: #fff"]:not(.find-contractor-btn):not(button):not([href="/about"]),
+body:has(.homepage-container) .bg-white:not(.find-contractor-btn):not(button):not([href="/about"]) {
   display: none !important;
   visibility: hidden !important;
   opacity: 0 !important;
@@ -265,6 +277,32 @@ body:has(.homepage-container) [data-portal] {
 /* ========================================= */
 /* NUCLEAR YELLOW REMOVAL TACTICS */
 /* ========================================= */
+
+/* Tactic 0: Kill ALL yellow/orange browser bars and warnings */
+[style*="yellow"],
+[style*="#ffff"],
+[style*="#ffa500"],
+[style*="orange"],
+[class*="yellow"],
+[class*="warning"],
+[class*="alert"],
+div[style*="position: fixed"][style*="top: 0"],
+div[style*="position: absolute"][style*="top: 0"],
+iframe[src*="replit"],
+[id*="replit"],
+[class*="replit"],
+[data-replit],
+.replit-notification,
+.replit-banner,
+.development-banner {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  height: 0 !important;
+  width: 0 !important;
+  pointer-events: none !important;
+  z-index: -9999 !important;
+}
 
 /* Tactic 1: CSS Variable Overrides */
 :root {

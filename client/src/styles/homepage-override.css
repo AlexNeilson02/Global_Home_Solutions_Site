@@ -1,7 +1,7 @@
 /* HOMEPAGE WHITE RECTANGLE KILLER - NUCLEAR APPROACH */
 
 /* Hide absolutely EVERYTHING that could be white on the homepage */
-body:has(.homepage-container) *:not(.find-contractor-btn):not([href="/about"]) {
+body:has(.homepage-container) *:not(.find-contractor-btn):not(button):not([href="/about"]) {
   background: transparent !important;
   background-color: transparent !important;
   border: none !important;
@@ -72,9 +72,9 @@ body:has(.homepage-container) [href="/about"] {
 }
 
 /* Kill ALL fixed, absolute, and potentially overlaying elements */
-body:has(.homepage-container) .fixed,
-body:has(.homepage-container) [style*="position: fixed"],
-body:has(.homepage-container) [style*="position: absolute"]:not(.homepage-container > *),
+body:has(.homepage-container) .fixed:not([href="/about"]):not(.find-contractor-btn),
+body:has(.homepage-container) [style*="position: fixed"]:not([href="/about"]):not(.find-contractor-btn),
+body:has(.homepage-container) [style*="position: absolute"]:not(.homepage-container > *):not([href="/about"]):not(.find-contractor-btn),
 body:has(.homepage-container) [data-radix-toast-viewport],
 body:has(.homepage-container) [data-radix-toast-root],
 body:has(.homepage-container) .toast,
@@ -82,19 +82,22 @@ body:has(.homepage-container) [role="status"],
 body:has(.homepage-container) [role="alert"],
 body:has(.homepage-container) [class*="toast"],
 body:has(.homepage-container) [id*="toast"],
-body:has(.homepage-container) [data-state],
+body:has(.homepage-container) [data-state]:not([href="/about"]):not(.find-contractor-btn),
 body:has(.homepage-container) [data-overlay],
 body:has(.homepage-container) [data-portal],
 body:has(.homepage-container) iframe,
 body:has(.homepage-container) [id*="replit"],
 body:has(.homepage-container) [class*="replit"],
-body:has(.homepage-container) .bg-white,
-body:has(.homepage-container) [style*="background: white"],
-body:has(.homepage-container) [style*="background-color: white"],
-body:has(.homepage-container) [style*="background: #fff"],
-body:has(.homepage-container) [style*="background-color: #fff"],
-body:has(.homepage-container) [style*="background: #ffffff"],
-body:has(.homepage-container) [style*="background-color: #ffffff"] {
+body:has(.homepage-container) [style*="yellow"],
+body:has(.homepage-container) [style*="#ffff"],
+body:has(.homepage-container) [style*="orange"],
+body:has(.homepage-container) .bg-white:not([href="/about"]):not(.find-contractor-btn),
+body:has(.homepage-container) [style*="background: white"]:not([href="/about"]):not(.find-contractor-btn),
+body:has(.homepage-container) [style*="background-color: white"]:not([href="/about"]):not(.find-contractor-btn),
+body:has(.homepage-container) [style*="background: #fff"]:not([href="/about"]):not(.find-contractor-btn),
+body:has(.homepage-container) [style*="background-color: #fff"]:not([href="/about"]):not(.find-contractor-btn),
+body:has(.homepage-container) [style*="background: #ffffff"]:not([href="/about"]):not(.find-contractor-btn),
+body:has(.homepage-container) [style*="background-color: #ffffff"]:not([href="/about"]):not(.find-contractor-btn) {
   display: none !important;
   visibility: hidden !important;
   opacity: 0 !important;
@@ -113,7 +116,7 @@ body:has(.homepage-container) [class*="bottom-"] {
 }
 
 /* Final nuclear option - any white rectangle anywhere on the page */
-body:has(.homepage-container) *[style*="width"][style*="height"]:not(.homepage-container):not(.hero-background-image):not(.find-contractor-btn):not([href="/about"]):not(button) {
+body:has(.homepage-container) *[style*="width"][style*="height"]:not(.homepage-container):not(.hero-background-image):not(.find-contractor-btn):not([href="/about"]):not(button):not([class*="find-contractor"]) {
   background: transparent !important;
   background-color: transparent !important;
   border: none !important;
