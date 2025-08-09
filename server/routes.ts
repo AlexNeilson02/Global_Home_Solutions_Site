@@ -329,7 +329,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
   apiRouter.get("/salespersons", isAuthenticated, requireRole(["admin"]), async (req: Request, res: Response) => {
     try {
       const salespersons = await storage.getAllSalespersons();
-      res.json({ salespersons });
+      
+      // Get all bid requests once for efficiency
+      const allBidRequests = await storage.getRecentBidRequests(5000);
+      
+      // Calculate real-time stats for each salesperson
+      const salespersonsWithStats = salespersons.map((salesperson) => {
+        // Filter bid requests for this salesperson
+        const repBidRequests = allBidRequests.filter(bid => bid.salespersonId === salesperson.id);
+        
+        // Get page visits (totalVisits from salesperson record)
+        const pageVisits = salesperson.totalVisits || 0;
+        
+        // Calculate metrics
+        const totalLeads = repBidRequests.length;
+        const bidRequestsSent = repBidRequests.filter(bid => 
+          ['bid_sent', 'won', 'lost'].includes(bid.status)
+        ).length;
+        
+        // Conversion rate = (bid requests sent / page visits) * 100
+        const conversionRate = pageVisits > 0 ? (bidRequestsSent / pageVisits) * 100 : 0;
+        
+        // Commission total (use existing stored value as it's calculated by commission service)
+        const commissions = salesperson.commissions || 0;
+        
+        console.log(`Salesperson ${salesperson.fullName || salesperson.id}: pageVisits=${pageVisits}, totalLeads=${totalLeads}, bidRequestsSent=${bidRequestsSent}, conversionRate=${conversionRate.toFixed(2)}%`);
+        
+        return {
+          ...salesperson,
+          totalLeads,
+          conversionRate: conversionRate / 100, // Store as decimal for frontend percentage calculation
+          commissions,
+          bidRequestsSent,
+          pageVisits
+        };
+      });
+      
+      res.json({ salespersons: salespersonsWithStats });
     } catch (error) {
       console.error("Error fetching salespersons:", error);
       res.status(500).json({ message: "Failed to fetch salespersons" });
