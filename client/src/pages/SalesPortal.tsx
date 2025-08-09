@@ -96,11 +96,10 @@ const SalesPortal: React.FC = () => {
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
             {/* Desktop Navigation - Only show on desktop */}
             {!isMobile && (
-              <TabsList className="grid w-full grid-cols-5">
+              <TabsList className="grid w-full grid-cols-4">
                 <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
                 <TabsTrigger value="leads">Lead Management</TabsTrigger>
                 <TabsTrigger value="commissions">Commissions</TabsTrigger>
-                <TabsTrigger value="analytics">Analytics</TabsTrigger>
                 <TabsTrigger value="profile">Profile</TabsTrigger>
               </TabsList>
             )}
