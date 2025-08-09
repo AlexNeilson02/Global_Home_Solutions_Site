@@ -280,12 +280,26 @@ const SalesPortalEnhanced: React.FC = () => {
     }
   };
 
-  // Calculate key metrics using real data
-  const totalVisits = (salesAnalytics as any)?.personalMetrics?.totalQrScans || (analytics as any)?.totalVisits || 0;
-  const totalConversions = (salesAnalytics as any)?.personalMetrics?.totalConversions || (analytics as any)?.conversions || 0;
-  const conversionRate = totalVisits > 0 && !isNaN(totalConversions) ? ((totalConversions / totalVisits) * 100).toFixed(1) : '0.0';
-  const totalLeads = (salesAnalytics as any)?.personalMetrics?.totalLeads || (salesperson as any)?.totalLeads || 0;
-  const commissionEarnings = (commissionData as any)?.totalEarned || 0;
+  // Calculate key metrics using real data with better fallbacks
+  const totalVisits = (salesAnalytics as any)?.personalMetrics?.totalQrScans || 
+                     (salesperson as any)?.totalVisits || 
+                     (analytics as any)?.totalVisits || 0;
+  
+  // Use successfulConversions from salesperson data as primary source
+  const totalConversions = (salesperson as any)?.successfulConversions || 
+                          (salesAnalytics as any)?.personalMetrics?.totalConversions || 
+                          bidRequests.filter((bid: any) => bid.status === 'completed').length || 
+                          (analytics as any)?.conversions || 0;
+  
+  const conversionRate = totalVisits > 0 && !isNaN(totalConversions) ? 
+                        ((totalConversions / totalVisits) * 100).toFixed(1) : '0.0';
+  
+  const totalLeads = bidRequests.length || 
+                    (salesAnalytics as any)?.personalMetrics?.totalLeads || 
+                    (salesperson as any)?.totalLeads || 0;
+  
+  const commissionEarnings = (salesperson as any)?.commissions || 
+                            (commissionData as any)?.totalEarned || 0;
 
   // Real performance data from analytics
   const performanceData = (salesAnalytics as any)?.performanceHistory || [
