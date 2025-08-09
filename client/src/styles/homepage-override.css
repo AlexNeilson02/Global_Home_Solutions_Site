@@ -1,7 +1,7 @@
 /* HOMEPAGE WHITE RECTANGLE KILLER - NUCLEAR APPROACH */
 
 /* Hide absolutely EVERYTHING that could be white on the homepage */
-body:has(.homepage-container) *:not(.find-contractor-btn):not([href="/about"]) {
+body:has(.homepage-container) * {
   background: transparent !important;
   background-color: transparent !important;
   border: none !important;
@@ -18,57 +18,11 @@ body:has(.homepage-container) .find-contractor-btn {
   background: #00aeef !important;
   background-color: #00aeef !important;
   border: none !important;
-  padding: 25px 60px !important;
-  border-radius: 15px !important;
-  color: white !important;
-  font-size: 28px !important;
-  font-weight: bold !important;
-  box-shadow: 0 8px 20px rgba(0,174,239,0.3) !important;
-  text-transform: uppercase !important;
-  letter-spacing: 1px !important;
-  cursor: pointer !important;
-  transition: all 0.3s ease !important;
-  display: inline-block !important;
-  visibility: visible !important;
-  opacity: 1 !important;
-  pointer-events: auto !important;
-  z-index: 10 !important;
-  position: relative !important;
-}
-
-body:has(.homepage-container) .find-contractor-btn:hover {
-  background: #0088cc !important;
-  transform: scale(1.05) !important;
-}
-
-/* Mobile responsive styles for Find Contractor button */
-@media (max-width: 768px) {
-  body:has(.homepage-container) .find-contractor-btn {
-    padding: 15px 30px !important;
-    font-size: 20px !important;
-  }
-}
-
-@media (max-width: 480px) {
-  body:has(.homepage-container) .find-contractor-btn {
-    padding: 12px 25px !important;
-    font-size: 18px !important;
-  }
 }
 
 body:has(.homepage-container) [href="/about"] {
   background: rgba(59, 130, 246, 0.7) !important;
   background-color: rgba(59, 130, 246, 0.7) !important;
-  backdrop-filter: blur(10px) !important;
-  -webkit-backdrop-filter: blur(10px) !important;
-  border: 2px solid rgba(255, 255, 255, 0.3) !important;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;
-  display: inline-block !important;
-  visibility: visible !important;
-  opacity: 1 !important;
-  pointer-events: auto !important;
-  z-index: 20 !important;
-  position: relative !important;
 }
 
 /* Kill ALL fixed, absolute, and potentially overlaying elements */
@@ -113,7 +67,7 @@ body:has(.homepage-container) [class*="bottom-"] {
 }
 
 /* Final nuclear option - any white rectangle anywhere on the page */
-body:has(.homepage-container) *[style*="width"][style*="height"]:not(.homepage-container):not(.hero-background-image):not(.find-contractor-btn):not([href="/about"]):not(button) {
+body:has(.homepage-container) *[style*="width"][style*="height"]:not(.homepage-container):not(.hero-background-image):not(.find-contractor-btn):not([href="/about"]) {
   background: transparent !important;
   background-color: transparent !important;
   border: none !important;
