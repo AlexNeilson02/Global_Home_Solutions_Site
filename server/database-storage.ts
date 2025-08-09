@@ -150,7 +150,7 @@ export class DatabaseStorage implements IStorage {
     } catch (error) {
       console.error('Error creating contractor in database:', error);
       console.error('Error details:', error);
-      throw new Error(`Failed to create contractor: ${error.message}`);
+      throw new Error(`Failed to create contractor: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
 
@@ -566,6 +566,18 @@ export class DatabaseStorage implements IStorage {
       .returning();
     return request;
   }
+
+  async markBidRequestAsContacted(id: number): Promise<BidRequest | undefined> {
+    const [request] = await db
+      .update(bidRequests)
+      .set({ 
+        status: 'contacted',
+        lastUpdated: new Date()
+      })
+      .where(eq(bidRequests.id, id))
+      .returning();
+    return request;
+  }
   
   // Page Visit methods
   async createPageVisit(pageVisit: InsertPageVisit): Promise<PageVisit> {
@@ -611,12 +623,7 @@ export class DatabaseStorage implements IStorage {
       
     // Apply date filters if provided
     if (startDate && endDate) {
-      whereConditions.push(
-        and(
-          gt(pageVisits.timestamp, startDate),
-          lt(pageVisits.timestamp, endDate)
-        )
-      );
+      whereConditions.push(between(pageVisits.timestamp, startDate, endDate));
     } else if (startDate) {
       whereConditions.push(gt(pageVisits.timestamp, startDate));
     } else if (endDate) {
@@ -1113,13 +1120,13 @@ export class DatabaseStorage implements IStorage {
     paidCommissions: number;
     totalRecords: number;
   }> {
-    let query = db.select().from(commissionRecords).where(eq(commissionRecords.salespersonId, salespersonId));
+    const conditions = [eq(commissionRecords.salespersonId, salespersonId)];
     
     if (startDate && endDate) {
-      query = query.where(between(commissionRecords.createdAt, startDate, endDate));
+      conditions.push(between(commissionRecords.createdAt, startDate, endDate));
     }
     
-    const records = await query;
+    const records = await db.select().from(commissionRecords).where(and(...conditions));
     
     return {
       totalEarned: records.reduce((sum, r) => sum + (r.salesmanAmount || 0), 0),
@@ -1130,23 +1137,26 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getTopEarnersBySalesperson(limit: number, startDate?: Date, endDate?: Date): Promise<any[]> {
-    let query = db.select({
+    const conditions = [];
+    
+    if (startDate && endDate) {
+      conditions.push(between(commissionRecords.createdAt, startDate, endDate));
+    }
+    
+    const query = db.select({
       salespersonId: commissionRecords.salespersonId,
       totalEarnings: sql<number>`SUM(${commissionRecords.salesmanAmount})`,
       totalCommissions: sql<number>`COUNT(${commissionRecords.id})`
     })
     .from(commissionRecords)
+    .where(conditions.length > 0 ? and(...conditions) : undefined)
     .groupBy(commissionRecords.salespersonId);
-    
-    if (startDate && endDate) {
-      query = query.where(between(commissionRecords.createdAt, startDate, endDate));
-    }
     
     const results = await query.orderBy(sql`SUM(${commissionRecords.salesmanAmount}) DESC`).limit(limit);
     
     // Get salesperson details
     return await Promise.all(results.map(async (result) => {
-      const salesperson = await this.getSalesperson(result.salespersonId);
+      const salesperson = result.salespersonId ? await this.getSalesperson(result.salespersonId) : null;
       const user = salesperson ? await this.getUser(salesperson.userId) : null;
       
       return {
@@ -1165,13 +1175,14 @@ export class DatabaseStorage implements IStorage {
     corpTotal: number;
     totalRecords: number;
   }> {
-    let query = db.select().from(commissionRecords);
+    const conditions = [];
     
     if (startDate && endDate) {
-      query = query.where(between(commissionRecords.createdAt, startDate, endDate));
+      conditions.push(between(commissionRecords.createdAt, startDate, endDate));
     }
     
-    const records = await query;
+    const records = await db.select().from(commissionRecords)
+      .where(conditions.length > 0 ? and(...conditions) : undefined);
     
     return {
       totalCommissions: records.reduce((sum, r) => sum + (r.totalCommission || 0), 0),
