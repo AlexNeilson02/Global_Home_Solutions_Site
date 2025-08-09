@@ -51,6 +51,55 @@ html::after {
   opacity: 1 !important;
 }
 
+/* Enhanced modal styling with prominent backdrop */
+[data-radix-dialog-overlay] {
+  background: rgba(0, 0, 0, 0.6) !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+}
+
+/* Make dialog content more prominent */
+[data-radix-dialog-content] {
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(59, 130, 246, 0.1) !important;
+  border: 2px solid rgba(59, 130, 246, 0.2) !important;
+  transform: scale(1.02) !important;
+  animation: modalAppear 0.2s ease-out !important;
+}
+
+@keyframes modalAppear {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translate(-50%, -48%);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1.02) translate(-50%, -50%);
+  }
+}
+
+/* Enhanced dialog title styling */
+[data-radix-dialog-content] h2 {
+  color: #1e40af !important;
+  font-weight: 600 !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Enhanced button styling in modals */
+[data-radix-dialog-content] button[type="submit"],
+[data-radix-dialog-content] .bg-blue-600 {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8) !important;
+  box-shadow: 0 4px 14px 0 rgba(37, 99, 235, 0.4) !important;
+  border: none !important;
+  transform: translateY(0) !important;
+  transition: all 0.2s ease !important;
+}
+
+[data-radix-dialog-content] button[type="submit"]:hover,
+[data-radix-dialog-content] .bg-blue-600:hover {
+  transform: translateY(-1px) !important;
+  box-shadow: 0 6px 20px 0 rgba(37, 99, 235, 0.5) !important;
+}
+
 /* Ensure About Us page content is always visible */
 [data-page="about-us"] *,
 .about-us-page *,

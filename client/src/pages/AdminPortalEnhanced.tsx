@@ -1367,7 +1367,7 @@ export default function AdminPortalEnhanced() {
 
         {/* View Details Modal */}
         <Dialog open={viewDetailsOpen} onOpenChange={setViewDetailsOpen}>
-          <DialogContent className="sm:max-w-[600px]">
+          <DialogContent className="sm:max-w-[600px] shadow-2xl border-2 border-blue-200 bg-white/95 backdrop-blur-sm">
             <DialogHeader>
               <DialogTitle>Sales Representative Details</DialogTitle>
               <DialogDescription>
@@ -1450,7 +1450,7 @@ export default function AdminPortalEnhanced() {
 
         {/* Edit Modal */}
         <Dialog open={editModalOpen} onOpenChange={setEditModalOpen}>
-          <DialogContent className="sm:max-w-[450px] max-w-[90vw]">
+          <DialogContent className="sm:max-w-[450px] max-w-[90vw] shadow-2xl border-2 border-blue-200 bg-white/95 backdrop-blur-sm">
             <DialogHeader>
               <DialogTitle>Edit Sales Representative</DialogTitle>
               <DialogDescription>
@@ -1569,7 +1569,7 @@ export default function AdminPortalEnhanced() {
 
         {/* Contractor View Modal */}
         <Dialog open={contractorViewOpen} onOpenChange={setContractorViewOpen}>
-          <DialogContent className="sm:max-w-[600px] max-w-[90vw]">
+          <DialogContent className="sm:max-w-[600px] max-w-[90vw] shadow-2xl border-2 border-blue-200 bg-white/95 backdrop-blur-sm">
             <DialogHeader
               className="anti-yellow-nuclear"
               style={{
@@ -1660,7 +1660,7 @@ export default function AdminPortalEnhanced() {
 
         {/* Contractor Edit Modal */}
         <Dialog open={contractorEditOpen} onOpenChange={setContractorEditOpen}>
-          <DialogContent className="sm:max-w-[500px] max-w-[90vw]">
+          <DialogContent className="sm:max-w-[500px] max-w-[90vw] shadow-2xl border-2 border-blue-200 bg-white/95 backdrop-blur-sm">
             <DialogHeader
               className="anti-yellow-nuclear"
               style={{
