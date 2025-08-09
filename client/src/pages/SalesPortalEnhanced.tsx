@@ -398,16 +398,7 @@ const SalesPortalEnhanced: React.FC = () => {
                   outlineStyle: 'none'
                 }}
               >Commissions</TabsTrigger>
-              <TabsTrigger 
-                value="analytics" 
-                className="anti-yellow-nuclear"
-                style={{
-                  outline: 'none',
-                  outlineColor: 'transparent',
-                  outlineWidth: '0',
-                  outlineStyle: 'none'
-                }}
-              >Analytics</TabsTrigger>
+
             </TabsList>
 
             {/* Mobile Navigation - Fixed bottom bar, shown only on mobile */}
