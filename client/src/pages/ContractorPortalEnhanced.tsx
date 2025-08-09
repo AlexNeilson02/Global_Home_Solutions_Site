@@ -34,7 +34,7 @@ import { Elements, useStripe, useElements, PaymentElement } from "@stripe/react-
 import { loadStripe } from "@stripe/stripe-js";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import DocumentManager from "@/components/DocumentManager";
 import ProjectTimeline from "@/components/ProjectTimeline";
 import AnalyticsDashboard from "@/components/AnalyticsDashboard";
@@ -1038,7 +1038,6 @@ const ContractorPortalEnhanced: React.FC = () => {
                   <CardContent>
                     <ResponsiveContainer width="100%" height={300}>
                       <BarChart data={projectData}>
-                        <CartesianGrid strokeDasharray="3 3" />
                         <XAxis dataKey="month" />
                         <YAxis />
                         <Tooltip />
