@@ -336,11 +336,14 @@ export default function AdminPortalEnhanced() {
   });
 
   const handleViewDetails = (salesperson: any) => {
+    console.log('handleViewDetails called', salesperson);
     setSelectedSalesperson(salesperson);
     setViewDetailsOpen(true);
+    console.log('viewDetailsOpen should now be true');
   };
 
   const handleEdit = (salesperson: any) => {
+    console.log('handleEdit called', salesperson);
     setSelectedSalesperson(salesperson);
     setEditFormData({
       fullName: salesperson.fullName || '',
@@ -349,6 +352,7 @@ export default function AdminPortalEnhanced() {
       confirmPassword: ''
     });
     setEditModalOpen(true);
+    console.log('editModalOpen should now be true');
   };
 
   const handleEditSubmit = () => {
@@ -394,11 +398,14 @@ export default function AdminPortalEnhanced() {
 
   // Contractor handlers
   const handleContractorView = (contractor: any) => {
+    console.log('handleContractorView called', contractor);
     setSelectedContractor(contractor);
     setContractorViewOpen(true);
+    console.log('contractorViewOpen should now be true');
   };
 
   const handleContractorEdit = (contractor: any) => {
+    console.log('handleContractorEdit called', contractor);
     setSelectedContractor(contractor);
     setContractorEditData({
       companyName: contractor.companyName || '',
@@ -413,6 +420,7 @@ export default function AdminPortalEnhanced() {
       confirmPassword: ''
     });
     setContractorEditOpen(true);
+    console.log('contractorEditOpen should now be true');
   };
 
   const handleContractorEditSubmit = () => {
@@ -1358,6 +1366,7 @@ export default function AdminPortalEnhanced() {
         </Tabs>
 
         {/* View Details Modal */}
+        {console.log('Rendering with viewDetailsOpen:', viewDetailsOpen)}
         <Dialog open={viewDetailsOpen} onOpenChange={setViewDetailsOpen}>
           <DialogContent 
             className="sm:max-w-[600px] anti-yellow-nuclear admin-portal-overlay"
