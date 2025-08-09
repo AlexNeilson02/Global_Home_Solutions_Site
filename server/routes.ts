@@ -661,8 +661,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         if (salespersonId) {
           console.log(`💰 PROCESSING COMMISSION: Salesperson ${salespersonId} attributed to bid request ${bidRequest.id}`);
           
-          // Increment the salesperson's successful conversions
+          // Track conversion: visit from attributed link + bid request submission
           await storage.incrementSalespersonStats(Number(salespersonId), 'successfulConversions');
+          console.log(`✅ CONVERSION TRACKED: Salesperson ${salespersonId} - attributed visit + bid request submitted`);
           
           // Get salesperson and user details for notification
           const salesperson = await storage.getSalesperson(Number(salespersonId));

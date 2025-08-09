@@ -286,9 +286,9 @@ const SalesPortalEnhanced: React.FC = () => {
                      (analytics as any)?.totalVisits || 0;
   
   // Use successfulConversions from salesperson data as primary source
+  // Conversions = visit from attributed link + bid request submission
   const totalConversions = (salesperson as any)?.successfulConversions || 
                           (salesAnalytics as any)?.personalMetrics?.totalConversions || 
-                          bidRequests.filter((bid: any) => bid.status === 'completed').length || 
                           (analytics as any)?.conversions || 0;
   
   const conversionRate = totalVisits > 0 && !isNaN(totalConversions) ? 
@@ -492,7 +492,7 @@ const SalesPortalEnhanced: React.FC = () => {
                   </CardHeader>
                   <CardContent className="p-3 pt-0 sm:p-4 sm:pt-0">
                     <div className="text-lg sm:text-2xl font-bold">{totalConversions}</div>
-                    <p className="text-xs text-muted-foreground">{conversionRate}% conversion rate</p>
+                    <p className="text-xs text-muted-foreground">{conversionRate}% visit-to-bid rate</p>
                   </CardContent>
                 </Card>
 
