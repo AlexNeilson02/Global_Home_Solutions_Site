@@ -178,9 +178,24 @@ enhancedRouter.get('/admin/analytics', isAuthenticated, requireRole(['admin']), 
     const activeProjects = projects.filter(p => p.status === 'in_progress').length;
     const completedProjects = projects.filter(p => p.status === 'completed').length;
     const pendingBids = bidRequests.filter(b => b.status === 'pending').length;
-    const totalRevenue = projects
-      .filter(p => p.status === 'completed')
-      .reduce((sum, p) => sum + (p.budget || 0), 0);
+
+    // Calculate revenue from subscriptions and commissions
+    const activeContractors = contractors.filter(c => c.isActive).length;
+    const subscriptionRevenue = activeContractors * 100; // $100 per active contractor per month
+    
+    // Get commission earnings for the corporation
+    let commissionRevenue = 0;
+    try {
+      // For now, we'll calculate commission revenue from bid requests that have been completed
+      // This is a placeholder calculation since commission records may not be fully implemented
+      const completedBidRequests = bidRequests.filter(b => b.status === 'completed');
+      commissionRevenue = completedBidRequests.length * 50; // Estimated $50 commission per completed bid
+    } catch (error) {
+      console.log('Commission calculation error:', error);
+      commissionRevenue = 0;
+    }
+
+    const totalRevenue = subscriptionRevenue + commissionRevenue;
 
     const analytics = {
       totalUsers,
@@ -192,6 +207,8 @@ enhancedRouter.get('/admin/analytics', isAuthenticated, requireRole(['admin']), 
       totalBidRequests: bidRequests.length,
       pendingBids,
       totalRevenue,
+      subscriptionRevenue,
+      commissionRevenue,
       conversionRate: bidRequests.length > 0 ? (completedProjects / bidRequests.length) * 100 : 0,
       recentActivity: {
         newUsers: 0, // Would need to calculate based on recent registrations

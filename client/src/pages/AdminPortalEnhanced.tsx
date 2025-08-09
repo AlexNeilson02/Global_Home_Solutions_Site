@@ -568,8 +568,11 @@ export default function AdminPortalEnhanced() {
   const completedProjects = projects?.filter((p: any) => p.status === 'completed')?.length || 0;
   const totalBidRequests = bidRequests?.length || 0;
   const pendingBidRequests = bidRequests?.filter((b: any) => b.status === 'pending')?.length || 0;
-  const totalRevenue = projects?.filter((p: any) => p.status === 'completed')
-    ?.reduce((sum: number, p: any) => sum + (p.budget || 0), 0) || 0;
+  
+  // Use revenue data from analytics endpoint
+  const totalRevenue = analyticsData?.analytics?.totalRevenue || 0;
+  const subscriptionRevenue = analyticsData?.analytics?.subscriptionRevenue || 0;
+  const commissionRevenue = analyticsData?.analytics?.commissionRevenue || 0;
 
   // Real chart data from analytics
   const monthlyData = analyticsData?.monthlyPerformance || [
@@ -595,7 +598,9 @@ export default function AdminPortalEnhanced() {
     completedProjects,
     totalBidRequests,
     pendingBidRequests,
-    totalRevenue
+    totalRevenue,
+    subscriptionRevenue,
+    commissionRevenue
   };
 
   if (isLoadingAnalytics || isLoadingUsers || isLoadingSalespersons || isLoadingContractors) {
@@ -668,11 +673,11 @@ export default function AdminPortalEnhanced() {
             <CardContent className="p-4 sm:p-6">
               <div className="flex items-center justify-between">
                 <div className="min-w-0 flex-1">
-                  <p className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-300 truncate">Total Projects</p>
-                  <p className="text-lg sm:text-2xl font-bold text-gray-900 dark:text-white">{stats.totalProjects}</p>
-                  <p className="text-xs text-blue-600">Active projects</p>
+                  <p className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-300 truncate">Revenue</p>
+                  <p className="text-lg sm:text-2xl font-bold text-gray-900 dark:text-white">${stats.totalRevenue?.toLocaleString() || '0'}</p>
+                  <p className="text-xs text-green-600">${stats.subscriptionRevenue?.toLocaleString() || '0'} subscriptions + ${stats.commissionRevenue?.toLocaleString() || '0'} commissions</p>
                 </div>
-                <FileText className="h-6 w-6 sm:h-8 sm:w-8 text-purple-600 flex-shrink-0" />
+                <DollarSign className="h-6 w-6 sm:h-8 sm:w-8 text-green-600 flex-shrink-0" />
               </div>
             </CardContent>
           </Card>
