@@ -855,7 +855,7 @@ const AnalyticsDashboard: React.FC<AnalyticsProps> = ({ userRole, userId, extern
                 </div>
                 <div className="flex items-center justify-between p-3 bg-green-50 rounded">
                   <span className="font-medium">Won</span>
-                  <Badge variant="default">{conversions?.won || 0}</Badge>
+                  <Badge variant="default" className="text-[#000000]">{conversions?.won || 0}</Badge>
                 </div>
               </div>
             </CardContent>
