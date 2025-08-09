@@ -45,6 +45,8 @@ import { useToast } from "@/hooks/use-toast";
 
 interface GmailIntegrationProps {
   contractorId?: number;
+  pendingContactEmail?: any;
+  onEmailSent?: () => void;
 }
 
 interface GmailMessage {
@@ -72,7 +74,7 @@ interface EmailForm {
   bidRequestId?: number;
 }
 
-const GmailIntegration: React.FC<GmailIntegrationProps> = ({ contractorId }) => {
+const GmailIntegration: React.FC<GmailIntegrationProps> = ({ contractorId, pendingContactEmail, onEmailSent }) => {
   const [isConnecting, setIsConnecting] = useState(false);
   const [showCompose, setShowCompose] = useState(false);
   const [showInbox, setShowInbox] = useState(true);
@@ -117,6 +119,17 @@ const GmailIntegration: React.FC<GmailIntegrationProps> = ({ contractorId }) => 
       });
     }
   }, [recentEmails]);
+
+  // Handle pending contact email from contractor dashboard
+  useEffect(() => {
+    if (pendingContactEmail) {
+      handleContactLead(pendingContactEmail);
+      if (onEmailSent) {
+        // Clear the pending email after handling
+        onEmailSent();
+      }
+    }
+  }, [pendingContactEmail]);
 
   // Function to handle opening an email
   const handleOpenEmail = (email: GmailMessage) => {
@@ -213,9 +226,7 @@ const GmailIntegration: React.FC<GmailIntegrationProps> = ({ contractorId }) => 
       // If this email was sent to a bid request, mark it as contacted
       if (variables.bidRequestId) {
         try {
-          await apiRequest(`/contractors/${contractor?.id}/bid-requests/${variables.bidRequestId}/contact`, {
-            method: 'POST'
-          });
+          await apiRequest('POST', `/api/contractors/${contractor?.id}/bid-requests/${variables.bidRequestId}/contact`, {});
           // Refresh bid requests to update the UI
           queryClient.invalidateQueries({ queryKey: [`/api/contractors/${contractor?.id}/bid-requests`] });
         } catch (error) {
@@ -240,9 +251,7 @@ const GmailIntegration: React.FC<GmailIntegrationProps> = ({ contractorId }) => 
   // Mark bid request as contacted mutation
   const markBidContactedMutation = useMutation({
     mutationFn: async (bidRequestId: number) => {
-      return apiRequest(`/contractors/${contractor?.id}/bid-requests/${bidRequestId}/contact`, {
-        method: 'POST'
-      });
+      return apiRequest('POST', `/api/contractors/${contractor?.id}/bid-requests/${bidRequestId}/contact`, {});
     },
     onSuccess: () => {
       // Refresh bid requests to update the UI

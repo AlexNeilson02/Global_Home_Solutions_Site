@@ -10,7 +10,9 @@ import { Slider } from "@/components/ui/slider";
 import { Textarea } from "@/components/ui/textarea";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { VideoUpload } from "@/components/VideoUpload";
+import GmailIntegration from "@/components/GmailIntegration";
 import { useToast } from "@/hooks/use-toast";
 import { useState, useRef, useEffect } from "react";
 import { 
@@ -26,7 +28,8 @@ import {
   MapPin,
   Edit,
   Save,
-  Building
+  Building,
+  MessageSquare
 } from "lucide-react";
 
 function formatCurrency(amount: number | null | undefined): string {
@@ -80,6 +83,8 @@ function ContractorDashboard() {
   const [uploadedFiles, setUploadedFiles] = useState<MediaFile[]>([]);
   const [paymentMethodAdded, setPaymentMethodAdded] = useState(false);
   const [isEditingProfile, setIsEditingProfile] = useState(false);
+  const [activeTab, setActiveTab] = useState("bid-requests");
+  const [pendingContactEmail, setPendingContactEmail] = useState<any>(null);
   
   // Profile form state
   const [profileForm, setProfileForm] = useState({
@@ -283,6 +288,51 @@ function ContractorDashboard() {
     });
   };
 
+  // Contact customer mutation - marks bid as contacted
+  const contactCustomerMutation = useMutation({
+    mutationFn: async (bidRequestId: number) => {
+      return apiRequest("POST", `/api/contractors/${contractorData?.id}/bid-requests/${bidRequestId}/contact`, {});
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/contractors", contractorData?.id, "bid-requests"] });
+      toast({
+        title: "Customer contacted",
+        description: "Bid request has been marked as contacted.",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Contact failed",
+        description: error.message || "Failed to mark customer as contacted.",
+        variant: "destructive"
+      });
+    }
+  });
+
+  // Handle contact customer - switches to email tab and prepares email
+  const handleContactCustomer = (request: any) => {
+    // Extract email from contact string (format: "email | phone")
+    const email = request.contact.split(' | ')[0];
+    const customerName = request.customer;
+    
+    // Prepare email data for the Gmail component
+    const emailData = {
+      id: request.id,
+      email: email,
+      customerName: customerName,
+      fullName: customerName,
+      serviceType: request.details,
+      description: request.details,
+      servicesRequested: [request.details]
+    };
+    
+    // Set the pending contact email data
+    setPendingContactEmail(emailData);
+    
+    // Switch to email tab
+    setActiveTab("email");
+  };
+
   const getStatusBadgeVariant = (status: string) => {
     switch (status) {
       case 'pending': return 'secondary';
@@ -482,10 +532,10 @@ function ContractorDashboard() {
           </CardContent>
         </Card>
 
-        {/* Contractor Dashboard Card */}
+        {/* Settings Card */}
         <Card className="w-full">
           <CardHeader>
-            <CardTitle className="text-2xl font-bold text-center">CONTRACTOR DASHBOARD</CardTitle>
+            <CardTitle className="text-2xl font-bold text-center">SETTINGS</CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
             {/* Monthly Spend Cap Slider */}
@@ -510,51 +560,108 @@ function ContractorDashboard() {
           </CardContent>
         </Card>
 
-        {/* Bid Requests Table */}
+        {/* Tabbed Interface for Bid Requests and Email */}
         <Card className="w-full">
           <CardHeader>
-            <CardTitle className="text-2xl font-bold text-center">BID REQUESTS</CardTitle>
+            <CardTitle className="text-2xl font-bold text-center">CONTRACTOR DASHBOARD</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow className="border-b-2 border-border">
-                    <TableHead className="font-bold text-base">CUSTOMER</TableHead>
-                    <TableHead className="font-bold text-base">CONTACT</TableHead>
-                    <TableHead className="font-bold text-base">DETAILS</TableHead>
-                    <TableHead className="font-bold text-base">STATUS</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {sampleBidRequests.map((request) => (
-                    <TableRow key={request.id} className="border-b border-border">
-                      <TableCell className="font-medium">{request.customer}</TableCell>
-                      <TableCell>
-                        <div className="space-y-1">
-                          <div className="flex items-center gap-2">
-                            <Mail className="h-4 w-4" />
-                            <span className="text-sm">{request.contact.split(' | ')[0]}</span>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <Phone className="h-4 w-4" />
-                            <span className="text-sm">{request.contact.split(' | ')[1]}</span>
-                          </div>
-                        </div>
-                      </TableCell>
-                      <TableCell className="max-w-xs">
-                        <p className="text-sm">{request.details}</p>
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant={getStatusBadgeVariant(request.status)} className="capitalize">
-                          {request.status}
-                        </Badge>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="bid-requests" className="flex items-center gap-2">
+                  <Building className="h-4 w-4" />
+                  BID REQUESTS
+                </TabsTrigger>
+                <TabsTrigger value="email" className="flex items-center gap-2">
+                  <MessageSquare className="h-4 w-4" />
+                  EMAIL
+                </TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="bid-requests" className="mt-6">
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow className="border-b-2 border-border">
+                        <TableHead className="font-bold text-base">CUSTOMER</TableHead>
+                        <TableHead className="font-bold text-base">CONTACT</TableHead>
+                        <TableHead className="font-bold text-base">DETAILS</TableHead>
+                        <TableHead className="font-bold text-base">STATUS</TableHead>
+                        <TableHead className="font-bold text-base">ACTIONS</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {isLoadingBids ? (
+                        <TableRow>
+                          <TableCell colSpan={5} className="text-center py-8">
+                            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary mx-auto"></div>
+                          </TableCell>
+                        </TableRow>
+                      ) : bidRequestsData?.bidRequests?.length > 0 ? (
+                        bidRequestsData.bidRequests.map((request: any) => (
+                          <TableRow key={request.id} className="border-b border-border">
+                            <TableCell className="font-medium">{request.fullName}</TableCell>
+                            <TableCell>
+                              <div className="space-y-1">
+                                <div className="flex items-center gap-2">
+                                  <Mail className="h-4 w-4" />
+                                  <span className="text-sm">{request.email}</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <Phone className="h-4 w-4" />
+                                  <span className="text-sm">{request.phone || 'No phone'}</span>
+                                </div>
+                              </div>
+                            </TableCell>
+                            <TableCell className="max-w-xs">
+                              <p className="text-sm">{request.description || request.serviceRequested}</p>
+                            </TableCell>
+                            <TableCell>
+                              <Badge variant={getStatusBadgeVariant(request.status)} className="capitalize">
+                                {request.status}
+                              </Badge>
+                            </TableCell>
+                            <TableCell>
+                              {request.status === 'pending' && (
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => handleContactCustomer({
+                                    id: request.id,
+                                    customer: request.fullName,
+                                    contact: `${request.email} | ${request.phone || 'No phone'}`,
+                                    details: request.description || request.serviceRequested,
+                                    status: request.status
+                                  })}
+                                  className="flex items-center gap-2"
+                                >
+                                  <Mail className="h-4 w-4" />
+                                  Contact Customer
+                                </Button>
+                              )}
+                            </TableCell>
+                          </TableRow>
+                        ))
+                      ) : (
+                        <TableRow>
+                          <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
+                            No bid requests found
+                          </TableCell>
+                        </TableRow>
+                      )}
+                    </TableBody>
+                  </Table>
+                </div>
+              </TabsContent>
+              
+              <TabsContent value="email" className="mt-6">
+                <GmailIntegration 
+                  contractorId={contractorData?.id} 
+                  pendingContactEmail={pendingContactEmail}
+                  onEmailSent={() => setPendingContactEmail(null)}
+                />
+              </TabsContent>
+            </Tabs>
           </CardContent>
         </Card>
 
