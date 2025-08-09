@@ -283,18 +283,35 @@ body:has(.homepage-container) [data-portal] {
 [style*="#ffff"],
 [style*="#ffa500"],
 [style*="orange"],
+[style*="rgb(255, 255, 0)"],
+[style*="rgb(255, 165, 0)"],
 [class*="yellow"],
 [class*="warning"],
 [class*="alert"],
+[class*="notification"],
+[class*="banner"],
 div[style*="position: fixed"][style*="top: 0"],
 div[style*="position: absolute"][style*="top: 0"],
+div[style*="position: fixed"][style*="top:0"],
+div[style*="position: absolute"][style*="top:0"],
+*[style*="background-color: yellow"],
+*[style*="background: yellow"],
+*[style*="background-color: #ffff00"],
+*[style*="background: #ffff00"],
+*[style*="background-color: orange"],
+*[style*="background: orange"],
 iframe[src*="replit"],
 [id*="replit"],
 [class*="replit"],
 [data-replit],
 .replit-notification,
 .replit-banner,
-.development-banner {
+.development-banner,
+.warning-banner,
+.dev-warning,
+#dev-tools,
+[id*="dev-tools"],
+[class*="dev-tools"] {
   display: none !important;
   visibility: hidden !important;
   opacity: 0 !important;
@@ -302,6 +319,9 @@ iframe[src*="replit"],
   width: 0 !important;
   pointer-events: none !important;
   z-index: -9999 !important;
+  position: absolute !important;
+  top: -9999px !important;
+  left: -9999px !important;
 }
 
 /* Tactic 1: CSS Variable Overrides */
