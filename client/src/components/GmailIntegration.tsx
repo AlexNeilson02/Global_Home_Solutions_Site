@@ -262,7 +262,16 @@ ${(contractor as any)?.phone ? `Phone: ${(contractor as any).phone}` : ''}`;
       // If this email was sent to a bid request, mark it as contacted
       if (variables.bidRequestId) {
         try {
-          await apiRequest('PATCH', `/api/bid-requests/${variables.bidRequestId}/status`, { status: 'contacted' });
+          const response = await fetch(`/api/bid-requests/${variables.bidRequestId}/status`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status: 'contacted' })
+          });
+          
+          if (!response.ok) {
+            throw new Error('Failed to update bid status');
+          }
+          
           // Refresh bid requests to update the UI
           queryClient.invalidateQueries({ queryKey: [`/api/contractors/${contractor?.id}/bid-requests`] });
         } catch (error) {
@@ -287,7 +296,17 @@ ${(contractor as any)?.phone ? `Phone: ${(contractor as any).phone}` : ''}`;
   // Mark bid request as contacted mutation
   const markBidContactedMutation = useMutation({
     mutationFn: async (bidRequestId: number) => {
-      return apiRequest('PATCH', `/api/bid-requests/${bidRequestId}/status`, { status: 'contacted' });
+      const response = await fetch(`/api/bid-requests/${bidRequestId}/status`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'contacted' })
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to update bid status');
+      }
+      
+      return response.json();
     },
     onSuccess: () => {
       // Refresh bid requests to update the UI
