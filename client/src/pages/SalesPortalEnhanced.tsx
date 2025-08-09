@@ -104,7 +104,7 @@ const SalesPortalEnhanced: React.FC = () => {
     enabled: true
   });
 
-  const salesperson = userData?.roleData || {};
+  const salesperson = (userData as any)?.roleData || {};
   const user = userData || {};
 
   // Get salesperson analytics
@@ -137,16 +137,16 @@ const SalesPortalEnhanced: React.FC = () => {
     enabled: !!salesperson?.id
   });
 
-  const analytics = analyticsData?.analytics || {};
-  const bidRequests = bidRequestsData?.bidRequests || [];
-  const recentBidRequests = analyticsData?.recentBidRequests || [];
-  const visitStats = analyticsData?.visitStats || {};
+  const analytics = (analyticsData as any)?.analytics || {};
+  const bidRequests = (bidRequestsData as any)?.bidRequests || [];
+  const recentBidRequests = (analyticsData as any)?.recentBidRequests || [];
+  const visitStats = (analyticsData as any)?.visitStats || {};
   
   // Set QR code and landing page data
   useEffect(() => {
-    if (qrCodeResponse?.qrCode) {
-      setQrCodeData(qrCodeResponse.qrCode);
-      setLandingPageUrl(qrCodeResponse.landingPageUrl || '');
+    if ((qrCodeResponse as any)?.qrCode) {
+      setQrCodeData((qrCodeResponse as any).qrCode);
+      setLandingPageUrl((qrCodeResponse as any).landingPageUrl || '');
     }
   }, [qrCodeResponse]);
 
@@ -279,10 +279,10 @@ const SalesPortalEnhanced: React.FC = () => {
   };
 
   // Calculate key metrics using real data
-  const totalVisits = salesAnalytics?.personalMetrics?.totalQrScans || (analytics as any)?.totalVisits || 0;
-  const totalConversions = salesAnalytics?.personalMetrics?.totalConversions || (analytics as any)?.conversions || 0;
+  const totalVisits = (salesAnalytics as any)?.personalMetrics?.totalQrScans || (analytics as any)?.totalVisits || 0;
+  const totalConversions = (salesAnalytics as any)?.personalMetrics?.totalConversions || (analytics as any)?.conversions || 0;
   const conversionRate = totalVisits > 0 && !isNaN(totalConversions) ? ((totalConversions / totalVisits) * 100).toFixed(1) : '0.0';
-  const totalLeads = salesAnalytics?.personalMetrics?.totalLeads || (salesperson as any)?.totalLeads || 0;
+  const totalLeads = (salesAnalytics as any)?.personalMetrics?.totalLeads || (salesperson as any)?.totalLeads || 0;
   const commissionEarnings = (commissionData as any)?.totalEarned || 0;
 
   // Real performance data from analytics
@@ -340,7 +340,7 @@ const SalesPortalEnhanced: React.FC = () => {
           >
             {/* Desktop/Tablet Navigation - Hidden on mobile */}
             <TabsList 
-              className="hidden sm:grid w-full grid-cols-6 anti-yellow-nuclear"
+              className="hidden sm:grid w-full grid-cols-5 anti-yellow-nuclear"
               style={{
                 outline: 'none',
                 outlineColor: 'transparent',
@@ -399,16 +399,7 @@ const SalesPortalEnhanced: React.FC = () => {
                   outlineStyle: 'none'
                 }}
               >Commissions</TabsTrigger>
-              <TabsTrigger 
-                value="analytics" 
-                className="anti-yellow-nuclear"
-                style={{
-                  outline: 'none',
-                  outlineColor: 'transparent',
-                  outlineWidth: '0',
-                  outlineStyle: 'none'
-                }}
-              >Analytics</TabsTrigger>
+
             </TabsList>
 
             {/* Mobile Navigation - Fixed bottom bar, shown only on mobile */}
@@ -459,15 +450,7 @@ const SalesPortalEnhanced: React.FC = () => {
                   <DollarSign className="h-4 w-4" />
                   <span>Commission</span>
                 </button>
-                <button
-                  onClick={() => setActiveTab("analytics")}
-                  className={`flex flex-col items-center justify-center gap-1 text-xs hover:bg-gray-100 dark:hover:bg-gray-800 px-4 min-w-[80px] flex-shrink-0 ${
-                    activeTab === "analytics" ? "text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950" : ""
-                  }`}
-                >
-                  <TrendingUp className="h-4 w-4" />
-                  <span>Analytics</span>
-                </button>
+
               </div>
             </div>
 
@@ -1021,10 +1004,8 @@ const SalesPortalEnhanced: React.FC = () => {
               <CommissionDashboard salespersonId={salesperson?.id} />
             </TabsContent>
 
-            {/* Analytics Tab */}
-            <TabsContent value="analytics" className="space-y-6">
-              <AnalyticsDashboard userRole="salesperson" userId={salesperson?.id} />
-            </TabsContent>
+
+
           </Tabs>
         </div>
       </div>
