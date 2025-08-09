@@ -37,26 +37,11 @@ export class CommissionService {
       // ========== COMMISSION ELIGIBILITY CHECK ==========
       let isEligibleForSalesCommission = false;
       
-      // Check if salesperson should receive commission (must have verified QR/NFC visit)
+      // If salesperson is attributed, they get commission
       if (salespersonId) {
-        if (bidRequest.sessionTrackingId && bidRequest.isCommissionEligible) {
-          // Double-check with page visit verification
-          const verifiedVisit = await storage.getVerifiedQrNfcVisit(bidRequest.sessionTrackingId, salespersonId);
-          
-          if (verifiedVisit) {
-            isEligibleForSalesCommission = true;
-            console.log(`✅ SALES COMMISSION ELIGIBLE: Verified QR/NFC visit found for session ${bidRequest.sessionTrackingId}, salesperson ${salespersonId}`);
-          } else {
-            console.warn(`❌ SALES COMMISSION DENIED: No verified QR/NFC visit found for session ${bidRequest.sessionTrackingId}, salesperson ${salespersonId}`);
-          }
-        } else {
-          console.warn(`❌ SALES COMMISSION DENIED: Missing session tracking or not commission eligible`);
-        }
-      }
-      
-      if (!isEligibleForSalesCommission && salespersonId) {
-        console.log(`🚫 Salesperson ${salespersonId} will not receive commission - no verified QR/NFC attribution`);
-      } else if (!salespersonId) {
+        isEligibleForSalesCommission = true;
+        console.log(`✅ SALES COMMISSION ELIGIBLE: Salesperson ${salespersonId} attributed to bid request ${bidRequest.id}`);
+      } else {
         console.log(`ℹ️  No salesperson attribution - processing as general lead (corporate commission only)`);
       }
       
@@ -134,10 +119,8 @@ export class CommissionService {
             commissions: (salesperson.commissions || 0) + salesCommissionTotal
           });
           
-          console.log(`💰 Salesperson ${salespersonId} earned $${salesCommissionTotal} commission from verified QR/NFC lead`);
+          console.log(`💰 Salesperson ${salespersonId} earned $${salesCommissionTotal} commission from lead attribution`);
         }
-      } else if (salespersonId && !isEligibleForSalesCommission) {
-        console.log(`🏢 Salesperson ${salespersonId} attributed but not eligible - commission ($${totalCommissionAmount}) goes to corporate`);
       } else {
         console.log(`🏢 No salesperson - entire commission ($${totalCommissionAmount}) assigned to corporate`);
       }
