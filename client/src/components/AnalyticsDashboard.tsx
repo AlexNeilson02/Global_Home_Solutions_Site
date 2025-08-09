@@ -468,7 +468,229 @@ const AnalyticsDashboard: React.FC<AnalyticsProps> = ({ userRole, userId }) => {
       );
     }
 
-    // Charts for salesperson and contractor roles would be similar but with role-specific data
+    // Contractor-specific charts
+    if (userRole === 'contractor') {
+      const analytics = analyticsData;
+      
+      // Calculate bid response time distribution
+      const bidResponseTimeData = [
+        { 
+          timeRange: 'Less than 24 hours', 
+          count: analytics?.responseTimeBreakdown?.under24h || 0,
+          fill: '#10b981' // green
+        },
+        { 
+          timeRange: '24-48 hours', 
+          count: analytics?.responseTimeBreakdown?.day1to2 || 0,
+          fill: '#3b82f6' // blue
+        },
+        { 
+          timeRange: '2-3 days', 
+          count: analytics?.responseTimeBreakdown?.day2to3 || 0,
+          fill: '#f59e0b' // yellow
+        },
+        { 
+          timeRange: '3-7 days', 
+          count: analytics?.responseTimeBreakdown?.day3to7 || 0,
+          fill: '#ef4444' // red
+        },
+        { 
+          timeRange: 'More than 7 days', 
+          count: analytics?.responseTimeBreakdown?.over7days || 0,
+          fill: '#8b5cf6' // purple
+        }
+      ];
+
+      // Calculate bid status distribution
+      const bidStatusData = [
+        { 
+          status: 'Pending', 
+          count: analytics?.statusBreakdown?.pending || 0,
+          fill: '#f59e0b' // yellow
+        },
+        { 
+          status: 'Contacted', 
+          count: analytics?.statusBreakdown?.contacted || 0,
+          fill: '#3b82f6' // blue
+        },
+        { 
+          status: 'Sent', 
+          count: analytics?.statusBreakdown?.sent || 0,
+          fill: '#8b5cf6' // purple
+        },
+        { 
+          status: 'Completed', 
+          count: analytics?.statusBreakdown?.completed || 0,
+          fill: '#10b981' // green
+        },
+        { 
+          status: 'Declined', 
+          count: analytics?.statusBreakdown?.declined || 0,
+          fill: '#ef4444' // red
+        }
+      ];
+
+      return (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Bid Response Time Chart */}
+          <Card style={antiYellowStyles}>
+            <CardHeader>
+              <CardTitle>Bid Response Time</CardTitle>
+              <CardDescription>Time taken to respond to bid requests</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={bidResponseTimeData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis 
+                    dataKey="timeRange" 
+                    angle={-45}
+                    textAnchor="end"
+                    height={80}
+                    fontSize={12}
+                  />
+                  <YAxis />
+                  <Tooltip 
+                    formatter={(value) => [value, 'Requests']}
+                    labelStyle={{ color: '#000' }}
+                    contentStyle={{ 
+                      backgroundColor: 'white', 
+                      border: '1px solid #e5e7eb',
+                      borderRadius: '6px'
+                    }}
+                  />
+                  <Bar dataKey="count" fill="#3b82f6" />
+                </BarChart>
+              </ResponsiveContainer>
+              <div className="mt-4 text-center">
+                <p className="text-sm text-gray-600">
+                  Average response time: <span className="font-medium">{safeToFixed(analytics?.averageResponseTime)}h</span>
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Bid Status Distribution */}
+          <Card style={antiYellowStyles}>
+            <CardHeader>
+              <CardTitle>Bid Status Distribution</CardTitle>
+              <CardDescription>Current status of all bid requests</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ResponsiveContainer width="100%" height={300}>
+                <PieChart>
+                  <Pie
+                    data={bidStatusData}
+                    cx="50%"
+                    cy="50%"
+                    labelLine={false}
+                    label={({ status, count, percent }) => 
+                      count > 0 ? `${status}: ${count} (${(percent * 100).toFixed(0)}%)` : ''
+                    }
+                    outerRadius={80}
+                    dataKey="count"
+                  >
+                    {bidStatusData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.fill} />
+                    ))}
+                  </Pie>
+                  <Tooltip 
+                    formatter={(value) => [value, 'Requests']}
+                    labelStyle={{ color: '#000' }}
+                    contentStyle={{ 
+                      backgroundColor: 'white', 
+                      border: '1px solid #e5e7eb',
+                      borderRadius: '6px'
+                    }}
+                  />
+                </PieChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
+
+          {/* Performance Trends */}
+          <Card style={antiYellowStyles}>
+            <CardHeader>
+              <CardTitle>Performance Trends</CardTitle>
+              <CardDescription>Bid requests and response metrics over time</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ResponsiveContainer width="100%" height={300}>
+                <LineChart data={analytics?.trends || []}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="week" />
+                  <YAxis />
+                  <Tooltip 
+                    labelStyle={{ color: '#000' }}
+                    contentStyle={{ 
+                      backgroundColor: 'white', 
+                      border: '1px solid #e5e7eb',
+                      borderRadius: '6px'
+                    }}
+                  />
+                  <Line 
+                    type="monotone" 
+                    dataKey="totalRequests" 
+                    stroke="#3b82f6" 
+                    name="Total Requests" 
+                    strokeWidth={2}
+                  />
+                  <Line 
+                    type="monotone" 
+                    dataKey="responded" 
+                    stroke="#10b981" 
+                    name="Responded" 
+                    strokeWidth={2}
+                  />
+                  <Line 
+                    type="monotone" 
+                    dataKey="won" 
+                    stroke="#f59e0b" 
+                    name="Won Projects" 
+                    strokeWidth={2}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
+
+          {/* Response Time vs Win Rate */}
+          <Card style={antiYellowStyles}>
+            <CardHeader>
+              <CardTitle>Response Time vs Win Rate</CardTitle>
+              <CardDescription>How response speed affects project success</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="text-center p-4 bg-green-50 rounded-lg">
+                    <div className="text-2xl font-bold text-green-600">
+                      {formatPercentage(analytics?.responseAnalysis?.fastResponseWinRate || 0)}
+                    </div>
+                    <div className="text-sm text-gray-600">Win rate (&lt;24h response)</div>
+                  </div>
+                  <div className="text-center p-4 bg-red-50 rounded-lg">
+                    <div className="text-2xl font-bold text-red-600">
+                      {formatPercentage(analytics?.responseAnalysis?.slowResponseWinRate || 0)}
+                    </div>
+                    <div className="text-sm text-gray-600">Win rate (&gt;24h response)</div>
+                  </div>
+                </div>
+                <div className="text-center">
+                  <p className="text-sm text-gray-600">
+                    <span className="font-medium">
+                      {safeToFixed((analytics?.responseAnalysis?.fastResponseWinRate || 0) - (analytics?.responseAnalysis?.slowResponseWinRate || 0))}%
+                    </span> higher win rate with faster responses
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      );
+    }
+
+    // Salesperson charts would go here
     return (
       <Card style={antiYellowStyles}>
         <CardContent className="p-6">

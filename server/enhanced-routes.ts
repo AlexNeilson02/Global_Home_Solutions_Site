@@ -223,7 +223,121 @@ enhancedRouter.get('/contractors/:id/analytics', isAuthenticated, async (req: Re
     const projects = await storage.getProjectsByContractorId(contractorId);
     const bidRequests = await storage.getBidRequestsByContractorId(contractorId);
 
+    // Calculate response time breakdown
+    const respondedBids = bidRequests.filter(b => b.lastUpdated && b.createdAt);
+    const responseTimeBreakdown = {
+      under24h: 0,
+      day1to2: 0,
+      day2to3: 0,
+      day3to7: 0,
+      over7days: 0
+    };
+
+    let totalResponseTime = 0;
+    let responseCount = 0;
+
+    respondedBids.forEach(bid => {
+      if (bid.createdAt && bid.lastUpdated) {
+        const responseTime = new Date(bid.lastUpdated).getTime() - new Date(bid.createdAt).getTime();
+        const responseHours = responseTime / (1000 * 60 * 60);
+        
+        totalResponseTime += responseHours;
+        responseCount++;
+
+        if (responseHours < 24) {
+          responseTimeBreakdown.under24h++;
+        } else if (responseHours < 48) {
+          responseTimeBreakdown.day1to2++;
+        } else if (responseHours < 72) {
+          responseTimeBreakdown.day2to3++;
+        } else if (responseHours < 168) { // 7 days
+          responseTimeBreakdown.day3to7++;
+        } else {
+          responseTimeBreakdown.over7days++;
+        }
+      }
+    });
+
+    // Calculate average response time
+    const averageResponseTime = responseCount > 0 ? totalResponseTime / responseCount : 0;
+
+    // Calculate status breakdown
+    const statusBreakdown = {
+      pending: bidRequests.filter(b => b.status === 'pending').length,
+      contacted: bidRequests.filter(b => b.status === 'contacted').length,
+      sent: bidRequests.filter(b => b.status === 'sent').length,
+      completed: bidRequests.filter(b => b.status === 'completed').length,
+      declined: bidRequests.filter(b => b.status === 'declined').length
+    };
+
+    // Calculate win rates by response time
+    const fastResponders = respondedBids.filter(bid => {
+      if (!bid.createdAt || !bid.lastUpdated) return false;
+      const responseTime = new Date(bid.lastUpdated).getTime() - new Date(bid.createdAt).getTime();
+      return responseTime < (24 * 60 * 60 * 1000); // less than 24 hours
+    });
+
+    const slowResponders = respondedBids.filter(bid => {
+      if (!bid.createdAt || !bid.lastUpdated) return false;
+      const responseTime = new Date(bid.lastUpdated).getTime() - new Date(bid.createdAt).getTime();
+      return responseTime >= (24 * 60 * 60 * 1000); // 24 hours or more
+    });
+
+    const fastResponseWinRate = fastResponders.length > 0 
+      ? (fastResponders.filter(b => b.status === 'completed').length / fastResponders.length) * 100 
+      : 0;
+
+    const slowResponseWinRate = slowResponders.length > 0 
+      ? (slowResponders.filter(b => b.status === 'completed').length / slowResponders.length) * 100 
+      : 0;
+
+    // Generate weekly trends (last 12 weeks)
+    const trends = [];
+    const now = new Date();
+    for (let i = 11; i >= 0; i--) {
+      const weekStart = new Date(now.getTime() - (i * 7 * 24 * 60 * 60 * 1000));
+      const weekEnd = new Date(weekStart.getTime() + (7 * 24 * 60 * 60 * 1000));
+      
+      const weekBids = bidRequests.filter(b => {
+        const createdAt = new Date(b.createdAt);
+        return createdAt >= weekStart && createdAt < weekEnd;
+      });
+
+      trends.push({
+        week: `Week ${12 - i}`,
+        totalRequests: weekBids.length,
+        responded: weekBids.filter(b => b.lastUpdated).length,
+        won: weekBids.filter(b => b.status === 'completed').length
+      });
+    }
+
     const analytics = {
+      // Basic metrics
+      totalRequests: bidRequests.length,
+      responded: bidRequests.filter(b => b.lastUpdated).length,
+      won: bidRequests.filter(b => b.status === 'completed').length,
+      lost: bidRequests.filter(b => b.status === 'declined').length,
+      revenue: projects
+        .filter(p => p.status === 'completed')
+        .reduce((sum, p) => sum + (p.budget || 0), 0),
+      
+      // Response time analytics
+      averageResponseTime,
+      responseTimeBreakdown,
+      
+      // Status breakdown
+      statusBreakdown,
+      
+      // Response analysis
+      responseAnalysis: {
+        fastResponseWinRate,
+        slowResponseWinRate
+      },
+      
+      // Trends
+      trends,
+
+      // Legacy fields for backward compatibility
       totalProjects: projects.length,
       activeProjects: projects.filter(p => p.status === 'in_progress').length,
       completedProjects: projects.filter(p => p.status === 'completed').length,
@@ -232,10 +346,10 @@ enhancedRouter.get('/contractors/:id/analytics', isAuthenticated, async (req: Re
         .reduce((sum, p) => sum + (p.budget || 0), 0),
       totalBids: bidRequests.length,
       pendingBids: bidRequests.filter(b => b.status === 'pending').length,
-      successRate: projects.length > 0 ? (projects.filter(p => p.status === 'completed').length / projects.length) * 100 : 0
+      successRate: bidRequests.length > 0 ? (bidRequests.filter(b => b.status === 'completed').length / bidRequests.length) * 100 : 0
     };
 
-    res.json({ analytics });
+    res.json(analytics);
   } catch (error) {
     console.error('Contractor analytics error:', error);
     res.status(500).json({ message: 'Failed to fetch contractor analytics' });
