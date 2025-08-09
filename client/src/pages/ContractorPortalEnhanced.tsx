@@ -1557,7 +1557,7 @@ ${contractor?.email || ''}`;
                                   project.status === 'won' ? 'default' :
                                   project.status === 'bid_sent' ? 'secondary' : 
                                   project.status === 'lost' ? 'destructive' : 'outline'
-                                }>
+                                } className={project.status === 'won' ? 'text-[#000000]' : ''}>
                                   {project.status === 'bid_sent' ? 'Bid Sent' : project.status.replace('_', ' ')}
                                 </Badge>
                               </div>
