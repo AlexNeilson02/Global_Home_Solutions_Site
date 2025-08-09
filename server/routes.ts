@@ -468,10 +468,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Track page visit for QR code attribution - public endpoint
+  // Track page visit for QR/NFC attribution - public endpoint
   apiRouter.post("/track-visit", async (req: Request, res: Response) => {
     try {
-      const { salespersonProfileUrl, userAgent, referrer } = req.body;
+      const { salespersonProfileUrl, userAgent, referrer, source } = req.body;
       
       console.log('Track visit request received:', { 
         salespersonProfileUrl, 
@@ -486,8 +486,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Generate unique session tracking ID for this visit
-      const sessionTrackingId = `qr_${salespersonProfileUrl}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-      console.log('Generated session tracking ID:', sessionTrackingId);
+      const scanSource = source || 'qr_code'; // Default to QR if not specified
+      const sessionTrackingId = `${scanSource}_${salespersonProfileUrl}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      console.log(`Generated session tracking ID for ${scanSource}:`, sessionTrackingId);
 
       // Get salesperson by profile URL with improved error handling
       console.log('Looking up salesperson by profile URL:', salespersonProfileUrl);
@@ -520,7 +521,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         visitorIp: req.ip || null,
         // Mark as verified QR/NFC visit for commission eligibility
         isVerifiedQrNfcVisit: true,
-        qrNfcSource: 'qr_code', // or 'nfc_tag' if coming from NFC
+        qrNfcSource: scanSource, // 'qr_code' or 'nfc_tag' based on source
         sessionTrackingId: sessionTrackingId
       });
 
