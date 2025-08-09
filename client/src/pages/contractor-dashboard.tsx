@@ -288,26 +288,7 @@ function ContractorDashboard() {
     });
   };
 
-  // Contact customer mutation - marks bid as contacted
-  const contactCustomerMutation = useMutation({
-    mutationFn: async (bidRequestId: number) => {
-      return apiRequest("POST", `/api/contractors/${contractorData?.id}/bid-requests/${bidRequestId}/contact`, {});
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/contractors", contractorData?.id, "bid-requests"] });
-      toast({
-        title: "Customer contacted",
-        description: "Bid request has been marked as contacted.",
-      });
-    },
-    onError: (error: any) => {
-      toast({
-        title: "Contact failed",
-        description: error.message || "Failed to mark customer as contacted.",
-        variant: "destructive"
-      });
-    }
-  });
+
 
   // Handle contact customer - switches to email tab and prepares email
   const handleContactCustomer = (request: any) => {
@@ -326,11 +307,13 @@ function ContractorDashboard() {
       servicesRequested: [request.details]
     };
     
-    // Set the pending contact email data
-    setPendingContactEmail(emailData);
-    
-    // Switch to email tab
+    // Switch to email tab first
     setActiveTab("email");
+    
+    // Set the pending contact email data with a slight delay to ensure tab switch
+    setTimeout(() => {
+      setPendingContactEmail(emailData);
+    }, 100);
   };
 
   const getStatusBadgeVariant = (status: string) => {

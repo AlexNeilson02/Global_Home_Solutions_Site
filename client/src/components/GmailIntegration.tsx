@@ -123,9 +123,45 @@ const GmailIntegration: React.FC<GmailIntegrationProps> = ({ contractorId, pendi
   // Handle pending contact email from contractor dashboard
   useEffect(() => {
     if (pendingContactEmail) {
-      handleContactLead(pendingContactEmail);
+      // Don't call handleContactLead (which marks as contacted immediately)
+      // Instead, just prepare the email composition
+      const serviceType = pendingContactEmail.servicesRequested?.[0] || pendingContactEmail.serviceType || 'your service request';
+      const customerName = pendingContactEmail.fullName || pendingContactEmail.customerName || 'there';
+      
+      const subject = `Professional ${serviceType} Services - ${(contractor as any)?.companyName || 'Our Company'}`;
+      const body = `Dear ${customerName},
+
+Thank you for your interest in ${serviceType.toLowerCase()} services. I received your request and I'm excited to help you with your project.
+
+About us:
+• Licensed and insured contractor
+• Extensive experience in ${serviceType.toLowerCase()}
+• Quality workmanship with warranty
+• Competitive pricing and flexible scheduling
+
+${pendingContactEmail.description ? `Regarding your project: "${pendingContactEmail.description}"` : 'I\'d love to learn more about your specific needs.'}
+
+I'd be happy to schedule a free consultation to discuss your project in detail and provide you with a personalized quote.
+
+Are you available for a brief call this week to get started?
+
+Best regards,
+${(contractor as any)?.companyName || '[Your Company]'}
+${(contractor as any)?.phone ? `Phone: ${(contractor as any).phone}` : ''}`;
+      
+      // Set the email form with the bid ID to mark as contacted after sending
+      setEmailForm({
+        to: pendingContactEmail.email,
+        subject,
+        body,
+        bidRequestId: pendingContactEmail.id
+      });
+      setShowCompose(true);
+      setShowInbox(false);
+      setSelectedEmail(null);
+      
+      // Clear the pending email after handling
       if (onEmailSent) {
-        // Clear the pending email after handling
         onEmailSent();
       }
     }
