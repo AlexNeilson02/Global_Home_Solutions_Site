@@ -305,12 +305,6 @@ const ContractorPortalEnhanced: React.FC = () => {
 
   const bidRequests = (bidRequestsData as any)?.bidRequests || [];
 
-  // Get contractor analytics
-  const { data: analyticsData } = useQuery({
-    queryKey: [`/api/contractors/${contractor?.id}/analytics`],
-    enabled: !!contractor?.id
-  });
-
   // Get service categories for specialties dropdown
   const { data: servicesData, error: servicesError, isLoading: servicesLoading } = useQuery({
     queryKey: ["/api/service-categories"],
@@ -733,84 +727,20 @@ ${contractor?.email || ''}`;
     .filter((p: any) => p.status === 'completed')
     .reduce((sum: number, p: any) => sum + (p.budget || 0), 0);
 
-  // Calculate response time analytics from actual bid requests
-  const calculateResponseTimes = () => {
-    // Filter out pending bids and calculate response times for contacted bids
-    const respondedBids = bidRequests.filter((bid: any) => 
-      bid.status !== 'pending' && bid.createdAt && bid.lastUpdated
-    );
+  // Chart data
+  const projectData = [
+    { month: 'Jan', completed: 8, active: 12, revenue: 45000 },
+    { month: 'Feb', completed: 12, active: 15, revenue: 62000 },
+    { month: 'Mar', completed: 10, active: 18, revenue: 58000 },
+    { month: 'Apr', completed: 15, active: 20, revenue: 75000 },
+    { month: 'May', completed: 18, active: 16, revenue: 89000 },
+    { month: 'Jun', completed: 22, active: 14, revenue: 95000 }
+  ];
 
-    const sameDay = respondedBids.filter((bid: any) => {
-      const created = new Date(bid.createdAt);
-      const responded = new Date(bid.lastUpdated);
-      const hoursDiff = (responded.getTime() - created.getTime()) / (1000 * 60 * 60);
-      return hoursDiff <= 24;
-    }).length;
-
-    const twoDays = respondedBids.filter((bid: any) => {
-      const created = new Date(bid.createdAt);
-      const responded = new Date(bid.lastUpdated);
-      const hoursDiff = (responded.getTime() - created.getTime()) / (1000 * 60 * 60);
-      return hoursDiff > 24 && hoursDiff <= 72;
-    }).length;
-
-    const lateResponse = respondedBids.filter((bid: any) => {
-      const created = new Date(bid.createdAt);
-      const responded = new Date(bid.lastUpdated);
-      const hoursDiff = (responded.getTime() - created.getTime()) / (1000 * 60 * 60);
-      return hoursDiff > 72;
-    }).length;
-
-    const noResponse = bidRequests.filter((bid: any) => bid.status === 'pending').length;
-
-    return { sameDay, twoDays, lateResponse, noResponse };
-  };
-
-  const responseTimeData = calculateResponseTimes();
-
-  // Calculate bid performance data from actual bid requests
-  const calculateBidPerformance = () => {
-    // Group bid requests by month
-    const monthlyData: { [key: string]: { won: number; sent: number; total: number } } = {};
-    
-    bidRequests.forEach((bid: any) => {
-      const date = new Date(bid.createdAt);
-      const monthYear = date.toLocaleDateString('en-US', { month: 'short', year: '2-digit' });
-      
-      if (!monthlyData[monthYear]) {
-        monthlyData[monthYear] = { won: 0, sent: 0, total: 0 };
-      }
-      
-      monthlyData[monthYear].total++;
-      
-      if (bid.status === 'completed' || bid.status === 'won') {
-        monthlyData[monthYear].won++;
-      } else if (bid.status === 'bid_sent' || bid.status === 'contacted') {
-        monthlyData[monthYear].sent++;
-      }
-    });
-    
-    // Convert to array format for chart, sorted by date
-    return Object.entries(monthlyData)
-      .map(([month, data]) => ({
-        month,
-        won: data.won,
-        sent: data.sent,
-        total: data.total
-      }))
-      .sort((a, b) => {
-        // Simple sort by month name for now - in production you'd want proper date sorting
-        return a.month.localeCompare(b.month);
-      });
-  };
-
-  const bidPerformanceData = calculateBidPerformance();
-
-  const responseTimeAnalytics = [
-    { name: 'Same Day', value: responseTimeData.sameDay, color: '#10b981' },
-    { name: '2-3 Days', value: responseTimeData.twoDays, color: '#3b82f6' },
-    { name: 'Late (3+ Days)', value: responseTimeData.lateResponse, color: '#f59e0b' },
-    { name: 'No Response', value: responseTimeData.noResponse, color: '#ef4444' }
+  const statusDistribution = [
+    { name: 'Completed', value: completedProjects, color: '#10b981' },
+    { name: 'Active', value: activeProjects, color: '#3b82f6' },
+    { name: 'Pending', value: pendingBids, color: '#f59e0b' }
   ];
 
   // Subscription management functions
@@ -1099,63 +1029,43 @@ ${contractor?.email || ''}`;
                 <Card style={antiYellowStyles}>
                   <CardHeader>
                     <CardTitle>Bid Performance Overview</CardTitle>
-                    <CardDescription>Monthly breakdown of won vs sent bids</CardDescription>
                   </CardHeader>
                   <CardContent>
-                    {bidPerformanceData.length > 0 ? (
-                      <ResponsiveContainer width="100%" height={300}>
-                        <BarChart data={bidPerformanceData}>
-                          <CartesianGrid strokeDasharray="3 3" />
-                          <XAxis dataKey="month" />
-                          <YAxis />
-                          <Tooltip />
-                          <Bar dataKey="won" fill="#10b981" name="Won Bids" />
-                          <Bar dataKey="sent" fill="#3b82f6" name="Sent Bids" />
-                        </BarChart>
-                      </ResponsiveContainer>
-                    ) : (
-                      <div className="flex items-center justify-center h-[300px] text-muted-foreground">
-                        <div className="text-center">
-                          <BarChart3 className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                          <p>No bid data available yet</p>
-                          <p className="text-sm">Start receiving bid requests to see performance metrics</p>
-                        </div>
-                      </div>
-                    )}
+                    <ResponsiveContainer width="100%" height={300}>
+                      <BarChart data={projectData}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="month" />
+                        <YAxis />
+                        <Tooltip />
+                        <Bar dataKey="completed" fill="#10b981" name="Won Bids" />
+                        <Bar dataKey="active" fill="#3b82f6" name="Sent Bids" />
+                      </BarChart>
+                    </ResponsiveContainer>
                   </CardContent>
                 </Card>
 
                 <Card style={antiYellowStyles}>
                   <CardHeader>
-                    <CardTitle>Response Time Analytics</CardTitle>
-                    <CardDescription>How quickly you respond to bid requests</CardDescription>
+                    <CardTitle>Bid Status Distribution</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <ResponsiveContainer width="100%" height={300}>
-                      <BarChart data={responseTimeAnalytics} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis 
-                          dataKey="name" 
-                          tick={{ fontSize: 12 }}
-                          angle={-45}
-                          textAnchor="end"
-                          height={80}
-                        />
-                        <YAxis />
-                        <Tooltip 
-                          formatter={(value, name) => [value, 'Bid Requests']}
-                          labelFormatter={(label) => `Response Time: ${label}`}
-                        />
-                        <Bar 
-                          dataKey="value" 
-                          fill="#3b82f6"
-                          radius={[4, 4, 0, 0]}
+                      <PieChart>
+                        <Pie
+                          data={statusDistribution}
+                          cx="50%"
+                          cy="50%"
+                          innerRadius={60}
+                          outerRadius={120}
+                          paddingAngle={5}
+                          dataKey="value"
                         >
-                          {responseTimeAnalytics.map((entry, index) => (
+                          {statusDistribution.map((entry, index) => (
                             <Cell key={`cell-${index}`} fill={entry.color} />
                           ))}
-                        </Bar>
-                      </BarChart>
+                        </Pie>
+                        <Tooltip />
+                      </PieChart>
                     </ResponsiveContainer>
                   </CardContent>
                 </Card>
@@ -1557,7 +1467,7 @@ ${contractor?.email || ''}`;
                                   project.status === 'won' ? 'default' :
                                   project.status === 'bid_sent' ? 'secondary' : 
                                   project.status === 'lost' ? 'destructive' : 'outline'
-                                } className={project.status === 'won' ? 'text-[#000000]' : ''}>
+                                }>
                                   {project.status === 'bid_sent' ? 'Bid Sent' : project.status.replace('_', ' ')}
                                 </Badge>
                               </div>
@@ -2070,7 +1980,7 @@ ${contractor?.email || ''}`;
 
             {/* Analytics Tab */}
             <TabsContent value="analytics" className="space-y-6">
-              <AnalyticsDashboard userRole="contractor" userId={contractor?.id} externalAnalyticsData={analyticsData} />
+              <AnalyticsDashboard userRole="contractor" userId={contractor?.id} />
             </TabsContent>
           </Tabs>
         </div>

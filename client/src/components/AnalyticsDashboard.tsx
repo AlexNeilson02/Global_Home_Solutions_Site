@@ -17,10 +17,9 @@ import {
 interface AnalyticsProps {
   userRole: 'admin' | 'contractor' | 'salesperson';
   userId?: number;
-  externalAnalyticsData?: any;
 }
 
-const AnalyticsDashboard: React.FC<AnalyticsProps> = ({ userRole, userId, externalAnalyticsData }) => {
+const AnalyticsDashboard: React.FC<AnalyticsProps> = ({ userRole, userId }) => {
   const [timeRange, setTimeRange] = useState('30d');
 
   // Style object to remove yellow coloring with subtle borders - Solution #2
@@ -50,8 +49,8 @@ const AnalyticsDashboard: React.FC<AnalyticsProps> = ({ userRole, userId, extern
     appearance: 'none'
   } as const;
 
-  // Fetch comprehensive analytics data only if not provided externally
-  const { data: internalAnalyticsData, isLoading, error } = useQuery({
+  // Fetch comprehensive analytics data
+  const { data: analyticsData, isLoading, error } = useQuery({
     queryKey: [`/api/analytics/${userRole}/overview`, timeRange, userId],
     queryFn: () => {
       const endpoint = userRole === 'admin' 
@@ -64,11 +63,8 @@ const AnalyticsDashboard: React.FC<AnalyticsProps> = ({ userRole, userId, extern
         credentials: 'include'
       }).then(res => res.json());
     },
-    enabled: !externalAnalyticsData && !!userRole && (userRole === 'admin' || !!userId)
+    enabled: !!userRole && (userRole === 'admin' || !!userId)
   });
-
-  // Use external data if provided, otherwise use internal query data
-  const analyticsData = externalAnalyticsData || internalAnalyticsData;
 
   if (isLoading) {
     return (
@@ -308,8 +304,8 @@ const AnalyticsDashboard: React.FC<AnalyticsProps> = ({ userRole, userId, extern
       );
     }
 
-    // Contractor KPIs - access the nested analytics object
-    const contractorAnalytics = analyticsData?.analytics;
+    // Contractor KPIs
+    const analytics = analyticsData;
     return (
       <div className="grid grid-cols-2 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
         <Card style={antiYellowStyles}>
@@ -318,9 +314,9 @@ const AnalyticsDashboard: React.FC<AnalyticsProps> = ({ userRole, userId, extern
             <Target className="h-4 w-4 text-muted-foreground flex-shrink-0" />
           </CardHeader>
           <CardContent className="p-3 pt-0 sm:p-4 sm:pt-0">
-            <div className="text-lg sm:text-2xl font-bold">{contractorAnalytics?.totalRequests || 0}</div>
+            <div className="text-lg sm:text-2xl font-bold">{analytics?.totalRequests || 0}</div>
             <p className="text-xs text-muted-foreground">
-              {contractorAnalytics?.responded || 0} responded to
+              {analytics?.responded || 0} responded to
             </p>
           </CardContent>
         </Card>
@@ -331,22 +327,22 @@ const AnalyticsDashboard: React.FC<AnalyticsProps> = ({ userRole, userId, extern
             <TrendingUp className="h-4 w-4 text-muted-foreground flex-shrink-0" />
           </CardHeader>
           <CardContent className="p-3 pt-0 sm:p-4 sm:pt-0">
-            <div className="text-lg sm:text-2xl font-bold">{contractorAnalytics?.won || 0}</div>
+            <div className="text-lg sm:text-2xl font-bold">{analytics?.won || 0}</div>
             <p className="text-xs text-muted-foreground">
-              {contractorAnalytics?.lost || 0} lost
+              {analytics?.lost || 0} lost
             </p>
           </CardContent>
         </Card>
 
         <Card style={antiYellowStyles}>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3 sm:p-4">
-            <CardTitle className="text-xs sm:text-sm font-medium truncate">Bid Request Volume</CardTitle>
-            <Target className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+            <CardTitle className="text-xs sm:text-sm font-medium truncate">Revenue</CardTitle>
+            <DollarSign className="h-4 w-4 text-muted-foreground flex-shrink-0" />
           </CardHeader>
           <CardContent className="p-3 pt-0 sm:p-4 sm:pt-0">
-            <div className="text-lg sm:text-2xl font-bold">{contractorAnalytics?.bidRequestVolume || 0}</div>
+            <div className="text-lg sm:text-2xl font-bold">{formatCurrency(analytics?.revenue || 0)}</div>
             <p className="text-xs text-muted-foreground">
-              {formatPercentage(contractorAnalytics?.conversionRate || 0)} conversion rate
+              From won projects
             </p>
           </CardContent>
         </Card>
@@ -357,7 +353,7 @@ const AnalyticsDashboard: React.FC<AnalyticsProps> = ({ userRole, userId, extern
             <PhoneCall className="h-4 w-4 text-muted-foreground flex-shrink-0" />
           </CardHeader>
           <CardContent className="p-3 pt-0 sm:p-4 sm:pt-0">
-            <div className="text-lg sm:text-2xl font-bold">{safeToFixed(contractorAnalytics?.averageResponseTime)}h</div>
+            <div className="text-lg sm:text-2xl font-bold">{safeToFixed(analytics?.averageResponseTime)}h</div>
             <p className="text-xs text-muted-foreground">
               Average response time
             </p>
@@ -472,99 +468,7 @@ const AnalyticsDashboard: React.FC<AnalyticsProps> = ({ userRole, userId, extern
       );
     }
 
-    // Contractor-specific charts with real data
-    if (userRole === 'contractor') {
-      const responseTimeData = analyticsData?.analytics?.responseTimeDistribution;
-      
-      const responseTimeChartData = [
-        { name: 'Same Day', value: responseTimeData?.sameDay || 0, color: '#10b981' },
-        { name: '2-3 Days', value: responseTimeData?.twoDays || 0, color: '#3b82f6' },
-        { name: 'Late (3+ Days)', value: responseTimeData?.lateResponse || 0, color: '#f59e0b' },
-        { name: 'No Response', value: responseTimeData?.noResponse || 0, color: '#ef4444' }
-      ];
-
-      const totalBids = responseTimeChartData.reduce((sum, item) => sum + item.value, 0);
-
-      return (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Response Time Analytics Chart */}
-          <Card style={antiYellowStyles}>
-            <CardHeader>
-              <CardTitle>Response Time Analytics</CardTitle>
-              <CardDescription>How quickly you respond to bid requests</CardDescription>
-            </CardHeader>
-            <CardContent>
-              {totalBids > 0 ? (
-                <ResponsiveContainer width="100%" height={300}>
-                  <BarChart data={responseTimeChartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis 
-                      dataKey="name" 
-                      tick={{ fontSize: 12 }}
-                      angle={-45}
-                      textAnchor="end"
-                      height={80}
-                    />
-                    <YAxis />
-                    <Tooltip 
-                      formatter={(value, name) => [value, 'Bid Requests']}
-                      labelFormatter={(label) => `Response Time: ${label}`}
-                    />
-                    <Bar 
-                      dataKey="value" 
-                      fill="#3b82f6"
-                      radius={[4, 4, 0, 0]}
-                    >
-                      {responseTimeChartData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.color} />
-                      ))}
-                    </Bar>
-                  </BarChart>
-                </ResponsiveContainer>
-              ) : (
-                <div className="flex items-center justify-center h-[300px] text-muted-foreground">
-                  <div className="text-center">
-                    <PhoneCall className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                    <p>No response data available yet</p>
-                    <p className="text-sm">Start responding to bid requests to see analytics</p>
-                  </div>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Bid Status Overview */}
-          <Card style={antiYellowStyles}>
-            <CardHeader>
-              <CardTitle>Bid Status Overview</CardTitle>
-              <CardDescription>Current status of all your bid requests</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="flex items-center justify-between p-3 bg-orange-50 rounded">
-                  <span className="font-medium">Pending Response</span>
-                  <Badge variant="outline">{responseTimeData?.noResponse || 0}</Badge>
-                </div>
-                <div className="flex items-center justify-between p-3 bg-blue-50 rounded">
-                  <span className="font-medium">Responded</span>
-                  <Badge variant="outline">{analyticsData?.analytics?.responded || 0}</Badge>
-                </div>
-                <div className="flex items-center justify-between p-3 bg-green-50 rounded">
-                  <span className="font-medium">Won</span>
-                  <Badge variant="outline" className="text-black border-green-300 bg-[#ffffff]">{analyticsData?.analytics?.won || 0}</Badge>
-                </div>
-                <div className="flex items-center justify-between p-3 bg-red-50 rounded">
-                  <span className="font-medium">Lost</span>
-                  <Badge variant="outline">{analyticsData?.analytics?.lost || 0}</Badge>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      );
-    }
-
-    // Charts for salesperson role would be similar but with role-specific data
+    // Charts for salesperson and contractor roles would be similar but with role-specific data
     return (
       <Card style={antiYellowStyles}>
         <CardContent className="p-6">

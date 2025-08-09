@@ -329,44 +329,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   apiRouter.get("/salespersons", isAuthenticated, requireRole(["admin"]), async (req: Request, res: Response) => {
     try {
       const salespersons = await storage.getAllSalespersons();
-      
-      // Get all bid requests once for efficiency
-      const allBidRequests = await storage.getRecentBidRequests(5000);
-      
-      // Calculate real-time stats for each salesperson
-      const salespersonsWithStats = salespersons.map((salesperson) => {
-        // Filter bid requests for this salesperson
-        const repBidRequests = allBidRequests.filter(bid => bid.salespersonId === salesperson.id);
-        
-        // Get page visits (totalVisits from salesperson record)
-        const pageVisits = salesperson.totalVisits || 0;
-        
-        // Calculate metrics
-        const totalLeads = repBidRequests.length;
-        const bidRequestsSent = repBidRequests.filter(bid => 
-          ['bid_sent', 'won', 'lost'].includes(bid.status)
-        ).length;
-        
-        // Conversion rate = (total leads generated / page visits) * 100
-        // This shows: of all people who visited via salesperson's link, how many sent a bid request
-        const conversionRate = pageVisits > 0 ? (totalLeads / pageVisits) * 100 : 0;
-        
-        // Commission total (use existing stored value as it's calculated by commission service)
-        const commissions = salesperson.commissions || 0;
-        
-        console.log(`Salesperson ${salesperson.fullName || salesperson.id}: pageVisits=${pageVisits}, totalLeads=${totalLeads}, bidRequestsSent=${bidRequestsSent}, conversionRate=${conversionRate.toFixed(2)}% (leads/visits)`);
-        
-        return {
-          ...salesperson,
-          totalLeads,
-          conversionRate: conversionRate / 100, // Store as decimal for frontend percentage calculation
-          commissions,
-          bidRequestsSent,
-          pageVisits
-        };
-      });
-      
-      res.json({ salespersons: salespersonsWithStats });
+      res.json({ salespersons });
     } catch (error) {
       console.error("Error fetching salespersons:", error);
       res.status(500).json({ message: "Failed to fetch salespersons" });
@@ -972,80 +935,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Contractor analytics endpoint
-  apiRouter.get("/contractors/:id/analytics", isAuthenticated, async (req: Request, res: Response) => {
-    try {
-      const contractorId = parseInt(req.params.id);
-      const user = req.user as User;
-      
-      // Verify access - user must be the contractor or admin
-      if (user.role !== 'admin') {
-        const contractor = await storage.getContractorByUserId(user.id);
-        if (!contractor || contractor.id !== contractorId) {
-          return res.status(403).json({ message: "Access denied" });
-        }
-      }
-
-      // Get all bid requests for this contractor
-      const bidRequests = await storage.getBidRequestsByContractorId(contractorId);
-      
-      // Calculate analytics from real data
-      const totalRequests = bidRequests.length;
-      const responded = bidRequests.filter(bid => bid.status !== 'pending').length;
-      const won = bidRequests.filter(bid => bid.status === 'completed' || bid.status === 'won').length;
-      const lost = bidRequests.filter(bid => bid.status === 'declined' || bid.status === 'lost').length;
-      
-      // Calculate average response time from actual timestamps
-      const respondedBids = bidRequests.filter(bid => 
-        bid.status !== 'pending' && bid.createdAt && bid.lastUpdated
-      );
-      
-      let totalResponseTime = 0;
-      let responseTimes: number[] = [];
-      
-      respondedBids.forEach(bid => {
-        const created = new Date(bid.createdAt);
-        const responded = new Date(bid.lastUpdated);
-        const hours = (responded.getTime() - created.getTime()) / (1000 * 60 * 60);
-        responseTimes.push(hours);
-        totalResponseTime += hours;
-      });
-      
-      const averageResponseTime = responseTimes.length > 0 ? 
-        (totalResponseTime / responseTimes.length) : 0;
-      
-      // Calculate conversion rate
-      const conversionRate = totalRequests > 0 ? (won / totalRequests * 100) : 0;
-      
-      // Calculate response time distribution
-      const sameDay = responseTimes.filter(hours => hours <= 24).length;
-      const twoDays = responseTimes.filter(hours => hours > 24 && hours <= 72).length;
-      const lateResponse = responseTimes.filter(hours => hours > 72).length;
-      const noResponse = bidRequests.filter(bid => bid.status === 'pending').length;
-
-      res.json({
-        analytics: {
-          totalRequests,
-          responded,
-          won,
-          lost,
-          averageResponseTime: Number(averageResponseTime.toFixed(1)),
-          conversionRate: Number(conversionRate.toFixed(1)),
-          bidRequestVolume: totalRequests,
-          responseTimeDistribution: {
-            sameDay,
-            twoDays,
-            lateResponse,
-            noResponse
-          }
-        }
-      });
-    } catch (error) {
-      console.error("Error fetching contractor analytics:", error);
-      res.status(500).json({ message: "Failed to fetch contractor analytics" });
-    }
-  });
-
   // Enhanced analytics endpoints with real data calculations
   apiRouter.get("/analytics/admin/overview", isAuthenticated, requireRole(['admin']), async (req: Request, res: Response) => {
     try {
@@ -1252,34 +1141,60 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Admin analytics endpoint
-  apiRouter.get("/admin/analytics", isAuthenticated, requireRole(["admin"]), async (req: Request, res: Response) => {
+  // Projects routes
+  apiRouter.get("/projects", isAuthenticated, async (req: Request, res: Response) => {
     try {
-      // Get commission analytics which includes corporate commission totals
-      const commissionAnalytics = await storage.getCommissionAnalytics();
+      const user = req.user as User;
+      let projects;
       
-      // Get basic counts
-      const allUsers = await storage.getAllUsers();
-      const allSalespersons = await storage.getAllSalespersons();
-      const allContractors = await storage.getAllContractors();
-      const allBidRequests = await storage.getRecentBidRequests(5000);
-      
-      res.json({
-        analytics: {
-          totalUsers: allUsers.length,
-          totalSalespersons: allSalespersons.length,
-          totalContractors: allContractors.length,
-          totalBidRequests: allBidRequests.length,
-          corporateCommissions: commissionAnalytics.corpTotal || 0
+      if (user.role === "admin") {
+        projects = await storage.getAllProjects();
+      } else if (user.role === "contractor") {
+        const contractor = await storage.getContractorByUserId(user.id);
+        if (contractor) {
+          projects = await storage.getProjectsByContractorId(contractor.id);
         }
-      });
+      } else if (user.role === "salesperson") {
+        const salesperson = await storage.getSalespersonByUserId(user.id);
+        if (salesperson) {
+          projects = await storage.getProjectsBySalespersonId(salesperson.id);
+        }
+      } else {
+        projects = await storage.getProjectsByHomeownerId(user.id);
+      }
+      
+      res.json({ projects: projects || [] });
     } catch (error) {
-      console.error("Error fetching admin analytics:", error);
-      res.status(500).json({ message: "Failed to fetch admin analytics" });
+      console.error("Error fetching projects:", error);
+      res.status(500).json({ message: "Failed to fetch projects" });
     }
   });
 
+  apiRouter.get("/projects/recent", async (req: Request, res: Response) => {
+    try {
+      const limit = parseInt(req.query.limit as string) || 6;
+      const projects = await storage.getRecentProjects(limit);
+      res.json({ projects });
+    } catch (error) {
+      console.error("Error fetching recent projects:", error);
+      res.status(500).json({ message: "Failed to fetch recent projects" });
+    }
+  });
 
+  apiRouter.post("/projects", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const user = req.user as User;
+      const data = insertProjectSchema.parse(req.body);
+      const project = await storage.createProject({
+        ...data,
+        homeownerId: user.id,
+      });
+      res.status(201).json({ message: "Project created successfully", project });
+    } catch (error) {
+      console.error("Error creating project:", error);
+      res.status(400).json({ message: "Invalid project data" });
+    }
+  });
 
   // Testimonials routes
   apiRouter.get("/testimonials/recent", async (req: Request, res: Response) => {

@@ -336,14 +336,11 @@ export default function AdminPortalEnhanced() {
   });
 
   const handleViewDetails = (salesperson: any) => {
-    console.log('handleViewDetails called', salesperson);
     setSelectedSalesperson(salesperson);
     setViewDetailsOpen(true);
-    console.log('viewDetailsOpen should now be true');
   };
 
   const handleEdit = (salesperson: any) => {
-    console.log('handleEdit called', salesperson);
     setSelectedSalesperson(salesperson);
     setEditFormData({
       fullName: salesperson.fullName || '',
@@ -352,7 +349,6 @@ export default function AdminPortalEnhanced() {
       confirmPassword: ''
     });
     setEditModalOpen(true);
-    console.log('editModalOpen should now be true');
   };
 
   const handleEditSubmit = () => {
@@ -398,14 +394,11 @@ export default function AdminPortalEnhanced() {
 
   // Contractor handlers
   const handleContractorView = (contractor: any) => {
-    console.log('handleContractorView called', contractor);
     setSelectedContractor(contractor);
     setContractorViewOpen(true);
-    console.log('contractorViewOpen should now be true');
   };
 
   const handleContractorEdit = (contractor: any) => {
-    console.log('handleContractorEdit called', contractor);
     setSelectedContractor(contractor);
     setContractorEditData({
       companyName: contractor.companyName || '',
@@ -420,7 +413,6 @@ export default function AdminPortalEnhanced() {
       confirmPassword: ''
     });
     setContractorEditOpen(true);
-    console.log('contractorEditOpen should now be true');
   };
 
   const handleContractorEditSubmit = () => {
@@ -495,7 +487,18 @@ export default function AdminPortalEnhanced() {
 
   const contractors = Array.isArray(contractorsData) ? contractorsData : [];
 
+  // Fetch projects
+  const { data: projectsData = [], isLoading: isLoadingProjects } = useQuery({
+    queryKey: ['/api/projects'],
+    queryFn: async () => {
+      const response = await fetch('/api/projects');
+      if (!response.ok) throw new Error('Failed to fetch projects');
+      const data = await response.json();
+      return data.projects || [];
+    }
+  });
 
+  const projects = Array.isArray(projectsData) ? projectsData : [];
 
   // Fetch bid requests
   const { data: bidRequestsData = [], isLoading: isLoadingBidRequests } = useQuery({
@@ -561,24 +564,16 @@ export default function AdminPortalEnhanced() {
   const activeSalespersons = salespersons?.filter((s: any) => s.isActive !== false)?.length || 0;
   const totalContractors = contractors?.length || 0;
   const activeContractors = contractors?.filter((c: any) => c.isActive !== false)?.length || 0;
-
+  const totalProjects = projects?.length || 0;
+  const completedProjects = projects?.filter((p: any) => p.status === 'completed')?.length || 0;
   const totalBidRequests = bidRequests?.length || 0;
   const pendingBidRequests = bidRequests?.filter((b: any) => b.status === 'pending')?.length || 0;
-  
-  // Calculate Total Revenue: Corporate commissions + contractor subscriptions
-  
-  // Corporate commissions from all successful bid requests (50% of commission structure)
-  const corporateCommissions = analyticsData?.analytics?.corporateCommissions || 0;
-  
-  // Contractor monthly subscriptions (assuming $29.99/month per active contractor)
-  const contractorSubscriptionRevenue = activeContractors * 29.99;
-  
-  // Total Revenue = Corporate commissions + Contractor subscriptions  
-  const totalRevenue = corporateCommissions + contractorSubscriptionRevenue;
+  const totalRevenue = projects?.filter((p: any) => p.status === 'completed')
+    ?.reduce((sum: number, p: any) => sum + (p.budget || 0), 0) || 0;
 
   // Real chart data from analytics
   const monthlyData = analyticsData?.monthlyPerformance || [
-    { name: 'Current', leads: totalBidRequests, conversions: 0 }
+    { name: 'Current', leads: totalBidRequests, conversions: completedProjects }
   ];
 
   const pieData = [
@@ -596,12 +591,14 @@ export default function AdminPortalEnhanced() {
     activeSalespersons,
     totalContractors,
     activeContractors,
+    totalProjects,
+    completedProjects,
     totalBidRequests,
     pendingBidRequests,
     totalRevenue
   };
 
-  if (isLoadingAnalytics || isLoadingUsers || isLoadingSalespersons || isLoadingContractors || isLoadingBidRequests) {
+  if (isLoadingAnalytics || isLoadingUsers || isLoadingSalespersons || isLoadingContractors) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
@@ -671,11 +668,11 @@ export default function AdminPortalEnhanced() {
             <CardContent className="p-4 sm:p-6">
               <div className="flex items-center justify-between">
                 <div className="min-w-0 flex-1">
-                  <p className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-300 truncate">Total Revenue</p>
-                  <p className="text-lg sm:text-2xl font-bold text-gray-900 dark:text-white">${stats.totalRevenue.toLocaleString()}</p>
-                  <p className="text-xs text-green-600">Corp commissions + subscriptions</p>
+                  <p className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-300 truncate">Total Projects</p>
+                  <p className="text-lg sm:text-2xl font-bold text-gray-900 dark:text-white">{stats.totalProjects}</p>
+                  <p className="text-xs text-blue-600">Active projects</p>
                 </div>
-                <DollarSign className="h-6 w-6 sm:h-8 sm:w-8 text-green-600 flex-shrink-0" />
+                <FileText className="h-6 w-6 sm:h-8 sm:w-8 text-purple-600 flex-shrink-0" />
               </div>
             </CardContent>
           </Card>
@@ -933,7 +930,7 @@ export default function AdminPortalEnhanced() {
                             </div>
                           </div>
                         </div>
-                        <Badge variant={salesperson.isActive ? "default" : "destructive"} className="inline-flex items-center rounded-apple border px-3 py-1 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent hover:bg-primary/90 text-[#000000] bg-[#16d44e]">
+                        <Badge variant={salesperson.isActive ? "default" : "destructive"}>
                           {salesperson.isActive ? "Active" : "Inactive"}
                         </Badge>
                       </div>
@@ -1366,7 +1363,6 @@ export default function AdminPortalEnhanced() {
         </Tabs>
 
         {/* View Details Modal */}
-        {console.log('Rendering with viewDetailsOpen:', viewDetailsOpen)}
         <Dialog open={viewDetailsOpen} onOpenChange={setViewDetailsOpen}>
           <DialogContent 
             className="sm:max-w-[600px] anti-yellow-nuclear admin-portal-overlay"
