@@ -339,7 +339,7 @@ const SalesPortalEnhanced: React.FC = () => {
           >
             {/* Desktop/Tablet Navigation - Hidden on mobile */}
             <TabsList 
-              className="hidden sm:grid w-full grid-cols-6 anti-yellow-nuclear"
+              className="hidden sm:grid w-full grid-cols-5 anti-yellow-nuclear"
               style={{
                 outline: 'none',
                 outlineColor: 'transparent',
