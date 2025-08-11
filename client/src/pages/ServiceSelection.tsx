@@ -46,7 +46,10 @@ const ServiceSelection = () => {
 
   const trades = serviceCategories?.services.map(service => service.name).sort() || [];
 
-  const handleFindContractor = () => {
+  const handleFindContractor = (e?: React.FormEvent) => {
+    if (e) {
+      e.preventDefault();
+    }
     if (!trade) return;
     setSearchTriggered(true);
     setSelectedContractor(null);
@@ -97,20 +100,29 @@ const ServiceSelection = () => {
         width: '100%',
         textAlign: 'center'
       }}>
-        <div style={{ 
-          display: 'flex', 
-          flexDirection: 'column',
-          alignItems: 'center', 
-          justifyContent: 'center',
-          marginTop: '80px',
-          marginBottom: '20px',
-          gap: '5px'
-        }}>
+        <form 
+          onSubmit={handleFindContractor}
+          style={{ 
+            display: 'flex', 
+            flexDirection: 'column',
+            alignItems: 'center', 
+            justifyContent: 'center',
+            marginTop: '80px',
+            marginBottom: '20px',
+            gap: '5px'
+          }}
+        >
           <div className="search-input-container" style={{ position: 'relative', width: '100%', maxWidth: '600px', minWidth: '280px', margin: '0 auto' }}>
             <select
               className="service-dropdown"
               value={trade}
               onChange={e => setTrade(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  handleFindContractor();
+                }
+              }}
               style={{ 
                 width: '100%',
                 fontSize: '20px',
@@ -131,6 +143,7 @@ const ServiceSelection = () => {
             </select>
             {trade && (
               <button 
+                type="button"
                 className="clear-search-btn" 
                 onClick={clearSearch}
                 style={{
@@ -151,8 +164,8 @@ const ServiceSelection = () => {
             )}
           </div>
           <button 
+            type="submit"
             className="find-contractor-btn" 
-            onClick={handleFindContractor}
             style={{ 
               fontSize: '18px',
               padding: '15px 70px',
@@ -182,7 +195,7 @@ const ServiceSelection = () => {
           >
             Find a Contractor
           </button>
-        </div>
+        </form>
       </section>
       {/* Featured Contractors Section - Only show when no search has been triggered */}
       {!searchTriggered && (
