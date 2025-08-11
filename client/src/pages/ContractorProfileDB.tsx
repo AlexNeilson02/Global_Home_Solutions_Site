@@ -42,7 +42,9 @@ export default function ContractorProfileDB() {
     return contractor?.mediaFiles?.filter((file: any) => file.type === 'image') || [];
   };
 
-  const handleImageClick = (index: number) => {
+  const handleImageClick = (e: React.MouseEvent, index: number) => {
+    e.preventDefault();
+    e.stopPropagation();
     setSelectedImageIndex(index);
     setIsImageModalOpen(true);
   };
@@ -186,7 +188,7 @@ export default function ContractorProfileDB() {
                     .filter((file: any) => file.type === 'image')
                     .map((image: any, i: number) => (
                       <div key={`image-${i}`} className="bg-slate-800 rounded-xl overflow-hidden border border-slate-700 cursor-pointer group relative"
-                           onClick={() => handleImageClick(i)}>
+                           onClick={(e) => handleImageClick(e, i)}>
                         <img 
                           src={image.url} 
                           alt={image.name} 
@@ -299,8 +301,16 @@ export default function ContractorProfileDB() {
       </div>
 
       {/* Image Enlargement Modal */}
-      <Dialog open={isImageModalOpen} onOpenChange={setIsImageModalOpen}>
-        <DialogContent className="max-w-4xl w-full p-0 bg-black border-0">
+      <Dialog open={isImageModalOpen} onOpenChange={(open) => {
+        if (!open) {
+          setIsImageModalOpen(false);
+        }
+      }}>
+        <DialogContent 
+          className="max-w-4xl w-full p-0 bg-black border-0"
+          aria-labelledby="image-modal-title"
+          aria-describedby="image-modal-description"
+        >
           {(() => {
             const images = getImages();
             const currentImage = images[selectedImageIndex];
@@ -309,6 +319,14 @@ export default function ContractorProfileDB() {
             
             return (
               <div className="relative">
+                {/* Hidden accessibility elements */}
+                <div id="image-modal-title" className="sr-only">
+                  Image Gallery - {currentImage.name}
+                </div>
+                <div id="image-modal-description" className="sr-only">
+                  View enlarged image {selectedImageIndex + 1} of {images.length}. Use arrow keys or navigation buttons to browse images.
+                </div>
+                
                 {/* Close button */}
                 <button
                   onClick={() => setIsImageModalOpen(false)}
