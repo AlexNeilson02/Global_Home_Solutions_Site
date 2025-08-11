@@ -5,7 +5,7 @@ import { useSalesperson } from "@/contexts/SalespersonContext";
 import BidRequestForm from "@/components/BidRequestForm";
 import { ContractorVideoDisplay } from "@/components/ContractorVideoDisplay";
 import { ArrowLeft, Phone, Mail, Globe, MapPin, Star, CheckCircle, Play, User, X, ChevronLeft, ChevronRight } from "lucide-react";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTrigger, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import "../styles/ContractorProfile.css";
 
 export default function ContractorProfileDB() {
@@ -335,8 +335,7 @@ export default function ContractorProfileDB() {
       }}>
         <DialogContent 
           className="max-w-4xl w-full p-0 bg-black border-0"
-          aria-labelledby="image-modal-title"
-          aria-describedby="image-modal-description"
+          data-component="image-modal"
         >
           {(() => {
             const images = getImages();
@@ -345,14 +344,14 @@ export default function ContractorProfileDB() {
             if (!currentImage) return null;
             
             return (
-              <div className="relative">
-                {/* Hidden accessibility elements */}
-                <div id="image-modal-title" className="sr-only">
+              <>
+                <DialogTitle className="sr-only">
                   Image Gallery - {currentImage.name}
-                </div>
-                <div id="image-modal-description" className="sr-only">
+                </DialogTitle>
+                <DialogDescription className="sr-only">
                   View enlarged image {selectedImageIndex + 1} of {images.length}. Use arrow keys or navigation buttons to browse images.
-                </div>
+                </DialogDescription>
+                <div className="relative">
                 
                 {/* Close button */}
                 <button
@@ -411,7 +410,8 @@ export default function ContractorProfileDB() {
                     </p>
                   )}
                 </div>
-              </div>
+                </div>
+              </>
             );
           })()}
         </DialogContent>

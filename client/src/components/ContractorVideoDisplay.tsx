@@ -1,6 +1,6 @@
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Play, Volume2, VolumeX, Expand } from 'lucide-react';
 import { useState, useRef } from 'react';
 
@@ -175,8 +175,7 @@ export const ContractorVideoDisplay: React.FC<ContractorVideoDisplayProps> = ({
       }}>
         <DialogContent 
           className="max-w-4xl w-full p-0 no-yellow-border contractor-video-modal"
-          aria-labelledby="video-modal-title"
-          aria-describedby="video-modal-description"
+          data-component="video-modal"
           style={{
             outline: 'none',
             outlineColor: 'transparent',
@@ -187,20 +186,20 @@ export const ContractorVideoDisplay: React.FC<ContractorVideoDisplayProps> = ({
             boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.3)'
           }}
         >
-          <div 
-            className="relative bg-black no-yellow-border"
-            style={{
-              outline: 'none',
-              border: 'none'
-            }}
-          >
-            {/* Hidden accessibility elements */}
-            <div id="video-modal-title" className="sr-only">
+          <>
+            <DialogTitle className="sr-only">
               Video Player - {contractorName}
-            </div>
-            <div id="video-modal-description" className="sr-only">
+            </DialogTitle>
+            <DialogDescription className="sr-only">
               Enlarged video view with playback controls. Press Escape to close.
-            </div>
+            </DialogDescription>
+            <div 
+              className="relative bg-black no-yellow-border"
+              style={{
+                outline: 'none',
+                border: 'none'
+              }}
+            >
             
             <video
               ref={enlargedVideoRef}
@@ -228,7 +227,8 @@ export const ContractorVideoDisplay: React.FC<ContractorVideoDisplayProps> = ({
             >
               Your browser does not support video playback.
             </video>
-          </div>
+            </div>
+          </>
         </DialogContent>
       </Dialog>
     </>

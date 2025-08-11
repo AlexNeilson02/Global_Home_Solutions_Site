@@ -49,11 +49,11 @@ html::after {
   display: none !important;
 }
 
-/* Force remove any dialog/modal overlays that might interfere, except bid request form, login forms, and admin portal dialogs */
+/* Force remove any dialog/modal overlays that might interfere, except bid request form, login forms, admin portal dialogs, and media modals */
 [data-radix-popper-content-wrapper],
-[data-state="open"][role="dialog"]:not([data-component="bid-request-form"]):not([data-component="login-form"]):not([data-component="admin-portal-dialog"]),
-.fixed.inset-0.z-50.bg-black\/80:not(.bid-request-overlay):not(.login-overlay):not(.admin-portal-overlay),
-.fixed.inset-0.z-50.bg-black\/80.data-\[state\=open\]\:animate-in:not(.bid-request-overlay):not(.login-overlay):not(.admin-portal-overlay) {
+[data-state="open"][role="dialog"]:not([data-component="bid-request-form"]):not([data-component="login-form"]):not([data-component="admin-portal-dialog"]):not([data-component="image-modal"]):not([data-component="video-modal"]),
+.fixed.inset-0.z-50.bg-black\/80:not(.bid-request-overlay):not(.login-overlay):not(.admin-portal-overlay):not(.image-modal-overlay):not(.video-modal-overlay),
+.fixed.inset-0.z-50.bg-black\/80.data-\[state\=open\]\:animate-in:not(.bid-request-overlay):not(.login-overlay):not(.admin-portal-overlay):not(.image-modal-overlay):not(.video-modal-overlay) {
   display: none !important;
   visibility: hidden !important;
   opacity: 0 !important;
