@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams, useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { useSalesperson } from "@/contexts/SalespersonContext";
@@ -58,6 +58,33 @@ export default function ContractorProfileDB() {
     const images = getImages();
     setSelectedImageIndex(prev => prev < images.length - 1 ? prev + 1 : 0);
   };
+
+  // Keyboard navigation for image modal
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!isImageModalOpen) return;
+      
+      switch (e.key) {
+        case 'Escape':
+          e.preventDefault();
+          setIsImageModalOpen(false);
+          break;
+        case 'ArrowLeft':
+          e.preventDefault();
+          handlePreviousImage();
+          break;
+        case 'ArrowRight':
+          e.preventDefault();
+          handleNextImage();
+          break;
+      }
+    };
+
+    if (isImageModalOpen) {
+      document.addEventListener('keydown', handleKeyDown);
+      return () => document.removeEventListener('keydown', handleKeyDown);
+    }
+  }, [isImageModalOpen, handlePreviousImage, handleNextImage]);
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#0f172a' }}>
@@ -329,8 +356,13 @@ export default function ContractorProfileDB() {
                 
                 {/* Close button */}
                 <button
-                  onClick={() => setIsImageModalOpen(false)}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setIsImageModalOpen(false);
+                  }}
                   className="absolute top-4 right-4 z-50 bg-black bg-opacity-50 hover:bg-opacity-75 text-white rounded-full p-2 transition-all"
+                  aria-label="Close image modal"
                 >
                   <X size={24} />
                 </button>
@@ -339,14 +371,24 @@ export default function ContractorProfileDB() {
                 {images.length > 1 && (
                   <>
                     <button
-                      onClick={handlePreviousImage}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        handlePreviousImage();
+                      }}
                       className="absolute left-4 top-1/2 transform -translate-y-1/2 z-50 bg-black bg-opacity-50 hover:bg-opacity-75 text-white rounded-full p-2 transition-all"
+                      aria-label="Previous image"
                     >
                       <ChevronLeft size={24} />
                     </button>
                     <button
-                      onClick={handleNextImage}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        handleNextImage();
+                      }}
                       className="absolute right-4 top-1/2 transform -translate-y-1/2 z-50 bg-black bg-opacity-50 hover:bg-opacity-75 text-white rounded-full p-2 transition-all"
+                      aria-label="Next image"
                     >
                       <ChevronRight size={24} />
                     </button>

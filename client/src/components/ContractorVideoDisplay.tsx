@@ -151,7 +151,11 @@ export const ContractorVideoDisplay: React.FC<ContractorVideoDisplayProps> = ({
                 
                 {/* Expand Button */}
                 <button
-                  onClick={handleEnlarge}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleEnlarge();
+                  }}
                   className="absolute top-2 right-2 bg-black/50 hover:bg-black/70 text-white rounded p-1 transition-all opacity-0 group-hover:opacity-100"
                   aria-label="Enlarge video"
                 >
@@ -164,9 +168,15 @@ export const ContractorVideoDisplay: React.FC<ContractorVideoDisplayProps> = ({
       </Card>
 
       {/* Enlarged Video Modal */}
-      <Dialog open={isEnlarged} onOpenChange={setIsEnlarged}>
+      <Dialog open={isEnlarged} onOpenChange={(open) => {
+        if (!open) {
+          setIsEnlarged(false);
+        }
+      }}>
         <DialogContent 
           className="max-w-4xl w-full p-0 no-yellow-border contractor-video-modal"
+          aria-labelledby="video-modal-title"
+          aria-describedby="video-modal-description"
           style={{
             outline: 'none',
             outlineColor: 'transparent',
@@ -184,6 +194,14 @@ export const ContractorVideoDisplay: React.FC<ContractorVideoDisplayProps> = ({
               border: 'none'
             }}
           >
+            {/* Hidden accessibility elements */}
+            <div id="video-modal-title" className="sr-only">
+              Video Player - {contractorName}
+            </div>
+            <div id="video-modal-description" className="sr-only">
+              Enlarged video view with playback controls. Press Escape to close.
+            </div>
+            
             <video
               ref={enlargedVideoRef}
               src={videoUrl}
