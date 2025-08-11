@@ -257,12 +257,12 @@ const ServiceSelection = () => {
               flexDirection: 'column',
               height: '100%'
             }}>
-              <div className="category-image bg-[#ffffff]" style={{
+              <div className="category-image" style={{
                 height: '150px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                backgroundColor: '#f8f9fa',
+                backgroundColor: '#ffffff',
                 padding: '10px',
                 flexShrink: 0
               }}>
@@ -319,7 +319,7 @@ const ServiceSelection = () => {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                backgroundColor: '#f8f9fa',
+                backgroundColor: '#ffffff',
                 padding: '10px',
                 flexShrink: 0
               }}>
@@ -376,7 +376,7 @@ const ServiceSelection = () => {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                backgroundColor: '#f8f9fa',
+                backgroundColor: '#ffffff',
                 padding: '10px',
                 flexShrink: 0
               }}>
