@@ -184,7 +184,6 @@ const ServiceSelection = () => {
           </button>
         </div>
       </section>
-
       {/* Featured Contractors Section - Only show when no search has been triggered */}
       {!searchTriggered && (
         <section className="category-section" style={{ 
@@ -258,7 +257,7 @@ const ServiceSelection = () => {
               flexDirection: 'column',
               height: '100%'
             }}>
-              <div className="category-image" style={{
+              <div className="category-image bg-[#ffffff]" style={{
                 height: '150px',
                 display: 'flex',
                 alignItems: 'center',
@@ -426,7 +425,6 @@ const ServiceSelection = () => {
           </div>
         </section>
       )}
-
       {/* Search Results Section */}
       {searchTriggered && (
         <section className="search-results" style={{ 
