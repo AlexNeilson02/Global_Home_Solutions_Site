@@ -30,9 +30,6 @@ export default function ContractorProfileDB() {
 
   const contractor = contractorData?.contractor;
 
-  if (isLoading) return <div>Loading contractor...</div>;
-  if (error || !contractor) return <div>Contractor not found.</div>;
-
   const handleBack = () => {
     setLocation('/services');
   };
@@ -85,6 +82,9 @@ export default function ContractorProfileDB() {
       return () => document.removeEventListener('keydown', handleKeyDown);
     }
   }, [isImageModalOpen, handlePreviousImage, handleNextImage]);
+
+  if (isLoading) return <div>Loading contractor...</div>;
+  if (error || !contractor) return <div>Contractor not found.</div>;
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#0f172a' }}>
