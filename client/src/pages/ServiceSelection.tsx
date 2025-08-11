@@ -200,11 +200,16 @@ const ServiceSelection = () => {
             gap: '20px',
             justifyContent: 'center'
           }}>
-            <div className="category-card" onClick={() => handleCategoryClick("Electrical")}>
+            <div className="category-card" onClick={() => handleCategoryClick("Electrical")} style={{
+              display: 'flex',
+              flexDirection: 'column',
+              height: '100%'
+            }}>
               <div className="category-image electrician-bg" style={{
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
-                height: '150px'
+                height: '150px',
+                flexShrink: 0
               }}>
                 <img 
                   src="/attached_assets/image_1751041918876.png" 
@@ -217,81 +222,205 @@ const ServiceSelection = () => {
                   }}
                 />
               </div>
-              <div className="category-content">
-                <h3>Electrical</h3>
-                <button className="category-btn">Find Contractors</button>
+              <div className="category-content" style={{
+                display: 'flex',
+                flexDirection: 'column',
+                flexGrow: 1,
+                padding: '20px'
+              }}>
+                <h3 style={{ 
+                  color: '#333',
+                  fontSize: '1.3rem',
+                  margin: '0 0 15px 0',
+                  fontWeight: '600',
+                  flexGrow: 1,
+                  display: 'flex',
+                  alignItems: 'center',
+                  textAlign: 'center'
+                }}>Electrical</h3>
+                <button className="category-btn" style={{
+                  background: '#2ca7f8',
+                  color: 'white',
+                  border: 'none',
+                  padding: '10px 20px',
+                  borderRadius: '8px',
+                  fontWeight: 'bold',
+                  cursor: 'pointer',
+                  width: '100%',
+                  fontSize: '1rem',
+                  marginTop: 'auto'
+                }}>Find Contractors</button>
               </div>
             </div>
 
-            <div className="category-card" onClick={() => navigateWithSalesperson('/contractor/19')}>
+            <div className="category-card" onClick={() => navigateWithSalesperson('/contractor/19')} style={{
+              display: 'flex',
+              flexDirection: 'column',
+              height: '100%'
+            }}>
               <div className="category-image" style={{
                 height: '150px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                backgroundColor: '#f8f9fa'
+                backgroundColor: '#f8f9fa',
+                padding: '10px',
+                flexShrink: 0
               }}>
                 <img 
                   src={continentalLogo} 
                   alt="Continental Concrete" 
                   style={{
-                    width: '100%',
-                    height: '100%',
-                    objectFit: 'cover'
+                    maxWidth: '100%',
+                    maxHeight: '100%',
+                    width: 'auto',
+                    height: 'auto',
+                    objectFit: 'contain'
                   }}
                 />
               </div>
-              <div className="category-content">
-                <h3>Continental Concrete</h3>
-                <button className="category-btn">Find Contractors</button>
+              <div className="category-content" style={{
+                display: 'flex',
+                flexDirection: 'column',
+                flexGrow: 1,
+                padding: '20px'
+              }}>
+                <h3 style={{ 
+                  color: '#333',
+                  fontSize: '1.3rem',
+                  margin: '0 0 15px 0',
+                  fontWeight: '600',
+                  flexGrow: 1,
+                  display: 'flex',
+                  alignItems: 'center',
+                  textAlign: 'center'
+                }}>Continental Concrete</h3>
+                <button className="category-btn" style={{
+                  background: '#2ca7f8',
+                  color: 'white',
+                  border: 'none',
+                  padding: '10px 20px',
+                  borderRadius: '8px',
+                  fontWeight: 'bold',
+                  cursor: 'pointer',
+                  width: '100%',
+                  fontSize: '1rem',
+                  marginTop: 'auto'
+                }}>Find Contractors</button>
               </div>
             </div>
 
-            <div className="category-card" onClick={() => navigateWithSalesperson('/contractor/18')}>
+            <div className="category-card" onClick={() => navigateWithSalesperson('/contractor/18')} style={{
+              display: 'flex',
+              flexDirection: 'column',
+              height: '100%'
+            }}>
               <div className="category-image" style={{
                 height: '150px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                backgroundColor: '#f8f9fa'
+                backgroundColor: '#f8f9fa',
+                padding: '10px',
+                flexShrink: 0
               }}>
                 <img 
                   src={watermelonLogo} 
                   alt="Watermelon Window Washing" 
                   style={{
-                    width: '100%',
-                    height: '100%',
-                    objectFit: 'cover'
+                    maxWidth: '100%',
+                    maxHeight: '100%',
+                    width: 'auto',
+                    height: 'auto',
+                    objectFit: 'contain'
                   }}
                 />
               </div>
-              <div className="category-content">
-                <h3>Watermelon Window Washing</h3>
-                <button className="category-btn">Find Contractors</button>
+              <div className="category-content" style={{
+                display: 'flex',
+                flexDirection: 'column',
+                flexGrow: 1,
+                padding: '20px'
+              }}>
+                <h3 style={{ 
+                  color: '#333',
+                  fontSize: '1.3rem',
+                  margin: '0 0 15px 0',
+                  fontWeight: '600',
+                  flexGrow: 1,
+                  display: 'flex',
+                  alignItems: 'center',
+                  textAlign: 'center'
+                }}>Watermelon Window Washing</h3>
+                <button className="category-btn" style={{
+                  background: '#2ca7f8',
+                  color: 'white',
+                  border: 'none',
+                  padding: '10px 20px',
+                  borderRadius: '8px',
+                  fontWeight: 'bold',
+                  cursor: 'pointer',
+                  width: '100%',
+                  fontSize: '1rem',
+                  marginTop: 'auto'
+                }}>Find Contractors</button>
               </div>
             </div>
 
-            <div className="category-card" onClick={() => navigateWithSalesperson('/contractor/20')}>
+            <div className="category-card" onClick={() => navigateWithSalesperson('/contractor/20')} style={{
+              display: 'flex',
+              flexDirection: 'column',
+              height: '100%'
+            }}>
               <div className="category-image" style={{
                 height: '150px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                backgroundColor: '#f8f9fa'
+                backgroundColor: '#f8f9fa',
+                padding: '10px',
+                flexShrink: 0
               }}>
                 <img 
                   src={vaultLogo} 
                   alt="Vault Pest Control" 
                   style={{
-                    width: '100%',
-                    height: '100%',
-                    objectFit: 'cover'
+                    maxWidth: '100%',
+                    maxHeight: '100%',
+                    width: 'auto',
+                    height: 'auto',
+                    objectFit: 'contain'
                   }}
                 />
               </div>
-              <div className="category-content">
-                <h3>Vault Pest Control</h3>
-                <button className="category-btn">Find Contractors</button>
+              <div className="category-content" style={{
+                display: 'flex',
+                flexDirection: 'column',
+                flexGrow: 1,
+                padding: '20px'
+              }}>
+                <h3 style={{ 
+                  color: '#333',
+                  fontSize: '1.3rem',
+                  margin: '0 0 15px 0',
+                  fontWeight: '600',
+                  flexGrow: 1,
+                  display: 'flex',
+                  alignItems: 'center',
+                  textAlign: 'center'
+                }}>Vault Pest Control</h3>
+                <button className="category-btn" style={{
+                  background: '#2ca7f8',
+                  color: 'white',
+                  border: 'none',
+                  padding: '10px 20px',
+                  borderRadius: '8px',
+                  fontWeight: 'bold',
+                  cursor: 'pointer',
+                  width: '100%',
+                  fontSize: '1rem',
+                  marginTop: 'auto'
+                }}>Find Contractors</button>
               </div>
             </div>
           </div>
