@@ -58,7 +58,7 @@ export function Sidebar({ className }: SidebarProps) {
   const navItems = getNavItems();
 
   return (
-    <div className={cn("hidden md:block w-64 bg-white shadow-apple-md border-r border-border p-8 space-y-8", className)}>      
+    <div className={cn("hidden md:block w-64 bg-white shadow-apple-md p-8 space-y-8", className)}>      
       {/* Logo Section */}
       <div className="flex items-center space-x-3 pb-4">
         <img src={globalLogoPath} alt="Global Home Solutions" className="h-10 w-10 rounded-apple" />
