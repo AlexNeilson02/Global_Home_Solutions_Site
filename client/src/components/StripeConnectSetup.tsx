@@ -281,8 +281,5 @@ export function StripeConnectSetup() {
           )}
         </CardContent>
       </Card>
-
-      
-    </div>
   );
 }
