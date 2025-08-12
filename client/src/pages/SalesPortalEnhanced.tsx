@@ -114,9 +114,11 @@ const SalesPortalEnhanced: React.FC = () => {
   });
 
   // Get salesperson bid requests
-  const { data: bidRequestsData } = useQuery<{bidRequests: any[]}>({
+  const { data: bidRequestsData, refetch: refetchBidRequests } = useQuery<{bidRequests: any[]}>({
     queryKey: [`/api/salespersons/${salesperson?.id}/bid-requests`],
-    enabled: !!salesperson?.id
+    enabled: !!salesperson?.id,
+    staleTime: 0, // Always consider data stale
+    refetchInterval: 30000 // Refetch every 30 seconds
   });
 
   // Get QR code data
@@ -949,8 +951,21 @@ const SalesPortalEnhanced: React.FC = () => {
             <TabsContent value="leads" className="space-y-6">
               <Card style={antiYellowStyles}>
                 <CardHeader>
-                  <CardTitle>My Generated Leads</CardTitle>
-                  <CardDescription>Track all leads generated through your sales activities</CardDescription>
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <CardTitle>My Generated Leads</CardTitle>
+                      <CardDescription>Track all leads generated through your sales activities</CardDescription>
+                    </div>
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={() => refetchBidRequests()}
+                      className="flex items-center gap-2"
+                    >
+                      <TrendingUp className="h-4 w-4" />
+                      Refresh
+                    </Button>
+                  </div>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
