@@ -119,6 +119,37 @@ export function StripeConnectSetup() {
     },
   });
 
+  // Force update account status
+  const forceUpdateMutation = useMutation({
+    mutationFn: async () => {
+      const response = await fetch('/api/stripe-connect/accounts/force-update', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+      });
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to update account status');
+      }
+      return response.json();
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ['/api/stripe-connect/accounts/status'] });
+      toast({
+        title: "Status Updated",
+        description: "Account status has been refreshed from Stripe.",
+      });
+    },
+    onError: (error: Error) => {
+      console.error('Force update error:', error);
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
   const getStatusColor = (accountStatus: string, onboardingComplete: boolean) => {
     if (onboardingComplete && accountStatus === 'complete') return 'default';
     if (accountStatus === 'pending') return 'secondary';
@@ -222,6 +253,20 @@ export function StripeConnectSetup() {
               >
                 <ExternalLink className="h-4 w-4" />
                 {dashboardMutation.isPending ? 'Opening Dashboard...' : 'View Stripe Dashboard'}
+              </Button>
+            )}
+
+            {/* Debug: Force Update Button */}
+            {status?.hasStripeAccount && (
+              <Button 
+                variant="outline"
+                size="sm"
+                onClick={() => forceUpdateMutation.mutate()}
+                disabled={forceUpdateMutation.isPending}
+                className="flex items-center gap-2 text-xs"
+              >
+                <Clock className="h-3 w-3" />
+                {forceUpdateMutation.isPending ? 'Updating...' : 'Refresh Status'}
               </Button>
             )}
           </div>

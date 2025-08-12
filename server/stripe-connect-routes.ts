@@ -120,6 +120,46 @@ stripeConnectRouter.get('/accounts/status', isAuthenticated, requireRole(['admin
   }
 });
 
+// Force update account status (for debugging)
+stripeConnectRouter.post('/accounts/force-update', isAuthenticated, requireRole(['admin', 'salesperson']), async (req: Request, res: Response) => {
+  try {
+    if (!stripeConnectService) {
+      return res.status(500).json({ error: 'Stripe Connect not configured' });
+    }
+
+    const user = (req as any).user;
+    const salesperson = await storage.getSalespersonByUserId(user.id);
+    
+    if (!salesperson) {
+      return res.status(404).json({ error: 'Salesperson profile not found' });
+    }
+
+    if (!salesperson.stripeAccountId) {
+      return res.status(400).json({ error: 'No Stripe account found' });
+    }
+
+    // Force update the account status
+    await stripeConnectService.updateAccountStatus(salesperson.stripeAccountId);
+    
+    // Get updated salesperson data
+    const updatedSalesperson = await storage.getSalesperson(salesperson.id);
+    
+    res.json({ 
+      success: true, 
+      message: 'Account status updated',
+      status: {
+        accountStatus: updatedSalesperson?.stripeAccountStatus,
+        onboardingComplete: updatedSalesperson?.stripeOnboardingComplete,
+        payoutsEnabled: updatedSalesperson?.stripePayoutsEnabled,
+        chargesEnabled: updatedSalesperson?.stripeChargesEnabled,
+      }
+    });
+  } catch (error) {
+    console.error('Error forcing account status update:', error);
+    res.status(500).json({ error: 'Failed to update account status' });
+  }
+});
+
 // Get Stripe dashboard link
 stripeConnectRouter.post('/accounts/dashboard', isAuthenticated, requireRole(['admin', 'salesperson']), async (req: Request, res: Response) => {
   try {
@@ -207,16 +247,27 @@ stripeConnectRouter.post('/payments/commission', isAuthenticated, requireRole(['
 
 // Stripe Connect webhook handler
 stripeConnectRouter.post('/webhook', async (req: Request, res: Response) => {
+  console.log('=== STRIPE WEBHOOK RECEIVED ===');
+  console.log('Headers:', req.headers);
+  console.log('Body type:', typeof req.body);
+  console.log('Body length:', req.body ? req.body.length : 'null');
+  
   try {
     if (!stripe) {
+      console.error('Stripe not configured for webhook');
       return res.status(500).send("Stripe not configured");
     }
 
     const sig = req.headers['stripe-signature'];
+    console.log('Stripe signature present:', !!sig);
+    
     let event: Stripe.Event;
 
     try {
       event = stripe.webhooks.constructEvent(req.body, sig as string, process.env.STRIPE_CONNECT_WEBHOOK_SECRET || "");
+      console.log('Webhook signature verified successfully');
+      console.log('Event type:', event.type);
+      console.log('Event ID:', event.id);
     } catch (err) {
       console.error('Webhook signature verification failed:', err);
       return res.status(400).send(`Webhook Error: ${err instanceof Error ? err.message : 'Unknown error'}`);
@@ -226,6 +277,11 @@ stripeConnectRouter.post('/webhook', async (req: Request, res: Response) => {
     switch (event.type) {
       case 'account.updated':
         const account = event.data.object as Stripe.Account;
+        console.log(`Processing account.updated for account: ${account.id}`);
+        console.log('Account details_submitted:', account.details_submitted);
+        console.log('Account charges_enabled:', account.charges_enabled);
+        console.log('Account payouts_enabled:', account.payouts_enabled);
+        
         if (stripeConnectService) {
           await stripeConnectService.updateAccountStatus(account.id);
         }
