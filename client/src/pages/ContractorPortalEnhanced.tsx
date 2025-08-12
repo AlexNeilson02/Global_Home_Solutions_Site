@@ -848,9 +848,9 @@ const ContractorPortalEnhanced: React.FC = () => {
 
   return (
     <div 
-      className="min-h-screen bg-white contractor-portal-main no-yellow-border"
+      className="min-h-screen bg-gray-50 dark:bg-gray-900 contractor-portal-main no-yellow-border"
       style={{
-        backgroundColor: 'white',
+        backgroundColor: '#f9fafb',
         border: 'none',
         outline: 'none',
         outlineColor: 'transparent',
@@ -861,9 +861,9 @@ const ContractorPortalEnhanced: React.FC = () => {
       }}
     >
       <div 
-        className="w-full px-4 py-8 contractor-portal-container no-yellow-border"
+        className="container mx-auto px-4 py-8 contractor-portal-container no-yellow-border"
         style={{
-          backgroundColor: 'white',
+          backgroundColor: 'transparent',
           border: 'none',
           outline: 'none',
           outlineColor: 'transparent',
@@ -871,9 +871,9 @@ const ContractorPortalEnhanced: React.FC = () => {
         }}
       >
         <div 
-          className="w-full contractor-portal-content no-yellow-border"
+          className="max-w-7xl mx-auto contractor-portal-content no-yellow-border"
           style={{
-            backgroundColor: 'white',
+            backgroundColor: 'transparent',
             border: 'none',
             outline: 'none',
             outlineColor: 'transparent',
