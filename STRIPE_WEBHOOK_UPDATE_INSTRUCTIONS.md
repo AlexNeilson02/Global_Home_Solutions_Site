@@ -17,13 +17,23 @@ Find your existing webhook endpoint and update it to:
 https://global-home-solutions.com/api/stripe-connect/webhook
 ```
 
-### 3. Verify Events
-Make sure these events are selected:
+### 3. Fix Event Payload Configuration
+**IMPORTANT:** Change the event payload setting:
+- Look for **"Event payload"** dropdown
+- Change from "Snapshot" to **"Thin"**
+- This fixes the "thin event types when event_payload is snapshot" error
+
+### 4. Select These Events
+After changing to "Thin" payload, select:
 - `account.updated`
-- `payment_intent.succeeded` 
-- `transfer.created`
+- `application_fee.created`
 - `capability.updated`
+- `charge.succeeded`
+- `payment_intent.succeeded`
+- `payment_intent.payment_failed`
+- `person.created`
 - `person.updated`
+- `transfer.created`
 
 ### 4. Get New Webhook Secret
 After updating, you'll get a new webhook signing secret that starts with `whsec_`
