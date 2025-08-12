@@ -8,7 +8,6 @@ import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
 import { 
   CreditCard, 
-  DollarSign, 
   ExternalLink, 
   CheckCircle, 
   AlertCircle, 
@@ -179,8 +178,7 @@ export function StripeConnectSetup() {
   }
 
   return (
-    <div className="space-y-6">
-      <Card>
+    <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Wallet className="h-5 w-5" />
@@ -284,45 +282,7 @@ export function StripeConnectSetup() {
         </CardContent>
       </Card>
 
-      {/* How It Works */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <DollarSign className="h-5 w-5" />
-            How Commission Payments Work
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          <div className="flex items-start gap-3">
-            <div className="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm font-medium">1</div>
-            <div>
-              <div className="font-medium">Customer Uses Your QR Code</div>
-              <div className="text-sm text-muted-foreground">When customers scan your QR code and submit a bid request, you're credited for the referral.</div>
-            </div>
-          </div>
-          <div className="flex items-start gap-3">
-            <div className="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm font-medium">2</div>
-            <div>
-              <div className="font-medium">Contractor Pays Referral Fee</div>
-              <div className="text-sm text-muted-foreground">When contractors are charged for accessing the customer bid, the commission is automatically processed.</div>
-            </div>
-          </div>
-          <div className="flex items-start gap-3">
-            <div className="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm font-medium">3</div>
-            <div>
-              <div className="font-medium">50/50 Split Payment</div>
-              <div className="text-sm text-muted-foreground">You receive 50% of the commission directly to your account, and the platform keeps 50% for operations.</div>
-            </div>
-          </div>
-          <div className="flex items-start gap-3">
-            <div className="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm font-medium">4</div>
-            <div>
-              <div className="font-medium">Instant Payment</div>
-              <div className="text-sm text-muted-foreground">Payments are processed immediately and deposited to your bank account within 2 business days.</div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      
     </div>
   );
 }
