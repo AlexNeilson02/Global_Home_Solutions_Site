@@ -30,7 +30,6 @@ import {
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
-import { CommissionDashboard } from "@/components/CommissionDashboard";
 import { StripeConnectSetup } from "@/components/StripeConnectSetup";
 
 const SalesPortalEnhanced: React.FC = () => {
@@ -1011,7 +1010,90 @@ const SalesPortalEnhanced: React.FC = () => {
 
             {/* Commissions Tab */}
             <TabsContent value="commissions" className="space-y-6">
-              <CommissionDashboard salespersonId={salesperson?.id} />
+              <Card style={antiYellowStyles}>
+                <CardHeader>
+                  <CardTitle>Commission Records</CardTitle>
+                  <CardDescription>
+                    View your commission history and payment status
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {commissionData?.recentCommissions && commissionData.recentCommissions.length > 0 ? (
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                        <div className="text-center p-4 bg-green-50 rounded-lg">
+                          <div className="text-2xl font-bold text-green-600">
+                            ${commissionData.totalEarned?.toFixed(2) || '0.00'}
+                          </div>
+                          <div className="text-sm text-gray-600">Total Earned</div>
+                        </div>
+                        <div className="text-center p-4 bg-blue-50 rounded-lg">
+                          <div className="text-2xl font-bold text-blue-600">
+                            {commissionData.paidRecordsCount || 0}
+                          </div>
+                          <div className="text-sm text-gray-600">Paid Records</div>
+                        </div>
+                        <div className="text-center p-4 bg-orange-50 rounded-lg">
+                          <div className="text-2xl font-bold text-orange-600">
+                            {commissionData.pendingRecordsCount || 0}
+                          </div>
+                          <div className="text-sm text-gray-600">Pending Records</div>
+                        </div>
+                      </div>
+                      
+                      <div className="overflow-x-auto">
+                        <table className="w-full border-collapse border border-gray-300">
+                          <thead>
+                            <tr className="bg-gray-50">
+                              <th className="border border-gray-300 px-4 py-2 text-left">Date</th>
+                              <th className="border border-gray-300 px-4 py-2 text-left">Service</th>
+                              <th className="border border-gray-300 px-4 py-2 text-left">Amount</th>
+                              <th className="border border-gray-300 px-4 py-2 text-left">Status</th>
+                              <th className="border border-gray-300 px-4 py-2 text-left">Payment Status</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {commissionData.recentCommissions.map((record: any) => (
+                              <tr key={record.id} className="hover:bg-gray-50">
+                                <td className="border border-gray-300 px-4 py-2">
+                                  {new Date(record.createdAt).toLocaleDateString()}
+                                </td>
+                                <td className="border border-gray-300 px-4 py-2">
+                                  {record.serviceCategory}
+                                </td>
+                                <td className="border border-gray-300 px-4 py-2">
+                                  ${record.salesmanAmount?.toFixed(2) || '0.00'}
+                                </td>
+                                <td className="border border-gray-300 px-4 py-2">
+                                  <Badge variant={record.status === 'paid' ? 'default' : 'outline'}>
+                                    {record.status}
+                                  </Badge>
+                                </td>
+                                <td className="border border-gray-300 px-4 py-2">
+                                  <Badge variant={
+                                    record.paymentStatus === 'paid' ? 'default' :
+                                    record.paymentStatus === 'pending' ? 'secondary' : 'outline'
+                                  }>
+                                    {record.paymentStatus}
+                                  </Badge>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="text-center py-12">
+                      <DollarSign className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                      <h3 className="text-lg font-medium text-gray-900 mb-2">No Commission Records</h3>
+                      <p className="text-gray-500">
+                        Commission records will appear here once you start generating leads and conversions.
+                      </p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
             </TabsContent>
 
 
