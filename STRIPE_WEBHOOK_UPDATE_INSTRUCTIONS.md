@@ -1,7 +1,7 @@
 # Update Stripe Webhook Endpoint URL
 
 ## Current Issue
-Your Stripe webhook is currently pointing to the wrong URL and needs to be updated.
+Your Stripe webhook needs to point to your production domain for proper functionality.
 
 ## Steps to Fix
 
@@ -12,9 +12,9 @@ Your Stripe webhook is currently pointing to the wrong URL and needs to be updat
 ### 2. Update Existing Webhook
 Find your existing webhook endpoint and update it to:
 
-**New Endpoint URL:**
+**Production Endpoint URL:**
 ```
-https://workspace.replit.app/api/stripe-connect/webhook
+https://global-home-solutions.com/api/stripe-connect/webhook
 ```
 
 ### 3. Verify Events

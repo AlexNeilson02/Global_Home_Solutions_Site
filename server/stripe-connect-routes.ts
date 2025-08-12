@@ -71,10 +71,10 @@ stripeConnectRouter.post('/accounts/onboarding', isAuthenticated, requireRole(['
       return res.status(400).json({ error: 'No Stripe account found. Create account first.' });
     }
 
-    // Get the origin URL for redirect links
-    const host = req.headers.host;
-    const protocol = req.headers['x-forwarded-proto'] || 'https';
-    const origin = req.headers.origin || `${protocol}://${host}`;
+    // Use production domain for redirect links
+    const origin = process.env.NODE_ENV === 'production' 
+      ? 'https://global-home-solutions.com'
+      : (req.headers.origin || `${req.headers['x-forwarded-proto'] || 'https'}://${req.headers.host}`);
     
     const refreshUrl = `${origin}/sales-portal?stripe_onboarding=refresh`;
     const returnUrl = `${origin}/sales-portal?stripe_onboarding=complete`;
