@@ -31,6 +31,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
 import { CommissionDashboard } from "@/components/CommissionDashboard";
+import { StripeConnectSetup } from "@/components/StripeConnectSetup";
 
 const SalesPortalEnhanced: React.FC = () => {
   const [, navigate] = useLocation();
@@ -339,7 +340,7 @@ const SalesPortalEnhanced: React.FC = () => {
           >
             {/* Desktop/Tablet Navigation - Hidden on mobile */}
             <TabsList 
-              className="hidden sm:grid w-full grid-cols-5 anti-yellow-nuclear"
+              className="hidden sm:grid w-full grid-cols-6 anti-yellow-nuclear"
               style={{
                 outline: 'none',
                 outlineColor: 'transparent',
@@ -398,6 +399,16 @@ const SalesPortalEnhanced: React.FC = () => {
                   outlineStyle: 'none'
                 }}
               >Commissions</TabsTrigger>
+              <TabsTrigger 
+                value="payments" 
+                className="anti-yellow-nuclear"
+                style={{
+                  outline: 'none',
+                  outlineColor: 'transparent',
+                  outlineWidth: '0',
+                  outlineStyle: 'none'
+                }}
+              >Payments</TabsTrigger>
 
             </TabsList>
 
@@ -448,6 +459,15 @@ const SalesPortalEnhanced: React.FC = () => {
                 >
                   <DollarSign className="h-4 w-4" />
                   <span>Commission</span>
+                </button>
+                <button
+                  onClick={() => setActiveTab("payments")}
+                  className={`flex flex-col items-center justify-center gap-1 text-xs hover:bg-gray-100 dark:hover:bg-gray-800 px-4 min-w-[80px] flex-shrink-0 ${
+                    activeTab === "payments" ? "text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950" : ""
+                  }`}
+                >
+                  <DollarSign className="h-4 w-4" />
+                  <span>Payments</span>
                 </button>
 
               </div>
@@ -1003,6 +1023,10 @@ const SalesPortalEnhanced: React.FC = () => {
               <CommissionDashboard salespersonId={salesperson?.id} />
             </TabsContent>
 
+            {/* Payments Tab */}
+            <TabsContent value="payments" className="space-y-6">
+              <StripeConnectSetup />
+            </TabsContent>
 
           </Tabs>
         </div>
