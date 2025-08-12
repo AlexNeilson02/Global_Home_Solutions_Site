@@ -315,6 +315,7 @@ enhancedRouter.get('/contractors/:id/analytics', isAuthenticated, async (req: Re
       const weekEnd = new Date(weekStart.getTime() + (7 * 24 * 60 * 60 * 1000));
       
       const weekBids = bidRequests.filter(b => {
+        if (!b.createdAt) return false;
         const createdAt = new Date(b.createdAt);
         return createdAt >= weekStart && createdAt < weekEnd;
       });
@@ -470,7 +471,7 @@ enhancedRouter.get('/salespersons/:id/detailed-analytics', isAuthenticated, asyn
       performance: {
         averageLeadsPerMonth: (bidRequests.length / 6) || 0, // Assuming 6 months of data
         bestMonth: 'June', // Would calculate from actual data
-        topService: bidRequests.length > 0 ? bidRequests[0].serviceRequested : 'None'
+        topService: bidRequests.length > 0 ? bidRequests[0].servicesRequested : 'None'
       }
     };
 
