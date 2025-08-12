@@ -192,7 +192,7 @@ export function CommissionDashboard({ salespersonId }: CommissionDashboardProps)
 
         <Card style={antiYellowStyles}>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Paid This Month</CardTitle>
+            <CardTitle className="text-sm font-medium">Earnings This Month</CardTitle>
             <CheckCircle className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -200,7 +200,7 @@ export function CommissionDashboard({ salespersonId }: CommissionDashboardProps)
               {formatCurrency(summary?.stripeAnalytics?.totalEarnedThisMonth || 0)}
             </div>
             <p className="text-xs text-muted-foreground">
-              Stripe payments received
+              Commission payments received
             </p>
           </CardContent>
         </Card>
@@ -222,77 +222,19 @@ export function CommissionDashboard({ salespersonId }: CommissionDashboardProps)
 
         <Card style={antiYellowStyles}>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Payment Success Rate</CardTitle>
+            <CardTitle className="text-sm font-medium">Deals Made</CardTitle>
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-blue-600">
-              {summary?.stripeAnalytics?.successfulPaymentRate || '0.0'}%
+              {summary?.totalRecords || 0}
             </div>
             <p className="text-xs text-muted-foreground">
-              {summary?.paidRecordsCount || 0} of {summary?.totalRecords || 0} paid successfully
+              All time leads converted to deals
             </p>
           </CardContent>
         </Card>
       </div>
-
-      {/* Enhanced Analytics Cards */}
-      {summary?.stripeAnalytics && (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Card style={antiYellowStyles}>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium">Payment Breakdown</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-green-600">Paid</span>
-                  <span className="font-medium">{summary.paidRecordsCount}</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-orange-600">Pending</span>
-                  <span className="font-medium">{summary.pendingRecordsCount}</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-red-600">Unpaid</span>
-                  <span className="font-medium">{summary.unpaidRecordsCount}</span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card style={antiYellowStyles}>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium">Average Payment Time</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-blue-600">
-                {summary.stripeAnalytics.averagePaymentTimeInDays} days
-              </div>
-              <p className="text-xs text-muted-foreground">
-                From commission to payment
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card style={antiYellowStyles}>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium">Last Payment</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-lg font-bold text-green-600">
-                {summary.stripeAnalytics.lastPaymentDate 
-                  ? format(new Date(summary.stripeAnalytics.lastPaymentDate), "MMM dd, yyyy")
-                  : 'No payments yet'
-                }
-              </div>
-              <p className="text-xs text-muted-foreground">
-                Most recent Stripe payment
-              </p>
-            </CardContent>
-          </Card>
-        </div>
-      )}
 
       {/* Commission Records */}
       <Tabs defaultValue="recent" className="w-full">
