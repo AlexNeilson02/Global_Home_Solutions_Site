@@ -85,6 +85,17 @@ export class StripeConnectService {
         return;
       }
 
+      console.log('=== DETAILED STRIPE ACCOUNT STATUS ===');
+      console.log('Account ID:', stripeAccountId);
+      console.log('Details submitted:', account.details_submitted);
+      console.log('Charges enabled:', account.charges_enabled);
+      console.log('Payouts enabled:', account.payouts_enabled);
+      console.log('Currently due:', account.requirements?.currently_due);
+      console.log('Eventually due:', account.requirements?.eventually_due);
+      console.log('Past due:', account.requirements?.past_due);
+      console.log('Pending verification:', account.requirements?.pending_verification);
+      console.log('Disabled reason:', account.requirements?.disabled_reason);
+
       const isOnboardingComplete = account.details_submitted && 
                                    account.charges_enabled && 
                                    account.payouts_enabled;
@@ -97,6 +108,8 @@ export class StripeConnectService {
       });
 
       console.log(`Updated account status for salesperson ${salesperson.id}: ${account.charges_enabled ? 'complete' : 'pending'}`);
+      console.log('Onboarding complete:', isOnboardingComplete);
+      console.log('=====================================');
     } catch (error) {
       console.error('Error updating account status:', error);
     }
