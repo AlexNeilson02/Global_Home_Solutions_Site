@@ -85,16 +85,17 @@ export class StripeConnectService {
         return;
       }
 
-      console.log('=== DETAILED STRIPE ACCOUNT STATUS ===');
-      console.log('Account ID:', stripeAccountId);
-      console.log('Details submitted:', account.details_submitted);
-      console.log('Charges enabled:', account.charges_enabled);
-      console.log('Payouts enabled:', account.payouts_enabled);
-      console.log('Currently due:', account.requirements?.currently_due);
-      console.log('Eventually due:', account.requirements?.eventually_due);
-      console.log('Past due:', account.requirements?.past_due);
-      console.log('Pending verification:', account.requirements?.pending_verification);
-      console.log('Disabled reason:', account.requirements?.disabled_reason);
+      console.log('\n🔍 === DETAILED STRIPE ACCOUNT STATUS ===');
+      console.log('📋 Account ID:', stripeAccountId);
+      console.log('✅ Details submitted:', account.details_submitted);
+      console.log('💳 Charges enabled:', account.charges_enabled);
+      console.log('💰 Payouts enabled:', account.payouts_enabled);
+      console.log('📝 Currently due:', account.requirements?.currently_due);
+      console.log('📅 Eventually due:', account.requirements?.eventually_due);
+      console.log('⚠️  Past due:', account.requirements?.past_due);
+      console.log('🔄 Pending verification:', account.requirements?.pending_verification);
+      console.log('❌ Disabled reason:', account.requirements?.disabled_reason);
+      console.log('🔗 Account URL:', `https://dashboard.stripe.com/connect/accounts/${stripeAccountId}`);
 
       const isOnboardingComplete = account.details_submitted && 
                                    account.charges_enabled && 
