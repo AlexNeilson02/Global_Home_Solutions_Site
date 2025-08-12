@@ -340,7 +340,7 @@ const SalesPortalEnhanced: React.FC = () => {
           >
             {/* Desktop/Tablet Navigation - Hidden on mobile */}
             <TabsList 
-              className="hidden sm:grid w-full grid-cols-6 anti-yellow-nuclear"
+              className="hidden sm:grid w-full grid-cols-5 anti-yellow-nuclear"
               style={{
                 outline: 'none',
                 outlineColor: 'transparent',
@@ -399,16 +399,7 @@ const SalesPortalEnhanced: React.FC = () => {
                   outlineStyle: 'none'
                 }}
               >Commissions</TabsTrigger>
-              <TabsTrigger 
-                value="payments" 
-                className="anti-yellow-nuclear"
-                style={{
-                  outline: 'none',
-                  outlineColor: 'transparent',
-                  outlineWidth: '0',
-                  outlineStyle: 'none'
-                }}
-              >Payments</TabsTrigger>
+
 
             </TabsList>
 
@@ -1023,10 +1014,7 @@ const SalesPortalEnhanced: React.FC = () => {
               <CommissionDashboard salespersonId={salesperson?.id} />
             </TabsContent>
 
-            {/* Payments Tab */}
-            <TabsContent value="payments" className="space-y-6">
-              <StripeConnectSetup />
-            </TabsContent>
+
 
           </Tabs>
         </div>

@@ -13,11 +13,13 @@ import {
   CheckCircle, 
   Calendar as CalendarIcon,
   Download,
-  Eye
+  Eye,
+  Wallet
 } from "lucide-react";
 import { format } from "date-fns";
 import { useState } from "react";
 import type { DateRange } from "react-day-picker";
+import { StripeConnectSetup } from "./StripeConnectSetup";
 
 interface CommissionRecord {
   id: number;
@@ -211,6 +213,10 @@ export function CommissionDashboard({ salespersonId }: CommissionDashboardProps)
           <TabsList>
             <TabsTrigger value="recent">Recent Commissions</TabsTrigger>
             <TabsTrigger value="rates">Commission Rates</TabsTrigger>
+            <TabsTrigger value="payment-setup">
+              <Wallet className="w-4 h-4 mr-2" />
+              Payment Setup
+            </TabsTrigger>
           </TabsList>
           
           <div className="flex gap-2 flex-shrink-0">
@@ -364,6 +370,24 @@ export function CommissionDashboard({ salespersonId }: CommissionDashboardProps)
                   </div>
                 )}
               </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Payment Setup Tab */}
+        <TabsContent value="payment-setup" className="space-y-4">
+          <Card style={antiYellowStyles}>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Wallet className="h-5 w-5" />
+                Commission Payment Setup
+              </CardTitle>
+              <CardDescription>
+                Set up automatic commission payments with Stripe Connect. Get paid directly when contractors pay referral fees.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <StripeConnectSetup />
             </CardContent>
           </Card>
         </TabsContent>

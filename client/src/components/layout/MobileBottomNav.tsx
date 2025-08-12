@@ -48,10 +48,10 @@ const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
       case 'sales':
         return [
           { id: 'dashboard', label: 'Home', icon: Home },
+          { id: 'profile', label: 'Profile', icon: User },
+          { id: 'qr-tools', label: 'QR Tools', icon: Target },
           { id: 'leads', label: 'Leads', icon: FileText },
-          { id: 'payments', label: 'Payments', icon: CreditCard },
-          { id: 'analytics', label: 'Analytics', icon: TrendingUp },
-          { id: 'profile', label: 'Profile', icon: User }
+          { id: 'commissions', label: 'Pay', icon: DollarSign }
         ];
       default:
         return [];
