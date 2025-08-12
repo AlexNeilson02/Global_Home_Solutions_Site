@@ -1161,7 +1161,11 @@ export class DatabaseStorage implements IStorage {
     totalEarned: number;
     pendingCommissions: number;
     paidCommissions: number;
+    unpaidCommissions: number;
     totalRecords: number;
+    paidRecordsCount: number;
+    pendingRecordsCount: number;
+    unpaidRecordsCount: number;
   }> {
     const conditions = [eq(commissionRecords.salespersonId, salespersonId)];
     
@@ -1171,11 +1175,19 @@ export class DatabaseStorage implements IStorage {
     
     const records = await db.select().from(commissionRecords).where(and(...conditions));
     
+    const paidRecords = records.filter(r => r.paymentStatus === 'paid');
+    const pendingRecords = records.filter(r => r.paymentStatus === 'pending');
+    const unpaidRecords = records.filter(r => r.paymentStatus === 'unpaid');
+    
     return {
       totalEarned: records.reduce((sum, r) => sum + (r.salesmanAmount || 0), 0),
-      pendingCommissions: records.filter(r => r.paymentStatus === 'pending').reduce((sum, r) => sum + (r.salesmanAmount || 0), 0),
-      paidCommissions: records.filter(r => r.paymentStatus === 'paid').reduce((sum, r) => sum + (r.salesmanAmount || 0), 0),
-      totalRecords: records.length
+      pendingCommissions: pendingRecords.reduce((sum, r) => sum + (r.salesmanAmount || 0), 0),
+      paidCommissions: paidRecords.reduce((sum, r) => sum + (r.salesmanAmount || 0), 0),
+      unpaidCommissions: unpaidRecords.reduce((sum, r) => sum + (r.salesmanAmount || 0), 0),
+      totalRecords: records.length,
+      paidRecordsCount: paidRecords.length,
+      pendingRecordsCount: pendingRecords.length,
+      unpaidRecordsCount: unpaidRecords.length
     };
   }
 

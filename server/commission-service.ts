@@ -267,7 +267,7 @@ export class CommissionService {
   }
 
   /**
-   * Get commission summary for a salesperson
+   * Get enhanced commission summary for a salesperson with Stripe analytics
    */
   static async getSalespersonCommissionSummary(
     salespersonId: number,
@@ -288,9 +288,63 @@ export class CommissionService {
         })
       : records.slice(0, 10); // Last 10 records
 
+    // Calculate Stripe payment analytics
+    const paidRecords = records.filter(r => r.paymentStatus === 'paid' && r.paidAt);
+    const unpaidRecords = records.filter(r => r.paymentStatus === 'unpaid');
+    const pendingRecords = records.filter(r => r.paymentStatus === 'pending');
+
+    // Calculate payment timing analytics
+    const paymentTimings = paidRecords.map(r => {
+      if (r.createdAt && r.paidAt) {
+        const created = new Date(r.createdAt);
+        const paid = new Date(r.paidAt);
+        return Math.floor((paid.getTime() - created.getTime()) / (1000 * 60 * 60 * 24)); // days
+      }
+      return 0;
+    }).filter(days => days >= 0);
+
+    const averagePaymentTime = paymentTimings.length > 0 
+      ? Math.round(paymentTimings.reduce((sum, days) => sum + days, 0) / paymentTimings.length)
+      : 0;
+
+    // Calculate monthly payment trends
+    const monthlyPayments = new Map<string, {amount: number, count: number}>();
+    paidRecords.forEach(r => {
+      if (r.paidAt) {
+        const monthKey = new Date(r.paidAt).toISOString().substr(0, 7); // YYYY-MM
+        const existing = monthlyPayments.get(monthKey) || {amount: 0, count: 0};
+        monthlyPayments.set(monthKey, {
+          amount: existing.amount + (r.salesmanAmount || 0),
+          count: existing.count + 1
+        });
+      }
+    });
+
+    // Convert to array sorted by month
+    const paymentTrends = Array.from(monthlyPayments.entries())
+      .map(([month, data]) => ({month, ...data}))
+      .sort((a, b) => a.month.localeCompare(b.month))
+      .slice(-6); // Last 6 months
+
     return {
       ...summary,
-      recentCommissions: recentRecords
+      recentCommissions: recentRecords,
+      stripeAnalytics: {
+        totalPaidPayments: paidRecords.length,
+        totalUnpaidPayments: unpaidRecords.length,
+        totalPendingPayments: pendingRecords.length,
+        averagePaymentTimeInDays: averagePaymentTime,
+        successfulPaymentRate: records.length > 0 ? ((paidRecords.length / records.length) * 100).toFixed(1) : '0.0',
+        paymentTrends,
+        lastPaymentDate: paidRecords.length > 0 
+          ? Math.max(...paidRecords.map(r => new Date(r.paidAt!).getTime()))
+          : null,
+        totalEarnedThisMonth: (() => {
+          const thisMonth = new Date().toISOString().substr(0, 7);
+          const thisMonthData = monthlyPayments.get(thisMonth);
+          return thisMonthData?.amount || 0;
+        })()
+      }
     };
   }
 

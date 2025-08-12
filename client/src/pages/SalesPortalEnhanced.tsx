@@ -99,7 +99,7 @@ const SalesPortalEnhanced: React.FC = () => {
   });
 
   // Get current user data
-  const { data: userData } = useQuery({
+  const { data: userData } = useQuery<{roleData: any, user: any}>({
     queryKey: ['/api/users/me'],
     enabled: true
   });
@@ -108,31 +108,31 @@ const SalesPortalEnhanced: React.FC = () => {
   const user = userData || {};
 
   // Get salesperson analytics
-  const { data: analyticsData } = useQuery({
+  const { data: analyticsData } = useQuery<{analytics: any, recentBidRequests: any[], visitStats: any}>({
     queryKey: [`/api/salespersons/${salesperson?.id}/analytics`],
     enabled: !!salesperson?.id
   });
 
   // Get salesperson bid requests
-  const { data: bidRequestsData } = useQuery({
+  const { data: bidRequestsData } = useQuery<{bidRequests: any[]}>({
     queryKey: [`/api/salespersons/${salesperson?.id}/bid-requests`],
     enabled: !!salesperson?.id
   });
 
   // Get QR code data
-  const { data: qrCodeResponse } = useQuery({
+  const { data: qrCodeResponse } = useQuery<{qrCode: string, landingPageUrl: string}>({
     queryKey: [`/api/salespersons/${salesperson?.id}/qrcode`],
     enabled: !!salesperson?.id
   });
 
   // Get commission data
-  const { data: commissionData } = useQuery({
+  const { data: commissionData } = useQuery<{totalEarned: number, pendingCommissions: number}>({
     queryKey: [`/api/commissions/salesperson/${salesperson?.id}/commissions`],
     enabled: !!salesperson?.id
   });
 
   // Get sales analytics with performance metrics
-  const { data: salesAnalytics } = useQuery({
+  const { data: salesAnalytics } = useQuery<{personalMetrics: any, performanceHistory: any[]}>({
     queryKey: [`/api/analytics/sales-rep/${salesperson?.id}`],
     enabled: !!salesperson?.id
   });
@@ -279,14 +279,14 @@ const SalesPortalEnhanced: React.FC = () => {
   };
 
   // Calculate key metrics using real data
-  const totalVisits = salesAnalytics?.personalMetrics?.totalQrScans || (analytics as any)?.totalVisits || 0;
-  const totalConversions = salesAnalytics?.personalMetrics?.totalConversions || (analytics as any)?.conversions || 0;
+  const totalVisits = salesAnalytics?.personalMetrics?.totalQrScans || analytics?.totalVisits || 0;
+  const totalConversions = salesAnalytics?.personalMetrics?.totalConversions || analytics?.conversions || 0;
   const conversionRate = totalVisits > 0 && !isNaN(totalConversions) ? ((totalConversions / totalVisits) * 100).toFixed(1) : '0.0';
-  const totalLeads = salesAnalytics?.personalMetrics?.totalLeads || (salesperson as any)?.totalLeads || 0;
-  const commissionEarnings = (commissionData as any)?.totalEarned || 0;
+  const totalLeads = salesAnalytics?.personalMetrics?.totalLeads || salesperson?.totalLeads || 0;
+  const commissionEarnings = commissionData?.totalEarned || 0;
 
   // Real performance data from analytics
-  const performanceData = (salesAnalytics as any)?.performanceHistory || [
+  const performanceData = salesAnalytics?.performanceHistory || [
     { month: 'Current', visits: totalVisits, conversions: totalConversions, leads: totalLeads }
   ];
 
