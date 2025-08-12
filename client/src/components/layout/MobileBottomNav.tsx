@@ -49,7 +49,7 @@ const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
         return [
           { id: 'dashboard', label: 'Home', icon: Home },
           { id: 'leads', label: 'Leads', icon: FileText },
-          { id: 'commissions', label: 'Commissions', icon: DollarSign },
+          { id: 'payments', label: 'Payments', icon: CreditCard },
           { id: 'analytics', label: 'Analytics', icon: TrendingUp },
           { id: 'profile', label: 'Profile', icon: User }
         ];

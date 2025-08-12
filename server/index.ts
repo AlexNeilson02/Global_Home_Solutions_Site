@@ -67,6 +67,10 @@ app.use((req, res, next) => {
   // Register commission system routes
   app.use('/api/commissions', commissionRouter);
   
+  // Register Stripe Connect routes for commission distribution
+  const stripeConnectRouter = (await import('./stripe-connect-routes')).default;
+  app.use('/api/stripe-connect', stripeConnectRouter);
+  
   // Register video upload routes
   app.use('/api/video', videoUploadRouter);
   

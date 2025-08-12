@@ -10,6 +10,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import { TrendingUp, Users, DollarSign, Target, QrCode, Eye, ArrowUpRight } from "lucide-react";
 import MobileBottomNav from "@/components/layout/MobileBottomNav";
 import { CommissionDashboard } from "@/components/CommissionDashboard";
+import { StripeConnectSetup } from "@/components/StripeConnectSetup";
 import { useIsMobile } from "@/hooks/useIsMobile";
 
 const SalesPortal: React.FC = () => {
@@ -90,9 +91,10 @@ const SalesPortal: React.FC = () => {
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
             {/* Desktop Navigation - Only show on desktop */}
             {!isMobile && (
-              <TabsList className="grid w-full grid-cols-5">
+              <TabsList className="grid w-full grid-cols-6">
                 <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
                 <TabsTrigger value="leads">Lead Management</TabsTrigger>
+                <TabsTrigger value="payments">Payments</TabsTrigger>
                 <TabsTrigger value="commissions">Commissions</TabsTrigger>
                 <TabsTrigger value="analytics">Analytics</TabsTrigger>
                 <TabsTrigger value="profile">Profile</TabsTrigger>
@@ -305,6 +307,11 @@ const SalesPortal: React.FC = () => {
                   </Button>
                 </CardContent>
               </Card>
+            </TabsContent>
+
+            {/* Payments Tab */}
+            <TabsContent value="payments" className="space-y-6">
+              <StripeConnectSetup />
             </TabsContent>
           </Tabs>
         </div>

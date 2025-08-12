@@ -1,10 +1,23 @@
 import { storage } from "./database-storage";
+import { StripeConnectService } from './stripe-connect-service';
+import Stripe from 'stripe';
 import { 
   type InsertCommissionRecord, 
   type ServiceCategory, 
   type BidRequest,
   type Salesperson
 } from "@shared/schema";
+
+// Initialize Stripe for Connect service
+let stripeConnectService: StripeConnectService | null = null;
+try {
+  if (process.env.STRIPE_SECRET_KEY) {
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+    stripeConnectService = new StripeConnectService(stripe);
+  }
+} catch (error) {
+  console.error("Failed to initialize Stripe Connect in commission service:", error);
+}
 
 export class CommissionService {
   /**
@@ -197,6 +210,59 @@ export class CommissionService {
       console.log(`Commission payment processed for record ${commissionRecordId}`);
     } catch (error) {
       console.error('Error processing commission payment:', error);
+    }
+  }
+
+  /**
+   * Process commission payment using Stripe Connect for automatic splitting
+   */
+  static async processStripeConnectCommissionPayment(
+    contractorId: number,
+    salespersonId: number,
+    totalAmount: number,
+    description: string
+  ): Promise<{ success: boolean; paymentIntentId?: string }> {
+    try {
+      if (!stripeConnectService) {
+        console.error('Stripe Connect service not initialized');
+        return { success: false };
+      }
+
+      // Check if salesperson has Stripe Connect account set up
+      const salesperson = await storage.getSalesperson(salespersonId);
+      if (!salesperson || !salesperson.stripeAccountId || !salesperson.stripeChargesEnabled) {
+        console.error(`Salesperson ${salespersonId} not set up for Stripe Connect payments`);
+        return { success: false };
+      }
+
+      // Convert dollars to cents for Stripe
+      const amountInCents = Math.round(totalAmount * 100);
+
+      // Create split payment using Stripe Connect
+      const result = await stripeConnectService.createSplitPayment(
+        contractorId,
+        salespersonId,
+        amountInCents,
+        description
+      );
+
+      if (result.success) {
+        console.log(`✅ Stripe Connect commission payment successful: ${result.paymentIntent.id}`);
+        console.log(`   → Total: $${totalAmount}`);
+        console.log(`   → Salesperson (50%): $${totalAmount * 0.50}`);
+        console.log(`   → Platform (50%): $${totalAmount * 0.50}`);
+        
+        return { 
+          success: true, 
+          paymentIntentId: result.paymentIntent.id 
+        };
+      } else {
+        console.error('❌ Stripe Connect commission payment failed');
+        return { success: false };
+      }
+    } catch (error) {
+      console.error('Error processing Stripe Connect commission payment:', error);
+      return { success: false };
     }
   }
 

@@ -101,6 +101,13 @@ export const salespersons = pgTable("salespersons", {
   activeProjects: integer("active_projects").default(0),
   totalVisits: integer("total_visits").default(0),
   successfulConversions: integer("successful_conversions").default(0),
+  
+  // Stripe Connect integration
+  stripeAccountId: text("stripe_account_id"),
+  stripeAccountStatus: text("stripe_account_status").default("pending"), // pending, complete, restricted, rejected
+  stripeOnboardingComplete: boolean("stripe_onboarding_complete").default(false),
+  stripePayoutsEnabled: boolean("stripe_payouts_enabled").default(false),
+  stripeChargesEnabled: boolean("stripe_charges_enabled").default(false),
 });
 
 // Projects/Leads table

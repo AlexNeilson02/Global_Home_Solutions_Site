@@ -45,6 +45,7 @@ export interface IStorage {
   getSalespersonByUserId(userId: number): Promise<Salesperson | undefined>;
   getSalespersonByNfcId(nfcId: string): Promise<Salesperson | undefined>;
   getSalespersonByProfileUrl(profileUrl: string): Promise<Salesperson | undefined>;
+  getSalespersonByStripeAccountId(stripeAccountId: string): Promise<Salesperson | undefined>;
   createSalesperson(salesperson: InsertSalesperson): Promise<Salesperson>;
   updateSalesperson(id: number, salesperson: Partial<Salesperson>): Promise<Salesperson | undefined>;
   getAllSalespersons(): Promise<Salesperson[]>;

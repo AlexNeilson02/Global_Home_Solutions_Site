@@ -240,6 +240,11 @@ export class DatabaseStorage implements IStorage {
     return undefined;
   }
 
+  async getSalespersonByStripeAccountId(stripeAccountId: string): Promise<Salesperson | undefined> {
+    const [salesperson] = await db.select().from(salespersons).where(eq(salespersons.stripeAccountId, stripeAccountId));
+    return salesperson;
+  }
+
   async createSalesperson(insertSalesperson: InsertSalesperson): Promise<Salesperson> {
     // Create the salesperson first
     const [salesperson] = await db.insert(salespersons).values(insertSalesperson).returning();
