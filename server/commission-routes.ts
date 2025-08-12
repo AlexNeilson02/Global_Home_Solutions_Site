@@ -137,6 +137,73 @@ commissionRouter.get('/payments/:userId', isAuthenticated, async (req: Request, 
   }
 });
 
+// Manually trigger Stripe Connect payment for a commission record
+commissionRouter.post('/process-stripe-payment/:commissionId', isAuthenticated, async (req: Request, res: Response) => {
+  try {
+    const commissionId = parseInt(req.params.commissionId);
+    const { contractorId } = req.body;
+
+    const commissionRecord = await storage.getCommissionRecord(commissionId);
+    if (!commissionRecord) {
+      return res.status(404).json({ error: 'Commission record not found' });
+    }
+
+    if (!commissionRecord.salespersonId) {
+      return res.status(400).json({ error: 'Commission record has no salesperson' });
+    }
+
+    if (commissionRecord.paymentStatus === 'paid') {
+      return res.status(400).json({ error: 'Commission already paid' });
+    }
+
+    // Use provided contractor or find eligible contractor
+    let targetContractorId = contractorId;
+    if (!targetContractorId) {
+      const contractors = await storage.getAllContractors();
+      const eligibleContractor = contractors.find(c => c.stripeCustomerId && c.paymentMethodId);
+      if (!eligibleContractor) {
+        return res.status(400).json({ error: 'No eligible contractor found for payment processing' });
+      }
+      targetContractorId = eligibleContractor.id;
+    }
+
+    console.log(`🔄 Manual Stripe Connect payment triggered for commission ${commissionId}`);
+    
+    const paymentResult = await CommissionService.processStripeConnectCommissionPayment(
+      targetContractorId,
+      commissionRecord.salespersonId,
+      commissionRecord.totalCommission,
+      `Manual commission payment for ${commissionRecord.serviceCategory}`
+    );
+
+    if (paymentResult.success) {
+      // Update commission record
+      await storage.updateCommissionRecordPayment(
+        commissionId,
+        'paid',
+        new Date()
+      );
+      
+      console.log(`✅ Manual Stripe payment successful for commission ${commissionId}`);
+      res.json({ 
+        success: true, 
+        message: 'Stripe Connect payment processed successfully',
+        paymentIntentId: paymentResult.paymentIntentId
+      });
+    } else {
+      console.log(`❌ Manual Stripe payment failed for commission ${commissionId}`);
+      res.status(500).json({ 
+        success: false, 
+        error: 'Stripe Connect payment failed' 
+      });
+    }
+
+  } catch (error) {
+    console.error('Error processing manual Stripe payment:', error);
+    res.status(500).json({ error: 'Failed to process Stripe payment' });
+  }
+});
+
 // Manual payment processing (admin only)
 commissionRouter.post('/payments/:paymentId/process', isAuthenticated, requireRole(['admin']), async (req: Request, res: Response) => {
   try {

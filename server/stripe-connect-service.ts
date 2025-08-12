@@ -143,7 +143,7 @@ export class StripeConnectService {
 
       console.log(`Creating split payment: Total $${totalAmount/100}, Salesperson $${salespersonAmount/100}, Platform $${platformAmount/100}`);
 
-      // Create payment intent with destination charges (money goes to salesperson, platform takes application fee)
+      // Step 1: Create a direct charge to the contractor 
       const paymentIntent = await this.stripe.paymentIntents.create({
         amount: totalAmount,
         currency: 'usd',
@@ -152,19 +152,30 @@ export class StripeConnectService {
         confirm: true,
         off_session: true,
         description: `Commission charge: ${description}`,
-        transfer_data: {
-          destination: salesperson.stripeAccountId,
-          amount: salespersonAmount,
-        },
-        application_fee_amount: platformAmount,
         metadata: {
           contractor_id: contractorId.toString(),
           salesperson_id: salespersonId.toString(),
-          charge_type: 'commission_split',
-          salesperson_amount: (salespersonAmount / 100).toString(),
-          platform_amount: (platformAmount / 100).toString(),
+          charge_type: 'commission_charge',
+          total_amount: (totalAmount / 100).toString(),
         },
       });
+
+      // Step 2: Transfer 50% to the salesperson's Connect account
+      if (paymentIntent.status === 'succeeded') {
+        const transfer = await this.stripe.transfers.create({
+          amount: salespersonAmount,
+          currency: 'usd',
+          destination: salesperson.stripeAccountId,
+          source_transaction: paymentIntent.latest_charge as string,
+          description: `50% commission transfer: ${description}`,
+          metadata: {
+            commission_split: 'salesperson_50_percent',
+            original_payment_intent: paymentIntent.id,
+          },
+        });
+        
+        console.log(`✅ Transfer created: ${transfer.id} for $${salespersonAmount/100}`);
+      }
 
       if (paymentIntent.status === 'succeeded') {
         console.log(`✅ Split payment successful: ${paymentIntent.id}`);

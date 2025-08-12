@@ -121,7 +121,42 @@ export class CommissionService {
         };
 
         const createdRecord = await storage.createCommissionRecord(commissionRecord);
-        await this.processCommissionPayment(createdRecord.id);
+        
+        // Process actual Stripe Connect payment if salesperson has Stripe account
+        if (salespersonId && commissionAmounts.salesmanAmount > 0) {
+          console.log(`💳 Processing Stripe Connect payment for salesperson ${salespersonId}: $${commissionAmounts.salesmanAmount}`);
+          
+          // Find a contractor to charge (use the first available contractor for now)
+          const contractors = await storage.getAllContractors();
+          const eligibleContractor = contractors.find(c => c.stripeCustomerId && c.paymentMethodId);
+          
+          if (eligibleContractor) {
+            const paymentResult = await this.processStripeConnectCommissionPayment(
+              eligibleContractor.id,
+              salespersonId,
+              commissionAmounts.totalCommission,
+              `${requestedServiceName} commission for ${bidRequest.fullName}`
+            );
+            
+            if (paymentResult.success) {
+              // Update commission record with actual payment
+              await storage.updateCommissionRecordPayment(
+                createdRecord.id,
+                'paid',
+                new Date()
+              );
+              console.log(`✅ Stripe Connect payment successful for commission ${createdRecord.id}`);
+            } else {
+              console.log(`❌ Stripe Connect payment failed for commission ${createdRecord.id}, keeping as pending`);
+            }
+          } else {
+            console.log(`⚠️  No eligible contractor found for Stripe payment, processing as database-only`);
+            await this.processCommissionPayment(createdRecord.id);
+          }
+        } else {
+          // Fallback to database-only processing for non-Stripe payments
+          await this.processCommissionPayment(createdRecord.id);
+        }
       }
 
       console.log(`Total commission for ${serviceCommissions.length} services: $${totalCommissionAmount}`);

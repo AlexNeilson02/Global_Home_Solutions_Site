@@ -68,6 +68,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   const gmailRoutes = (await import("./gmail-routes")).default;
   apiRouter.use("/gmail", gmailRoutes);
 
+  // Import and use Commission routes
+  const { commissionRouter } = await import("./commission-routes");
+  apiRouter.use("/commissions", commissionRouter);
+
   // WebSocket connections for real-time notifications
   const contractorConnections = new Map<number, WebSocket[]>();
 
