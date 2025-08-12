@@ -83,18 +83,26 @@ function SubscriptionForm({ contractorId, onSuccess, onError }: SubscriptionForm
 
       // If payment confirmation failed, try setup intent confirmation
       if (result.error && result.error.type === 'invalid_request_error') {
-        result = await stripe.confirmSetup({
+        const setupResult = await stripe.confirmSetup({
           elements,
           confirmParams: {
             return_url: `${window.location.origin}/contractor-portal-enhanced?subscription_success=true`,
           },
           redirect: 'if_required',
         });
-      }
-
-      if (result.error) {
+        
+        if (setupResult.error) {
+          onError(setupResult.error.message || 'Payment failed');
+        } else if (setupResult.setupIntent?.status === 'succeeded') {
+          toast({
+            title: "Payment Method Added!",
+            description: "Your payment method has been successfully verified and saved.",
+          });
+          onSuccess();
+        }
+      } else if (result.error) {
         onError(result.error.message || 'Payment failed');
-      } else if (result.paymentIntent?.status === 'succeeded' || result.setupIntent?.status === 'succeeded') {
+      } else if (result.paymentIntent?.status === 'succeeded') {
         toast({
           title: "Payment Method Added!",
           description: "Your payment method has been successfully verified and saved.",
@@ -316,12 +324,13 @@ const ContractorPortalEnhanced: React.FC = () => {
   });
   
   // Calculate bid response time data
-  const bidResponseTimeData = contractorAnalytics?.responseTimeBreakdown ? [
-    { timeRange: "< 24h", count: contractorAnalytics.responseTimeBreakdown.under24h },
-    { timeRange: "24-48h", count: contractorAnalytics.responseTimeBreakdown.day1to2 },
-    { timeRange: "2-3 days", count: contractorAnalytics.responseTimeBreakdown.day2to3 },
-    { timeRange: "3-7 days", count: contractorAnalytics.responseTimeBreakdown.day3to7 },
-    { timeRange: "> 7 days", count: contractorAnalytics.responseTimeBreakdown.over7days }
+  const analytics = contractorAnalytics as any;
+  const bidResponseTimeData = analytics?.responseTimeBreakdown ? [
+    { timeRange: "< 24h", count: analytics.responseTimeBreakdown.under24h },
+    { timeRange: "24-48h", count: analytics.responseTimeBreakdown.day1to2 },
+    { timeRange: "2-3 days", count: analytics.responseTimeBreakdown.day2to3 },
+    { timeRange: "3-7 days", count: analytics.responseTimeBreakdown.day3to7 },
+    { timeRange: "> 7 days", count: analytics.responseTimeBreakdown.over7days }
   ] : [
     { timeRange: "< 24h", count: 0 },
     { timeRange: "24-48h", count: 0 },
@@ -1089,7 +1098,7 @@ const ContractorPortalEnhanced: React.FC = () => {
                     </ResponsiveContainer>
                     <div className="mt-4 text-center">
                       <p className="text-sm text-gray-600">
-                        Average response time: <span className="font-medium">{contractorAnalytics?.averageResponseTime?.toFixed(1) || '0.0'}h</span>
+                        Average response time: <span className="font-medium">{analytics?.averageResponseTime?.toFixed(1) || '0.0'}h</span>
                       </p>
                     </div>
                   </CardContent>
