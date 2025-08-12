@@ -206,7 +206,7 @@ export function StripeConnectSetup() {
                 </div>
               </div>
             </div>
-            <Badge variant={getStatusColor(status?.accountStatus || 'pending', status?.onboardingComplete || false)}>
+            <Badge className="bg-[#00ff00c7] text-black font-medium px-3 py-1 rounded-full border-0">
               {getStatusText(status?.accountStatus || 'pending', status?.onboardingComplete || false)}
             </Badge>
           </div>
