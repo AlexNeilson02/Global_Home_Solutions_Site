@@ -256,19 +256,7 @@ export function StripeConnectSetup() {
               </Button>
             )}
 
-            {/* Debug: Force Update Button */}
-            {status?.hasStripeAccount && (
-              <Button 
-                variant="outline"
-                size="sm"
-                onClick={() => forceUpdateMutation.mutate()}
-                disabled={forceUpdateMutation.isPending}
-                className="flex items-center gap-2 text-xs"
-              >
-                <Clock className="h-3 w-3" />
-                {forceUpdateMutation.isPending ? 'Updating...' : 'Refresh Status'}
-              </Button>
-            )}
+
           </div>
 
           {/* Capabilities Status */}
