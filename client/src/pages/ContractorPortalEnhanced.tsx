@@ -1049,62 +1049,6 @@ const ContractorPortalEnhanced: React.FC = () => {
                 </Card>
               </div>
 
-              {/* Enhanced Bid Lifecycle Analytics */}
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-                <Card style={antiYellowStyles}>
-                  <CardHeader>
-                    <CardTitle className="text-lg">Bid Conversion Rate</CardTitle>
-                    <CardDescription>Requests converted to bids sent</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-3xl font-bold text-blue-600">
-                      {analytics?.bidLifecycle?.conversionRate?.toFixed(1) || '0.0'}%
-                    </div>
-                    <Progress 
-                      value={analytics?.bidLifecycle?.conversionRate || 0} 
-                      className="mt-3" 
-                    />
-                    <p className="text-sm text-gray-600 mt-2">
-                      {analytics?.bidLifecycle?.bidsSentCount || 0} of {analytics?.bidLifecycle?.totalBidsReceived || 0} requests
-                    </p>
-                  </CardContent>
-                </Card>
-
-                <Card style={antiYellowStyles}>
-                  <CardHeader>
-                    <CardTitle className="text-lg">Win Rate</CardTitle>
-                    <CardDescription>Bids sent that were won</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-3xl font-bold text-green-600">
-                      {analytics?.bidLifecycle?.winRate?.toFixed(1) || '0.0'}%
-                    </div>
-                    <Progress 
-                      value={analytics?.bidLifecycle?.winRate || 0} 
-                      className="mt-3" 
-                    />
-                    <p className="text-sm text-gray-600 mt-2">
-                      {analytics?.bidLifecycle?.bidsWon || 0} won of {analytics?.bidLifecycle?.bidsSentCount || 0} sent
-                    </p>
-                  </CardContent>
-                </Card>
-
-                <Card style={antiYellowStyles}>
-                  <CardHeader>
-                    <CardTitle className="text-lg">Avg. Time to Bid</CardTitle>
-                    <CardDescription>From request to bid sent</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-3xl font-bold text-purple-600">
-                      {analytics?.averageTimeToSendBid ? `${analytics.averageTimeToSendBid.toFixed(1)}h` : '0.0h'}
-                    </div>
-                    <p className="text-sm text-gray-600 mt-2">
-                      Average response time to send bid
-                    </p>
-                  </CardContent>
-                </Card>
-              </div>
-
               {/* Charts */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <Card style={antiYellowStyles}>

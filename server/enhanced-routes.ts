@@ -281,9 +281,8 @@ enhancedRouter.get('/contractors/:id/analytics', isAuthenticated, async (req: Re
     const statusBreakdown = {
       pending: bidRequests.filter(b => b.status === 'pending').length,
       contacted: bidRequests.filter(b => b.status === 'contacted').length,
-      bid_sent: bidRequests.filter(b => b.status === 'bid_sent').length,
-      won: bidRequests.filter(b => b.status === 'won').length,
-      lost: bidRequests.filter(b => b.status === 'lost').length,
+      sent: bidRequests.filter(b => b.status === 'sent').length,
+      completed: bidRequests.filter(b => b.status === 'completed').length,
       declined: bidRequests.filter(b => b.status === 'declined').length
     };
 
@@ -316,7 +315,7 @@ enhancedRouter.get('/contractors/:id/analytics', isAuthenticated, async (req: Re
       const weekEnd = new Date(weekStart.getTime() + (7 * 24 * 60 * 60 * 1000));
       
       const weekBids = bidRequests.filter(b => {
-        const createdAt = b.createdAt ? new Date(b.createdAt) : new Date();
+        const createdAt = new Date(b.createdAt);
         return createdAt >= weekStart && createdAt < weekEnd;
       });
 
@@ -328,47 +327,16 @@ enhancedRouter.get('/contractors/:id/analytics', isAuthenticated, async (req: Re
       });
     }
 
-    // Calculate bid lifecycle timing analytics
-    const bidLifecycleAnalytics = {
-      totalBidsReceived: bidRequests.length,
-      bidsSentCount: bidRequests.filter(b => b.status === 'bid_sent' || b.status === 'won' || b.status === 'lost').length,
-      bidsWon: bidRequests.filter(b => b.status === 'won').length,
-      bidsLost: bidRequests.filter(b => b.status === 'lost').length,
-      conversionRate: bidRequests.length > 0 ? (bidRequests.filter(b => b.status === 'bid_sent' || b.status === 'won' || b.status === 'lost').length / bidRequests.length) * 100 : 0,
-      winRate: (() => {
-        const sentBids = bidRequests.filter(b => b.status === 'bid_sent' || b.status === 'won' || b.status === 'lost');
-        return sentBids.length > 0 ? (bidRequests.filter(b => b.status === 'won').length / sentBids.length) * 100 : 0;
-      })()
-    };
-
-    // Calculate average time from contact to bid sent
-    const contactToBidAnalytics = bidRequests.filter(b => 
-      (b.status === 'bid_sent' || b.status === 'won' || b.status === 'lost') && 
-      b.lastUpdated && 
-      b.createdAt
-    ).map(bid => {
-      const timeToSend = new Date(bid.lastUpdated!).getTime() - new Date(bid.createdAt!).getTime();
-      return timeToSend / (1000 * 60 * 60); // Convert to hours
-    });
-
-    const averageTimeToSendBid = contactToBidAnalytics.length > 0 
-      ? contactToBidAnalytics.reduce((sum, time) => sum + time, 0) / contactToBidAnalytics.length 
-      : 0;
-
     const analytics = {
       // Basic metrics
       totalRequests: bidRequests.length,
       responded: bidRequests.filter(b => b.lastUpdated).length,
       totalBidsSent: bidRequests.filter(b => b.status === 'bid_sent' || b.status === 'won' || b.status === 'lost' || b.status === 'completed').length,
-      won: bidRequests.filter(b => b.status === 'won').length,
-      lost: bidRequests.filter(b => b.status === 'lost').length,
+      won: bidRequests.filter(b => b.status === 'completed').length,
+      lost: bidRequests.filter(b => b.status === 'declined').length,
       revenue: projects
         .filter(p => p.status === 'completed')
         .reduce((sum, p) => sum + (p.budget || 0), 0),
-      
-      // Enhanced bid lifecycle analytics
-      bidLifecycle: bidLifecycleAnalytics,
-      averageTimeToSendBid,
       
       // Response time analytics
       averageResponseTime,
@@ -395,7 +363,7 @@ enhancedRouter.get('/contractors/:id/analytics', isAuthenticated, async (req: Re
         .reduce((sum, p) => sum + (p.budget || 0), 0),
       totalBids: bidRequests.length,
       pendingBids: bidRequests.filter(b => b.status === 'pending').length,
-      successRate: bidRequests.length > 0 ? (bidRequests.filter(b => b.status === 'won').length / bidRequests.length) * 100 : 0
+      successRate: bidRequests.length > 0 ? (bidRequests.filter(b => b.status === 'completed').length / bidRequests.length) * 100 : 0
     };
 
     res.json(analytics);
@@ -502,7 +470,7 @@ enhancedRouter.get('/salespersons/:id/detailed-analytics', isAuthenticated, asyn
       performance: {
         averageLeadsPerMonth: (bidRequests.length / 6) || 0, // Assuming 6 months of data
         bestMonth: 'June', // Would calculate from actual data
-        topService: bidRequests.length > 0 ? (bidRequests[0].servicesRequested?.[0] || 'None') : 'None'
+        topService: bidRequests.length > 0 ? bidRequests[0].serviceRequested : 'None'
       }
     };
 
