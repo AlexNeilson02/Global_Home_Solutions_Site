@@ -315,33 +315,40 @@ div[role="tabpanel"] * {
 }
 
 /* Tactic 13: Toast/Notification Nuclear Yellow Removal */
-[data-radix-toast-viewport],
-[data-radix-toast-viewport] *,
+/* Toast styling — only style actual toast items, not the viewport */
 [data-radix-toast-root],
-[data-radix-toast-root] *,
 [data-radix-toast-title],
-[data-radix-toast-title] *,
 [data-radix-toast-description],
-[data-radix-toast-description] *,
 [data-radix-toast-action],
-[data-radix-toast-action] *,
 [data-radix-toast-close],
-[data-radix-toast-close] *,
-[role="status"],
-[role="status"] *,
-[role="alert"],
-[role="alert"] *,
 .toast,
-.toast *,
-[class*="toast"],
-[class*="toast"] * {
+[class*="toast"] {
   outline: none !important;
   outline-color: transparent !important;
   outline-width: 0 !important;
   outline-style: none !important;
   border-color: #e5e7eb !important;
-  background-color: white !important;
+  background-color: white !important; /* Only on actual toast */
   color: black !important;
+}
+
+/* The viewport (container) should not be visible or clickable */
+[data-radix-toast-viewport] {
+  background: transparent !important;
+  box-shadow: none !important;
+  pointer-events: none !important;
+}
+
+/* Hide the viewport entirely when there are no toasts */
+[data-radix-toast-viewport]:empty {
+  display: none !important;
+}
+
+/* Avoid forcing backgrounds on generic live regions */
+[role="status"],
+[role="alert"] {
+  background: transparent !important;
+  color: inherit !important;
 }
 
 /* Tactic 14: Toast Animation and State Overrides */
