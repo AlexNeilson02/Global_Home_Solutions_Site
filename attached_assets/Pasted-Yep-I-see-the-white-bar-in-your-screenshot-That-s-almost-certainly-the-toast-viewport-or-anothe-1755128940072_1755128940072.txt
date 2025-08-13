@@ -1,0 +1,75 @@
+Yep, I see the white bar in your screenshot. That’s almost certainly the toast “viewport” (or another ARIA live-region) being rendered with a white background even when there are no messages.
+
+Do this—copy/paste exactly:
+
+### 1) Add this to the **very end** of `client/src/index.css`
+
+```css
+/* --- Kill the empty bottom-right white band (toast/live-region container) --- */
+
+/* Make any toast/live-region container transparent & unclickable by default */
+[data-radix-toast-viewport],
+[role="status"],
+[role="alert"] {
+  background: transparent !important;
+  box-shadow: none !important;
+  pointer-events: none !important; /* let clicks pass through when empty */
+}
+
+/* Hide them entirely when they’re empty */
+[data-radix-toast-viewport]:empty,
+[role="status"]:empty,
+[role="alert"]:empty {
+  display: none !important;
+}
+
+/* Ensure the *actual* toast items remain interactive */
+[data-radix-toast-root],
+.Toastify__toast,
+.toast {
+  pointer-events: auto !important;
+}
+
+/* Last-resort guard: hide any empty fixed box sitting bottom-right */
+@supports (selector(:has(*))) {
+  body > div[style*="position: fixed"][style*="right"][style*="bottom"]:has(:empty) {
+    display: none !important;
+  }
+}
+```
+
+### 2) Check the toast viewport component for a hardcoded background
+
+Open whichever you have (one of these is likely in your repo):
+
+* `client/src/components/ui/toast.tsx`
+* `client/src/components/ui/toaster.tsx`
+* `client/src/App.tsx` (where `<Toaster />` or `<ToastContainer />` is mounted)
+
+If you see `bg-white`, `shadow`, or any inline `style={{ background: 'white' }}` on the **viewport** (container), remove them or make it transparent. For example:
+
+```tsx
+// BAD on viewport (causes the white band)
+<ToastViewport className="fixed bottom-0 right-0 bg-white shadow" />
+
+// GOOD on viewport (transparent, no shadow)
+<ToastViewport className="fixed bottom-0 right-0 bg-transparent shadow-none pointer-events-none" />
+```
+
+Keep backgrounds/styles on the **toast items**, not the viewport.
+
+### 3) Ensure only one global toast container exists
+
+Search the project for `Toaster`, `ToastContainer`, or `Snackbar`. You should only have **one** at the app root. Multiple containers can create phantom boxes.
+
+### 4) Hard refresh your app
+
+After saving, do a **hard reload** (Ctrl/Cmd+Shift+R). If Replit caches aggressively, stop & rerun the repl.
+
+---
+
+If the band is still there after this, use DevTools for 10 seconds:
+
+1. Right‑click the white bar ➜ **Inspect**.
+2. The highlighted node’s selector will tell us what it is (copy the element + its classes/attributes).
+3. Paste that selector back here and I’ll give you an exact one‑line CSS kill switch.
