@@ -179,7 +179,11 @@ const ContractorPortalEnhanced: React.FC = () => {
     email: '',
     logoUrl: '',
     hourlyRate: 0,
-    videoUrl: ''
+    videoUrl: '',
+    ownerName: '',
+    instagram: '',
+    facebook: '',
+    twitter: ''
   });
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [logoPreview, setLogoPreview] = useState<string>('');
@@ -493,7 +497,11 @@ const ContractorPortalEnhanced: React.FC = () => {
         email: contractor.email || '',
         logoUrl: contractor.logoUrl || '',
         hourlyRate: contractor.hourlyRate || 0,
-        videoUrl: contractor.videoUrl || ''
+        videoUrl: contractor.videoUrl || '',
+        ownerName: contractor.ownerName || '',
+        instagram: contractor.instagram || '',
+        facebook: contractor.facebook || '',
+        twitter: contractor.twitter || ''
       });
       setLogoPreview(contractor.logoUrl || '');
       setMediaFiles(contractor.mediaFiles || []);
@@ -1153,6 +1161,33 @@ const ContractorPortalEnhanced: React.FC = () => {
                               <span>${contractor?.hourlyRate || 0}/hr</span>
                             </div>
                           </div>
+                          {contractor?.ownerName && (
+                            <div className="mt-2">
+                              <span className="text-sm text-gray-600">Owner: {contractor.ownerName}</span>
+                            </div>
+                          )}
+                          {(contractor?.instagram || contractor?.facebook || contractor?.twitter) && (
+                            <div className="flex items-center space-x-4 mt-3">
+                              {contractor?.instagram && (
+                                <a href={contractor.instagram.startsWith('http') ? contractor.instagram : `https://instagram.com/${contractor.instagram}`} 
+                                   target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800">
+                                  Instagram
+                                </a>
+                              )}
+                              {contractor?.facebook && (
+                                <a href={contractor.facebook.startsWith('http') ? contractor.facebook : `https://facebook.com/${contractor.facebook}`} 
+                                   target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800">
+                                  Facebook
+                                </a>
+                              )}
+                              {contractor?.twitter && (
+                                <a href={contractor.twitter.startsWith('http') ? contractor.twitter : `https://twitter.com/${contractor.twitter}`} 
+                                   target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800">
+                                  Twitter
+                                </a>
+                              )}
+                            </div>
+                          )}
                         </div>
                       </div>
 
@@ -1298,6 +1333,42 @@ const ContractorPortalEnhanced: React.FC = () => {
                             value={editForm.email}
                             onChange={(e) => setEditForm({...editForm, email: e.target.value})}
                             placeholder="Enter email address"
+                            style={antiYellowInputStyles}
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium mb-2">Owner Name</label>
+                          <Input
+                            value={editForm.ownerName}
+                            onChange={(e) => setEditForm({...editForm, ownerName: e.target.value})}
+                            placeholder="Enter owner name"
+                            style={antiYellowInputStyles}
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium mb-2">Instagram</label>
+                          <Input
+                            value={editForm.instagram}
+                            onChange={(e) => setEditForm({...editForm, instagram: e.target.value})}
+                            placeholder="Instagram username or URL"
+                            style={antiYellowInputStyles}
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium mb-2">Facebook</label>
+                          <Input
+                            value={editForm.facebook}
+                            onChange={(e) => setEditForm({...editForm, facebook: e.target.value})}
+                            placeholder="Facebook page URL"
+                            style={antiYellowInputStyles}
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium mb-2">Twitter</label>
+                          <Input
+                            value={editForm.twitter}
+                            onChange={(e) => setEditForm({...editForm, twitter: e.target.value})}
+                            placeholder="Twitter username or URL"
                             style={antiYellowInputStyles}
                           />
                         </div>

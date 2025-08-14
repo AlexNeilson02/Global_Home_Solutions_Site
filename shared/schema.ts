@@ -58,6 +58,10 @@ export const contractors = pgTable("contractors", {
   logoUrl: text("logo_url"),
   videoUrl: text("video_url"),
   mediaFiles: json("media_files").$type<{url: string, type: 'image' | 'video', name: string}[]>().default([]),
+  ownerName: text("owner_name"),
+  instagram: text("instagram"),
+  facebook: text("facebook"),
+  twitter: text("twitter"),
   isVerified: boolean("is_verified").default(false),
   isActive: boolean("is_active").default(true),
   subscriptionTier: text("subscription_tier").default("basic"), // basic, premium, pro
