@@ -47,6 +47,7 @@ const ServiceSelection = () => {
   const continentalContractor = contractors?.contractors.find(c => c.id === 19);
   const watermelonContractor = contractors?.contractors.find(c => c.id === 18);
   const vaultContractor = contractors?.contractors.find(c => c.id === 20);
+  const c16Contractor = contractors?.contractors.find(c => c.id === 22);
 
   const trades = serviceCategories?.services.map(service => service.name).sort() || [];
 
@@ -480,46 +481,78 @@ const ServiceSelection = () => {
               </div>
             )}
 
-            <div className="category-card" onClick={() => handleCategoryClick("Electrical")} style={{
-              display: 'flex',
-              flexDirection: 'column',
-              height: '100%'
-            }}>
-              <div className="category-image electrician-bg" style={{
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-                height: '150px',
-                flexShrink: 0
-              }}>
-                <img 
-                  src="/attached_assets/image_1751041918876.png" 
-                  alt="Professional Electrician at Work"
-                  style={{
-                    width: '100%',
-                    height: '100%',
-                    objectFit: 'cover',
-                    borderRadius: '8px 8px 0 0'
-                  }}
-                />
-              </div>
-              <div className="category-content" style={{
+            {c16Contractor && (
+              <div className="category-card" onClick={() => navigateWithSalesperson('/contractor/22')} style={{
                 display: 'flex',
                 flexDirection: 'column',
-                flexGrow: 1,
-                padding: '20px'
+                height: '100%'
               }}>
-                <h3 style={{ 
-                  color: '#333',
-                  fontSize: '1.3rem',
-                  margin: '0 0 15px 0',
-                  fontWeight: '600',
-                  flexGrow: 1,
+                <div className="category-image" style={{
+                  height: '150px',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  textAlign: 'center',
-                  width: '100%'
-                }}>Electrical</h3>
+                  backgroundColor: '#ffffff',
+                  padding: '10px',
+                  flexShrink: 0
+                }}>
+                  {c16Contractor.logoUrl ? (
+                    <img 
+                      src={c16Contractor.logoUrl} 
+                      alt={c16Contractor.companyName} 
+                      style={{
+                        maxWidth: '100%',
+                        maxHeight: '100%',
+                        width: 'auto',
+                        height: 'auto',
+                        objectFit: 'contain',
+                        minWidth: '80%', // Ensure rectangular logos are large enough
+                        minHeight: '40px' // Minimum height for visibility
+                      }}
+                      onLoad={(e) => {
+                        const img = e.target as HTMLImageElement;
+                        const aspectRatio = img.naturalWidth / img.naturalHeight;
+                        // If it's a wide/rectangular logo (aspect ratio > 1.5), make it bigger
+                        if (aspectRatio > 1.5) {
+                          img.style.minWidth = '95%';
+                          img.style.minHeight = '60px';
+                        }
+                      }}
+                    />
+                  ) : (
+                    <div style={{
+                      width: '100%',
+                      height: '100%',
+                      backgroundColor: '#e5e7eb',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: '48px',
+                      fontWeight: 'bold',
+                      color: '#6b7280'
+                    }}>
+                      {c16Contractor.companyName.charAt(0)}
+                    </div>
+                  )}
+                </div>
+                <div className="category-content" style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  flexGrow: 1,
+                  padding: '20px'
+                }}>
+                  <h3 style={{ 
+                    color: '#333',
+                    fontSize: '1.3rem',
+                    margin: '0 0 15px 0',
+                    fontWeight: '600',
+                    flexGrow: 1,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    textAlign: 'center',
+                    width: '100%'
+                  }}>{c16Contractor.companyName}</h3>
                 <button className="category-btn" style={{
                   background: '#2ca7f8',
                   color: 'white',
@@ -532,8 +565,9 @@ const ServiceSelection = () => {
                   fontSize: '1rem',
                   marginTop: 'auto'
                 }}>Find Contractors</button>
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </section>
       )}
