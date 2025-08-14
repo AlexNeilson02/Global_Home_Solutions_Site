@@ -46,8 +46,8 @@ export default function AboutUs() {
         {/* Hero Section */}
         <div style={{ textAlign: 'center', marginBottom: '60px' }}>
           <div style={{
-            width: '160px',
-            height: '160px',
+            width: '320px',
+            height: '320px',
             display: 'inline-flex',
             alignItems: 'center',
             justifyContent: 'center',
