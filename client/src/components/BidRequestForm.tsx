@@ -365,7 +365,7 @@ export default function BidRequestForm({ isOpen, onClose, contractor }: BidReque
                   <div className="space-y-2 p-3 border rounded-lg">
                     {contractorServices.length > 0 ? (
                       contractorServices.map((service) => (
-                        <div key={service.id} className="flex items-center space-x-3">
+                        <div key={service.id} className="flex items-center space-x-3 p-2 border rounded hover:bg-gray-50 dark:hover:bg-gray-800">
                           <Checkbox
                             id={`service-${service.id}`}
                             checked={field.value?.includes(service.name) || false}
@@ -377,7 +377,7 @@ export default function BidRequestForm({ isOpen, onClose, contractor }: BidReque
                                 field.onChange(currentValues.filter((value) => value !== service.name));
                               }
                             }}
-                            className="h-5 w-5"
+                            className="h-5 w-5 border-2"
                           />
                           <label
                             htmlFor={`service-${service.id}`}
