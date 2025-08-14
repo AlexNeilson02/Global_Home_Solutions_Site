@@ -46,16 +46,22 @@ export default function AboutUs() {
         {/* Hero Section */}
         <div style={{ textAlign: 'center', marginBottom: '60px' }}>
           <div style={{
-            width: '80px',
-            height: '80px',
-            backgroundColor: '#dbeafe',
-            borderRadius: '50%',
+            width: '120px',
+            height: '120px',
             display: 'inline-flex',
             alignItems: 'center',
             justifyContent: 'center',
             marginBottom: '30px'
           }}>
-            <Building2 style={{ width: '40px', height: '40px', color: '#2563eb' }} />
+            <img 
+              src={logoPath} 
+              alt="Global Home Solutions Logo" 
+              style={{ 
+                width: '100%', 
+                height: '100%', 
+                objectFit: 'contain'
+              }} 
+            />
           </div>
           <h1 style={{
             fontSize: '56px',
