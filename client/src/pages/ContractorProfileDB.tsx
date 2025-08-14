@@ -127,8 +127,8 @@ export default function ContractorProfileDB() {
                 <div className="pt-24">
                   <div className="flex items-start gap-6 mb-6">
                     {/* Company name and status next to logo area */}
-                    <div className="flex-shrink-0">
-                      <h1 className="text-3xl font-bold text-white mb-2">{contractor.companyName}</h1>
+                    <div className="flex-1 min-w-0">
+                      <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2 break-words leading-tight">{contractor.companyName}</h1>
                       <div className="flex items-center gap-2">
                         <CheckCircle className="text-green-400" size={20} />
                         <span className="text-green-400 font-medium">Available Now</span>
