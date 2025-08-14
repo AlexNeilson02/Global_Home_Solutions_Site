@@ -361,58 +361,35 @@ export default function BidRequestForm({ isOpen, onClose, contractor }: BidReque
               name="servicesRequested"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-base font-semibold text-blue-700 dark:text-blue-300">
-                    Services Requested *
-                  </FormLabel>
-                  <div className="border-2 border-blue-200 dark:border-blue-700 rounded-lg p-4 bg-blue-50 dark:bg-blue-950/20 space-y-3">
+                  <FormLabel className="text-base font-semibold">Services Requested</FormLabel>
+                  <div className="space-y-2 p-3 border rounded-lg">
                     {contractorServices.length > 0 ? (
-                      <>
-                        <p className="text-sm font-medium text-blue-800 dark:text-blue-200 bg-blue-100 dark:bg-blue-900/30 rounded-md p-2">
-                          📋 Select all services you need from {contractor.companyName}'s specialties:
-                        </p>
-                        <div className="space-y-3 bg-white dark:bg-gray-900 rounded-md p-3 border border-blue-200 dark:border-blue-700">
-                          {contractorServices.map((service) => (
-                            <div key={service.id} className="flex items-center space-x-3 p-2 hover:bg-blue-50 dark:hover:bg-blue-950/30 rounded-md transition-colors">
-                              <Checkbox
-                                id={`service-${service.id}`}
-                                checked={field.value?.includes(service.name) || false}
-                                onCheckedChange={(checked) => {
-                                  const currentValues = field.value || [];
-                                  if (checked) {
-                                    field.onChange([...currentValues, service.name]);
-                                  } else {
-                                    field.onChange(currentValues.filter((value) => value !== service.name));
-                                  }
-                                }}
-                                className="h-5 w-5"
-                              />
-                              <label
-                                htmlFor={`service-${service.id}`}
-                                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer text-gray-900 dark:text-gray-100"
-                              >
-                                {service.name}
-                              </label>
-                            </div>
-                          ))}
+                      contractorServices.map((service) => (
+                        <div key={service.id} className="flex items-center space-x-3">
+                          <Checkbox
+                            id={`service-${service.id}`}
+                            checked={field.value?.includes(service.name) || false}
+                            onCheckedChange={(checked) => {
+                              const currentValues = field.value || [];
+                              if (checked) {
+                                field.onChange([...currentValues, service.name]);
+                              } else {
+                                field.onChange(currentValues.filter((value) => value !== service.name));
+                              }
+                            }}
+                            className="h-5 w-5"
+                          />
+                          <label
+                            htmlFor={`service-${service.id}`}
+                            className="text-sm font-medium cursor-pointer"
+                          >
+                            {service.name}
+                          </label>
                         </div>
-                        {field.value && field.value.length > 0 && (
-                          <div className="bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-700 rounded-md p-3">
-                            <p className="text-sm font-medium text-green-800 dark:text-green-200 mb-2">
-                              ✅ Selected Services ({field.value.length}):
-                            </p>
-                            <div className="flex flex-wrap gap-2">
-                              {field.value.map((serviceName) => (
-                                <Badge key={serviceName} className="bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200 hover:bg-green-200 dark:hover:bg-green-900/50 text-xs font-medium">
-                                  {serviceName}
-                                </Badge>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-                      </>
+                      ))
                     ) : (
-                      <p className="text-sm text-muted-foreground bg-yellow-50 dark:bg-yellow-950/20 border border-yellow-200 dark:border-yellow-700 rounded-md p-3">
-                        ⚠️ No services available for this contractor.
+                      <p className="text-sm text-muted-foreground">
+                        No services available for this contractor.
                       </p>
                     )}
                   </div>
