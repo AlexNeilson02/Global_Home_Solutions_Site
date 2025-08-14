@@ -293,7 +293,18 @@ const ServiceSelection = () => {
                         maxHeight: '100%',
                         width: 'auto',
                         height: 'auto',
-                        objectFit: 'contain'
+                        objectFit: 'contain',
+                        minWidth: '80%', // Ensure rectangular logos are large enough
+                        minHeight: '40px' // Minimum height for visibility
+                      }}
+                      onLoad={(e) => {
+                        const img = e.target as HTMLImageElement;
+                        const aspectRatio = img.naturalWidth / img.naturalHeight;
+                        // If it's a wide/rectangular logo (aspect ratio > 1.5), make it bigger
+                        if (aspectRatio > 1.5) {
+                          img.style.minWidth = '95%';
+                          img.style.minHeight = '60px';
+                        }
                       }}
                     />
                   ) : (
@@ -368,7 +379,18 @@ const ServiceSelection = () => {
                         maxHeight: '100%',
                         width: 'auto',
                         height: 'auto',
-                        objectFit: 'contain'
+                        objectFit: 'contain',
+                        minWidth: '80%', // Ensure rectangular logos are large enough
+                        minHeight: '40px' // Minimum height for visibility
+                      }}
+                      onLoad={(e) => {
+                        const img = e.target as HTMLImageElement;
+                        const aspectRatio = img.naturalWidth / img.naturalHeight;
+                        // If it's a wide/rectangular logo (aspect ratio > 1.5), make it bigger
+                        if (aspectRatio > 1.5) {
+                          img.style.minWidth = '95%';
+                          img.style.minHeight = '60px';
+                        }
                       }}
                     />
                   ) : (
@@ -443,7 +465,18 @@ const ServiceSelection = () => {
                         maxHeight: '100%',
                         width: 'auto',
                         height: 'auto',
-                        objectFit: 'contain'
+                        objectFit: 'contain',
+                        minWidth: '80%', // Ensure rectangular logos are large enough
+                        minHeight: '40px' // Minimum height for visibility
+                      }}
+                      onLoad={(e) => {
+                        const img = e.target as HTMLImageElement;
+                        const aspectRatio = img.naturalWidth / img.naturalHeight;
+                        // If it's a wide/rectangular logo (aspect ratio > 1.5), make it bigger
+                        if (aspectRatio > 1.5) {
+                          img.style.minWidth = '95%';
+                          img.style.minHeight = '60px';
+                        }
                       }}
                     />
                   ) : (
@@ -561,7 +594,18 @@ const ServiceSelection = () => {
                         style={{
                           width: '100%',
                           height: '100%',
-                          objectFit: 'cover'
+                          objectFit: 'contain',
+                          minWidth: '80%', // Ensure rectangular logos are large enough
+                          minHeight: '40px' // Minimum height for visibility
+                        }}
+                        onLoad={(e) => {
+                          const img = e.target as HTMLImageElement;
+                          const aspectRatio = img.naturalWidth / img.naturalHeight;
+                          // If it's a wide/rectangular logo (aspect ratio > 1.5), make it bigger
+                          if (aspectRatio > 1.5) {
+                            img.style.minWidth = '95%';
+                            img.style.minHeight = '60px';
+                          }
                         }}
                       />
                     ) : (
