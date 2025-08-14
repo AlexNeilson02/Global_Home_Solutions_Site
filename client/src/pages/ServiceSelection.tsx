@@ -110,7 +110,7 @@ const ServiceSelection = () => {
           left: '20px',
           display: 'flex',
           alignItems: 'center',
-          background: 'none',
+          backgroundColor: '#f3f4f6',
           border: 'none',
           cursor: 'pointer',
           padding: '8px',
@@ -119,10 +119,10 @@ const ServiceSelection = () => {
           zIndex: 1000
         }}
         onMouseOver={(e) => {
-          e.currentTarget.style.backgroundColor = '#f3f4f6';
+          e.currentTarget.style.backgroundColor = '#e5e7eb';
         }}
         onMouseOut={(e) => {
-          e.currentTarget.style.backgroundColor = 'transparent';
+          e.currentTarget.style.backgroundColor = '#f3f4f6';
         }}
       >
         <img 
