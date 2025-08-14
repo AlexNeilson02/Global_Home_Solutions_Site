@@ -365,26 +365,25 @@ export default function BidRequestForm({ isOpen, onClose, contractor }: BidReque
                   <div className="space-y-2 p-3 border rounded-lg">
                     {contractorServices.length > 0 ? (
                       contractorServices.map((service) => (
-                        <div key={service.id} className="flex items-center space-x-3 p-2 border rounded hover:bg-gray-50 dark:hover:bg-gray-800">
-                          <Checkbox
-                            id={`service-${service.id}`}
-                            checked={field.value?.includes(service.name) || false}
-                            onCheckedChange={(checked) => {
-                              const currentValues = field.value || [];
-                              if (checked) {
-                                field.onChange([...currentValues, service.name]);
-                              } else {
-                                field.onChange(currentValues.filter((value) => value !== service.name));
-                              }
-                            }}
-                            className=""
-                          />
-                          <label
-                            htmlFor={`service-${service.id}`}
-                            className="text-sm font-medium cursor-pointer"
-                          >
-                            {service.name}
-                          </label>
+                        <div 
+                          key={service.id} 
+                          className={`p-3 border-2 rounded-lg cursor-pointer transition-all duration-200 ${
+                            field.value?.includes(service.name) 
+                              ? 'border-blue-600 bg-blue-50 text-blue-900 font-semibold' 
+                              : 'border-gray-300 bg-white hover:border-blue-300 hover:bg-blue-25'
+                          }`}
+                          onClick={() => {
+                            const currentValues = field.value || [];
+                            if (currentValues.includes(service.name)) {
+                              field.onChange(currentValues.filter((value) => value !== service.name));
+                            } else {
+                              field.onChange([...currentValues, service.name]);
+                            }
+                          }}
+                        >
+                          <div className="text-base font-medium">
+                            {field.value?.includes(service.name) ? '✓ ' : ''}{service.name}
+                          </div>
                         </div>
                       ))
                     ) : (
