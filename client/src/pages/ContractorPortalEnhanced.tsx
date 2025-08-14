@@ -712,7 +712,13 @@ const ContractorPortalEnhanced: React.FC = () => {
       return response.json();
     },
     onSuccess: () => {
+      // Invalidate user data
       queryClient.invalidateQueries({ queryKey: ['/api/users/me'] });
+      // Invalidate contractor listing queries to update hero cards
+      queryClient.invalidateQueries({ queryKey: ['/api/contractors'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/contractors/featured'] });
+      // Invalidate specific contractor profile
+      queryClient.invalidateQueries({ queryKey: [`/api/contractors/${contractor?.id}`] });
       setIsEditingProfile(false);
       toast({
         title: "Profile Updated!",
