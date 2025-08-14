@@ -2,6 +2,7 @@ import React from "react";
 import { Link } from "wouter";
 import { ArrowLeft, MapPin, Phone, Mail, Users, Award, Home, Building2, Star, Clock, Shield, Target, TrendingUp, CheckCircle } from "lucide-react";
 import logoPath from "@/assets/global-home-solutions-logo.png";
+import aboutImage from "@assets/0F1A4578_1755180252596.jpeg";
 
 export default function AboutUs() {
   console.log('AboutUs main component rendered - checking for overlay issues');
@@ -118,18 +119,23 @@ export default function AboutUs() {
                 </div>
               </div>
               
-              {/* Image Placeholder Side */}
+              {/* Image Side */}
               <div style={{
-                background: 'linear-gradient(135deg, #3b82f6 0%, #6366f1 100%)',
-                padding: '48px',
+                padding: '0',
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'center'
+                justifyContent: 'center',
+                overflow: 'hidden'
               }}>
-                <div style={{ textAlign: 'center', color: '#ffffff' }}>
-                  <Building2 style={{ width: '96px', height: '96px', margin: '0 auto 24px auto', opacity: '0.8' }} />
-                  <p style={{ fontSize: '18px', opacity: '0.9' }}>Professional home services platform</p>
-                </div>
+                <img 
+                  src={aboutImage} 
+                  alt="Professional home services" 
+                  style={{ 
+                    width: '100%', 
+                    height: '100%', 
+                    objectFit: 'cover'
+                  }} 
+                />
               </div>
             </div>
           </div>
