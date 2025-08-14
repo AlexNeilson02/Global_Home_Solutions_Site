@@ -23,6 +23,36 @@ const Portals: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-slate-900" style={{ backgroundColor: '#0f172a' }}>
+      {/* Back Button - Top Left */}
+      <Link 
+        to="/"
+        style={{
+          position: 'fixed',
+          top: '20px',
+          left: '20px',
+          display: 'flex',
+          alignItems: 'center',
+          backgroundColor: 'rgba(51, 65, 85, 0.8)',
+          color: '#cbd5e1',
+          textDecoration: 'none',
+          padding: '8px 12px',
+          borderRadius: '8px',
+          transition: 'all 0.2s ease',
+          zIndex: 1000,
+          fontSize: '14px',
+          fontWeight: '500'
+        }}
+        onMouseOver={(e) => {
+          e.currentTarget.style.backgroundColor = 'rgba(71, 85, 105, 0.9)';
+          e.currentTarget.style.color = '#f1f5f9';
+        }}
+        onMouseOut={(e) => {
+          e.currentTarget.style.backgroundColor = 'rgba(51, 65, 85, 0.8)';
+          e.currentTarget.style.color = '#cbd5e1';
+        }}
+      >
+        ← Back to Home
+      </Link>
       <div className="container mx-auto px-4 py-4">
         <div className="text-center mb-8">
           <div className="flex justify-center mb-8">
@@ -100,14 +130,7 @@ const Portals: React.FC = () => {
           </div>
         </div>
 
-        <div className="text-center mt-12">
-          <Link 
-            to="/"
-            className="text-slate-400 hover:text-slate-200 transition-colors"
-          >
-            ← Back to Home
-          </Link>
-        </div>
+
       </div>
 
       <LoginModal
