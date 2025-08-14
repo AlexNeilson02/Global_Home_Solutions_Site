@@ -81,6 +81,7 @@ enhancedRouter.patch('/contractors/:id/profile', isAuthenticated, async (req: Re
       console.log('Updated user data for contractor:', contractorId, 'user:', contractor.userId, 'with:', userUpdateData);
     }
 
+    console.log('Contractor profile updated successfully - triggering cache invalidation');
     res.json({ contractor: updatedContractor });
   } catch (error) {
     console.error('Contractor update error:', error);
