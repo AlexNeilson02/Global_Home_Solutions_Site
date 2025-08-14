@@ -377,7 +377,7 @@ export default function BidRequestForm({ isOpen, onClose, contractor }: BidReque
                                 field.onChange(currentValues.filter((value) => value !== service.name));
                               }
                             }}
-                            className="h-5 w-5 border-2"
+                            className="peer shrink-0 rounded-apple border-gray-400 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-blue-600 data-[state=checked]:text-white data-[state=checked]:border-blue-600 data-[state=checked]:shadow-apple-md transition-all duration-200 ease-apple shadow-apple-sm hover:border-primary hover:shadow-apple h-5 w-5 border-2 bg-[#000000]"
                           />
                           <label
                             htmlFor={`service-${service.id}`}
