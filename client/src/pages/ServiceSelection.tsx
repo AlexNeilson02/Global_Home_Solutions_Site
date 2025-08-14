@@ -216,44 +216,78 @@ const ServiceSelection = () => {
             gap: '20px',
             justifyContent: 'center'
           }}>
-            <div className="category-card" onClick={() => handleCategoryClick("Electrical")} style={{
-              display: 'flex',
-              flexDirection: 'column',
-              height: '100%'
-            }}>
-              <div className="category-image electrician-bg" style={{
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-                height: '150px',
-                flexShrink: 0
-              }}>
-                <img 
-                  src="/attached_assets/image_1751041918876.png" 
-                  alt="Professional Electrician at Work"
-                  style={{
-                    width: '100%',
-                    height: '100%',
-                    objectFit: 'cover',
-                    borderRadius: '8px 8px 0 0'
-                  }}
-                />
-              </div>
-              <div className="category-content" style={{
+            {vaultContractor && (
+              <div className="category-card" onClick={() => navigateWithSalesperson('/contractor/20')} style={{
                 display: 'flex',
                 flexDirection: 'column',
-                flexGrow: 1,
-                padding: '20px'
+                height: '100%'
               }}>
-                <h3 style={{ 
-                  color: '#333',
-                  fontSize: '1.3rem',
-                  margin: '0 0 15px 0',
-                  fontWeight: '600',
-                  flexGrow: 1,
+                <div className="category-image" style={{
+                  height: '150px',
                   display: 'flex',
                   alignItems: 'center',
-                  textAlign: 'center'
-                }}>Electrical</h3>
+                  justifyContent: 'center',
+                  backgroundColor: '#ffffff',
+                  padding: '10px',
+                  flexShrink: 0
+                }}>
+                  {vaultContractor.logoUrl ? (
+                    <img 
+                      src={vaultContractor.logoUrl} 
+                      alt={vaultContractor.companyName} 
+                      style={{
+                        maxWidth: '100%',
+                        maxHeight: '100%',
+                        width: 'auto',
+                        height: 'auto',
+                        objectFit: 'contain',
+                        minWidth: '80%', // Ensure rectangular logos are large enough
+                        minHeight: '40px' // Minimum height for visibility
+                      }}
+                      onLoad={(e) => {
+                        const img = e.target as HTMLImageElement;
+                        const aspectRatio = img.naturalWidth / img.naturalHeight;
+                        // If it's a wide/rectangular logo (aspect ratio > 1.5), make it bigger
+                        if (aspectRatio > 1.5) {
+                          img.style.minWidth = '95%';
+                          img.style.minHeight = '60px';
+                        }
+                      }}
+                    />
+                  ) : (
+                    <div style={{
+                      width: '100%',
+                      height: '100%',
+                      backgroundColor: '#e5e7eb',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: '48px',
+                      fontWeight: 'bold',
+                      color: '#6b7280'
+                    }}>
+                      {vaultContractor.companyName.charAt(0)}
+                    </div>
+                  )}
+                </div>
+                <div className="category-content" style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  flexGrow: 1,
+                  padding: '20px'
+                }}>
+                  <h3 style={{ 
+                    color: '#333',
+                    fontSize: '1.3rem',
+                    margin: '0 0 15px 0',
+                    fontWeight: '600',
+                    flexGrow: 1,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    textAlign: 'center',
+                    width: '100%'
+                  }}>{vaultContractor.companyName}</h3>
                 <button className="category-btn" style={{
                   background: '#2ca7f8',
                   color: 'white',
@@ -266,8 +300,9 @@ const ServiceSelection = () => {
                   fontSize: '1rem',
                   marginTop: 'auto'
                 }}>Find Contractors</button>
+                </div>
               </div>
-            </div>
+            )}
 
             {continentalContractor && (
               <div className="category-card" onClick={() => navigateWithSalesperson('/contractor/19')} style={{
@@ -429,94 +464,6 @@ const ServiceSelection = () => {
                     textAlign: 'center',
                     width: '100%'
                   }}>{watermelonContractor.companyName}</h3>
-                <button className="category-btn" style={{
-                  background: '#2ca7f8',
-                  color: 'white',
-                  border: 'none',
-                  padding: '10px 20px',
-                  borderRadius: '8px',
-                  fontWeight: 'bold',
-                  cursor: 'pointer',
-                  width: '100%',
-                  fontSize: '1rem',
-                  marginTop: 'auto'
-                }}>Find Contractors</button>
-                </div>
-              </div>
-            )}
-
-            {vaultContractor && (
-              <div className="category-card" onClick={() => navigateWithSalesperson('/contractor/20')} style={{
-                display: 'flex',
-                flexDirection: 'column',
-                height: '100%'
-              }}>
-                <div className="category-image" style={{
-                  height: '150px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  backgroundColor: '#ffffff',
-                  padding: '10px',
-                  flexShrink: 0
-                }}>
-                  {vaultContractor.logoUrl ? (
-                    <img 
-                      src={vaultContractor.logoUrl} 
-                      alt={vaultContractor.companyName} 
-                      style={{
-                        maxWidth: '100%',
-                        maxHeight: '100%',
-                        width: 'auto',
-                        height: 'auto',
-                        objectFit: 'contain',
-                        minWidth: '80%', // Ensure rectangular logos are large enough
-                        minHeight: '40px' // Minimum height for visibility
-                      }}
-                      onLoad={(e) => {
-                        const img = e.target as HTMLImageElement;
-                        const aspectRatio = img.naturalWidth / img.naturalHeight;
-                        // If it's a wide/rectangular logo (aspect ratio > 1.5), make it bigger
-                        if (aspectRatio > 1.5) {
-                          img.style.minWidth = '95%';
-                          img.style.minHeight = '60px';
-                        }
-                      }}
-                    />
-                  ) : (
-                    <div style={{
-                      width: '100%',
-                      height: '100%',
-                      backgroundColor: '#e5e7eb',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      fontSize: '48px',
-                      fontWeight: 'bold',
-                      color: '#6b7280'
-                    }}>
-                      {vaultContractor.companyName.charAt(0)}
-                    </div>
-                  )}
-                </div>
-                <div className="category-content" style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  flexGrow: 1,
-                  padding: '20px'
-                }}>
-                  <h3 style={{ 
-                    color: '#333',
-                    fontSize: '1.3rem',
-                    margin: '0 0 15px 0',
-                    fontWeight: '600',
-                    flexGrow: 1,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    textAlign: 'center',
-                    width: '100%'
-                  }}>{vaultContractor.companyName}</h3>
                 <button className="category-btn" style={{
                   background: '#2ca7f8',
                   color: 'white',
