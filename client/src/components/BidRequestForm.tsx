@@ -377,7 +377,7 @@ export default function BidRequestForm({ isOpen, onClose, contractor }: BidReque
                                 field.onChange(currentValues.filter((value) => value !== service.name));
                               }
                             }}
-                            className="h-6 w-6 border-2 border-gray-800 bg-white shadow-lg data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600"
+                            className=""
                           />
                           <label
                             htmlFor={`service-${service.id}`}
