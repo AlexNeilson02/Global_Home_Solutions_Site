@@ -3,9 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useSalespersonNavigation } from "@/hooks/useSalespersonNavigation";
 import { useSalesperson } from "@/contexts/SalespersonContext";
 import "../styles/HomePage.css";
-import watermelonLogo from "@assets/Watermelon_WW_Logo_Square_1750971640089.png";
-import vaultLogo from "@assets/Vault_Logo_Square_1751036708596.png";
-import continentalLogo from "@assets/Continental Concrete Logo — 6.24.2025 Proof Alpha_1751036821066.jpeg";
+
 
 interface ServiceCategoriesResponse {
   services: Array<{
@@ -26,6 +24,7 @@ interface ContractorsResponse {
     contactEmail?: string;
     contactPhone?: string;
     websiteUrl?: string;
+    logoUrl?: string;
   }>;
 }
 
@@ -43,6 +42,11 @@ const ServiceSelection = () => {
   const { data: contractors } = useQuery<ContractorsResponse>({
     queryKey: ["/api/contractors"],
   });
+
+  // Get specific contractors for featured cards
+  const continentalContractor = contractors?.contractors.find(c => c.id === 19);
+  const watermelonContractor = contractors?.contractors.find(c => c.id === 18);
+  const vaultContractor = contractors?.contractors.find(c => c.id === 20);
 
   const trades = serviceCategories?.services.map(service => service.name).sort() || [];
 
@@ -265,48 +269,65 @@ const ServiceSelection = () => {
               </div>
             </div>
 
-            <div className="category-card" onClick={() => navigateWithSalesperson('/contractor/19')} style={{
-              display: 'flex',
-              flexDirection: 'column',
-              height: '100%'
-            }}>
-              <div className="category-image" style={{
-                height: '150px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                backgroundColor: '#ffffff',
-                padding: '10px',
-                flexShrink: 0
-              }}>
-                <img 
-                  src={continentalLogo} 
-                  alt="Continental Concrete" 
-                  style={{
-                    maxWidth: '100%',
-                    maxHeight: '100%',
-                    width: 'auto',
-                    height: 'auto',
-                    objectFit: 'contain'
-                  }}
-                />
-              </div>
-              <div className="category-content" style={{
+            {continentalContractor && (
+              <div className="category-card" onClick={() => navigateWithSalesperson('/contractor/19')} style={{
                 display: 'flex',
                 flexDirection: 'column',
-                flexGrow: 1,
-                padding: '20px'
+                height: '100%'
               }}>
-                <h3 style={{ 
-                  color: '#333',
-                  fontSize: '1.3rem',
-                  margin: '0 0 15px 0',
-                  fontWeight: '600',
-                  flexGrow: 1,
+                <div className="category-image" style={{
+                  height: '150px',
                   display: 'flex',
                   alignItems: 'center',
-                  textAlign: 'center'
-                }}>Continental Concrete</h3>
+                  justifyContent: 'center',
+                  backgroundColor: '#ffffff',
+                  padding: '10px',
+                  flexShrink: 0
+                }}>
+                  {continentalContractor.logoUrl ? (
+                    <img 
+                      src={continentalContractor.logoUrl} 
+                      alt={continentalContractor.companyName} 
+                      style={{
+                        maxWidth: '100%',
+                        maxHeight: '100%',
+                        width: 'auto',
+                        height: 'auto',
+                        objectFit: 'contain'
+                      }}
+                    />
+                  ) : (
+                    <div style={{
+                      width: '100%',
+                      height: '100%',
+                      backgroundColor: '#e5e7eb',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: '48px',
+                      fontWeight: 'bold',
+                      color: '#6b7280'
+                    }}>
+                      {continentalContractor.companyName.charAt(0)}
+                    </div>
+                  )}
+                </div>
+                <div className="category-content" style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  flexGrow: 1,
+                  padding: '20px'
+                }}>
+                  <h3 style={{ 
+                    color: '#333',
+                    fontSize: '1.3rem',
+                    margin: '0 0 15px 0',
+                    fontWeight: '600',
+                    flexGrow: 1,
+                    display: 'flex',
+                    alignItems: 'center',
+                    textAlign: 'center'
+                  }}>{continentalContractor.companyName}</h3>
                 <button className="category-btn" style={{
                   background: '#2ca7f8',
                   color: 'white',
@@ -319,51 +340,69 @@ const ServiceSelection = () => {
                   fontSize: '1rem',
                   marginTop: 'auto'
                 }}>Find Contractors</button>
+                </div>
               </div>
-            </div>
+            )}
 
-            <div className="category-card" onClick={() => navigateWithSalesperson('/contractor/18')} style={{
+            {watermelonContractor && (
+              <div className="category-card" onClick={() => navigateWithSalesperson('/contractor/18')} style={{
               display: 'flex',
               flexDirection: 'column',
               height: '100%'
             }}>
-              <div className="category-image" style={{
-                height: '150px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                backgroundColor: '#ffffff',
-                padding: '10px',
-                flexShrink: 0
-              }}>
-                <img 
-                  src={watermelonLogo} 
-                  alt="Watermelon Window Washing" 
-                  style={{
-                    maxWidth: '100%',
-                    maxHeight: '100%',
-                    width: 'auto',
-                    height: 'auto',
-                    objectFit: 'contain'
-                  }}
-                />
-              </div>
-              <div className="category-content" style={{
-                display: 'flex',
-                flexDirection: 'column',
-                flexGrow: 1,
-                padding: '20px'
-              }}>
-                <h3 style={{ 
-                  color: '#333',
-                  fontSize: '1.3rem',
-                  margin: '0 0 15px 0',
-                  fontWeight: '600',
-                  flexGrow: 1,
+                <div className="category-image" style={{
+                  height: '150px',
                   display: 'flex',
                   alignItems: 'center',
-                  textAlign: 'center'
-                }}>Watermelon Window Washing</h3>
+                  justifyContent: 'center',
+                  backgroundColor: '#ffffff',
+                  padding: '10px',
+                  flexShrink: 0
+                }}>
+                  {watermelonContractor.logoUrl ? (
+                    <img 
+                      src={watermelonContractor.logoUrl} 
+                      alt={watermelonContractor.companyName} 
+                      style={{
+                        maxWidth: '100%',
+                        maxHeight: '100%',
+                        width: 'auto',
+                        height: 'auto',
+                        objectFit: 'contain'
+                      }}
+                    />
+                  ) : (
+                    <div style={{
+                      width: '100%',
+                      height: '100%',
+                      backgroundColor: '#e5e7eb',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: '48px',
+                      fontWeight: 'bold',
+                      color: '#6b7280'
+                    }}>
+                      {watermelonContractor.companyName.charAt(0)}
+                    </div>
+                  )}
+                </div>
+                <div className="category-content" style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  flexGrow: 1,
+                  padding: '20px'
+                }}>
+                  <h3 style={{ 
+                    color: '#333',
+                    fontSize: '1.3rem',
+                    margin: '0 0 15px 0',
+                    fontWeight: '600',
+                    flexGrow: 1,
+                    display: 'flex',
+                    alignItems: 'center',
+                    textAlign: 'center'
+                  }}>{watermelonContractor.companyName}</h3>
                 <button className="category-btn" style={{
                   background: '#2ca7f8',
                   color: 'white',
@@ -376,51 +415,69 @@ const ServiceSelection = () => {
                   fontSize: '1rem',
                   marginTop: 'auto'
                 }}>Find Contractors</button>
+                </div>
               </div>
-            </div>
+            )}
 
-            <div className="category-card" onClick={() => navigateWithSalesperson('/contractor/20')} style={{
-              display: 'flex',
-              flexDirection: 'column',
-              height: '100%'
-            }}>
-              <div className="category-image" style={{
-                height: '150px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                backgroundColor: '#ffffff',
-                padding: '10px',
-                flexShrink: 0
-              }}>
-                <img 
-                  src={vaultLogo} 
-                  alt="Vault Pest Control" 
-                  style={{
-                    maxWidth: '100%',
-                    maxHeight: '100%',
-                    width: 'auto',
-                    height: 'auto',
-                    objectFit: 'contain'
-                  }}
-                />
-              </div>
-              <div className="category-content" style={{
+            {vaultContractor && (
+              <div className="category-card" onClick={() => navigateWithSalesperson('/contractor/20')} style={{
                 display: 'flex',
                 flexDirection: 'column',
-                flexGrow: 1,
-                padding: '20px'
+                height: '100%'
               }}>
-                <h3 style={{ 
-                  color: '#333',
-                  fontSize: '1.3rem',
-                  margin: '0 0 15px 0',
-                  fontWeight: '600',
-                  flexGrow: 1,
+                <div className="category-image" style={{
+                  height: '150px',
                   display: 'flex',
                   alignItems: 'center',
-                  textAlign: 'center'
-                }}>Vault Pest Control</h3>
+                  justifyContent: 'center',
+                  backgroundColor: '#ffffff',
+                  padding: '10px',
+                  flexShrink: 0
+                }}>
+                  {vaultContractor.logoUrl ? (
+                    <img 
+                      src={vaultContractor.logoUrl} 
+                      alt={vaultContractor.companyName} 
+                      style={{
+                        maxWidth: '100%',
+                        maxHeight: '100%',
+                        width: 'auto',
+                        height: 'auto',
+                        objectFit: 'contain'
+                      }}
+                    />
+                  ) : (
+                    <div style={{
+                      width: '100%',
+                      height: '100%',
+                      backgroundColor: '#e5e7eb',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: '48px',
+                      fontWeight: 'bold',
+                      color: '#6b7280'
+                    }}>
+                      {vaultContractor.companyName.charAt(0)}
+                    </div>
+                  )}
+                </div>
+                <div className="category-content" style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  flexGrow: 1,
+                  padding: '20px'
+                }}>
+                  <h3 style={{ 
+                    color: '#333',
+                    fontSize: '1.3rem',
+                    margin: '0 0 15px 0',
+                    fontWeight: '600',
+                    flexGrow: 1,
+                    display: 'flex',
+                    alignItems: 'center',
+                    textAlign: 'center'
+                  }}>{vaultContractor.companyName}</h3>
                 <button className="category-btn" style={{
                   background: '#2ca7f8',
                   color: 'white',
@@ -433,8 +490,9 @@ const ServiceSelection = () => {
                   fontSize: '1rem',
                   marginTop: 'auto'
                 }}>Find Contractors</button>
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </section>
       )}
