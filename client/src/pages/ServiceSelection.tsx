@@ -479,6 +479,61 @@ const ServiceSelection = () => {
                 </div>
               </div>
             )}
+
+            <div className="category-card" onClick={() => handleCategoryClick("Electrical")} style={{
+              display: 'flex',
+              flexDirection: 'column',
+              height: '100%'
+            }}>
+              <div className="category-image electrician-bg" style={{
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                height: '150px',
+                flexShrink: 0
+              }}>
+                <img 
+                  src="/attached_assets/image_1751041918876.png" 
+                  alt="Professional Electrician at Work"
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover',
+                    borderRadius: '8px 8px 0 0'
+                  }}
+                />
+              </div>
+              <div className="category-content" style={{
+                display: 'flex',
+                flexDirection: 'column',
+                flexGrow: 1,
+                padding: '20px'
+              }}>
+                <h3 style={{ 
+                  color: '#333',
+                  fontSize: '1.3rem',
+                  margin: '0 0 15px 0',
+                  fontWeight: '600',
+                  flexGrow: 1,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  textAlign: 'center',
+                  width: '100%'
+                }}>Electrical</h3>
+                <button className="category-btn" style={{
+                  background: '#2ca7f8',
+                  color: 'white',
+                  border: 'none',
+                  padding: '10px 20px',
+                  borderRadius: '8px',
+                  fontWeight: 'bold',
+                  cursor: 'pointer',
+                  width: '100%',
+                  fontSize: '1rem',
+                  marginTop: 'auto'
+                }}>Find Contractors</button>
+              </div>
+            </div>
           </div>
         </section>
       )}
