@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useSalespersonNavigation } from "@/hooks/useSalespersonNavigation";
 import { useSalesperson } from "@/contexts/SalespersonContext";
+import globalLogoPath from "@assets/GLOBAL HOME SOLUTIONS LOGO-01.png";
 import "../styles/HomePage.css";
 
 
@@ -98,12 +99,62 @@ const ServiceSelection = () => {
       alignItems: 'center', 
       justifyContent: 'center',
       minHeight: '100vh',
-      padding: '100px 20px 0px 20px'
+      padding: '20px 20px 0px 20px'
     }}>
+      {/* Header with Logo and Company Name as Back Button */}
+      <header style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        backgroundColor: 'white',
+        borderBottom: '1px solid #e5e7eb',
+        zIndex: 1000,
+        padding: '15px 20px',
+        boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+      }}>
+        <button
+          onClick={() => navigateWithSalesperson('/')}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            background: 'none',
+            border: 'none',
+            cursor: 'pointer',
+            padding: '8px',
+            borderRadius: '8px',
+            transition: 'background-color 0.2s ease'
+          }}
+          onMouseOver={(e) => {
+            e.currentTarget.style.backgroundColor = '#f3f4f6';
+          }}
+          onMouseOut={(e) => {
+            e.currentTarget.style.backgroundColor = 'transparent';
+          }}
+        >
+          <img 
+            src={globalLogoPath} 
+            alt="Global Home Solutions" 
+            style={{
+              height: '40px',
+              width: 'auto',
+              marginRight: '12px'
+            }}
+          />
+          <span style={{
+            fontSize: '20px',
+            fontWeight: 'bold',
+            color: '#111827'
+          }}>
+            Global Home Solutions
+          </span>
+        </button>
+      </header>
       <section className="search-section" style={{ 
         maxWidth: '1000px', 
         width: '100%',
-        textAlign: 'center'
+        textAlign: 'center',
+        marginTop: '80px'
       }}>
         <form 
           onSubmit={handleFindContractor}
