@@ -1,0 +1,78 @@
+Do steps A + B exactly, then hard‑refresh.
+
+A) Update your toaster component
+
+Open client/src/components/ui/toaster.tsx (or wherever your <ToastViewport /> lives) and replace the component with this version:
+
+// client/src/components/ui/toaster.tsx
+import { Toast, ToastClose, ToastDescription, ToastProvider, ToastTitle, ToastViewport } from "@/components/ui/toast"
+import { useToast } from "@/components/ui/use-toast"
+
+export function Toaster() {
+  const { toasts } = useToast()
+
+  return (
+    <ToastProvider>
+      {toasts.map(function ({ id, title, description, action, ...props }) {
+        return (
+          <Toast
+            key={id}
+            {...props}
+            // 👉 toast item is interactive and has its own background
+            className="pointer-events-auto bg-white text-gray-900 border border-gray-200 shadow-md"
+          >
+            <div className="grid gap-1">
+              {title && <ToastTitle>{title}</ToastTitle>}
+              {description && <ToastDescription>{description}</ToastDescription>}
+            </div>
+            {action}
+            <ToastClose />
+          </Toast>
+        )
+      })}
+
+      {/* 👉 viewport/container is transparent and not clickable when empty */}
+      <ToastViewport className="
+        fixed top-4 right-4 z-[100]
+        flex max-h-screen w-full max-w-sm flex-col gap-2
+        bg-transparent shadow-none pointer-events-none
+      " />
+    </ToastProvider>
+  )
+}
+
+export default Toaster
+
+B) Update the Radix toast primitives (if you have this file)
+
+Open client/src/components/ui/toast.tsx and make sure the root (the toast item) is interactive, while the viewport stays transparent. Find the exported Toast and ToastViewport components and ensure their classNames include:
+
+// for the toast item (root)
+className={cn(
+  "pointer-events-auto bg-white text-gray-900 border border-gray-200 shadow-md",
+  className
+)}
+
+// for the viewport (container)
+className={cn(
+  "fixed top-4 right-4 z-[100] flex max-h-screen w-full max-w-sm flex-col gap-2 bg-transparent shadow-none pointer-events-none",
+  className
+)}
+
+C) Keep the CSS guard (in case of empty containers)
+
+At the very end of client/src/index.css, keep/add:
+
+/* Hide/neutralize empty toast containers so no white band shows */
+[data-radix-toast-viewport] {
+  background: transparent !important;
+  box-shadow: none !important;
+  pointer-events: none !important;
+}
+[data-radix-toast-viewport]:empty {
+  display: none !important;
+}
+
+D) One container only
+
+Search for Toaster, ToastContainer, Snackbar across the repo and make sure you only mount one global container (usually in App.tsx or your root layout).

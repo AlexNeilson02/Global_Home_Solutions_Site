@@ -14,15 +14,9 @@ const ToastViewport = React.forwardRef<
   <ToastPrimitives.Viewport
     ref={ref}
     className={cn(
-      "fixed top-0 z-[100] flex max-h-screen w-full flex-col-reverse p-4 sm:bottom-0 sm:right-0 sm:top-auto sm:flex-col md:max-w-[420px] anti-yellow-nuclear",
+      "fixed top-4 right-4 z-[100] flex max-h-screen w-full max-w-sm flex-col gap-2 bg-transparent shadow-none pointer-events-none",
       className
     )}
-    style={{
-      outline: 'none',
-      outlineColor: 'transparent',
-      outlineWidth: '0',
-      outlineStyle: 'none'
-    }}
     {...props}
   />
 ))
@@ -52,16 +46,11 @@ const Toast = React.forwardRef<
   return (
     <ToastPrimitives.Root
       ref={ref}
-      className={cn(toastVariants({ variant }), className, "anti-yellow-nuclear")}
-      style={{
-        outline: 'none',
-        outlineColor: 'transparent',
-        outlineWidth: '0',
-        outlineStyle: 'none',
-        backgroundColor: 'white',
-        color: 'black',
-        border: '1px solid #e5e7eb'
-      }}
+      className={cn(
+        "pointer-events-auto bg-white text-gray-900 border border-gray-200 shadow-md",
+        toastVariants({ variant }),
+        className
+      )}
       {...props}
     />
   )
@@ -107,12 +96,7 @@ const ToastTitle = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <ToastPrimitives.Title
     ref={ref}
-    className={cn("text-sm font-semibold anti-yellow-nuclear", className)}
-    style={{
-      outline: 'none',
-      outlineColor: 'transparent',
-      color: 'black'
-    }}
+    className={cn("text-sm font-semibold", className)}
     {...props}
   />
 ))
@@ -124,12 +108,7 @@ const ToastDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <ToastPrimitives.Description
     ref={ref}
-    className={cn("text-sm opacity-90 anti-yellow-nuclear", className)}
-    style={{
-      outline: 'none',
-      outlineColor: 'transparent',
-      color: 'black'
-    }}
+    className={cn("text-sm opacity-90", className)}
     {...props}
   />
 ))
