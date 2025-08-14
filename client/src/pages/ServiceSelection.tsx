@@ -337,7 +337,9 @@ const ServiceSelection = () => {
                     flexGrow: 1,
                     display: 'flex',
                     alignItems: 'center',
-                    textAlign: 'center'
+                    justifyContent: 'center',
+                    textAlign: 'center',
+                    width: '100%'
                   }}>{continentalContractor.companyName}</h3>
                 <button className="category-btn" style={{
                   background: '#2ca7f8',
@@ -423,7 +425,9 @@ const ServiceSelection = () => {
                     flexGrow: 1,
                     display: 'flex',
                     alignItems: 'center',
-                    textAlign: 'center'
+                    justifyContent: 'center',
+                    textAlign: 'center',
+                    width: '100%'
                   }}>{watermelonContractor.companyName}</h3>
                 <button className="category-btn" style={{
                   background: '#2ca7f8',
@@ -509,7 +513,9 @@ const ServiceSelection = () => {
                     flexGrow: 1,
                     display: 'flex',
                     alignItems: 'center',
-                    textAlign: 'center'
+                    justifyContent: 'center',
+                    textAlign: 'center',
+                    width: '100%'
                   }}>{vaultContractor.companyName}</h3>
                 <button className="category-btn" style={{
                   background: '#2ca7f8',
@@ -631,7 +637,9 @@ const ServiceSelection = () => {
                     fontWeight: 'bold',
                     color: '#111827',
                     margin: '0 0 12px 0',
-                    lineHeight: '1.4'
+                    lineHeight: '1.4',
+                    textAlign: 'center',
+                    width: '100%'
                   }}>
                     {contractor.companyName}
                   </h3>
