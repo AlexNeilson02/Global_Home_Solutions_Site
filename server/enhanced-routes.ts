@@ -48,18 +48,37 @@ enhancedRouter.patch('/contractors/:id/profile', isAuthenticated, async (req: Re
     const updateData = req.body;
     console.log('Updating contractor:', contractorId, 'with data:', updateData);
 
-    // Ensure numeric fields are properly converted
-    const sanitizedData = {
-      ...updateData,
-      hourlyRate: updateData.hourlyRate ? parseFloat(updateData.hourlyRate) : 0,
-      isActive: updateData.isActive !== undefined ? updateData.isActive : true
+    // Get the contractor to access the associated user
+    const contractor = await storage.getContractor(contractorId);
+    if (!contractor) {
+      return res.status(404).json({ message: 'Contractor not found' });
+    }
+
+    // Separate contractor fields from user fields
+    const { phone, email, ...contractorFields } = updateData;
+
+    // Ensure numeric fields are properly converted for contractor data
+    const sanitizedContractorData = {
+      ...contractorFields,
+      hourlyRate: contractorFields.hourlyRate ? parseFloat(contractorFields.hourlyRate) : 0,
+      isActive: contractorFields.isActive !== undefined ? contractorFields.isActive : true
     };
 
-    // Update contractor with new data including media files
-    const updatedContractor = await storage.updateContractor(contractorId, sanitizedData);
+    // Update contractor data
+    const updatedContractor = await storage.updateContractor(contractorId, sanitizedContractorData);
     
     if (!updatedContractor) {
-      return res.status(404).json({ message: 'Contractor not found' });
+      return res.status(404).json({ message: 'Failed to update contractor' });
+    }
+
+    // Update user data if phone or email are provided
+    if (phone !== undefined || email !== undefined) {
+      const userUpdateData: any = {};
+      if (phone !== undefined) userUpdateData.phone = phone;
+      if (email !== undefined) userUpdateData.email = email;
+      
+      await storage.updateUser(contractor.userId, userUpdateData);
+      console.log('Updated user data for contractor:', contractorId, 'user:', contractor.userId, 'with:', userUpdateData);
     }
 
     res.json({ contractor: updatedContractor });

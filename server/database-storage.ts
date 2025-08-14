@@ -110,13 +110,95 @@ export class DatabaseStorage implements IStorage {
 
   // Contractor methods
   async getContractor(id: number): Promise<Contractor | undefined> {
-    const [contractor] = await db.select().from(contractors).where(eq(contractors.id, id));
-    return contractor;
+    const [result] = await db
+      .select({
+        id: contractors.id,
+        userId: contractors.userId,
+        companyName: contractors.companyName,
+        description: contractors.description,
+        specialties: contractors.specialties,
+        serviceAreas: contractors.serviceAreas,
+        licenseNumber: contractors.licenseNumber,
+        logoUrl: contractors.logoUrl,
+        hourlyRate: contractors.hourlyRate,
+        isVerified: contractors.isVerified,
+        isActive: contractors.isActive,
+        videoUrl: contractors.videoUrl,
+        mediaFiles: contractors.mediaFiles,
+        ownerName: contractors.ownerName,
+        instagram: contractors.instagram,
+        facebook: contractors.facebook,
+        twitter: contractors.twitter,
+        subscriptionTier: contractors.subscriptionTier,
+        monthlySpendCap: contractors.monthlySpendCap,
+        paymentMethodAdded: contractors.paymentMethodAdded,
+        paymentMethodId: contractors.paymentMethodId,
+        cardBrand: contractors.cardBrand,
+        cardLast4: contractors.cardLast4,
+        cardExpMonth: contractors.cardExpMonth,
+        cardExpYear: contractors.cardExpYear,
+        gmailAccessToken: contractors.gmailAccessToken,
+        gmailRefreshToken: contractors.gmailRefreshToken,
+        gmailTokenExpiry: contractors.gmailTokenExpiry,
+        gmailConnected: contractors.gmailConnected,
+        stripeCustomerId: contractors.stripeCustomerId,
+        stripeSubscriptionId: contractors.stripeSubscriptionId,
+        // Include user data
+        phone: users.phone,
+        email: users.email,
+        fullName: users.fullName
+      })
+      .from(contractors)
+      .leftJoin(users, eq(contractors.userId, users.id))
+      .where(eq(contractors.id, id));
+    
+    return result as any;
   }
 
   async getContractorByUserId(userId: number): Promise<Contractor | undefined> {
-    const [contractor] = await db.select().from(contractors).where(eq(contractors.userId, userId));
-    return contractor;
+    const [result] = await db
+      .select({
+        id: contractors.id,
+        userId: contractors.userId,
+        companyName: contractors.companyName,
+        description: contractors.description,
+        specialties: contractors.specialties,
+        serviceAreas: contractors.serviceAreas,
+        licenseNumber: contractors.licenseNumber,
+        logoUrl: contractors.logoUrl,
+        hourlyRate: contractors.hourlyRate,
+        isVerified: contractors.isVerified,
+        isActive: contractors.isActive,
+        videoUrl: contractors.videoUrl,
+        mediaFiles: contractors.mediaFiles,
+        ownerName: contractors.ownerName,
+        instagram: contractors.instagram,
+        facebook: contractors.facebook,
+        twitter: contractors.twitter,
+        subscriptionTier: contractors.subscriptionTier,
+        monthlySpendCap: contractors.monthlySpendCap,
+        paymentMethodAdded: contractors.paymentMethodAdded,
+        paymentMethodId: contractors.paymentMethodId,
+        cardBrand: contractors.cardBrand,
+        cardLast4: contractors.cardLast4,
+        cardExpMonth: contractors.cardExpMonth,
+        cardExpYear: contractors.cardExpYear,
+        gmailAccessToken: contractors.gmailAccessToken,
+        gmailRefreshToken: contractors.gmailRefreshToken,
+        gmailTokenExpiry: contractors.gmailTokenExpiry,
+        gmailConnected: contractors.gmailConnected,
+        stripeCustomerId: contractors.stripeCustomerId,
+        stripeSubscriptionId: contractors.stripeSubscriptionId,
+        // Include user data
+        phone: users.phone,
+        email: users.email,
+        fullName: users.fullName
+      })
+      .from(contractors)
+      .leftJoin(users, eq(contractors.userId, users.id))
+      .where(eq(contractors.userId, userId));
+    
+    return result as any;
   }
 
   async createContractor(insertContractor: InsertContractor): Promise<Contractor> {
