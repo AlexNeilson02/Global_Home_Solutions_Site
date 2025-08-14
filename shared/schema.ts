@@ -59,6 +59,7 @@ export const contractors = pgTable("contractors", {
   videoUrl: text("video_url"),
   mediaFiles: json("media_files").$type<{url: string, type: 'image' | 'video', name: string}[]>().default([]),
   ownerName: text("owner_name"),
+  website: text("website"),
   instagram: text("instagram"),
   facebook: text("facebook"),
   twitter: text("twitter"),

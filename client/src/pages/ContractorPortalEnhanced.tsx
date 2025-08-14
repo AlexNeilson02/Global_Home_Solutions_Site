@@ -15,6 +15,7 @@ import {
   Camera, 
   DollarSign, 
   FileText, 
+  Globe,
   Mail, 
   MapPin, 
   Phone, 
@@ -180,6 +181,7 @@ const ContractorPortalEnhanced: React.FC = () => {
     hourlyRate: 0,
     videoUrl: '',
     ownerName: '',
+    website: '',
     instagram: '',
     facebook: '',
     twitter: ''
@@ -497,6 +499,7 @@ const ContractorPortalEnhanced: React.FC = () => {
         hourlyRate: contractor.hourlyRate || 0,
         videoUrl: contractor.videoUrl || '',
         ownerName: contractor.ownerName || '',
+        website: contractor.website || '',
         instagram: contractor.instagram || '',
         facebook: contractor.facebook || '',
         twitter: contractor.twitter || ''
@@ -738,12 +741,16 @@ const ContractorPortalEnhanced: React.FC = () => {
         description: contractor.description || '',
         specialties: contractor.specialties || [],
         serviceAreas: contractor.serviceAreas || [],
-        licenseNumber: contractor.licenseNumber || '',
         phone: contractor.phone || '',
         email: contractor.email || '',
         logoUrl: contractor.logoUrl || '',
         hourlyRate: contractor.hourlyRate || 0,
-        videoUrl: contractor.videoUrl || ''
+        videoUrl: contractor.videoUrl || '',
+        ownerName: contractor.ownerName || '',
+        website: contractor.website || '',
+        instagram: contractor.instagram || '',
+        facebook: contractor.facebook || '',
+        twitter: contractor.twitter || ''
       });
       setLogoPreview(contractor.logoUrl || '');
       setMediaFiles(contractor.mediaFiles || []);
@@ -1164,6 +1171,15 @@ const ContractorPortalEnhanced: React.FC = () => {
                               <span className="text-sm text-gray-600">Owner: {contractor.ownerName}</span>
                             </div>
                           )}
+                          {contractor?.website && (
+                            <div className="mt-3">
+                              <a href={contractor.website.startsWith('http') ? contractor.website : `https://${contractor.website}`} 
+                                 target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 flex items-center">
+                                <Globe className="h-4 w-4 mr-1" />
+                                Website
+                              </a>
+                            </div>
+                          )}
                           {(contractor?.instagram || contractor?.facebook || contractor?.twitter) && (
                             <div className="flex items-center space-x-4 mt-3">
                               {contractor?.instagram && (
@@ -1340,6 +1356,15 @@ const ContractorPortalEnhanced: React.FC = () => {
                             value={editForm.ownerName}
                             onChange={(e) => setEditForm({...editForm, ownerName: e.target.value})}
                             placeholder="Enter owner name"
+                            style={antiYellowInputStyles}
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium mb-2">Website</label>
+                          <Input
+                            value={editForm.website}
+                            onChange={(e) => setEditForm({...editForm, website: e.target.value})}
+                            placeholder="https://yourwebsite.com"
                             style={antiYellowInputStyles}
                           />
                         </div>
