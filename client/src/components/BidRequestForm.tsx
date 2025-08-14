@@ -362,6 +362,7 @@ export default function BidRequestForm({ isOpen, onClose, contractor }: BidReque
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="text-base font-semibold">Services Requested</FormLabel>
+                  <p className="text-sm text-gray-600 mb-2">Select the service you require</p>
                   <div className="space-y-2 p-3 border rounded-lg">
                     {contractorServices.length > 0 ? (
                       contractorServices.map((service) => (
