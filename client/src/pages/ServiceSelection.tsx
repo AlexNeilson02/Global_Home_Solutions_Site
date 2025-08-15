@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useSalespersonNavigation } from "@/hooks/useSalespersonNavigation";
 import { useSalesperson } from "@/contexts/SalespersonContext";
+import { ChevronLeft } from "lucide-react";
 import globalLogoPath from "@assets/GLOBAL HOME SOLUTIONS LOGO-01.png";
 import "../styles/HomePage.css";
 
@@ -35,6 +36,18 @@ const ServiceSelection = () => {
   const [trade, setTrade] = useState("");
   const [searchTriggered, setSearchTriggered] = useState(false);
   const [selectedContractor, setSelectedContractor] = useState<any>(null);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   const { data: serviceCategories } = useQuery<ServiceCategoriesResponse>({
     queryKey: ["/api/service-categories"],
@@ -125,22 +138,30 @@ const ServiceSelection = () => {
           e.currentTarget.style.backgroundColor = '#f3f4f6';
         }}
       >
-        <img 
-          src={globalLogoPath} 
-          alt="Global Home Solutions" 
-          style={{
-            height: '40px',
-            width: 'auto',
-            marginRight: '12px'
-          }}
-        />
-        <span style={{
-          fontSize: '20px',
-          fontWeight: 'bold',
-          color: '#111827'
-        }}>
-          Global Home Solutions
-        </span>
+        {isMobile ? (
+          /* Mobile: Show only arrow */
+          <ChevronLeft size={24} color="#111827" />
+        ) : (
+          /* Desktop: Show logo and company name */
+          <>
+            <img 
+              src={globalLogoPath} 
+              alt="Global Home Solutions" 
+              style={{
+                height: '40px',
+                width: 'auto',
+                marginRight: '12px'
+              }}
+            />
+            <span style={{
+              fontSize: '20px',
+              fontWeight: 'bold',
+              color: '#111827'
+            }}>
+              Global Home Solutions
+            </span>
+          </>
+        )}
       </button>
       <section className="search-section" style={{ 
         maxWidth: '1000px', 
