@@ -71,7 +71,7 @@ export default function AboutUs() {
             marginBottom: '24px',
             lineHeight: '1.1'
           }}>
-            About <span style={{ color: '#2563eb' }}>Global Home Solutions</span>
+            About <span style={{ color: '#00adee' }}>Global Home Solutions</span>
           </h1>
           <p style={{
             fontSize: '24px',
@@ -115,7 +115,7 @@ export default function AboutUs() {
             {/* Content Section - Below Image */}
             <div style={{ padding: '32px 24px 48px 24px' }}>
               <div style={{ display: 'flex', alignItems: 'center', marginBottom: '24px' }}>
-                <Home style={{ width: '32px', height: '32px', color: '#2563eb', marginRight: '16px' }} />
+                <Home style={{ width: '32px', height: '32px', color: '#00adee', marginRight: '16px' }} />
                 <h2 style={{ fontSize: '32px', fontWeight: 'bold', color: '#1f2937' }}>Our Story</h2>
               </div>
               <div style={{ marginBottom: '24px' }}>
@@ -127,11 +127,11 @@ export default function AboutUs() {
                 </p>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', maxWidth: '400px' }}>
                   <div style={{ textAlign: 'center' }}>
-                    <div style={{ fontSize: '28px', fontWeight: 'bold', color: '#2563eb', marginBottom: '8px' }}>5+</div>
+                    <div style={{ fontSize: '28px', fontWeight: 'bold', color: '#00adee', marginBottom: '8px' }}>5+</div>
                     <div style={{ fontSize: '14px', color: '#6b7280' }}>Years Experience</div>
                   </div>
                   <div style={{ textAlign: 'center' }}>
-                    <div style={{ fontSize: '28px', fontWeight: 'bold', color: '#2563eb', marginBottom: '8px' }}>1000+</div>
+                    <div style={{ fontSize: '28px', fontWeight: 'bold', color: '#00adee', marginBottom: '8px' }}>1000+</div>
                     <div style={{ fontSize: '14px', color: '#6b7280' }}>Projects Completed</div>
                   </div>
                 </div>
@@ -151,8 +151,8 @@ export default function AboutUs() {
           
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-xl hover:shadow-2xl transition-shadow">
-              <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900 rounded-2xl flex items-center justify-center mb-6">
-                <Users className="h-8 w-8 text-blue-600" />
+              <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-6" style={{ backgroundColor: '#e6f7ff' }}>
+                <Users className="h-8 w-8" style={{ color: '#00adee' }} />
               </div>
               <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
                 Expert Network
@@ -257,13 +257,13 @@ export default function AboutUs() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {/* Team member cards - populate with actual team members */}
             <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-xl text-center">
-              <div className="w-24 h-24 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full mx-auto mb-6 flex items-center justify-center">
+              <div className="w-24 h-24 rounded-full mx-auto mb-6 flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #00adee, #0088cc)' }}>
                 <Users className="h-12 w-12 text-white" />
               </div>
               <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
                 [Name]
               </h3>
-              <p className="text-blue-600 dark:text-blue-400 font-medium mb-4">
+              <p className="font-medium mb-4" style={{ color: '#00adee' }}>
                 [Title]
               </p>
               <p className="text-gray-600 dark:text-gray-400 text-sm">
@@ -306,7 +306,7 @@ export default function AboutUs() {
 
         {/* Contact Section */}
         <section className="mb-20">
-          <div className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 rounded-3xl p-8 lg:p-12 text-white relative overflow-hidden">
+          <div className="rounded-3xl p-8 lg:p-12 text-white relative overflow-hidden" style={{ background: 'linear-gradient(135deg, #00adee, #0088cc, #6366f1)' }}>
             {/* Background Pattern */}
             <div className="absolute inset-0 bg-white/5 bg-[radial-gradient(circle_at_1px_1px,_white_1px,_transparent_0)] bg-[length:20px_20px]"></div>
             
@@ -372,7 +372,7 @@ export default function AboutUs() {
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link 
                   href="/services"
-                  className="inline-flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white font-bold px-8 py-4 rounded-full text-lg transition-all shadow-xl hover:shadow-2xl hover:scale-105"
+                  className="inline-flex items-center justify-center text-white font-bold px-8 py-4 rounded-full text-lg transition-all shadow-xl hover:shadow-2xl hover:scale-105" style={{ backgroundColor: '#00adee' }}
                 >
                   Find a Contractor
                 </Link>
