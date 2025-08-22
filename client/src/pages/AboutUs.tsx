@@ -92,50 +92,49 @@ export default function AboutUs() {
             boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
             overflow: 'hidden'
           }}>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0' }}>
-              {/* Content Side */}
-              <div style={{ padding: '48px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', marginBottom: '32px' }}>
-                  <Home style={{ width: '32px', height: '32px', color: '#2563eb', marginRight: '16px' }} />
-                  <h2 style={{ fontSize: '36px', fontWeight: 'bold', color: '#1f2937' }}>Our Story</h2>
-                </div>
-                <div style={{ marginBottom: '24px' }}>
-                  <p style={{ fontSize: '18px', color: '#374151', lineHeight: '1.7', marginBottom: '24px' }}>
-                    Global Home Solutions revolutionizes the home improvement industry by connecting homeowners with trusted contractors through innovative door-to-door sales solutions.
-                  </p>
-                  <p style={{ fontSize: '18px', color: '#374151', lineHeight: '1.7', marginBottom: '32px' }}>
-                    Our platform streamlines the bidding process, ensures quality work, and provides transparent pricing for all your home improvement needs.
-                  </p>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
-                    <div style={{ textAlign: 'center' }}>
-                      <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#2563eb', marginBottom: '8px' }}>5+</div>
-                      <div style={{ fontSize: '14px', color: '#6b7280' }}>Years Experience</div>
-                    </div>
-                    <div style={{ textAlign: 'center' }}>
-                      <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#2563eb', marginBottom: '8px' }}>1000+</div>
-                      <div style={{ fontSize: '14px', color: '#6b7280' }}>Projects Completed</div>
-                    </div>
+            {/* Image Section - Full Width at Top */}
+            <div style={{
+              width: '100%',
+              height: '300px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              overflow: 'hidden'
+            }}>
+              <img 
+                src={aboutImage} 
+                alt="Professional home services" 
+                style={{ 
+                  width: '100%', 
+                  height: '100%', 
+                  objectFit: 'cover'
+                }} 
+              />
+            </div>
+            
+            {/* Content Section - Below Image */}
+            <div style={{ padding: '32px 24px 48px 24px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', marginBottom: '24px' }}>
+                <Home style={{ width: '32px', height: '32px', color: '#2563eb', marginRight: '16px' }} />
+                <h2 style={{ fontSize: '32px', fontWeight: 'bold', color: '#1f2937' }}>Our Story</h2>
+              </div>
+              <div style={{ marginBottom: '24px' }}>
+                <p style={{ fontSize: '16px', color: '#374151', lineHeight: '1.7', marginBottom: '20px' }}>
+                  Global Home Solutions revolutionizes the home improvement industry by connecting homeowners with trusted contractors through innovative door-to-door sales solutions.
+                </p>
+                <p style={{ fontSize: '16px', color: '#374151', lineHeight: '1.7', marginBottom: '32px' }}>
+                  Our platform streamlines the bidding process, ensures quality work, and provides transparent pricing for all your home improvement needs.
+                </p>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', maxWidth: '400px' }}>
+                  <div style={{ textAlign: 'center' }}>
+                    <div style={{ fontSize: '28px', fontWeight: 'bold', color: '#2563eb', marginBottom: '8px' }}>5+</div>
+                    <div style={{ fontSize: '14px', color: '#6b7280' }}>Years Experience</div>
+                  </div>
+                  <div style={{ textAlign: 'center' }}>
+                    <div style={{ fontSize: '28px', fontWeight: 'bold', color: '#2563eb', marginBottom: '8px' }}>1000+</div>
+                    <div style={{ fontSize: '14px', color: '#6b7280' }}>Projects Completed</div>
                   </div>
                 </div>
-              </div>
-              
-              {/* Image Side */}
-              <div style={{
-                padding: '0',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                overflow: 'hidden'
-              }}>
-                <img 
-                  src={aboutImage} 
-                  alt="Professional home services" 
-                  style={{ 
-                    width: '100%', 
-                    height: '100%', 
-                    objectFit: 'cover'
-                  }} 
-                />
               </div>
             </div>
           </div>
