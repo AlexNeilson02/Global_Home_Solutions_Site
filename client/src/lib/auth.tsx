@@ -34,17 +34,16 @@ const defaultValue: AuthContextType = {
 const AuthContext = createContext<AuthContextType>(defaultValue);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [token, setToken] = useState<string | null>(localStorage.getItem("auth-token"));
   const [error, setError] = useState<Error | null>(null);
 
   // Get current user data
-  const { data, isLoading } = useQuery<{ user: User, roleData: any }>({
-    queryKey: ["/api/users/me"],
-    enabled: !!token,
+  const { data, isLoading } = useQuery<User>({
+    queryKey: ["/api/auth/user"],
+    enabled: true,
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
 
-  const user = data?.user || null;
+  const user = data || null;
 
   // Login mutation
   const loginMutation = useMutation({
@@ -53,9 +52,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return res.json();
     },
     onSuccess: (data) => {
-      localStorage.setItem("auth-token", data.token);
-      setToken(data.token);
-      queryClient.invalidateQueries({ queryKey: ["/api/users/me"] });
+      // Session-based auth - no token needed
+      setError(null);
+      queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
     },
     onError: (err: Error) => {
       setError(err);
@@ -65,49 +64,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // Logout mutation
   const logoutMutation = useMutation({
     mutationFn: async () => {
-      if (token) {
-        try {
-          await apiRequest("POST", "/api/auth/logout", {});
-        } catch (error) {
-          // Continue with client-side logout even if server request fails
-          console.error("Logout request failed:", error);
-        }
+      try {
+        await apiRequest("POST", "/api/auth/logout", {});
+      } catch (error) {
+        // Continue with client-side logout even if server request fails
+        console.error("Logout request failed:", error);
       }
       return null;
     },
     onSuccess: () => {
-      localStorage.removeItem("auth-token");
-      setToken(null);
+      setError(null);
       queryClient.clear();
     },
   });
 
-  // Setup auth header for API requests
-  useEffect(() => {
-    const originalFetch = window.fetch;
-    window.fetch = async function(input: RequestInfo | URL, init?: RequestInit) {
-      let url = "";
-      if (typeof input === 'string') {
-        url = input;
-      } else if (input instanceof Request) {
-        url = input.url;
-      }
-      
-      if (url.includes('/api') && token) {
-        init = init || {};
-        init.headers = {
-          ...init.headers,
-          'Authorization': `Bearer ${token}`
-        };
-      }
-      
-      return originalFetch(input, init);
-    };
-    
-    return () => {
-      window.fetch = originalFetch;
-    };
-  }, [token]);
+  // No token setup needed for session-based auth
 
   const login = async (loginData: LoginData) => {
     setError(null);
