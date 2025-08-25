@@ -116,28 +116,35 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     },
   });
 
-  const login = async (loginData: LoginData) => {
+  const login = React.useCallback(async (loginData: LoginData) => {
     setError(null);
     await loginMutation.mutateAsync(loginData);
-  };
+  }, [loginMutation]);
 
-  const logout = async () => {
+  const logout = React.useCallback(async () => {
     await logoutMutation.mutateAsync();
-  };
+  }, [logoutMutation]);
 
   // Debug logging for user state
   useEffect(() => {
     console.log('🔐 AuthContext - User state updated:', user);
   }, [user]);
 
+  // Create a memoized context value to ensure proper re-renders
+  const contextValue = React.useMemo(() => ({
+    user: user ?? null,
+    login,
+    logout,
+    isLoading: isLoading || loginMutation.isPending,
+    error
+  }), [user, login, logout, isLoading, loginMutation.isPending, error]);
+
+  useEffect(() => {
+    console.log('🔐 AuthContext - Context value updated:', contextValue);
+  }, [contextValue]);
+
   return (
-    <AuthContext.Provider value={{ 
-      user: user ?? null, // Use nullish coalescing instead of ||
-      login, 
-      logout, 
-      isLoading: isLoading || loginMutation.isPending, 
-      error 
-    }}>
+    <AuthContext.Provider value={contextValue}>
       {children}
     </AuthContext.Provider>
   );

@@ -45,6 +45,11 @@ export default function HomePage() {
     console.log('🔍 HomePage - User role:', user?.role);
     console.log('🔍 HomePage - Is homeowner?', user?.role === 'homeowner');
     console.log('🔍 HomePage - Auth loading?', isLoading);
+    
+    // Force a state update to check if component is updating
+    if (user) {
+      console.log('✅ HomePage - User is logged in as:', user.username, 'with role:', user.role);
+    }
   }, [user, isLoading, authContext]);
   const [isMobile, setIsMobile] = useState(false);
   const [trackingComplete, setTrackingComplete] = useState(false);
