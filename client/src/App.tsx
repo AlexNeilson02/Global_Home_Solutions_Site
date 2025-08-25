@@ -10,6 +10,7 @@ import ContractorProfile from "@/pages/ContractorProfileDB";
 import ContractorPortalEnhanced from "@/pages/ContractorPortalEnhanced";
 import SalesPortalEnhanced from "@/pages/SalesPortalEnhanced";
 import AdminPortalEnhanced from "@/pages/AdminPortalEnhanced";
+import HomeownerPortal from "@/pages/HomeownerPortal";
 
 import ContractorRegistration from "@/pages/ContractorRegistration";
 import SalespersonProfile from "@/pages/SalespersonProfile";
@@ -51,6 +52,11 @@ function App() {
             <Route path="/admin-portal">
               <ProtectedRoute requiredRole="admin">
                 <AdminPortalEnhanced />
+              </ProtectedRoute>
+            </Route>
+            <Route path="/homeowner-portal">
+              <ProtectedRoute requiredRole="homeowner">
+                <HomeownerPortal />
               </ProtectedRoute>
             </Route>
             <Route path="/checkout">

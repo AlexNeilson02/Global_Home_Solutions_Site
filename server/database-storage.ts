@@ -541,6 +541,15 @@ export class DatabaseStorage implements IStorage {
       ))
       .orderBy(desc(bidRequests.createdAt));
   }
+
+  async getBidRequestsByHomeownerId(homeownerId: number): Promise<BidRequest[]> {
+    return db.select().from(bidRequests)
+      .where(and(
+        eq(bidRequests.homeownerId, homeownerId),
+        ne(bidRequests.status, 'deleted')
+      ))
+      .orderBy(desc(bidRequests.createdAt));
+  }
   
   async getRecentBidRequests(limit: number): Promise<BidRequest[]> {
     const results = await db

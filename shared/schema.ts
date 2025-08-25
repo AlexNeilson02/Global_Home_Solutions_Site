@@ -36,6 +36,7 @@ export const users = pgTable("users", {
   email: text("email").notNull().unique(),
   fullName: text("full_name").notNull(),
   phone: text("phone"),
+  address: text("address"), // Address for homeowners
   role: text("role").notNull().default("homeowner"), // homeowner, contractor, salesperson, admin
   createdAt: timestamp("created_at").defaultNow(),
   avatarUrl: text("avatar_url"),
@@ -147,6 +148,7 @@ export const bidRequests = pgTable("bid_requests", {
   createdAt: timestamp("created_at").defaultNow(),
   contractorId: integer("contractor_id").notNull().references(() => contractors.id),
   salespersonId: integer("salesperson_id").references(() => salespersons.id),
+  homeownerId: integer("homeowner_id").references(() => users.id), // Link to authenticated homeowner
   fullName: text("full_name").notNull(),
   email: text("email").notNull(),
   phone: text("phone").notNull(),
@@ -429,6 +431,7 @@ export const usersRelations = relations(users, ({ many }) => ({
   salespersons: many(salespersons),
   testimonials: many(testimonials),
   projects: many(projects, { relationName: 'homeowner' }),
+  bidRequests: many(bidRequests, { relationName: 'homeownerBids' }),
   documents: many(documents),
   projectMilestones: many(projectMilestones),
   projectStatusUpdates: many(projectStatusUpdates),
@@ -465,6 +468,11 @@ export const bidRequestsRelations = relations(bidRequests, ({ one, many }) => ({
   salesperson: one(salespersons, {
     fields: [bidRequests.salespersonId],
     references: [salespersons.id],
+  }),
+  homeowner: one(users, {
+    fields: [bidRequests.homeownerId],
+    references: [users.id],
+    relationName: 'homeownerBids',
   }),
   pageVisits: many(pageVisits),
 }));

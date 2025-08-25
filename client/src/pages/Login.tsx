@@ -65,6 +65,9 @@ export default function Login() {
         case "admin":
           setLocation("/admin-portal");
           break;
+        case "homeowner":
+          setLocation("/homeowner-portal");
+          break;
         default:
           setLocation("/");
       }
