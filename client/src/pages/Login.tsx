@@ -77,6 +77,7 @@ export default function Login() {
 
   const loginForm = useForm<LoginForm>({
     resolver: zodResolver(loginSchema),
+    mode: "onSubmit", // Only validate on submit, not while typing
     defaultValues: {
       username: "",
       password: "",
@@ -85,6 +86,7 @@ export default function Login() {
 
   const registerForm = useForm<RegisterForm>({
     resolver: zodResolver(registerSchema),
+    mode: "onSubmit", // Only validate on submit, not while typing
     defaultValues: {
       fullName: "",
       username: "",
