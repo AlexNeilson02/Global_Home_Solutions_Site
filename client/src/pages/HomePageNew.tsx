@@ -115,7 +115,7 @@ export default function HomePage() {
   }, [trackingComplete, trackingLoading]);
 
   // Fetch homeowner's bid requests
-  const { data: bidRequestsData, isLoading: bidsLoading } = useQuery({
+  const { data: bidRequestsData, isLoading: bidsLoading } = useQuery<{bidRequests: any[]}>({
     queryKey: ['/api/homeowners/bid-requests'],
     enabled: !!user && user.role === 'homeowner'
   });
