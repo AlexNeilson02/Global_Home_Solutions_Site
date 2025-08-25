@@ -7,7 +7,7 @@ import { useSalespersonNavigation } from "@/hooks/useSalespersonNavigation";
 import BidRequestForm from "@/components/BidRequestForm";
 import HomeownerBottomNav from "@/components/mobile/HomeownerBottomNav";
 import { TouchOptimizedButton } from "@/components/mobile/TouchOptimizations";
-import { useAuth } from "@/lib/auth";
+import { useAuth } from "@/lib/auth-fixed";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -37,6 +37,15 @@ export default function HomePage() {
   const { salespersonId } = useSalesperson();
   const authContext = useAuth();
   const { user, logout, isLoading } = authContext;
+  
+  // Force re-render when auth changes
+  const [, forceUpdate] = useState({});
+  
+  useEffect(() => {
+    // Force component to re-render when user changes
+    console.log('🔥 HomePage - Auth context changed, forcing re-render');
+    forceUpdate({});
+  }, [authContext.user]);
   
   // Debug logging
   useEffect(() => {

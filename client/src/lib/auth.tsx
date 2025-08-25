@@ -152,5 +152,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
 export function useAuth() {
   const context = useContext(AuthContext);
+  
+  // Force a re-render when context changes
+  const [, forceUpdate] = React.useState({});
+  
+  React.useEffect(() => {
+    console.log('🔄 useAuth hook - context changed:', context);
+    forceUpdate({});
+  }, [context.user]);
+  
   return context;
 }
