@@ -1,8 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
-import { useQuery, useMutation } from "@tanstack/react-query";
-import { apiRequest } from "./queryClient";
-import { queryClient } from "./queryClient";
-import { LoginData } from "@shared/schema";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 type User = {
   id: number;
@@ -15,49 +12,67 @@ type User = {
   address?: string;
 };
 
+type LoginData = {
+  username: string;
+  password: string;
+};
+
 type AuthContextType = {
   user: User | null;
   login: (data: LoginData) => Promise<void>;
   logout: () => Promise<void>;
   isLoading: boolean;
-  error: Error | null;
+  error: string | null;
 };
 
-const defaultValue: AuthContextType = {
-  user: null,
-  login: async () => {},
-  logout: async () => {},
-  isLoading: false,
-  error: null
-};
-
-const AuthContext = createContext<AuthContextType>(defaultValue);
+const AuthContext = createContext<AuthContextType | null>(null);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [error, setError] = useState<Error | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const queryClient = useQueryClient();
 
   // Get current user data
-  const { data, isLoading } = useQuery<User>({
+  const { data: user, isLoading, refetch } = useQuery<User>({
     queryKey: ["/api/auth/user"],
-    enabled: true,
+    queryFn: async () => {
+      const response = await fetch("/api/auth/user", {
+        credentials: 'include' // Important for session-based auth
+      });
+      if (!response.ok) {
+        if (response.status === 401) {
+          return null; // Not authenticated
+        }
+        throw new Error('Failed to fetch user');
+      }
+      return response.json();
+    },
     staleTime: 1000 * 60 * 5, // 5 minutes
+    retry: false
   });
-
-  const user = data || null;
 
   // Login mutation
   const loginMutation = useMutation({
     mutationFn: async (loginData: LoginData) => {
-      const res = await apiRequest("POST", "/api/auth/login", loginData);
-      return res.json();
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: 'include', // Important for session-based auth
+        body: JSON.stringify(loginData),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText || "Login failed");
+      }
+
+      return response.json();
     },
-    onSuccess: (data) => {
-      // Session-based auth - no token needed
+    onSuccess: () => {
       setError(null);
-      queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
+      refetch(); // Refetch user data after successful login
     },
     onError: (err: Error) => {
-      setError(err);
+      setError(err.message);
     },
   });
 
@@ -65,9 +80,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const logoutMutation = useMutation({
     mutationFn: async () => {
       try {
-        await apiRequest("POST", "/api/auth/logout", {});
+        await fetch("/api/auth/logout", {
+          method: "POST",
+          credentials: 'include'
+        });
       } catch (error) {
-        // Continue with client-side logout even if server request fails
         console.error("Logout request failed:", error);
       }
       return null;
@@ -77,8 +94,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       queryClient.clear();
     },
   });
-
-  // No token setup needed for session-based auth
 
   const login = async (loginData: LoginData) => {
     setError(null);
@@ -91,7 +106,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <AuthContext.Provider value={{ 
-      user, 
+      user: user || null, 
       login, 
       logout, 
       isLoading: isLoading || loginMutation.isPending, 
@@ -104,5 +119,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
 export function useAuth() {
   const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error("useAuth must be used within an AuthProvider");
+  }
   return context;
 }
