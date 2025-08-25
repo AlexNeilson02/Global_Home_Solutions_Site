@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import * as React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -34,6 +35,10 @@ export default function Login() {
   const [, setLocation] = useLocation();
   const [isLoading, setIsLoading] = useState(false);
   const [isRegistering, setIsRegistering] = useState(false);
+  
+  // Custom state for problematic fields
+  const [customFullName, setCustomFullName] = useState("");
+  const [customUsername, setCustomUsername] = useState("");
 
   // Robust JavaScript fix for input fields
   useEffect(() => {
@@ -86,6 +91,17 @@ export default function Login() {
       confirmPassword: "",
     },
   });
+  
+  // Sync custom values with form
+  const syncFormValues = () => {
+    registerForm.setValue('fullName', customFullName);
+    registerForm.setValue('username', customUsername);
+  };
+  
+  // Update form values when custom values change
+  React.useEffect(() => {
+    syncFormValues();
+  }, [customFullName, customUsername]);
 
   const onLogin = async (data: LoginForm) => {
     setIsLoading(true);
@@ -248,77 +264,71 @@ export default function Login() {
               // Registration Form
               <Form {...registerForm}>
                 <form onSubmit={registerForm.handleSubmit(onRegister)} className="space-y-6">
-                  <FormField
-                    control={registerForm.control}
-                    name="fullName"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Full Name</FormLabel>
-                        <FormControl>
-                          <Input 
-                            placeholder="Enter your full name" 
-                            autoComplete="name"
-                            autoFocus={false}
-                            value={field.value || ''}
-                            onChange={(e) => {
-                              const value = e.target.value;
-                              console.log('Full Name input change:', value);
-                              field.onChange(e);
-                              // Ensure text stays visible without interfering with input
-                              const input = e.target as HTMLInputElement;
-                              input.style.color = '#000000';
-                              input.style.webkitTextFillColor = '#000000';
-                            }}
-                            onFocus={() => console.log('Full Name focused')}
-                            onClick={() => console.log('Full Name clicked')}
-                            style={{ 
-                              backgroundColor: '#ffffff',
-                              color: '#000000',
-                              pointerEvents: 'auto',
-                              userSelect: 'text'
-                            }}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                      Full Name
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="Enter your full name"
+                      value={customFullName}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        console.log('Full Name input change:', value);
+                        setCustomFullName(value);
+                      }}
+                      onFocus={() => console.log('Full Name focused')}
+                      onClick={() => console.log('Full Name clicked')}
+                      className="flex h-12 w-full rounded-apple border-2 border-gray-300 bg-white px-4 py-3 text-base text-gray-900 placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:border-primary focus-visible:ring-offset-2"
+                      style={{
+                        backgroundColor: '#ffffff',
+                        color: '#000000',
+                        fontSize: '16px',
+                        fontFamily: 'inherit',
+                        WebkitTextFillColor: '#000000',
+                        opacity: 1,
+                        visibility: 'visible'
+                      }}
+                    />
+                    {registerForm.formState.errors.fullName && (
+                      <p className="text-sm font-medium text-destructive">
+                        {registerForm.formState.errors.fullName.message}
+                      </p>
                     )}
-                  />
+                  </div>
                   
-                  <FormField
-                    control={registerForm.control}
-                    name="username"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Username</FormLabel>
-                        <FormControl>
-                          <Input 
-                            placeholder="Choose a username" 
-                            autoComplete="username"
-                            autoFocus={false}
-                            value={field.value || ''}
-                            onChange={(e) => {
-                              const value = e.target.value;
-                              console.log('Username input change:', value);
-                              field.onChange(e);
-                              // Ensure text stays visible without interfering with input
-                              const input = e.target as HTMLInputElement;
-                              input.style.color = '#000000';
-                              input.style.webkitTextFillColor = '#000000';
-                            }}
-                            onFocus={() => console.log('Username focused')}
-                            onClick={() => console.log('Username clicked')}
-                            style={{ 
-                              backgroundColor: '#ffffff',
-                              color: '#000000',
-                              pointerEvents: 'auto',
-                              userSelect: 'text'
-                            }}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                      Username
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="Choose a username"
+                      value={customUsername}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        console.log('Username input change:', value);
+                        setCustomUsername(value);
+                      }}
+                      onFocus={() => console.log('Username focused')}
+                      onClick={() => console.log('Username clicked')}
+                      className="flex h-12 w-full rounded-apple border-2 border-gray-300 bg-white px-4 py-3 text-base text-gray-900 placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:border-primary focus-visible:ring-offset-2"
+                      style={{
+                        backgroundColor: '#ffffff',
+                        color: '#000000',
+                        fontSize: '16px',
+                        fontFamily: 'inherit',
+                        WebkitTextFillColor: '#000000',
+                        opacity: 1,
+                        visibility: 'visible'
+                      }}
+                    />
+                    {registerForm.formState.errors.username && (
+                      <p className="text-sm font-medium text-destructive">
+                        {registerForm.formState.errors.username.message}
+                      </p>
                     )}
-                  />
+                  </div>
 
                   <FormField
                     control={registerForm.control}
