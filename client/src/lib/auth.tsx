@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { LoginData } from "@shared/schema";
 
 type User = {
   id: number;
@@ -12,10 +13,7 @@ type User = {
   address?: string;
 };
 
-type LoginData = {
-  username: string;
-  password: string;
-};
+// LoginData is now imported from shared schema
 
 type AuthContextType = {
   user: User | null;
@@ -30,6 +28,17 @@ const AuthContext = createContext<AuthContextType | null>(null);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [error, setError] = useState<string | null>(null);
   const queryClient = useQueryClient();
+
+  // Clear any old auth tokens on startup
+  useEffect(() => {
+    // Clear all possible localStorage keys that might contain user data
+    localStorage.removeItem("auth-token");
+    localStorage.removeItem("user");
+    localStorage.removeItem("currentUser");
+    localStorage.removeItem("storedUser");
+    localStorage.removeItem("authUser");
+    localStorage.clear(); // Nuclear option - clear everything
+  }, []);
 
   // Get current user data
   const { data: user, isLoading, refetch } = useQuery<User>({
