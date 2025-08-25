@@ -1774,3 +1774,18 @@ div[role="tabpanel"] * {
     padding-bottom: env(safe-area-inset-bottom);
   }
 }
+
+/* Mobile Navigation Overrides */
+@media (max-width: 640px) {
+  .mobile-nav-show {
+    display: block !important;
+  }
+  
+  .mobile-nav-hide {
+    display: none !important;
+  }
+  
+  .mobile-grid-2-cols {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
