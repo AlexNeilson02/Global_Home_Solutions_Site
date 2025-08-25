@@ -1813,6 +1813,16 @@ input[placeholder*="Enter your full name"] {
   -webkit-appearance: none !important;
   -moz-appearance: textfield !important;
   appearance: none !important;
+  font-size: 16px !important;
+  font-family: inherit !important;
+  line-height: 1.5 !important;
+  text-indent: 0px !important;
+  text-shadow: none !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  -webkit-text-fill-color: #000000 !important;
+  text-align: left !important;
+  direction: ltr !important;
 }
 
 input[name="fullName"]:focus,
@@ -1827,4 +1837,27 @@ input[placeholder*="Enter your full name"]:focus {
   color: #000000 !important;
   z-index: 11 !important;
   box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2) !important;
+  -webkit-text-fill-color: #000000 !important;
+}
+
+/* Force text visibility in all states */
+input[name="fullName"]::-webkit-input-placeholder,
+input[name="username"]::-webkit-input-placeholder {
+  color: #9ca3af !important;
+  opacity: 1 !important;
+}
+
+input[name="fullName"]::placeholder,
+input[name="username"]::placeholder {
+  color: #9ca3af !important;
+  opacity: 1 !important;
+}
+
+/* Override any webkit autofill styles */
+input[name="fullName"]:-webkit-autofill,
+input[name="username"]:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0 1000px white inset !important;
+  -webkit-text-fill-color: #000000 !important;
+  background-color: #ffffff !important;
+  color: #000000 !important;
 }
