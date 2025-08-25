@@ -35,16 +35,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [error, setError] = useState<string | null>(null);
   const queryClient = useQueryClient();
 
-  // Clear any old auth tokens on startup
-  useEffect(() => {
-    // Clear all possible localStorage keys that might contain user data
-    localStorage.removeItem("auth-token");
-    localStorage.removeItem("user");
-    localStorage.removeItem("currentUser");
-    localStorage.removeItem("storedUser");
-    localStorage.removeItem("authUser");
-    localStorage.clear(); // Nuclear option - clear everything
-  }, []);
+  // Don't clear localStorage on every mount - this was causing issues
+  // Only clear on logout
 
   // Get current user data
   const { data: user, isLoading, refetch } = useQuery<User | null>({
@@ -68,8 +60,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     staleTime: 1000 * 60 * 5, // 5 minutes
     retry: false,
     refetchOnMount: true,
-    refetchOnWindowFocus: true
+    refetchOnWindowFocus: false, // Disable refetch on window focus to avoid issues
+    enabled: true // Ensure query is enabled
   });
+  
+  // Debug the query result
+  useEffect(() => {
+    console.log('📊 Query result - user:', user, 'isLoading:', isLoading);
+  }, [user, isLoading]);
 
   // Login mutation
   const loginMutation = useMutation({
@@ -127,9 +125,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     await logoutMutation.mutateAsync();
   };
 
+  // Debug logging for user state
+  useEffect(() => {
+    console.log('🔐 AuthContext - User state updated:', user);
+  }, [user]);
+
   return (
     <AuthContext.Provider value={{ 
-      user: user || null, 
+      user: user ?? null, // Use nullish coalescing instead of ||
       login, 
       logout, 
       isLoading: isLoading || loginMutation.isPending, 

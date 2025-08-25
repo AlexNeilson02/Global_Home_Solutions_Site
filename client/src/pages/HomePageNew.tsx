@@ -35,14 +35,17 @@ import "../styles/HomePage.css";
 export default function HomePage() {
   const { navigateWithSalesperson } = useSalespersonNavigation();
   const { salespersonId } = useSalesperson();
-  const { user, logout } = useAuth();
+  const authContext = useAuth();
+  const { user, logout, isLoading } = authContext;
   
   // Debug logging
   useEffect(() => {
+    console.log('🔍 HomePage - Full auth context:', authContext);
     console.log('🔍 HomePage - Current user state:', user);
     console.log('🔍 HomePage - User role:', user?.role);
     console.log('🔍 HomePage - Is homeowner?', user?.role === 'homeowner');
-  }, [user]);
+    console.log('🔍 HomePage - Auth loading?', isLoading);
+  }, [user, isLoading, authContext]);
   const [isMobile, setIsMobile] = useState(false);
   const [trackingComplete, setTrackingComplete] = useState(false);
   const [trackingLoading, setTrackingLoading] = useState(false);
