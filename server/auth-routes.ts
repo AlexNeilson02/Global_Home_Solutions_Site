@@ -89,22 +89,34 @@ router.post("/register", async (req: Request, res: Response) => {
           specialties: [],
           bio: null,
           qrCodeUrl: null,
-          lastScanned: null,
-          totalVisits: 0,
-          totalLeads: 0,
-          conversionRate: 0,
-          commissions: 0,
-          activeProjects: 0,
-          yearsExperience: null,
-          successfulConversions: 0
+          yearsExperience: null
         });
       } catch (error) {
         console.error("Error creating salesperson record:", error);
       }
     }
     
-    const { password, ...userInfo } = newUser;
-    res.status(201).json({ message: "User created successfully", user: userInfo });
+    // Auto-login the user after successful registration
+    req.login(newUser, (err) => {
+      if (err) {
+        console.error("Auto-login error:", err);
+        const { password, ...userInfo } = newUser;
+        return res.status(201).json({ 
+          message: "User created successfully. Please login.", 
+          user: userInfo,
+          requiresLogin: true 
+        });
+      }
+      
+      // Successfully logged in
+      const { password, ...userInfo } = newUser;
+      res.status(201).json({ 
+        message: "User created and logged in successfully", 
+        user: userInfo,
+        redirectTo: getRedirectUrl(newUser.role),
+        autoLogin: true
+      });
+    });
   } catch (error) {
     console.error("Registration error:", error);
     res.status(400).json({ message: "Invalid registration data" });

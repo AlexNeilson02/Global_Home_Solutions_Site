@@ -47,7 +47,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   // Get current user data
-  const { data: user, isLoading, refetch } = useQuery<User>({
+  const { data: user, isLoading, refetch } = useQuery<User | null>({
     queryKey: ["/api/auth/user"],
     queryFn: async () => {
       const response = await fetch("/api/auth/user", {
@@ -62,7 +62,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return response.json();
     },
     staleTime: 1000 * 60 * 5, // 5 minutes
-    retry: false
+    retry: false,
+    refetchOnMount: true,
+    refetchOnWindowFocus: true
   });
 
   // Login mutation

@@ -11,6 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useLocation, Link } from "wouter";
 import { ArrowLeft } from "lucide-react";
 import { useAuth } from "@/lib/auth";
+import { useQueryClient } from "@tanstack/react-query";
 
 const loginSchema = z.object({
   username: z.string().min(1, "Username is required"),
@@ -35,6 +36,7 @@ export default function Login() {
   const { toast } = useToast();
   const [, setLocation] = useLocation();
   const { login } = useAuth();
+  const queryClient = useQueryClient();
   const [isLoading, setIsLoading] = useState(false);
   const [isRegistering, setIsRegistering] = useState(false);
   
@@ -143,6 +145,7 @@ export default function Login() {
       const response = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: 'include', // Important for session cookies
         body: JSON.stringify({
           ...registerData,
           role: "homeowner", // Set role to homeowner
@@ -154,19 +157,44 @@ export default function Login() {
         throw new Error(errorData || "Registration failed");
       }
 
-      toast({
-        title: "Account Created Successfully!",
-        description: "You can now sign in with your new account.",
-      });
-
-      // Switch to login form after successful registration
-      setIsRegistering(false);
-      registerForm.reset();
+      const result = await response.json();
+      
+      if (result.autoLogin) {
+        // User was automatically logged in
+        toast({
+          title: "Welcome to Global Home Solutions!",
+          description: "Your account has been created and you're now logged in.",
+          duration: 2000,
+        });
+        
+        // Force auth context to refresh
+        await queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
+        
+        // Redirect to home page after a short delay
+        setTimeout(() => {
+          setLocation("/");
+        }, 100);
+      } else {
+        // Need to manually login
+        toast({
+          title: "Account Created Successfully!",
+          description: "Please sign in with your new account.",
+          duration: 2000,
+        });
+        
+        // Switch to login form
+        setIsRegistering(false);
+        registerForm.reset();
+        
+        // Pre-fill the login form with the username
+        loginForm.setValue('username', registerData.username);
+      }
     } catch (error) {
       toast({
         title: "Registration Failed",
         description: error instanceof Error ? error.message : "Failed to create account",
         variant: "destructive",
+        duration: 2000,
       });
     } finally {
       setIsLoading(false);
