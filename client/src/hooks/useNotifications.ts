@@ -27,7 +27,7 @@ export function useNotifications(contractorId: number | null) {
     lastNotification: null,
     unreadCount: 0,
   });
-  
+
   const wsRef = useRef<WebSocket | null>(null);
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -37,33 +37,33 @@ export function useNotifications(contractorId: number | null) {
     try {
       const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
       const wsUrl = `${protocol}//${window.location.host}/ws`;
-      
+
       console.log('Connecting to WebSocket for notifications:', wsUrl);
-      
+
       const ws = new WebSocket(wsUrl);
       wsRef.current = ws;
 
       ws.onopen = () => {
         console.log('WebSocket connected for contractor:', contractorId);
-        
+
         // Register this contractor for notifications
         ws.send(JSON.stringify({
           type: 'CONTRACTOR_CONNECT',
           contractorId: contractorId
         }));
-        
+
         setState(prev => ({ ...prev, isConnected: true }));
       };
 
       ws.onmessage = (event) => {
         try {
           const message = JSON.parse(event.data);
-          
+
           if (message.type === 'CONNECTION_CONFIRMED') {
             console.log('Notification connection confirmed for contractor:', message.contractorId);
           } else if (message.type === 'NEW_BID_REQUEST') {
             console.log('New bid request notification received:', message.data);
-            
+
             setState(prev => ({
               ...prev,
               lastNotification: message,
@@ -72,7 +72,7 @@ export function useNotifications(contractorId: number | null) {
 
             // Show browser notification if permission granted
             showBrowserNotification(message.data);
-            
+
             // Play notification sound
             playNotificationSound();
           }
@@ -84,7 +84,7 @@ export function useNotifications(contractorId: number | null) {
       ws.onclose = () => {
         console.log('WebSocket connection closed');
         setState(prev => ({ ...prev, isConnected: false }));
-        
+
         // Attempt to reconnect after 3 seconds (only if component is still mounted)
         reconnectTimeoutRef.current = setTimeout(() => {
           if (reconnectTimeoutRef.current) {
@@ -108,7 +108,7 @@ export function useNotifications(contractorId: number | null) {
       wsRef.current.close();
       wsRef.current = null;
     }
-    
+
     if (reconnectTimeoutRef.current) {
       clearTimeout(reconnectTimeoutRef.current);
       reconnectTimeoutRef.current = null;
@@ -124,7 +124,7 @@ export function useNotifications(contractorId: number | null) {
     if (contractorId) {
       connect();
     }
-    
+
     return () => {
       disconnect();
     };
@@ -172,16 +172,16 @@ function playNotificationSound() {
     const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
     const oscillator = audioContext.createOscillator();
     const gainNode = audioContext.createGain();
-    
+
     oscillator.connect(gainNode);
     gainNode.connect(audioContext.destination);
-    
+
     oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
     oscillator.frequency.setValueAtTime(600, audioContext.currentTime + 0.1);
-    
+
     gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
     gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
-    
+
     oscillator.start(audioContext.currentTime);
     oscillator.stop(audioContext.currentTime + 0.3);
   } catch (error) {

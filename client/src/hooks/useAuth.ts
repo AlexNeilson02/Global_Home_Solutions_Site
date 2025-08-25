@@ -38,12 +38,12 @@ export function useAuth() {
         },
         body: JSON.stringify(credentials),
       });
-      
+
       if (!response.ok) {
         const error = await response.json();
         throw new Error(error.message || "Login failed");
       }
-      
+
       return response.json();
     },
     onSuccess: (data) => {
@@ -71,12 +71,12 @@ export function useAuth() {
           "Content-Type": "application/json",
         },
       });
-      
+
       if (!response.ok) {
         const error = await response.json();
         throw new Error(error.message || "Logout failed");
       }
-      
+
       return response.json();
     },
     onSuccess: () => {
