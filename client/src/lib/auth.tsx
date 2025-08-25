@@ -50,16 +50,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const { data: user, isLoading, refetch } = useQuery<User | null>({
     queryKey: ["/api/auth/user"],
     queryFn: async () => {
+      console.log('🔍 Fetching user data...');
       const response = await fetch("/api/auth/user", {
         credentials: 'include' // Important for session-based auth
       });
       if (!response.ok) {
         if (response.status === 401) {
+          console.log('⛔ Not authenticated');
           return null; // Not authenticated
         }
         throw new Error('Failed to fetch user');
       }
-      return response.json();
+      const userData = await response.json();
+      console.log('👤 User data received:', userData);
+      return userData;
     },
     staleTime: 1000 * 60 * 5, // 5 minutes
     retry: false,
@@ -84,9 +88,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       return response.json();
     },
-    onSuccess: () => {
+    onSuccess: async (data) => {
       setError(null);
-      refetch(); // Refetch user data after successful login
+      console.log('✅ Login successful, response:', data);
+      await refetch(); // Refetch user data after successful login
+      console.log('✅ User data refetched');
     },
     onError: (err: Error) => {
       setError(err.message);

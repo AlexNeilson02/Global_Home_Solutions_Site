@@ -36,6 +36,13 @@ export default function HomePage() {
   const { navigateWithSalesperson } = useSalespersonNavigation();
   const { salespersonId } = useSalesperson();
   const { user, logout } = useAuth();
+  
+  // Debug logging
+  useEffect(() => {
+    console.log('🔍 HomePage - Current user state:', user);
+    console.log('🔍 HomePage - User role:', user?.role);
+    console.log('🔍 HomePage - Is homeowner?', user?.role === 'homeowner');
+  }, [user]);
   const [isMobile, setIsMobile] = useState(false);
   const [trackingComplete, setTrackingComplete] = useState(false);
   const [trackingLoading, setTrackingLoading] = useState(false);
@@ -537,6 +544,26 @@ export default function HomePage() {
           activeTab={activeTab} 
           onTabChange={setActiveTab}
         />
+      )}
+      
+      {/* Debug info */}
+      {user && (
+        <div style={{ 
+          position: 'fixed', 
+          top: 0, 
+          right: 0, 
+          background: 'rgba(0,0,0,0.8)', 
+          color: 'white', 
+          padding: '10px',
+          fontSize: '12px',
+          zIndex: 9999,
+          maxWidth: '200px'
+        }}>
+          <div>User: {user.username}</div>
+          <div>Role: {user.role}</div>
+          <div>Email: {user.email}</div>
+          <div>Is Homeowner: {user.role === 'homeowner' ? 'YES' : 'NO'}</div>
+        </div>
       )}
     </div>
   );
