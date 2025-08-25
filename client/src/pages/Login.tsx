@@ -35,40 +35,37 @@ export default function Login() {
   const [isLoading, setIsLoading] = useState(false);
   const [isRegistering, setIsRegistering] = useState(false);
 
-  // Lightweight JavaScript fix for input fields
+  // Robust JavaScript fix for input fields
   useEffect(() => {
     const fixInputs = () => {
       const inputs = document.querySelectorAll('input[name="fullName"], input[name="username"]');
       inputs.forEach((input) => {
         const element = input as HTMLInputElement;
-        if (!element.dataset.fixed) {
-          // One-time fixes only
-          element.style.webkitUserSelect = 'text';
-          element.style.userSelect = 'text';
-          element.style.pointerEvents = 'auto';
-          element.style.backgroundColor = '#ffffff';
-          element.style.color = '#000000';
-          element.style.caretColor = '#3b82f6';
-          element.style.fontSize = '16px';
-          element.style.fontFamily = 'inherit';
-          element.style.opacity = '1';
-          element.style.visibility = 'visible';
-          element.style.textIndent = '0px';
-          element.style.textShadow = 'none';
-          element.style.webkitTextFillColor = '#000000';
-          element.readOnly = false;
-          element.disabled = false;
-          
-          // Mark as fixed to prevent re-processing
-          element.dataset.fixed = 'true';
-          
-          console.log('Fixed input:', element.name || element.placeholder);
-        }
+        // Apply visual fixes without touching input values
+        element.style.webkitUserSelect = 'text';
+        element.style.userSelect = 'text';
+        element.style.pointerEvents = 'auto';
+        element.style.backgroundColor = '#ffffff';
+        element.style.color = '#000000 !important';
+        element.style.caretColor = '#3b82f6';
+        element.style.fontSize = '16px';
+        element.style.fontFamily = 'inherit';
+        element.style.opacity = '1';
+        element.style.visibility = 'visible';
+        element.style.textIndent = '0px';
+        element.style.textShadow = 'none';
+        element.style.webkitTextFillColor = '#000000 !important';
+        element.style.display = 'block';
+        element.readOnly = false;
+        element.disabled = false;
       });
     };
 
-    // Run fix only once initially and when form mode changes
+    // Apply fixes regularly but don't interfere with input values
     fixInputs();
+    const timer = setInterval(fixInputs, 200);
+    
+    return () => clearInterval(timer);
   }, [isRegistering]);
 
   const loginForm = useForm<LoginForm>({

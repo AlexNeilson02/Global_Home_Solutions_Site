@@ -1861,3 +1861,17 @@ input[name="username"]:-webkit-autofill {
   background-color: #ffffff !important;
   color: #000000 !important;
 }
+
+/* CRITICAL TEXT VISIBILITY OVERRIDE */
+input[name="fullName"] *,
+input[name="username"] *,
+input[name="fullName"],
+input[name="username"] {
+  color: #000000 !important;
+  -webkit-text-fill-color: #000000 !important;
+  background-color: #ffffff !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  font-size: 16px !important;
+  display: block !important;
+}
