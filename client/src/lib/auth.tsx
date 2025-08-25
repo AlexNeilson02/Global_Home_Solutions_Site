@@ -23,7 +23,13 @@ type AuthContextType = {
   error: string | null;
 };
 
-const AuthContext = createContext<AuthContextType | null>(null);
+const AuthContext = createContext<AuthContextType>({
+  user: null,
+  login: async () => { throw new Error("AuthProvider not initialized"); },
+  logout: async () => { throw new Error("AuthProvider not initialized"); },
+  isLoading: false,
+  error: null
+});
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [error, setError] = useState<string | null>(null);
@@ -128,8 +134,5 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
 export function useAuth() {
   const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error("useAuth must be used within an AuthProvider");
-  }
   return context;
 }
