@@ -174,22 +174,6 @@ export default function HomePage() {
         )}
       </div>
 
-      {/* Mobile Bottom Navigation */}
-      {isMobile && (
-        <HomeownerBottomNav 
-          activeTab={activeTab}
-          onTabChange={(tab) => {
-            setActiveTab(tab);
-            if (tab === 'services') {
-              navigateWithSalesperson('/services');
-            } else if (tab === 'contractors') {
-              navigateWithSalesperson('/');
-            } else if (tab === 'profile') {
-              navigateWithSalesperson('/login');
-            }
-          }}
-        />
-      )}
     </div>
   );
 }
