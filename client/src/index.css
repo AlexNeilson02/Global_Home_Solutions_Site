@@ -1719,3 +1719,58 @@ div[role="tabpanel"] * {
 [data-radix-toast-viewport]:empty {
   display: none !important;
 }
+
+/* Mobile Viewport Fixes and PWA Optimizations */
+:root {
+  --vh: 1vh;
+}
+
+/* Use CSS custom property for more reliable viewport height on mobile */
+.full-height {
+  height: 100vh;
+  height: calc(var(--vh, 1vh) * 100);
+}
+
+/* Improve scrolling on iOS */
+.smooth-scroll {
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+}
+
+/* Better touch targets */
+.touch-target {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+/* Disable text selection on buttons and interactive elements */
+.no-select {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* Better button tap feedback */
+.tap-highlight {
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
+}
+
+/* PWA specific styles */
+@media (display-mode: standalone) {
+  body {
+    /* Remove any browser chrome artifacts in standalone mode */
+    user-select: none;
+  }
+  
+  /* Add some top padding for status bar on mobile */
+  .pwa-safe-top {
+    padding-top: env(safe-area-inset-top);
+  }
+  
+  .pwa-safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
