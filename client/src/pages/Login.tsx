@@ -18,8 +18,12 @@ const loginSchema = z.object({
 const registerSchema = z.object({
   fullName: z.string().min(1, "Name is required"),
   username: z.string().min(3, "Username must be at least 3 characters"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
   email: z.string().email("Please enter a valid email address"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+  confirmPassword: z.string().min(6, "Please confirm your password"),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Passwords don't match",
+  path: ["confirmPassword"],
 });
 
 type LoginForm = z.infer<typeof loginSchema>;
@@ -44,8 +48,9 @@ export default function Login() {
     defaultValues: {
       fullName: "",
       username: "",
-      password: "",
       email: "",
+      password: "",
+      confirmPassword: "",
     },
   });
 
@@ -104,11 +109,13 @@ export default function Login() {
   const onRegister = async (data: RegisterForm) => {
     setIsLoading(true);
     try {
+      // Exclude confirmPassword from the API call
+      const { confirmPassword, ...registerData } = data;
       const response = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          ...data,
+          ...registerData,
           role: "homeowner", // Set role to homeowner
         }),
       });
@@ -258,6 +265,20 @@ export default function Login() {
                         <FormLabel>Password</FormLabel>
                         <FormControl>
                           <Input type="password" placeholder="Create a password (min 6 characters)" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={registerForm.control}
+                    name="confirmPassword"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Confirm Password</FormLabel>
+                        <FormControl>
+                          <Input type="password" placeholder="Confirm your password" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
