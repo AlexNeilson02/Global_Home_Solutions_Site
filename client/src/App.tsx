@@ -4,6 +4,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { SalespersonProvider } from "@/contexts/SalespersonContext";
+import { MobileViewportFix } from "@/components/mobile/MobileViewportFix";
 import HomePage from "@/pages/HomePageNew";
 import ContractorProfile from "@/pages/ContractorProfileDB";
 import ContractorPortalEnhanced from "@/pages/ContractorPortalEnhanced";
@@ -24,7 +25,8 @@ function App() {
     <Router>
       <SalespersonProvider>
         <TooltipProvider>
-          <div className="min-h-screen" style={{ marginTop: 0, paddingTop: 0, position: 'relative', top: 0 }}>
+          <MobileViewportFix />
+          <div className="min-h-screen full-height smooth-scroll" style={{ marginTop: 0, paddingTop: 0, position: 'relative', top: 0 }}>
             <Toaster />
             <Route path="/" component={HomePage} />
             <Route path="/about" component={AboutUs} />
