@@ -172,8 +172,14 @@ const HomeownerPortal: React.FC = () => {
     );
   }
 
+  // Use effect to handle navigation to prevent React render errors
+  useEffect(() => {
+    if (!userLoading && !user) {
+      navigate("/login");
+    }
+  }, [user, userLoading, navigate]);
+
   if (!user) {
-    navigate("/login");
     return null;
   }
 
