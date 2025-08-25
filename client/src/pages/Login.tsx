@@ -140,7 +140,7 @@ export default function Login() {
           setLocation("/admin-portal");
           break;
         case "homeowner":
-          setLocation("/homeowner-portal");
+          setLocation("/");
           break;
         default:
           setLocation("/");
