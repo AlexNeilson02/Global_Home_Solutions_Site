@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -34,6 +34,44 @@ export default function Login() {
   const [, setLocation] = useLocation();
   const [isLoading, setIsLoading] = useState(false);
   const [isRegistering, setIsRegistering] = useState(false);
+
+  // Emergency JavaScript fix for input fields
+  useEffect(() => {
+    const fixInputs = () => {
+      const inputs = document.querySelectorAll('input[name="fullName"], input[name="username"]');
+      inputs.forEach((input) => {
+        const element = input as HTMLInputElement;
+        // Force enable text selection and input
+        element.style.webkitUserSelect = 'text';
+        element.style.userSelect = 'text';
+        element.style.pointerEvents = 'auto';
+        element.style.backgroundColor = '#ffffff';
+        element.style.color = '#000000';
+        element.style.caretColor = '#3b82f6';
+        element.readOnly = false;
+        element.disabled = false;
+        
+        // Add event listeners to ensure input works
+        element.addEventListener('click', (e) => {
+          e.stopPropagation();
+          element.focus();
+        });
+        
+        element.addEventListener('focus', () => {
+          element.style.borderColor = '#3b82f6';
+          element.style.outline = '2px solid #3b82f6';
+        });
+        
+        console.log('Fixed input:', element.name || element.placeholder);
+      });
+    };
+
+    // Run fix immediately and on form changes
+    fixInputs();
+    const timer = setInterval(fixInputs, 100);
+    
+    return () => clearInterval(timer);
+  }, [isRegistering]);
 
   const loginForm = useForm<LoginForm>({
     resolver: zodResolver(loginSchema),
@@ -222,7 +260,24 @@ export default function Login() {
                       <FormItem>
                         <FormLabel>Full Name</FormLabel>
                         <FormControl>
-                          <Input placeholder="Enter your full name" {...field} />
+                          <Input 
+                            placeholder="Enter your full name" 
+                            autoComplete="name"
+                            autoFocus={false}
+                            value={field.value || ''}
+                            onChange={(e) => {
+                              console.log('Full Name input change:', e.target.value);
+                              field.onChange(e);
+                            }}
+                            onFocus={() => console.log('Full Name focused')}
+                            onClick={() => console.log('Full Name clicked')}
+                            style={{ 
+                              backgroundColor: '#ffffff',
+                              color: '#000000',
+                              pointerEvents: 'auto',
+                              userSelect: 'text'
+                            }}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -236,7 +291,24 @@ export default function Login() {
                       <FormItem>
                         <FormLabel>Username</FormLabel>
                         <FormControl>
-                          <Input placeholder="Choose a username" {...field} />
+                          <Input 
+                            placeholder="Choose a username" 
+                            autoComplete="username"
+                            autoFocus={false}
+                            value={field.value || ''}
+                            onChange={(e) => {
+                              console.log('Username input change:', e.target.value);
+                              field.onChange(e);
+                            }}
+                            onFocus={() => console.log('Username focused')}
+                            onClick={() => console.log('Username clicked')}
+                            style={{ 
+                              backgroundColor: '#ffffff',
+                              color: '#000000',
+                              pointerEvents: 'auto',
+                              userSelect: 'text'
+                            }}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -250,7 +322,22 @@ export default function Login() {
                       <FormItem>
                         <FormLabel>Email</FormLabel>
                         <FormControl>
-                          <Input type="email" placeholder="Enter your email address" {...field} />
+                          <Input 
+                            type="email" 
+                            placeholder="Enter your email address" 
+                            autoComplete="email"
+                            value={field.value || ''}
+                            onChange={(e) => {
+                              console.log('Email input change:', e.target.value);
+                              field.onChange(e);
+                            }}
+                            style={{ 
+                              backgroundColor: '#ffffff',
+                              color: '#000000',
+                              pointerEvents: 'auto',
+                              userSelect: 'text'
+                            }}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>

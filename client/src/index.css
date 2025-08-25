@@ -1789,3 +1789,42 @@ div[role="tabpanel"] * {
     grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
   }
 }
+
+/* ===== EMERGENCY INPUT FIXES FOR REGISTRATION FORM ===== */
+input[name="fullName"],
+input[name="username"],
+input[placeholder*="full name"],
+input[placeholder*="username"],
+input[placeholder*="Choose a username"],
+input[placeholder*="Enter your full name"] {
+  -webkit-user-select: text !important;
+  -moz-user-select: text !important;
+  -ms-user-select: text !important;
+  user-select: text !important;
+  pointer-events: auto !important;
+  background-color: #ffffff !important;
+  color: #000000 !important;
+  caret-color: #3b82f6 !important;
+  outline: none !important;
+  border: 2px solid #d1d5db !important;
+  z-index: 10 !important;
+  position: relative !important;
+  -webkit-touch-callout: default !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: textfield !important;
+  appearance: none !important;
+}
+
+input[name="fullName"]:focus,
+input[name="username"]:focus,
+input[placeholder*="full name"]:focus,
+input[placeholder*="username"]:focus,
+input[placeholder*="Choose a username"]:focus,
+input[placeholder*="Enter your full name"]:focus {
+  border-color: #3b82f6 !important;
+  outline: 2px solid #3b82f6 !important;
+  background-color: #ffffff !important;
+  color: #000000 !important;
+  z-index: 11 !important;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2) !important;
+}
