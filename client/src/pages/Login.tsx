@@ -35,67 +35,40 @@ export default function Login() {
   const [isLoading, setIsLoading] = useState(false);
   const [isRegistering, setIsRegistering] = useState(false);
 
-  // Emergency JavaScript fix for input fields
+  // Lightweight JavaScript fix for input fields
   useEffect(() => {
     const fixInputs = () => {
       const inputs = document.querySelectorAll('input[name="fullName"], input[name="username"]');
       inputs.forEach((input) => {
         const element = input as HTMLInputElement;
-        // Force enable text selection and input
-        element.style.webkitUserSelect = 'text';
-        element.style.userSelect = 'text';
-        element.style.pointerEvents = 'auto';
-        element.style.backgroundColor = '#ffffff';
-        element.style.color = '#000000 !important';
-        element.style.caretColor = '#3b82f6';
-        element.style.fontSize = '16px';
-        element.style.fontFamily = 'inherit';
-        element.style.opacity = '1';
-        element.style.visibility = 'visible';
-        element.style.textIndent = '0px';
-        element.style.textShadow = 'none';
-        element.style.webkitTextFillColor = '#000000';
-        element.readOnly = false;
-        element.disabled = false;
-        
-        // Force visual text display
-        const originalValue = element.value;
-        if (originalValue) {
-          element.value = '';
-          setTimeout(() => {
-            element.value = originalValue;
-            element.dispatchEvent(new Event('input', { bubbles: true }));
-          }, 1);
+        if (!element.dataset.fixed) {
+          // One-time fixes only
+          element.style.webkitUserSelect = 'text';
+          element.style.userSelect = 'text';
+          element.style.pointerEvents = 'auto';
+          element.style.backgroundColor = '#ffffff';
+          element.style.color = '#000000';
+          element.style.caretColor = '#3b82f6';
+          element.style.fontSize = '16px';
+          element.style.fontFamily = 'inherit';
+          element.style.opacity = '1';
+          element.style.visibility = 'visible';
+          element.style.textIndent = '0px';
+          element.style.textShadow = 'none';
+          element.style.webkitTextFillColor = '#000000';
+          element.readOnly = false;
+          element.disabled = false;
+          
+          // Mark as fixed to prevent re-processing
+          element.dataset.fixed = 'true';
+          
+          console.log('Fixed input:', element.name || element.placeholder);
         }
-        
-        // Add event listeners to ensure input works
-        element.addEventListener('click', (e) => {
-          e.stopPropagation();
-          element.focus();
-        });
-        
-        element.addEventListener('focus', () => {
-          element.style.borderColor = '#3b82f6';
-          element.style.outline = '2px solid #3b82f6';
-        });
-        
-        // Force text to show on input
-        element.addEventListener('input', (e) => {
-          const target = e.target as HTMLInputElement;
-          target.style.color = '#000000 !important';
-          target.style.webkitTextFillColor = '#000000';
-          console.log('Input value:', target.value);
-        });
-        
-        console.log('Fixed input:', element.name || element.placeholder, 'Value:', element.value);
       });
     };
 
-    // Run fix immediately and on form changes
+    // Run fix only once initially and when form mode changes
     fixInputs();
-    const timer = setInterval(fixInputs, 500);
-    
-    return () => clearInterval(timer);
   }, [isRegistering]);
 
   const loginForm = useForm<LoginForm>({
@@ -294,15 +267,10 @@ export default function Login() {
                               const value = e.target.value;
                               console.log('Full Name input change:', value);
                               field.onChange(e);
-                              // Force visual update
-                              setTimeout(() => {
-                                const input = e.target as HTMLInputElement;
-                                input.style.color = '#000000 !important';
-                                input.style.webkitTextFillColor = '#000000 !important';
-                                if (input.value !== value) {
-                                  input.value = value;
-                                }
-                              }, 1);
+                              // Ensure text stays visible without interfering with input
+                              const input = e.target as HTMLInputElement;
+                              input.style.color = '#000000';
+                              input.style.webkitTextFillColor = '#000000';
                             }}
                             onFocus={() => console.log('Full Name focused')}
                             onClick={() => console.log('Full Name clicked')}
@@ -335,15 +303,10 @@ export default function Login() {
                               const value = e.target.value;
                               console.log('Username input change:', value);
                               field.onChange(e);
-                              // Force visual update
-                              setTimeout(() => {
-                                const input = e.target as HTMLInputElement;
-                                input.style.color = '#000000 !important';
-                                input.style.webkitTextFillColor = '#000000 !important';
-                                if (input.value !== value) {
-                                  input.value = value;
-                                }
-                              }, 1);
+                              // Ensure text stays visible without interfering with input
+                              const input = e.target as HTMLInputElement;
+                              input.style.color = '#000000';
+                              input.style.webkitTextFillColor = '#000000';
                             }}
                             onFocus={() => console.log('Username focused')}
                             onClick={() => console.log('Username clicked')}
