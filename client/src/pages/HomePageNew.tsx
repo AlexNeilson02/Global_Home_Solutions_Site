@@ -115,29 +115,6 @@ export default function HomePage() {
         About Us
       </Link>
 
-      {/* Mobile Login Button - Top Right */}
-      {isMobile && !user && (
-        <TouchOptimizedButton
-          onClick={() => navigateWithSalesperson('/login')}
-          size="sm"
-          className="mobile-nav-show fixed top-5 right-5 z-20 bg-white/20 backdrop-blur-sm text-white border border-white/30 hover:bg-white/30 touch-target"
-        >
-          Login
-        </TouchOptimizedButton>
-      )}
-
-      {/* Mobile User Menu - Top Right */}
-      {isMobile && user && (
-        <div className="mobile-nav-show fixed top-5 right-5 z-20">
-          <TouchOptimizedButton
-            onClick={logout}
-            size="sm"
-            className="bg-white/20 backdrop-blur-sm text-white border border-white/30 hover:bg-white/30 touch-target"
-          >
-            Logout
-          </TouchOptimizedButton>
-        </div>
-      )}
       
       <header className="hero-header">
         <div className="hero-image-container">
@@ -153,7 +130,8 @@ export default function HomePage() {
         bottom: isMobile ? '25%' : '15%', 
         left: '50%', 
         transform: 'translateX(-50%)', 
-        zIndex: 10 
+        zIndex: 10,
+        textAlign: 'center'
       }}>
         {isMobile ? (
           <TouchOptimizedButton
@@ -171,6 +149,44 @@ export default function HomePage() {
           >
             Find a Contractor
           </button>
+        )}
+        
+        {/* Login text under button */}
+        {!user && (
+          <div style={{ marginTop: '16px' }}>
+            <span 
+              onClick={() => navigateWithSalesperson('/login')}
+              style={{
+                color: 'white',
+                fontSize: isMobile ? '16px' : '14px',
+                cursor: 'pointer',
+                textShadow: '1px 1px 2px rgba(0,0,0,0.5)',
+                textDecoration: 'underline'
+              }}
+              className="hover:text-blue-200 transition-colors touch-target"
+            >
+              Have an account? Log in
+            </span>
+          </div>
+        )}
+
+        {/* Logout text for logged in users */}
+        {user && (
+          <div style={{ marginTop: '16px' }}>
+            <span 
+              onClick={logout}
+              style={{
+                color: 'white',
+                fontSize: isMobile ? '16px' : '14px',
+                cursor: 'pointer',
+                textShadow: '1px 1px 2px rgba(0,0,0,0.5)',
+                textDecoration: 'underline'
+              }}
+              className="hover:text-blue-200 transition-colors touch-target"
+            >
+              Logout
+            </span>
+          </div>
         )}
       </div>
 
