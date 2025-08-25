@@ -40,17 +40,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const fetchUser = async () => {
       try {
         setIsLoading(true);
-        console.log('🔍 Fetching user data...');
         const response = await fetch("/api/auth/user", {
           credentials: 'include'
         });
         
         if (response.ok) {
           const userData = await response.json();
-          console.log('👤 User data received:', userData);
           setUser(userData);
         } else {
-          console.log('⛔ Not authenticated');
           setUser(null);
         }
       } catch (err) {
@@ -81,7 +78,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
 
       const result = await response.json();
-      console.log('✅ Login successful, response:', result);
       
       // Fetch user data after successful login
       const userResponse = await fetch("/api/auth/user", {
@@ -90,7 +86,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       
       if (userResponse.ok) {
         const userData = await userResponse.json();
-        console.log('👤 User data after login:', userData);
         setUser(userData);
       }
     } catch (err: any) {
@@ -114,10 +109,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     queryClient.clear();
   };
 
-  // Debug logging
-  useEffect(() => {
-    console.log('🔐 AuthContext - User state updated:', user);
-  }, [user]);
 
   const contextValue = {
     user,

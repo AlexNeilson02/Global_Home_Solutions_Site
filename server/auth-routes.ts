@@ -133,7 +133,7 @@ function getRedirectUrl(role: string): string {
     case "salesperson":
       return "/sales-portal";
     case "homeowner":
-      return "/";
+      return "/homeowner-portal";
     default:
       return "/";
   }

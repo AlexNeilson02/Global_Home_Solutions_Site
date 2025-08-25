@@ -1,14 +1,20 @@
+"Please implement homeowner login and profile functionality with these exact specifications:
+
+Step 1: Database Setup
+The database already has a users table with a role field that defaults to 'homeowner'. No schema changes needed - just verify it exists.
+
+Step 2: Create Homeowner Portal Page
+Create client/src/pages/HomeownerPortal.tsx:
+
 import React from "react";
-import { useAuth } from "@/lib/auth-fixed";
+import { useAuth } from "@/lib/auth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { User, Mail, Phone, Home, Settings, LogOut, FileText, Search } from "lucide-react";
 import { useLocation } from "wouter";
-
 const HomeownerPortal: React.FC = () => {
   const { user, logout } = useAuth();
   const [, setLocation] = useLocation();
-  
   if (!user) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -21,12 +27,10 @@ const HomeownerPortal: React.FC = () => {
       </div>
     );
   }
-  
   const handleLogout = async () => {
     await logout();
     setLocation('/');
   };
-  
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="container mx-auto px-4 max-w-4xl">
@@ -37,7 +41,6 @@ const HomeownerPortal: React.FC = () => {
             Logout
           </Button>
         </div>
-        
         <div className="grid md:grid-cols-2 gap-6">
           <Card>
             <CardHeader>
@@ -71,7 +74,6 @@ const HomeownerPortal: React.FC = () => {
               </Button>
             </CardContent>
           </Card>
-          
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -113,5 +115,99 @@ const HomeownerPortal: React.FC = () => {
     </div>
   );
 };
-
 export default HomeownerPortal;
+Step 3: Add Routes in App.tsx
+In client/src/App.tsx, add the import at the top:
+
+import HomeownerPortal from "@/pages/HomeownerPortal";
+Then add this route after the admin-portal route (around line 65):
+
+<Route path="/homeowner-portal">
+  <ProtectedRoute requiredRole="homeowner">
+    <HomeownerPortal />
+  </ProtectedRoute>
+</Route>
+Step 4: Update Login Redirect Logic
+In server/auth-routes.ts, find the getRedirectUrl function (around line 116) and update it:
+
+function getRedirectUrl(role: string): string {
+  switch (role) {
+    case "admin":
+      return "/admin-portal";
+    case "contractor":
+      return "/contractor-portal";
+    case "salesperson":
+      return "/sales-portal";
+    case "homeowner":
+      return "/homeowner-portal";
+    default:
+      return "/";
+  }
+}
+Step 5: Create API Route for Homeowner Bids
+In server/routes.ts, add this route to fetch homeowner's bid requests:
+
+// Get bid requests for a specific homeowner
+app.get("/api/homeowner/:userId/bids", isAuthenticated, async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId);
+    const authenticatedUserId = (req.user as any).id;
+    
+    // Ensure users can only access their own bids
+    if (userId !== authenticatedUserId) {
+      return res.status(403).json({ message: "Forbidden" });
+    }
+    
+    const bidRequests = await storage.getBidRequestsByUserId(userId);
+    res.json({ bidRequests });
+  } catch (error) {
+    console.error("Error fetching homeowner bid requests:", error);
+    res.status(500).json({ message: "Failed to fetch bid requests" });
+  }
+});
+Step 6: Add Storage Method (if not exists)
+In server/database-storage.ts, add this method to the DatabaseStorage class if it doesn't exist:
+
+async getBidRequestsByUserId(userId: number): Promise<BidRequest[]> {
+  return db
+    .select()
+    .from(bidRequests)
+    .where(eq(bidRequests.userId, userId))
+    .orderBy(desc(bidRequests.createdAt));
+}
+Step 7: Test the Implementation
+Test with existing account:
+Go to /login
+Login with: Username: homeowner1, Password: password
+Should redirect to /homeowner-portal
+Verify profile information displays correctly
+Test all buttons work
+Create new homeowner:
+Go to /homeowner-registration
+Fill in all fields:
+Username: testhomeowner
+Password: test123
+Full Name: Test Homeowner
+Email: test@example.com
+Phone: 555-0123
+After registration, login with new credentials
+Should redirect to /homeowner-portal
+Step 8: Verify Mobile Integration
+Click "Edit Profile" - should go to /mobile-app/profile
+Click "My Bid Requests" - should go to /mobile-app/bids
+Click "Mobile View" - should go to /mobile-app
+Expected Result:
+✅ Homeowners can login and are redirected to /homeowner-portal
+✅ Profile shows their information (name, email, phone)
+✅ Quick actions navigate to correct pages
+✅ Logout works and redirects to homepage
+✅ Role-based protection prevents unauthorized access
+✅ Mobile app integration works seamlessly
+If Something Doesn't Work:
+Check browser console for errors
+Verify the workflow is running (npm run dev)
+Check that authentication middleware is working
+Ensure database has the users table with role field
+Verify the user's role is set to 'homeowner' in database
+The entire system should work immediately after these changes. No additional packages or complex setup needed!"
+

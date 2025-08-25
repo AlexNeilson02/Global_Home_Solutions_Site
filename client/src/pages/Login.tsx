@@ -120,9 +120,9 @@ export default function Login() {
         duration: 2000,
       });
 
-      // Small delay to let authentication context update, then redirect all users to home
+      // Small delay to let authentication context update, then redirect to homeowner portal
       setTimeout(() => {
-        setLocation("/");
+        setLocation("/homeowner-portal");
       }, 100);
       
     } catch (error) {
@@ -170,9 +170,9 @@ export default function Login() {
         // Force auth context to refresh
         await queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
         
-        // Redirect to home page after a short delay
+        // Redirect to homeowner portal after a short delay
         setTimeout(() => {
-          setLocation("/");
+          setLocation("/homeowner-portal");
         }, 100);
       } else {
         // Need to manually login

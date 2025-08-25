@@ -38,28 +38,6 @@ export default function HomePage() {
   const authContext = useAuth();
   const { user, logout, isLoading } = authContext;
   
-  // Force re-render when auth changes
-  const [, forceUpdate] = useState({});
-  
-  useEffect(() => {
-    // Force component to re-render when user changes
-    console.log('🔥 HomePage - Auth context changed, forcing re-render');
-    forceUpdate({});
-  }, [authContext.user]);
-  
-  // Debug logging
-  useEffect(() => {
-    console.log('🔍 HomePage - Full auth context:', authContext);
-    console.log('🔍 HomePage - Current user state:', user);
-    console.log('🔍 HomePage - User role:', user?.role);
-    console.log('🔍 HomePage - Is homeowner?', user?.role === 'homeowner');
-    console.log('🔍 HomePage - Auth loading?', isLoading);
-    
-    // Force a state update to check if component is updating
-    if (user) {
-      console.log('✅ HomePage - User is logged in as:', user.username, 'with role:', user.role);
-    }
-  }, [user, isLoading, authContext]);
   const [isMobile, setIsMobile] = useState(false);
   const [trackingComplete, setTrackingComplete] = useState(false);
   const [trackingLoading, setTrackingLoading] = useState(false);
