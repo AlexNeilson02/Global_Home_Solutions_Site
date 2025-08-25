@@ -142,17 +142,6 @@ export default function Login() {
                 >
                   {isLoading ? "Signing in..." : "Sign In"}
                 </Button>
-
-                <div className="text-center space-y-2">
-                  <p className="text-sm text-gray-600">
-                    Don't have an account?
-                  </p>
-                  <Link href="/contractor-registration">
-                    <Button variant="outline" className="w-full">
-                      Register as Contractor
-                    </Button>
-                  </Link>
-                </div>
               </form>
             </Form>
           </CardContent>
