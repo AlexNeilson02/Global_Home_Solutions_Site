@@ -3,6 +3,8 @@ import { useQuery } from "@tanstack/react-query";
 import { useSalespersonNavigation } from "@/hooks/useSalespersonNavigation";
 import { useSalesperson } from "@/contexts/SalespersonContext";
 import { ChevronLeft } from "lucide-react";
+import HomeownerBottomNav from "@/components/mobile/HomeownerBottomNav";
+import { TouchOptimizedButton } from "@/components/mobile/TouchOptimizations";
 import globalLogoPath from "@assets/GLOBAL HOME SOLUTIONS LOGO-01.png";
 import "../styles/HomePage.css";
 
@@ -37,6 +39,7 @@ const ServiceSelection = () => {
   const [searchTriggered, setSearchTriggered] = useState(false);
   const [selectedContractor, setSelectedContractor] = useState<any>(null);
   const [isMobile, setIsMobile] = useState(false);
+  const [activeTab, setActiveTab] = useState('services');
 
   useEffect(() => {
     const checkMobile = () => {
@@ -274,10 +277,10 @@ const ServiceSelection = () => {
           marginTop: '15px'
         }}>
           <h2>Find the right contractor for your project</h2>
-          <div className="category-grid" style={{ 
+          <div className={`category-grid ${isMobile ? 'mobile-grid-2-cols' : ''}`} style={{ 
             display: 'grid', 
-            gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', 
-            gap: '20px',
+            gridTemplateColumns: isMobile ? 'repeat(2, minmax(0, 1fr))' : 'repeat(auto-fit, minmax(250px, 1fr))', 
+            gap: isMobile ? '15px' : '20px',
             justifyContent: 'center'
           }}>
             {vaultContractor && (
@@ -663,12 +666,12 @@ const ServiceSelection = () => {
               {filteredContractors.map((contractor: any) => (
                 <div 
                   key={contractor.id} 
-                  className="contractor-card"
+                  className={`contractor-card ${isMobile ? 'touch-target' : ''}`}
                   style={{ 
                     margin: '0 auto',
                     background: 'white',
                     borderRadius: '16px',
-                    padding: '24px',
+                    padding: isMobile ? '16px' : '24px',
                     boxShadow: '0 4px 16px rgba(0,0,0,0.1)',
                     border: '1px solid #e5e7eb',
                     display: 'flex',
@@ -796,6 +799,23 @@ const ServiceSelection = () => {
             </div>
           )}
         </section>
+      )}
+
+      {/* Mobile Bottom Navigation */}
+      {isMobile && (
+        <HomeownerBottomNav 
+          activeTab={activeTab}
+          onTabChange={(tab) => {
+            setActiveTab(tab);
+            if (tab === 'contractors') {
+              navigateWithSalesperson('/');
+            } else if (tab === 'services') {
+              // Stay on current page
+            } else if (tab === 'profile') {
+              navigateWithSalesperson('/login');
+            }
+          }}
+        />
       )}
     </div>
   );

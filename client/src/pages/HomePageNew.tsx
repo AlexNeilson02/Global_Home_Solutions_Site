@@ -5,6 +5,9 @@ import { apiRequest } from "@/lib/queryClient";
 import { useSalesperson } from "@/contexts/SalespersonContext";
 import { useSalespersonNavigation } from "@/hooks/useSalespersonNavigation";
 import BidRequestForm from "@/components/BidRequestForm";
+import HomeownerBottomNav from "@/components/mobile/HomeownerBottomNav";
+import { TouchOptimizedButton } from "@/components/mobile/TouchOptimizations";
+import { useAuth } from "@/lib/auth";
 import logoPath from "@/assets/global-home-solutions-logo.png";
 import heroBackgroundImage from "@/assets/ghs-office-front.png";
 import mobileHeroImage from "@assets/global home mobile 1_1754514857525.png";
@@ -13,9 +16,11 @@ import "../styles/HomePage.css";
 export default function HomePage() {
   const { navigateWithSalesperson } = useSalespersonNavigation();
   const { salespersonId } = useSalesperson();
+  const { user, logout } = useAuth();
   const [isMobile, setIsMobile] = useState(false);
   const [trackingComplete, setTrackingComplete] = useState(false);
   const [trackingLoading, setTrackingLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState('contractors');
 
   useEffect(() => {
     const checkMobile = () => {
@@ -84,11 +89,10 @@ export default function HomePage() {
   const currentHeroImage = isMobile ? mobileHeroImage : heroBackgroundImage;
 
   return (
-    <div className="homepage-container" style={{ height: '100vh', overflow: 'hidden', position: 'relative' }}>
+    <div className="homepage-container full-height smooth-scroll" style={{ height: '100vh', overflow: 'hidden', position: 'relative' }}>
       {/* About Us Link */}
       <Link 
         href="/about"
-
         style={{
           position: 'absolute',
           top: '20px',
@@ -110,6 +114,30 @@ export default function HomePage() {
       >
         About Us
       </Link>
+
+      {/* Mobile Login Button - Top Right */}
+      {isMobile && !user && (
+        <TouchOptimizedButton
+          onClick={() => navigateWithSalesperson('/login')}
+          size="sm"
+          className="mobile-nav-show fixed top-5 right-5 z-20 bg-white/20 backdrop-blur-sm text-white border border-white/30 hover:bg-white/30 touch-target"
+        >
+          Login
+        </TouchOptimizedButton>
+      )}
+
+      {/* Mobile User Menu - Top Right */}
+      {isMobile && user && (
+        <div className="mobile-nav-show fixed top-5 right-5 z-20">
+          <TouchOptimizedButton
+            onClick={logout}
+            size="sm"
+            className="bg-white/20 backdrop-blur-sm text-white border border-white/30 hover:bg-white/30 touch-target"
+          >
+            Logout
+          </TouchOptimizedButton>
+        </div>
+      )}
       
       <header className="hero-header">
         <div className="hero-image-container">
@@ -122,19 +150,46 @@ export default function HomePage() {
       </header>
       <div style={{ 
         position: 'absolute', 
-        bottom: '15%', 
+        bottom: isMobile ? '25%' : '15%', 
         left: '50%', 
         transform: 'translateX(-50%)', 
         zIndex: 10 
       }}>
-        <button 
-          onClick={() => navigateWithSalesperson('/services')}
-          className="find-contractor-btn"
-        >
-          Find a Contractor
-        </button>
-
+        {isMobile ? (
+          <TouchOptimizedButton
+            onClick={() => navigateWithSalesperson('/services')}
+            size="lg"
+            className="find-contractor-btn touch-target no-select tap-highlight"
+            style={{ backgroundColor: '#00adee', borderColor: '#00adee' }}
+          >
+            Find a Contractor
+          </TouchOptimizedButton>
+        ) : (
+          <button 
+            onClick={() => navigateWithSalesperson('/services')}
+            className="find-contractor-btn"
+          >
+            Find a Contractor
+          </button>
+        )}
       </div>
+
+      {/* Mobile Bottom Navigation */}
+      {isMobile && (
+        <HomeownerBottomNav 
+          activeTab={activeTab}
+          onTabChange={(tab) => {
+            setActiveTab(tab);
+            if (tab === 'services') {
+              navigateWithSalesperson('/services');
+            } else if (tab === 'contractors') {
+              navigateWithSalesperson('/');
+            } else if (tab === 'profile') {
+              navigateWithSalesperson('/login');
+            }
+          }}
+        />
+      )}
     </div>
   );
 }
