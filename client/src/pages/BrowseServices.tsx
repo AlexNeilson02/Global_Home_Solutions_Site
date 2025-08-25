@@ -38,6 +38,52 @@ const BrowseServices = () => {
     service.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  // Organize services into categories
+  const serviceCategoryGroups = {
+    'Construction & Remodeling': [
+      'Kitchen Remodeling', 'Room Additions/New Construction', 'General Contracting Remodel',
+      'Bathroom Remodeling', 'Decks & Porches', 'Outdoor Remodeling', 'Foundation Repair'
+    ],
+    'Exterior Services': [
+      'Roofing', 'Siding', 'Painting Interior & Exterior', 'Landscaping', 'Landscape Design',
+      'Fencing', 'Block wall/ fence', 'Rain Gutters', 'Outdoor Kitchens', 'Swimming Pools',
+      'Concrete patio/drive walk', 'Stone and Masonry', 'Turf'
+    ],
+    'Interior Services': [
+      'Flooring & Hardwood', 'Tile', 'Carpet', 'Wood Refinishing', 'Trim Carpentry',
+      'Countertops', 'Shutters/Shades/Blinds', 'Blinds and Shutters', 'Interior Design',
+      'Fireplace', 'Epoxy Flooring', 'Concrete Polishing'
+    ],
+    'Mechanical & Utilities': [
+      'Plumbing', 'Electrical', 'Heating & Cooling', 'HVAC Maintenance', 'Low Voltage',
+      'Generator Install', 'Smart Home Automation', 'Home Security and Surveillance',
+      'Water Softeners and Filtration'
+    ],
+    'Maintenance & Specialized': [
+      'Handyman', 'handy man service', 'House Cleaning', 'Window Washing', 'Pest Control',
+      'Tree Service', 'Garbage Haul Off', 'Restoration (Fire and Water)', 'Reglazing (Bath & Countertop)',
+      'Walk-in Tubs', 'Pool Service', 'Home Inspection', 'Property Management', 'Appliances',
+      'Garage Door', 'Windows & Doors', 'Window and Door Install', 'Insulation', 'Sheet Rock',
+      'Patio Covers', 'Solar', 'Excavation', 'Vet Services'
+    ]
+  };
+
+  const getCategorizedServices = () => {
+    const categorized: { [key: string]: typeof services } = {};
+    
+    Object.entries(serviceCategoryGroups).forEach(([category, categoryServices]) => {
+      categorized[category] = services.filter(service => 
+        categoryServices.some(catService => 
+          catService.toLowerCase() === service.name.toLowerCase()
+        )
+      );
+    });
+    
+    return categorized;
+  };
+
+  const categorizedServices = getCategorizedServices();
+
   const handleServiceClick = (serviceName: string) => {
     // Navigate to contractor directory with pre-selected service
     navigateWithSalesperson(`/services?category=${encodeURIComponent(serviceName)}`);
@@ -65,35 +111,62 @@ const BrowseServices = () => {
         </div>
 
         {/* Services List */}
-        <div className="space-y-4">
-          {searchTerm && (
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">
-              {filteredServices.length > 0 ? 'Search Results' : 'No services found'}
-            </h2>
-          )}
-          
-          {!searchTerm && (
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">Other Services</h2>
-          )}
-
-          {filteredServices.map((service) => (
-            <div
-              key={service.id}
-              onClick={() => handleServiceClick(service.name)}
-              className={`bg-white rounded-xl border border-gray-200 p-5 flex items-center justify-between cursor-pointer transition-all hover:shadow-md hover:border-gray-300 ${isMobile ? 'touch-target' : ''}`}
-              style={{ minHeight: isMobile ? '60px' : '56px' }}
-            >
-              <span className="text-gray-900 font-medium text-lg capitalize">
-                {service.name.toLowerCase()}
-              </span>
-              <ChevronRight className="text-gray-400" size={20} />
-            </div>
-          ))}
-
-          {filteredServices.length === 0 && searchTerm && (
-            <div className="text-center py-12">
-              <p className="text-gray-500 text-lg">No services found matching "{searchTerm}"</p>
-            </div>
+        <div className="space-y-6">
+          {searchTerm ? (
+            // Show search results
+            <>
+              <h2 className="text-xl font-semibold text-gray-900 mb-4">
+                {filteredServices.length > 0 ? 'Search Results' : 'No services found'}
+              </h2>
+              <div className="space-y-3">
+                {filteredServices.map((service) => (
+                  <div
+                    key={service.id}
+                    onClick={() => handleServiceClick(service.name)}
+                    className={`bg-white rounded-xl border border-gray-200 p-5 flex items-center justify-between cursor-pointer transition-all hover:shadow-md hover:border-gray-300 ${isMobile ? 'touch-target' : ''}`}
+                    style={{ minHeight: isMobile ? '60px' : '56px' }}
+                  >
+                    <span className="text-gray-900 font-medium text-lg capitalize">
+                      {service.name.toLowerCase()}
+                    </span>
+                    <ChevronRight className="text-gray-400" size={20} />
+                  </div>
+                ))}
+                {filteredServices.length === 0 && (
+                  <div className="text-center py-12">
+                    <p className="text-gray-500 text-lg">No services found matching "{searchTerm}"</p>
+                  </div>
+                )}
+              </div>
+            </>
+          ) : (
+            // Show categorized services
+            <>
+              {Object.entries(categorizedServices).map(([category, categoryServices]) => (
+                categoryServices.length > 0 && (
+                  <div key={category} className="space-y-3">
+                    <h2 className="text-xl font-semibold text-gray-900 border-b border-gray-200 pb-2">
+                      {category}
+                    </h2>
+                    <div className="space-y-3">
+                      {categoryServices.map((service) => (
+                        <div
+                          key={service.id}
+                          onClick={() => handleServiceClick(service.name)}
+                          className={`bg-white rounded-xl border border-gray-200 p-4 flex items-center justify-between cursor-pointer transition-all hover:shadow-md hover:border-gray-300 ${isMobile ? 'touch-target' : ''}`}
+                          style={{ minHeight: isMobile ? '56px' : '52px' }}
+                        >
+                          <span className="text-gray-900 font-medium capitalize">
+                            {service.name.toLowerCase()}
+                          </span>
+                          <ChevronRight className="text-gray-400" size={20} />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )
+              ))}
+            </>
           )}
         </div>
       </div>
