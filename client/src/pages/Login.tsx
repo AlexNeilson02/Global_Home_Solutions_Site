@@ -10,6 +10,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { useToast } from "@/hooks/use-toast";
 import { useLocation, Link } from "wouter";
 import { ArrowLeft } from "lucide-react";
+import { useAuth } from "@/lib/auth";
 
 const loginSchema = z.object({
   username: z.string().min(1, "Username is required"),
@@ -33,6 +34,7 @@ type RegisterForm = z.infer<typeof registerSchema>;
 export default function Login() {
   const { toast } = useToast();
   const [, setLocation] = useLocation();
+  const { login } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [isRegistering, setIsRegistering] = useState(false);
   
@@ -106,50 +108,25 @@ export default function Login() {
   const onLogin = async (data: LoginForm) => {
     setIsLoading(true);
     try {
-      const response = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.text();
-        throw new Error(errorData || "Login failed");
-      }
-
-      const result = await response.json();
-      
-      // Store the authentication token
-      localStorage.setItem("auth-token", result.token);
+      await login(data);
       
       toast({
         title: "Login Successful!",
-        description: `Welcome back, ${result.user.fullName}!`,
+        description: `Welcome back!`,
         duration: 2000,
       });
 
-      // Redirect based on user role
-      switch (result.user.role) {
-        case "contractor":
-          setLocation("/contractor-portal");
-          break;
-        case "salesperson":
-          setLocation("/sales-portal");
-          break;
-        case "admin":
-          setLocation("/admin-portal");
-          break;
-        case "homeowner":
-          setLocation("/");
-          break;
-        default:
-          setLocation("/");
-      }
+      // Small delay to let authentication context update, then redirect all users to home
+      setTimeout(() => {
+        setLocation("/");
+      }, 100);
+      
     } catch (error) {
       toast({
         title: "Login Failed",
         description: error instanceof Error ? error.message : "Invalid username or password",
         variant: "destructive",
+        duration: 2000,
       });
     } finally {
       setIsLoading(false);
