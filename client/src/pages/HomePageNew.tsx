@@ -127,7 +127,7 @@ export default function HomePage() {
       </header>
       <div style={{ 
         position: 'absolute', 
-        bottom: isMobile ? '25%' : '15%', 
+        bottom: isMobile ? '12%' : '8%', 
         left: '50%', 
         transform: 'translateX(-50%)', 
         zIndex: 10,
@@ -158,7 +158,7 @@ export default function HomePage() {
               onClick={() => navigateWithSalesperson('/login')}
               style={{
                 color: 'white',
-                fontSize: isMobile ? '16px' : '14px',
+                fontSize: isMobile ? '14px' : '12px',
                 cursor: 'pointer',
                 textShadow: '1px 1px 2px rgba(0,0,0,0.5)',
                 textDecoration: 'underline'
@@ -177,7 +177,7 @@ export default function HomePage() {
               onClick={logout}
               style={{
                 color: 'white',
-                fontSize: isMobile ? '16px' : '14px',
+                fontSize: isMobile ? '14px' : '12px',
                 cursor: 'pointer',
                 textShadow: '1px 1px 2px rgba(0,0,0,0.5)',
                 textDecoration: 'underline'
