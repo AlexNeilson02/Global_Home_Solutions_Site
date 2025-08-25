@@ -39,7 +39,7 @@ const ServiceSelection = () => {
   const [searchTriggered, setSearchTriggered] = useState(false);
   const [selectedContractor, setSelectedContractor] = useState<any>(null);
   const [isMobile, setIsMobile] = useState(false);
-  const [activeTab, setActiveTab] = useState('services');
+  const [activeTab, setActiveTab] = useState('contractors');
 
   useEffect(() => {
     const checkMobile = () => {
@@ -50,6 +50,16 @@ const ServiceSelection = () => {
     window.addEventListener('resize', checkMobile);
     
     return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  // Check for category parameter in URL
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const category = urlParams.get('category');
+    if (category) {
+      setTrade(category);
+      setSearchTriggered(true);
+    }
   }, []);
 
   const { data: serviceCategories } = useQuery<ServiceCategoriesResponse>({
@@ -808,11 +818,13 @@ const ServiceSelection = () => {
           onTabChange={(tab) => {
             setActiveTab(tab);
             if (tab === 'contractors') {
-              navigateWithSalesperson('/');
+              // Stay on current page (this IS the contractors page)
             } else if (tab === 'services') {
-              // Stay on current page
+              navigateWithSalesperson('/browse-services');
             } else if (tab === 'profile') {
               navigateWithSalesperson('/login');
+            } else if (tab === 'bids') {
+              navigateWithSalesperson('/login'); // Redirect to login for now
             }
           }}
         />

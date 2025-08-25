@@ -18,6 +18,7 @@ import Portals from "@/pages/Portals";
 import Checkout from "@/pages/checkout";
 import Subscribe from "@/pages/subscribe";
 import ServiceSelection from "@/pages/ServiceSelection";
+import BrowseServices from "@/pages/BrowseServices";
 import AboutUs from "@/pages/AboutUs";
 
 function App() {
@@ -31,6 +32,7 @@ function App() {
             <Route path="/" component={HomePage} />
             <Route path="/about" component={AboutUs} />
             <Route path="/services" component={ServiceSelection} />
+            <Route path="/browse-services" component={BrowseServices} />
             <Route path="/portals" component={Portals} />
             <Route path="/contractor/:id" component={ContractorProfile} />
             <Route path="/contractor-registration" component={ContractorRegistration} />
