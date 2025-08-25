@@ -5,6 +5,7 @@ import { useSalesperson } from "@/contexts/SalespersonContext";
 import { ChevronLeft } from "lucide-react";
 import HomeownerBottomNav from "@/components/mobile/HomeownerBottomNav";
 import { TouchOptimizedButton } from "@/components/mobile/TouchOptimizations";
+import BidRequestForm from "@/components/BidRequestForm";
 import globalLogoPath from "@assets/GLOBAL HOME SOLUTIONS LOGO-01.png";
 import "../styles/HomePage.css";
 
@@ -40,6 +41,8 @@ const ServiceSelection = () => {
   const [selectedContractor, setSelectedContractor] = useState<any>(null);
   const [isMobile, setIsMobile] = useState(false);
   const [activeTab, setActiveTab] = useState('contractors');
+  const [isBidRequestOpen, setIsBidRequestOpen] = useState(false);
+  const [bidRequestContractor, setBidRequestContractor] = useState<any>(null);
 
   useEffect(() => {
     const checkMobile = () => {
@@ -780,7 +783,8 @@ const ServiceSelection = () => {
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
-                      navigateWithSalesperson(`/contractor/${contractor.id}`);
+                      setBidRequestContractor(contractor);
+                      setIsBidRequestOpen(true);
                     }}
                     style={{
                       backgroundColor: '#00aeef',
@@ -827,6 +831,18 @@ const ServiceSelection = () => {
               navigateWithSalesperson('/login'); // Redirect to login for now
             }
           }}
+        />
+      )}
+
+      {/* Bid Request Form Modal */}
+      {bidRequestContractor && (
+        <BidRequestForm
+          isOpen={isBidRequestOpen}
+          onClose={() => {
+            setIsBidRequestOpen(false);
+            setBidRequestContractor(null);
+          }}
+          contractor={bidRequestContractor}
         />
       )}
     </div>
