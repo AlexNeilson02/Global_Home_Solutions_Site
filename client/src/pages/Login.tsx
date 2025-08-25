@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
 import { useLocation, Link } from "wouter";
+import { ArrowLeft } from "lucide-react";
 
 const loginSchema = z.object({
   username: z.string().min(1, "Username is required"),
@@ -80,6 +81,18 @@ export default function Login() {
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+      {/* Back Arrow */}
+      <Link href="/">
+        <Button
+          variant="ghost"
+          size="sm"
+          className="fixed top-6 left-6 z-10 bg-white/80 backdrop-blur-sm hover:bg-white/90 shadow-sm"
+        >
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Back
+        </Button>
+      </Link>
+      
       <div className="max-w-md w-full space-y-8">
         <Card>
           <CardHeader className="text-center">
