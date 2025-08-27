@@ -43,17 +43,14 @@ export const trackActivity = async (
     
     const user = await authResponse.json();
     
-    await apiRequest('/api/activity/track', {
-      method: 'POST',
-      body: {
-        userId: user.id,
-        activityType,
-        path,
-        metadata: metadata || {},
-        userAgent: navigator.userAgent,
-        deviceType: getDeviceType(),
-        sessionId: localStorage.getItem('sessionId') || generateSessionId(),
-      },
+    await apiRequest('POST', '/api/activity/track', {
+      userId: user.id,
+      activityType,
+      path,
+      metadata: metadata || {},
+      userAgent: navigator.userAgent,
+      deviceType: getDeviceType(),
+      sessionId: localStorage.getItem('sessionId') || generateSessionId(),
     });
   } catch (error) {
     console.error('Failed to track activity:', error);
