@@ -32,23 +32,44 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
   
-  // Check for existing token on initial load
+  // Check for existing user session on initial load
   useEffect(() => {
-    const storedToken = localStorage.getItem('auth-token');
-    const storedUser = localStorage.getItem('user');
-    
-    if (storedToken && storedUser) {
-      try {
-        const parsedUser = JSON.parse(storedUser);
-        console.log("Loaded stored user:", parsedUser);
-        setUser(parsedUser);
-      } catch (err) {
-        console.error("Error parsing stored user:", err);
-        // Invalid stored user data
-        localStorage.removeItem('auth-token');
-        localStorage.removeItem('user');
+    const checkAuth = async () => {
+      const storedUser = localStorage.getItem('user');
+      
+      if (storedUser) {
+        try {
+          const parsedUser = JSON.parse(storedUser);
+          console.log("Loaded stored user:", parsedUser);
+          
+          // Verify session is still valid with server
+          try {
+            const response = await fetch('/api/auth/user', {
+              credentials: 'include' // Important for session cookies
+            });
+            
+            if (response.ok) {
+              const serverUser = await response.json();
+              setUser(serverUser);
+              localStorage.setItem('user', JSON.stringify(serverUser));
+            } else {
+              // Session expired, clear stored user
+              localStorage.removeItem('user');
+              setUser(null);
+            }
+          } catch (error) {
+            console.warn("Could not verify session:", error);
+            // Keep stored user if network error, but don't fail
+            setUser(parsedUser);
+          }
+        } catch (err) {
+          console.error("Error parsing stored user:", err);
+          localStorage.removeItem('user');
+        }
       }
-    }
+    };
+    
+    checkAuth();
   }, []);
 
   // Real API login implementation
@@ -65,6 +86,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include', // Important for session cookies
         body: JSON.stringify(loginData),
       });
       
@@ -82,8 +104,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         throw new Error("Server didn't return user data");
       }
       
-      // Store token and user in localStorage for persistence
-      localStorage.setItem('auth-token', data.token);
+      // Store user in localStorage for persistence (session-based auth, no token needed)
       localStorage.setItem('user', JSON.stringify(data.user));
       
       // Update state with user info
@@ -100,21 +121,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const logout = async () => {
     try {
-      // Call the API to logout
-      const token = localStorage.getItem('authToken');
-      if (token) {
-        await fetch('/api/auth/logout', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
-      }
+      // Call the API to logout (session-based)
+      await fetch('/api/auth/logout', {
+        method: 'POST',
+        credentials: 'include' // Important for session cookies
+      });
     } catch (err) {
       console.error('Logout error:', err);
     } finally {
       // Clear local storage regardless of API success
-      localStorage.removeItem('authToken');
       localStorage.removeItem('user');
       setUser(null);
       

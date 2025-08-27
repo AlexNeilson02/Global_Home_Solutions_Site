@@ -82,6 +82,7 @@ export interface IStorage {
   getBidRequest(id: number): Promise<BidRequest | undefined>;
   getBidRequestsByContractorId(contractorId: number): Promise<BidRequest[]>;
   getBidRequestsBySalespersonId(salespersonId: number): Promise<BidRequest[]>;
+  getBidRequestsByEmail(email: string): Promise<BidRequest[]>;
   getRecentBidRequests(limit: number): Promise<BidRequest[]>;
   updateBidRequestStatus(id: number, status: string): Promise<BidRequest | undefined>;
   updateBidRequestEmailSent(id: number, emailSent: boolean): Promise<BidRequest | undefined>;
@@ -418,6 +419,12 @@ export class MemStorage implements IStorage {
   async getBidRequestsByContractorId(contractorId: number): Promise<BidRequest[]> {
     return Array.from(this.bidRequests.values())
       .filter(bidRequest => bidRequest.contractorId === contractorId);
+  }
+
+  async getBidRequestsByEmail(email: string): Promise<BidRequest[]> {
+    return Array.from(this.bidRequests.values())
+      .filter(bidRequest => bidRequest.email.toLowerCase() === email.toLowerCase())
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()); // Most recent first
   }
   
   async updateBidRequestStatus(id: number, status: string): Promise<BidRequest | undefined> {

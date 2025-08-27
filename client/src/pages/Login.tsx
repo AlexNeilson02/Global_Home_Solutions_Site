@@ -64,6 +64,9 @@ export default function Login() {
         case "admin":
           setLocation("/admin-portal");
           break;
+        case "homeowner":
+          setLocation("/homeowner-dashboard");
+          break;
         default:
           setLocation("/");
       }
@@ -134,11 +137,18 @@ export default function Login() {
                   <p className="text-sm text-gray-600">
                     Don't have an account?
                   </p>
-                  <Link href="/contractor-registration">
-                    <Button variant="outline" className="w-full">
-                      Register as Contractor
-                    </Button>
-                  </Link>
+                  <div className="space-y-2">
+                    <Link href="/homeowner-registration">
+                      <Button variant="outline" className="w-full bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100">
+                        Register as Homeowner
+                      </Button>
+                    </Link>
+                    <Link href="/contractor-registration">
+                      <Button variant="outline" className="w-full">
+                        Register as Contractor
+                      </Button>
+                    </Link>
+                  </div>
                 </div>
               </form>
             </Form>

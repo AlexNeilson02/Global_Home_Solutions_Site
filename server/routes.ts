@@ -937,6 +937,79 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Update user profile - authenticated users only
+  apiRouter.patch("/users/:id", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const userId = Number(req.params.id);
+      const user = req.user as User;
+      
+      if (!user) {
+        return res.status(401).json({ message: "Authentication required" });
+      }
+
+      // Users can only update their own profile (except admins)
+      if (user.role !== 'admin' && user.id !== userId) {
+        return res.status(403).json({ message: "Access denied. You can only update your own profile." });
+      }
+
+      // Only allow updating specific fields for security
+      const allowedFields = ['fullName', 'phone'];
+      const updateData: any = {};
+      
+      for (const field of allowedFields) {
+        if (req.body[field] !== undefined) {
+          updateData[field] = req.body[field];
+        }
+      }
+
+      if (Object.keys(updateData).length === 0) {
+        return res.status(400).json({ message: "No valid fields to update" });
+      }
+
+      const updatedUser = await storage.updateUser(userId, updateData);
+      
+      if (!updatedUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // Return user without password
+      const { password, ...safeUser } = updatedUser;
+      
+      console.log(`User ${updatedUser.fullName} (ID: ${userId}) updated profile`);
+      
+      res.json(safeUser);
+    } catch (error) {
+      console.error("Error updating user profile:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Get homeowner's bid requests by email - authenticated homeowner only
+  apiRouter.get("/homeowner/bid-requests", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const user = req.user as User;
+      
+      if (!user) {
+        return res.status(401).json({ message: "Authentication required" });
+      }
+
+      // Only allow homeowner role to access this endpoint
+      if (user.role !== 'homeowner') {
+        return res.status(403).json({ message: "Access denied. Homeowner role required." });
+      }
+
+      // Get bid requests by the homeowner's email
+      const bidRequests = await storage.getBidRequestsByEmail(user.email);
+      
+      console.log(`Homeowner ${user.fullName} (${user.email}) fetched ${bidRequests.length} bid requests`);
+      
+      res.json(bidRequests);
+    } catch (error) {
+      console.error("Error fetching homeowner bid requests:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   // Mark bid request as contacted
   apiRouter.post("/contractors/:contractorId/bid-requests/:bidId/contact", isAuthenticated, async (req: Request, res: Response) => {
     try {
