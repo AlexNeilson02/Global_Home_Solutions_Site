@@ -8,6 +8,7 @@ import BidRequestForm from "@/components/BidRequestForm";
 import HomeownerBottomNav from "@/components/mobile/HomeownerBottomNav";
 import { TouchOptimizedButton } from "@/components/mobile/TouchOptimizations";
 import { useAuth } from "@/lib/auth";
+import PlatformDemo from "@/components/platform/PlatformDemo";
 import logoPath from "@/assets/global-home-solutions-logo.png";
 import heroBackgroundImage from "@/assets/ghs-office-front.png";
 import mobileHeroImage from "@assets/global home mobile 1_1754514857525.png";
@@ -190,6 +191,9 @@ export default function HomePage() {
           }}
         />
       )}
+
+      {/* Platform Detection Demo - Remove this in production */}
+      <PlatformDemo />
     </div>
   );
 }
