@@ -300,7 +300,7 @@ const ServiceSelection = () => {
                 height: '100%'
               }}>
                 <div className="category-image" style={{
-                  height: '150px',
+                  height: isMobile ? '120px' : '150px',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -351,11 +351,11 @@ const ServiceSelection = () => {
                   display: 'flex',
                   flexDirection: 'column',
                   flexGrow: 1,
-                  padding: '20px'
+                  padding: isMobile ? '15px' : '20px'
                 }}>
                   <h3 style={{ 
                     color: '#333',
-                    fontSize: '1.3rem',
+                    fontSize: isMobile ? '1.1rem' : '1.3rem',
                     margin: '0 0 15px 0',
                     fontWeight: '600',
                     flexGrow: 1,
@@ -388,7 +388,7 @@ const ServiceSelection = () => {
                 height: '100%'
               }}>
                 <div className="category-image" style={{
-                  height: '150px',
+                  height: isMobile ? '120px' : '150px',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -439,11 +439,11 @@ const ServiceSelection = () => {
                   display: 'flex',
                   flexDirection: 'column',
                   flexGrow: 1,
-                  padding: '20px'
+                  padding: isMobile ? '15px' : '20px'
                 }}>
                   <h3 style={{ 
                     color: '#333',
-                    fontSize: '1.3rem',
+                    fontSize: isMobile ? '1.1rem' : '1.3rem',
                     margin: '0 0 15px 0',
                     fontWeight: '600',
                     flexGrow: 1,
@@ -476,7 +476,7 @@ const ServiceSelection = () => {
               height: '100%'
             }}>
                 <div className="category-image" style={{
-                  height: '150px',
+                  height: isMobile ? '120px' : '150px',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -527,11 +527,11 @@ const ServiceSelection = () => {
                   display: 'flex',
                   flexDirection: 'column',
                   flexGrow: 1,
-                  padding: '20px'
+                  padding: isMobile ? '15px' : '20px'
                 }}>
                   <h3 style={{ 
                     color: '#333',
-                    fontSize: '1.3rem',
+                    fontSize: isMobile ? '1.1rem' : '1.3rem',
                     margin: '0 0 15px 0',
                     fontWeight: '600',
                     flexGrow: 1,
@@ -564,7 +564,7 @@ const ServiceSelection = () => {
                 height: '100%'
               }}>
                 <div className="category-image" style={{
-                  height: '150px',
+                  height: isMobile ? '120px' : '150px',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -615,11 +615,11 @@ const ServiceSelection = () => {
                   display: 'flex',
                   flexDirection: 'column',
                   flexGrow: 1,
-                  padding: '20px'
+                  padding: isMobile ? '15px' : '20px'
                 }}>
                   <h3 style={{ 
                     color: '#333',
-                    fontSize: '1.3rem',
+                    fontSize: isMobile ? '1.1rem' : '1.3rem',
                     margin: '0 0 15px 0',
                     fontWeight: '600',
                     flexGrow: 1,
