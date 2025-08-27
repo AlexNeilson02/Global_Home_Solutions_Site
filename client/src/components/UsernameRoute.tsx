@@ -8,34 +8,37 @@ import ContractorProfile from '@/pages/ContractorProfileDB';
 import { useAuth } from '@/lib/auth-fixed';
 
 export function UsernameRoute() {
-  const { user } = useAuth();
+  const { user, isLoading } = useAuth();
+  const [matchContractor, contractorParams] = useRoute('/:username/contractor/:id');
+  const [matchServices, servicesParams] = useRoute('/:username/services');
+  const [matchBrowse, browseParams] = useRoute('/:username/browse-services');
+  const [matchAbout, aboutParams] = useRoute('/:username/about');
   const [match, params] = useRoute('/:username');
-  const [matchServices] = useRoute('/:username/services');
-  const [matchBrowse] = useRoute('/:username/browse-services');
-  const [matchAbout] = useRoute('/:username/about');
-  const [matchContractor] = useRoute('/:username/contractor/:id');
   
-  // Only render if the username in URL matches logged-in user
+  // Wait for auth to load
+  if (isLoading) return null;
+  
+  // Only render for authenticated homeowners
   if (!user || user.role !== 'homeowner') return null;
   
-  if (matchContractor) {
-    const [, contractorParams] = useRoute('/:username/contractor/:id');
+  // Check if any username route matches
+  if (matchContractor && contractorParams?.username === user.username) {
     return <ContractorProfile />;
   }
   
-  if (matchServices) {
+  if (matchServices && servicesParams?.username === user.username) {
     return <ServiceSelection />;
   }
   
-  if (matchBrowse) {
+  if (matchBrowse && browseParams?.username === user.username) {
     return <BrowseServices />;
   }
   
-  if (matchAbout) {
+  if (matchAbout && aboutParams?.username === user.username) {
     return <AboutUs />;
   }
   
-  // Only show HomePage if the URL username matches the logged-in user
+  // Show HomePage for the base username route
   if (match && params?.username === user.username) {
     return <HomePage />;
   }
