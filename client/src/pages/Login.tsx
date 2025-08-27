@@ -157,10 +157,20 @@ export default function Login() {
         const userData = await userResponse.json();
         console.log('[LOGIN] User data:', userData);
         
+        // Check if user is on mobile device
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        
         // Redirect based on role
         switch(userData.role) {
           case 'homeowner':
-            setLocation("/homeowner-portal");
+            // Mobile homeowners go to main site's contractors section
+            if (isMobile) {
+              console.log('[LOGIN] Mobile homeowner detected - redirecting to contractors section');
+              setLocation("/#contractors");
+            } else {
+              // Desktop homeowners go to their personalized route
+              setLocation(`/${userData.username}`);
+            }
             break;
           case 'contractor':
             setLocation("/contractor-portal");

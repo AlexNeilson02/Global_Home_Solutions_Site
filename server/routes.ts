@@ -592,6 +592,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // User activity tracking route for logged-in users
+  apiRouter.post("/activity/track", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const user = req.user as User;
+      const { activityType, path, metadata, userAgent, deviceType, sessionId } = req.body;
+      
+      // Create activity record
+      const activity = await storage.createUserActivity({
+        userId: user.id,
+        activityType: activityType || 'page_view',
+        path: path || req.headers.referer || '/',
+        metadata: metadata || {},
+        userAgent: userAgent || req.headers['user-agent'] || null,
+        ipAddress: req.ip || null,
+        sessionId: sessionId || null,
+        deviceType: deviceType || null,
+      });
+      
+      console.log(`📊 Tracked activity: ${activityType} for user ${user.username} at ${path}`);
+      
+      res.json({ success: true, activityId: activity.id });
+    } catch (error) {
+      console.error("Error tracking activity:", error);
+      res.status(500).json({ 
+        message: "Error tracking activity",
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  });
+
   // Bid requests routes
   apiRouter.post("/bid-requests", upload.array('media', 10), async (req: Request, res: Response) => {
     try {

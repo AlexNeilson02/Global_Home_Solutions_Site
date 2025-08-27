@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { useSalesperson } from "@/contexts/SalespersonContext";
+import { useAuth } from "@/lib/auth-fixed";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -55,6 +56,7 @@ export default function BidRequestForm({ isOpen, onClose, contractor }: BidReque
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { salespersonId } = useSalesperson();
+  const { user } = useAuth();
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
   const [filePreviewUrls, setFilePreviewUrls] = useState<string[]>([]);
   const [dialogReady, setDialogReady] = useState(false);
@@ -104,6 +106,24 @@ export default function BidRequestForm({ isOpen, onClose, contractor }: BidReque
       budget: "",
     },
   });
+  
+  // Autofill form with user data when opening for logged-in homeowners
+  useEffect(() => {
+    if (isOpen && user && user.role === 'homeowner') {
+      // Pre-populate form with user's saved profile data
+      form.setValue('customerName', user.fullName || '');
+      form.setValue('customerEmail', user.email || '');
+      form.setValue('customerPhone', user.phone || '');
+      form.setValue('projectAddress', user.address || '');
+      
+      console.log('Autofilled bid request form with homeowner data:', {
+        fullName: user.fullName,
+        email: user.email,
+        phone: user.phone,
+        address: user.address
+      });
+    }
+  }, [isOpen, user, form]);
 
   // Handle file upload
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {

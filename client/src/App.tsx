@@ -11,6 +11,7 @@ import ContractorPortalEnhanced from "@/pages/ContractorPortalEnhanced";
 import SalesPortalEnhanced from "@/pages/SalesPortalEnhanced";
 import AdminPortalEnhanced from "@/pages/AdminPortalEnhanced";
 import HomeownerPortal from "@/pages/HomeownerPortal";
+import HomeownerRoute from "@/pages/HomeownerRoute";
 
 import ContractorRegistration from "@/pages/ContractorRegistration";
 import SalespersonProfile from "@/pages/SalespersonProfile";
@@ -32,6 +33,7 @@ function App() {
               <Toaster />
               <Route path="/" component={HomePage} />
               <Route path="/about" component={AboutUs} />
+              <Route path="/:username" component={HomeownerRoute} />
               <Route path="/services" component={ServiceSelection} />
               <Route path="/browse-services" component={BrowseServices} />
               <Route path="/portals" component={Portals} />

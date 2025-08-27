@@ -32,7 +32,12 @@ import heroBackgroundImage from "@/assets/ghs-office-front.png";
 import mobileHeroImage from "@assets/global home mobile 1_1754514857525.png";
 import "../styles/HomePage.css";
 
-export default function HomePage() {
+interface HomePageProps {
+  isHomeownerLoggedIn?: boolean;
+  homeownerData?: any;
+}
+
+export default function HomePage({ isHomeownerLoggedIn = false, homeownerData }: HomePageProps = {}) {
   const { navigateWithSalesperson } = useSalespersonNavigation();
   const { salespersonId } = useSalesperson();
   const authContext = useAuth();
