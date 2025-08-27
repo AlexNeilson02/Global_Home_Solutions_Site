@@ -1,5 +1,5 @@
 import React from 'react';
-import { useRoute } from 'wouter';
+import { useLocation } from 'wouter';
 import HomePage from '@/pages/HomePageNew';
 import ServiceSelection from '@/pages/ServiceSelection';
 import BrowseServices from '@/pages/BrowseServices';
@@ -9,11 +9,7 @@ import { useAuth } from '@/lib/auth-fixed';
 
 export function UsernameRoute() {
   const { user, isLoading } = useAuth();
-  const [matchContractor, contractorParams] = useRoute('/:username/contractor/:id');
-  const [matchServices, servicesParams] = useRoute('/:username/services');
-  const [matchBrowse, browseParams] = useRoute('/:username/browse-services');
-  const [matchAbout, aboutParams] = useRoute('/:username/about');
-  const [match, params] = useRoute('/:username');
+  const [location] = useLocation();
   
   // Wait for auth to load
   if (isLoading) return null;
@@ -21,27 +17,35 @@ export function UsernameRoute() {
   // Only render for authenticated homeowners
   if (!user || user.role !== 'homeowner') return null;
   
-  // Check if any username route matches
-  if (matchContractor && contractorParams?.username === user.username) {
-    return <ContractorProfile />;
-  }
+  // Parse the path
+  const pathParts = location.split('/').filter(Boolean);
+  const username = pathParts[0];
   
-  if (matchServices && servicesParams?.username === user.username) {
-    return <ServiceSelection />;
-  }
+  // Verify the username matches
+  if (username !== user.username) return null;
   
-  if (matchBrowse && browseParams?.username === user.username) {
-    return <BrowseServices />;
-  }
-  
-  if (matchAbout && aboutParams?.username === user.username) {
-    return <AboutUs />;
-  }
-  
-  // Show HomePage for the base username route
-  if (match && params?.username === user.username) {
+  // Handle different routes
+  if (pathParts.length === 1) {
+    // Just /:username
     return <HomePage />;
   }
   
+  if (pathParts[1] === 'services') {
+    return <ServiceSelection />;
+  }
+  
+  if (pathParts[1] === 'browse-services') {
+    return <BrowseServices />;
+  }
+  
+  if (pathParts[1] === 'about') {
+    return <AboutUs />;
+  }
+  
+  if (pathParts[1] === 'contractor' && pathParts[2]) {
+    return <ContractorProfile />;
+  }
+  
+  // No matching route
   return null;
 }

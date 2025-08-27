@@ -74,7 +74,16 @@ export default function HomePage({ isHomeownerLoggedIn = false, homeownerData }:
   const [isMobile, setIsMobile] = useState(false);
   const [trackingComplete, setTrackingComplete] = useState(false);
   const [trackingLoading, setTrackingLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState('contractors');
+  
+  // Initialize activeTab based on URL hash
+  const getInitialTab = () => {
+    const hash = window.location.hash.replace('#', '');
+    if (hash === 'profile') return 'profile';
+    if (hash === 'bids') return 'bids';
+    return 'contractors';
+  };
+  
+  const [activeTab, setActiveTab] = useState(getInitialTab());
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [profileForm, setProfileForm] = useState({
     fullName: '',
@@ -82,6 +91,24 @@ export default function HomePage({ isHomeownerLoggedIn = false, homeownerData }:
     phone: '',
     address: ''
   });
+  
+  // Handle tab changes with URL updates
+  const handleTabChange = (newTab: string) => {
+    setActiveTab(newTab);
+    
+    // Update URL to reflect tab selection
+    if (user && user.role === 'homeowner' && user.username) {
+      if (newTab === 'contractors') {
+        setLocation(`/${user.username}`);
+      } else if (newTab === 'services') {
+        setLocation(`/${user.username}/services`);
+      } else if (newTab === 'bids') {
+        setLocation(`/${user.username}#bids`);
+      } else if (newTab === 'profile') {
+        setLocation(`/${user.username}#profile`);
+      }
+    }
+  };
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -93,6 +120,19 @@ export default function HomePage({ isHomeownerLoggedIn = false, homeownerData }:
     checkMobile();
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+  
+  // Listen for hash changes to update active tab
+  useEffect(() => {
+    const handleHashChange = () => {
+      const hash = window.location.hash.replace('#', '');
+      if (hash === 'profile') setActiveTab('profile');
+      else if (hash === 'bids') setActiveTab('bids');
+      else if (!hash) setActiveTab('contractors');
+    };
+    
+    window.addEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('hashchange', handleHashChange);
   }, []);
 
   // Page visit tracking for ?ref=username
@@ -228,7 +268,7 @@ export default function HomePage({ isHomeownerLoggedIn = false, homeownerData }:
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-gray-200">
           <button 
-            onClick={() => setActiveTab('contractors')}
+            onClick={() => handleTabChange('contractors')}
             className="p-2"
           >
             <ChevronLeft className="h-6 w-6" />
@@ -454,12 +494,7 @@ export default function HomePage({ isHomeownerLoggedIn = false, homeownerData }:
   const shouldShowTabContent = user && user.role === 'homeowner' && 
     ['contractors', 'services', 'profile', 'bids'].includes(activeTab);
 
-  // Redirect to services page when services tab is active
-  useEffect(() => {
-    if (user && user.role === 'homeowner' && activeTab === 'services') {
-      navigateWithUsername('/services');
-    }
-  }, [activeTab, user]);
+  // Services tab is now handled in handleTabChange, so we don't need this useEffect anymore
 
   return (
     <div className="homepage-container full-height smooth-scroll" style={{ height: '100vh', overflow: 'hidden', position: 'relative' }}>
@@ -615,7 +650,7 @@ export default function HomePage({ isHomeownerLoggedIn = false, homeownerData }:
       {user && user.role === 'homeowner' && (
         <HomeownerBottomNav 
           activeTab={activeTab} 
-          onTabChange={setActiveTab}
+          onTabChange={handleTabChange}
         />
       )}
     </div>
