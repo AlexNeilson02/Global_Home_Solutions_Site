@@ -163,9 +163,8 @@ export default function Login() {
         // Redirect based on role
         switch(userData.role) {
           case 'homeowner':
-            // Both mobile and desktop homeowners get their username in the URL
-            console.log('[LOGIN] Homeowner detected - redirecting with username');
-            setLocation(`/${userData.username}`);
+            console.log('[LOGIN] Homeowner detected - redirecting to portal');
+            setLocation('/homeowner-portal');
             break;
           case 'contractor':
             setLocation("/contractor-portal");
@@ -181,7 +180,7 @@ export default function Login() {
         }
       } else {
         // Default redirect if can't get user data
-        setLocation("/homeowner-portal");
+        setLocation("/");
       }
       
     } catch (error) {

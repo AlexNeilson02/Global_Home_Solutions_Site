@@ -10,9 +10,7 @@ import ContractorProfile from "@/pages/ContractorProfileDB";
 import ContractorPortalEnhanced from "@/pages/ContractorPortalEnhanced";
 import SalesPortalEnhanced from "@/pages/SalesPortalEnhanced";
 import AdminPortalEnhanced from "@/pages/AdminPortalEnhanced";
-import HomeownerPortal from "@/pages/HomeownerPortal";
-import HomeownerRoute from "@/pages/HomeownerRoute";
-import { UsernameRoute } from "@/components/UsernameRoute";
+import HomeownerPortalNew from "@/pages/HomeownerPortalNew";
 
 import ContractorRegistration from "@/pages/ContractorRegistration";
 import SalespersonProfile from "@/pages/SalespersonProfile";
@@ -41,7 +39,11 @@ function App() {
               <Route path="/contractor-registration" component={ContractorRegistration} />
               <Route path="/sales/:profileUrl" component={SalespersonProfile} />
               <Route path="/login" component={Login} />
-              <Route path="/:username" component={UsernameRoute} />
+              <Route path="/homeowner-portal">
+                <ProtectedRoute requiredRole="homeowner">
+                  <HomeownerPortalNew />
+                </ProtectedRoute>
+              </Route>
               <Route path="/contractor-portal">
                 <ProtectedRoute requiredRole="contractor">
                   <ContractorPortalEnhanced />
