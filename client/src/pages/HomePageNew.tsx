@@ -21,7 +21,8 @@ export default function HomePage() {
   const [isMobile, setIsMobile] = useState(false);
   const [trackingComplete, setTrackingComplete] = useState(false);
   const [trackingLoading, setTrackingLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState('contractors');
+  const [activeTab, setActiveTab] = useState('services');
+  const [showBottomNav, setShowBottomNav] = useState(false);
 
   useEffect(() => {
     const checkMobile = () => {
@@ -158,7 +159,10 @@ export default function HomePage() {
       }}>
         {isMobile ? (
           <TouchOptimizedButton
-            onClick={() => navigateWithSalesperson('/services')}
+            onClick={() => {
+              setShowBottomNav(true);
+              navigateWithSalesperson('/services');
+            }}
             size="lg"
             className="find-contractor-btn touch-target no-select tap-highlight"
             style={{ backgroundColor: '#00adee', borderColor: '#00adee' }}
@@ -175,8 +179,8 @@ export default function HomePage() {
         )}
       </div>
 
-      {/* Mobile Bottom Navigation */}
-      {isMobile && (
+      {/* Mobile Bottom Navigation - Only show after Find a Contractor is pressed */}
+      {isMobile && showBottomNav && (
         <HomeownerBottomNav 
           activeTab={activeTab}
           onTabChange={(tab) => {
