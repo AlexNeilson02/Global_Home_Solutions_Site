@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { StatsCard } from "@/components/stats-card";
 import { QRCodeDisplay } from "@/components/qr-code-display";
-import { useAuth } from "@/lib/auth";
+import { useAuth } from "@/lib/auth-fixed";
 import { getInitials } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import QRCode from "react-qr-code";

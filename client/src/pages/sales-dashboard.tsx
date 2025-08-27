@@ -33,7 +33,7 @@ import {
   ArrowUpRight,
   Settings
 } from "lucide-react";
-import { useAuth } from "@/lib/auth";
+import { useAuth } from "@/lib/auth-fixed";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { toast } from "@/hooks/use-toast";
 

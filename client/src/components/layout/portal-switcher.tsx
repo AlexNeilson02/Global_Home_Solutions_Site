@@ -7,7 +7,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { useAuth } from "@/lib/auth";
+import { useAuth } from "@/lib/auth-fixed";
 import { ChevronDown } from "lucide-react";
 
 export function PortalSwitcher() {

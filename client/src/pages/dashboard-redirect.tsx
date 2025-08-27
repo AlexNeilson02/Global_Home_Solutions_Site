@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useLocation } from "wouter";
-import { useAuth } from "@/lib/auth";
+import { useAuth } from "@/lib/auth-fixed";
 
 export default function DashboardRedirect() {
   const { user } = useAuth();

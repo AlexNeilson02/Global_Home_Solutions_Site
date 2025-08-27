@@ -20,7 +20,7 @@ import {
   PlusCircle,
   Settings
 } from "lucide-react";
-import { useAuth } from "@/lib/auth";
+import { useAuth } from "@/lib/auth-fixed";
 
 export default function AdminDashboard() {
   const { user } = useAuth();
