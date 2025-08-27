@@ -25,7 +25,12 @@ import {
   Building2,
   FileText,
   Loader2,
-  DollarSign
+  DollarSign,
+  Settings,
+  ChevronLeft,
+  Heart,
+  Download,
+  ChevronRight
 } from "lucide-react";
 import logoPath from "@/assets/global-home-solutions-logo.png";
 import heroBackgroundImage from "@/assets/ghs-office-front.png";
@@ -47,6 +52,14 @@ export default function HomePage({ isHomeownerLoggedIn = false, homeownerData }:
   const [trackingComplete, setTrackingComplete] = useState(false);
   const [trackingLoading, setTrackingLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('contractors');
+  
+  // Handle hash-based navigation for mobile tabs
+  useEffect(() => {
+    const hash = window.location.hash.slice(1); // Remove the # symbol
+    if (hash && ['contractors', 'services', 'bids', 'profile'].includes(hash)) {
+      setActiveTab(hash);
+    }
+  }, []);
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [profileForm, setProfileForm] = useState({
     fullName: '',
@@ -193,43 +206,83 @@ export default function HomePage({ isHomeownerLoggedIn = false, homeownerData }:
 
   const currentHeroImage = isMobile ? mobileHeroImage : heroBackgroundImage;
 
-  // Render Profile Content
+  // Render Profile Content (Mobile Only)
   const renderProfileContent = () => (
-    <div className="fixed inset-0 bg-gray-50 z-40 overflow-y-auto">
-      <div className="min-h-screen p-4 pb-24">
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold text-gray-900">My Profile</h1>
-          <Button
-            variant="outline" 
+    <div className="fixed inset-0 bg-white z-40 overflow-y-auto block sm:hidden">
+      <div className="min-h-screen flex flex-col pb-24">
+        {/* Header */}
+        <div className="flex items-center justify-between p-4 border-b border-gray-200">
+          <button 
             onClick={() => setActiveTab('contractors')}
-            size="sm"
+            className="p-2"
           >
-            Back to Home
-          </Button>
+            <ChevronLeft className="h-6 w-6" />
+          </button>
+          <h1 className="text-lg font-semibold">My Profile</h1>
+          <button className="p-2">
+            <Settings className="h-6 w-6" />
+          </button>
         </div>
 
-        <Card>
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle>Profile Information</CardTitle>
-                <CardDescription>
-                  Manage your personal information and contact details
-                </CardDescription>
-              </div>
-              {!isEditingProfile && (
-                <Button
-                  variant="outline"
-                  onClick={() => setIsEditingProfile(true)}
-                >
-                  <Edit3 className="h-4 w-4 mr-2" />
-                  Edit Profile
-                </Button>
-              )}
+        {!isEditingProfile ? (
+          <>
+            {/* Profile Card */}
+            <div className="p-4">
+              <Card className="border-gray-200">
+                <CardContent className="pt-8 pb-6">
+                  <div className="flex flex-col items-center">
+                    {/* Avatar */}
+                    <div className="w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center mb-4">
+                      <User className="h-10 w-10 text-gray-500" />
+                    </div>
+                    
+                    {/* Name and Email */}
+                    <h2 className="text-xl font-semibold mb-1">
+                      {user?.fullName || user?.username || 'User'}
+                    </h2>
+                    <p className="text-gray-500 text-sm mb-6">
+                      {user?.email || 'email@example.com'}
+                    </p>
+                    
+                    {/* Edit Profile Button */}
+                    <Button
+                      className="bg-green-600 hover:bg-green-700 text-white rounded-full px-8"
+                      onClick={() => setIsEditingProfile(true)}
+                    >
+                      Edit Profile
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
-          </CardHeader>
-          <CardContent>
-            {isEditingProfile ? (
+
+            {/* Menu Items */}
+            <div className="px-4 space-y-2">
+              <button className="w-full flex items-center justify-between p-4 bg-white rounded-lg border border-gray-200">
+                <div className="flex items-center space-x-3">
+                  <Heart className="h-5 w-5 text-gray-600" />
+                  <span className="text-base">Favourites</span>
+                </div>
+                <ChevronRight className="h-5 w-5 text-gray-400" />
+              </button>
+              
+              <button className="w-full flex items-center justify-between p-4 bg-white rounded-lg border border-gray-200">
+                <div className="flex items-center space-x-3">
+                  <Download className="h-5 w-5 text-gray-600" />
+                  <span className="text-base">Downloads</span>
+                </div>
+                <ChevronRight className="h-5 w-5 text-gray-400" />
+              </button>
+            </div>
+          </>
+        ) : (
+          <div className="p-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>Edit Profile</CardTitle>
+                <CardDescription>Update your personal information</CardDescription>
+              </CardHeader>
+              <CardContent>
               <form onSubmit={handleProfileSubmit} className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
@@ -291,78 +344,30 @@ export default function HomePage({ isHomeownerLoggedIn = false, homeownerData }:
                   </Button>
                 </div>
               </form>
-            ) : (
-              <div className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-3">
-                    <div className="flex items-center space-x-2">
-                      <User className="h-4 w-4 text-gray-500" />
-                      <div>
-                        <p className="text-sm font-medium text-gray-700">Full Name</p>
-                        <p className="text-gray-900">{user?.fullName || 'Not provided'}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Mail className="h-4 w-4 text-gray-500" />
-                      <div>
-                        <p className="text-sm font-medium text-gray-700">Email</p>
-                        <p className="text-gray-900">{user?.email}</p>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="space-y-3">
-                    <div className="flex items-center space-x-2">
-                      <Phone className="h-4 w-4 text-gray-500" />
-                      <div>
-                        <p className="text-sm font-medium text-gray-700">Phone</p>
-                        <p className="text-gray-900">{user?.phone || 'Not provided'}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <MapPin className="h-4 w-4 text-gray-500" />
-                      <div>
-                        <p className="text-sm font-medium text-gray-700">Address</p>
-                        <p className="text-gray-900">{user?.address || 'Not provided'}</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+          </div>
+        )}
       </div>
     </div>
   );
 
-  // Render Bids Content
+  // Render Bids Content (Mobile Only)
   const renderBidsContent = () => (
-    <div className="fixed inset-0 bg-gray-50 z-40 overflow-y-auto">
-      <div className="min-h-screen p-4 pb-24">
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold text-gray-900">My Bids</h1>
-          <Button
-            variant="outline" 
-            onClick={() => setActiveTab('contractors')}
-            size="sm"
-          >
-            Back to Home
-          </Button>
+    <div className="fixed inset-0 bg-white z-40 overflow-y-auto block sm:hidden">
+      <div className="min-h-screen flex flex-col pb-24">
+        {/* Header */}
+        <div className="p-4 border-b border-gray-200">
+          <h1 className="text-xl font-bold">My Bid Requests</h1>
         </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>My Bid Requests</CardTitle>
-            <CardDescription>
-              Track all your service requests and their current status
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {bidsLoading ? (
-              <div className="flex items-center justify-center p-8">
-                <Loader2 className="h-6 w-6 animate-spin" />
-              </div>
-            ) : bidRequests.length > 0 ? (
+        {/* Content */}
+        <div className="flex-1 flex flex-col p-4">
+          {bidsLoading ? (
+            <div className="flex items-center justify-center flex-1">
+              <Loader2 className="h-6 w-6 animate-spin" />
+            </div>
+          ) : bidRequests.length > 0 ? (
               <div className="space-y-4">
                 {bidRequests.map((bid: any) => (
                   <div key={bid.id} className="border rounded-lg p-6 hover:shadow-md transition-shadow">
@@ -415,19 +420,17 @@ export default function HomePage({ isHomeownerLoggedIn = false, homeownerData }:
                 ))}
               </div>
             ) : (
-              <div className="text-center py-12">
-                <FileText className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">No bid requests yet</h3>
-                <p className="text-gray-500 mb-4">
-                  Start by browsing our contractors and requesting quotes for your home improvement projects.
+              <div className="flex flex-col items-center justify-center flex-1">
+                <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-6">
+                  <AlertCircle className="h-12 w-12 text-gray-400" />
+                </div>
+                <h3 className="text-lg font-semibold mb-2">No bid requests yet</h3>
+                <p className="text-gray-500 text-center">
+                  Submit your first bid request to get started with finding contractors.
                 </p>
-                <Button onClick={() => setActiveTab('services')}>
-                  Browse Services
-                </Button>
               </div>
             )}
-          </CardContent>
-        </Card>
+        </div>
       </div>
     </div>
   );
@@ -574,32 +577,12 @@ export default function HomePage({ isHomeownerLoggedIn = false, homeownerData }:
       {user && user.role === 'homeowner' && activeTab === 'profile' && renderProfileContent()}
       {user && user.role === 'homeowner' && activeTab === 'bids' && renderBidsContent()}
 
-      {/* Show bottom navigation only for homeowners */}
+      {/* Show bottom navigation only for homeowners on mobile */}
       {user && user.role === 'homeowner' && (
         <HomeownerBottomNav 
           activeTab={activeTab} 
           onTabChange={setActiveTab}
         />
-      )}
-      
-      {/* Debug info */}
-      {user && (
-        <div style={{ 
-          position: 'fixed', 
-          top: 0, 
-          right: 0, 
-          background: 'rgba(0,0,0,0.8)', 
-          color: 'white', 
-          padding: '10px',
-          fontSize: '12px',
-          zIndex: 9999,
-          maxWidth: '200px'
-        }}>
-          <div>User: {user.username}</div>
-          <div>Role: {user.role}</div>
-          <div>Email: {user.email}</div>
-          <div>Is Homeowner: {user.role === 'homeowner' ? 'YES' : 'NO'}</div>
-        </div>
       )}
     </div>
   );
