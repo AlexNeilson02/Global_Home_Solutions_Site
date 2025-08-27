@@ -125,14 +125,13 @@ export default function ContractorProfileDB() {
                 className="relative h-48"
                 style={{
                   backgroundImage: contractor.bannerImageUrl 
-                    ? `linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url(${contractor.bannerImageUrl})`
+                    ? `url(${contractor.bannerImageUrl})`
                     : 'linear-gradient(to right, rgb(37, 99, 235), rgb(29, 78, 216))',
                   backgroundSize: 'cover',
                   backgroundPosition: 'center',
                   backgroundRepeat: 'no-repeat'
                 }}
               >
-                <div className="absolute inset-0 bg-black bg-opacity-20"></div>
               </div>
               
               <div className="relative px-8 pb-8">
