@@ -30,8 +30,22 @@ export default function ContractorProfileDB() {
 
   const contractor = contractorData?.contractor;
 
+  const getBackNavigationInfo = () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const from = urlParams.get('from');
+    
+    if (from === 'homeowner-contractors') {
+      return { path: '/homeowner/contractors', label: 'Back to Contractors' };
+    } else if (from === 'homeowner-dashboard') {
+      return { path: '/homeowner-dashboard', label: 'Back to Dashboard' };
+    } else {
+      return { path: '/services', label: 'Back to Services' };
+    }
+  };
+
   const handleBack = () => {
-    setLocation('/services');
+    const backInfo = getBackNavigationInfo();
+    setLocation(backInfo.path);
   };
 
   // Get all images from mediaFiles
@@ -96,7 +110,7 @@ export default function ContractorProfileDB() {
             className="flex items-center gap-2 text-blue-400 hover:text-blue-300 transition-colors"
           >
             <ArrowLeft size={20} />
-            Back to Services
+            {getBackNavigationInfo().label}
           </button>
         </div>
       </div>

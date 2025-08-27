@@ -67,18 +67,6 @@ export default function MobileHomeownerBidRequest() {
   const [selectedServices, setSelectedServices] = useState<string[]>([]);
   const [selectedContractors, setSelectedContractors] = useState<number[]>([]);
   
-  // Check for pre-selected service from URL params
-  useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const serviceParam = urlParams.get('service');
-    if (serviceParam) {
-      setSelectedServices([serviceParam]);
-      form.setValue('servicesRequested', [serviceParam]);
-      // Auto-advance to step 2 if service is pre-selected
-      setStep(2);
-    }
-  }, [form]);
-  
   const form = useForm<BidRequestForm>({
     resolver: zodResolver(bidRequestSchema),
     defaultValues: {
@@ -91,6 +79,18 @@ export default function MobileHomeownerBidRequest() {
       additionalInformation: "",
     },
   });
+
+  // Check for pre-selected service from URL params
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const serviceParam = urlParams.get('service');
+    if (serviceParam) {
+      setSelectedServices([serviceParam]);
+      form.setValue('servicesRequested', [serviceParam]);
+      // Auto-advance to step 2 if service is pre-selected
+      setStep(2);
+    }
+  }, [form]);
 
   // Fetch service categories
   const { data: serviceCategories } = useQuery<{ services: ServiceCategory[] }>({

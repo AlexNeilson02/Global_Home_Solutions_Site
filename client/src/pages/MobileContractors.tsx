@@ -34,7 +34,7 @@ const MobileContractors = () => {
   };
 
   const viewContractor = (contractorId: number) => {
-    setLocation(`/contractor/${contractorId}`);
+    setLocation(`/contractor/${contractorId}?from=homeowner-contractors`);
   };
 
   const contractorsList = contractors?.contractors || [];
