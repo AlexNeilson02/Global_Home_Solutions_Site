@@ -21,12 +21,11 @@ type AuthContextType = {
   error: string | null;
 };
 
-// Solution 3: Enhanced error messages with debugging
+// Default context with proper error handling
 const AuthContext = createContext<AuthContextType>({
   user: null,
   login: async () => { 
     console.error("[AUTH ERROR] AuthProvider not initialized - login called outside provider");
-    alert("Authentication system not ready. Please refresh the page.");
     throw new Error("AuthProvider not initialized"); 
   },
   logout: async () => { 
@@ -168,21 +167,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     isLoading,
     error
   };
-  
-  // Solution 5: Show loading state during initialization
-  if (!initialized) {
-    console.log('[AUTH] Waiting for initialization...');
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-white">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading authentication...</p>
-        </div>
-      </div>
-    );
-  }
 
-  console.log('[AUTH] Providing context to children, user:', user?.username);
+  console.log('[AUTH] Providing context to children, user:', user?.username, 'initialized:', initialized);
   
   return (
     <AuthContext.Provider value={contextValue}>
@@ -194,31 +180,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 export function useAuth() {
   const context = useContext(AuthContext);
   
-  // Enhanced debugging
+  // Enhanced debugging without disruptive alerts
   if (!context) {
     console.error('[AUTH ERROR] useAuth called outside AuthProvider!');
     console.error('[AUTH ERROR] Check component tree - AuthProvider must wrap this component');
-    
-    // Solution 5: Return a fallback object for emergencies
-    // This prevents crashes but should be fixed properly
-    const fallback: AuthContextType = {
-      user: null,
-      login: async () => {
-        console.error('[AUTH] Fallback login - refresh page');
-        window.location.reload();
-      },
-      logout: async () => {
-        console.error('[AUTH] Fallback logout - refresh page');
-        window.location.reload();
-      },
-      isLoading: false,
-      error: 'Auth system not initialized'
-    };
-    
-    alert('Authentication system error. The page will refresh.');
-    setTimeout(() => window.location.reload(), 2000);
-    
-    return fallback;
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   
   return context;

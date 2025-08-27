@@ -35,7 +35,7 @@ type RegisterForm = z.infer<typeof registerSchema>;
 export default function Login() {
   const { toast } = useToast();
   const [, setLocation] = useLocation();
-  const { login } = useAuth();
+  const { login, logout, user } = useAuth();
   const queryClient = useQueryClient();
   const [isLoading, setIsLoading] = useState(false);
   const [isRegistering, setIsRegistering] = useState(false);
@@ -110,10 +110,14 @@ export default function Login() {
   }, [customFullName, customUsername]);
 
   const onLogin = async (data: LoginForm) => {
+    console.log('[LOGIN] Form submitted with username:', data.username);
     setIsLoading(true);
+    
     try {
+      console.log('[LOGIN] Calling login function...');
       await login(data);
       
+      console.log('[LOGIN] Login successful!');
       toast({
         title: "Login Successful!",
         description: `Welcome back!`,
@@ -122,10 +126,12 @@ export default function Login() {
 
       // Small delay to let authentication context update, then redirect to homeowner portal
       setTimeout(() => {
+        console.log('[LOGIN] Redirecting to homeowner portal...');
         setLocation("/homeowner-portal");
       }, 100);
       
     } catch (error) {
+      console.error('[LOGIN] Login failed:', error);
       toast({
         title: "Login Failed",
         description: error instanceof Error ? error.message : "Invalid username or password",
@@ -138,6 +144,7 @@ export default function Login() {
   };
 
   const onRegister = async (data: RegisterForm) => {
+    console.log('[REGISTER] Form submitted with username:', data.username);
     setIsLoading(true);
     try {
       // Exclude confirmPassword from the API call
@@ -200,6 +207,51 @@ export default function Login() {
       setIsLoading(false);
     }
   };
+
+  // Check if user is already logged in
+  if (user) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+        <Card className="max-w-md w-full">
+          <CardHeader className="text-center">
+            <CardTitle className="text-2xl font-bold">Already Logged In</CardTitle>
+            <CardDescription>
+              You are currently logged in as <strong>{user.username}</strong> ({user.role})
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <Button 
+              className="w-full"
+              onClick={() => setLocation(`/${user.role === 'homeowner' ? 'homeowner' : user.role}-portal`)}
+            >
+              Go to Your Portal
+            </Button>
+            <Button 
+              variant="outline" 
+              className="w-full"
+              onClick={async () => {
+                console.log('[LOGIN] Logging out current user...');
+                await logout();
+                queryClient.clear();
+                toast({
+                  title: "Logged Out",
+                  description: "You have been logged out successfully.",
+                });
+              }}
+            >
+              Logout to Switch Account
+            </Button>
+            <Link href="/">
+              <Button variant="ghost" className="w-full">
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Back to Home
+              </Button>
+            </Link>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
