@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
 import { useSalesperson } from "@/contexts/SalespersonContext";
 import { useSalespersonNavigation } from "@/hooks/useSalespersonNavigation";
@@ -48,19 +48,33 @@ export default function HomePage({ isHomeownerLoggedIn = false, homeownerData }:
   const { salespersonId } = useSalesperson();
   const authContext = useAuth();
   const { user, logout, isLoading } = authContext;
+  const [, setLocation] = useLocation();
+  
+  // Custom navigation that preserves username
+  const navigateWithUsername = (path: string) => {
+    if (user && user.role === 'homeowner') {
+      // Extract username from current URL if it exists
+      const currentPath = window.location.pathname;
+      const username = currentPath.split('/')[1];
+      
+      // If we have a username and it matches the logged in user, preserve it
+      if (username === user.username) {
+        setLocation(`/${user.username}${path}`);
+      } else if (user.username) {
+        // Otherwise use the logged in user's username
+        setLocation(`/${user.username}${path}`);
+      } else {
+        navigateWithSalesperson(path);
+      }
+    } else {
+      navigateWithSalesperson(path);
+    }
+  };
   
   const [isMobile, setIsMobile] = useState(false);
   const [trackingComplete, setTrackingComplete] = useState(false);
   const [trackingLoading, setTrackingLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('contractors');
-  
-  // Handle hash-based navigation for mobile tabs
-  useEffect(() => {
-    const hash = window.location.hash.slice(1); // Remove the # symbol
-    if (hash && ['contractors', 'services', 'bids', 'profile'].includes(hash)) {
-      setActiveTab(hash);
-    }
-  }, []);
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [profileForm, setProfileForm] = useState({
     fullName: '',
@@ -443,7 +457,7 @@ export default function HomePage({ isHomeownerLoggedIn = false, homeownerData }:
   // Redirect to services page when services tab is active
   useEffect(() => {
     if (user && user.role === 'homeowner' && activeTab === 'services') {
-      navigateWithSalesperson('/services');
+      navigateWithUsername('/services');
     }
   }, [activeTab, user]);
 
@@ -454,7 +468,7 @@ export default function HomePage({ isHomeownerLoggedIn = false, homeownerData }:
         <>
       {/* About Us Link */}
       <Link 
-        href="/about"
+        href={user && user.role === 'homeowner' ? `/${user.username}/about` : "/about"}
         style={{
           position: 'absolute',
           top: '20px',
@@ -533,7 +547,7 @@ export default function HomePage({ isHomeownerLoggedIn = false, homeownerData }:
       }}>
         {isMobile ? (
           <TouchOptimizedButton
-            onClick={() => navigateWithSalesperson('/services')}
+            onClick={() => navigateWithUsername('/services')}
             size="lg"
             className="find-contractor-btn touch-target no-select tap-highlight"
             style={{ backgroundColor: '#00adee', borderColor: '#00adee' }}
@@ -542,7 +556,7 @@ export default function HomePage({ isHomeownerLoggedIn = false, homeownerData }:
           </TouchOptimizedButton>
         ) : (
           <button 
-            onClick={() => navigateWithSalesperson('/services')}
+            onClick={() => navigateWithUsername('/services')}
             className="find-contractor-btn"
           >
             Find a Contractor
@@ -553,7 +567,7 @@ export default function HomePage({ isHomeownerLoggedIn = false, homeownerData }:
         {!user && (
           <div style={{ marginTop: '16px' }}>
             <span 
-              onClick={() => navigateWithSalesperson('/login')}
+              onClick={() => navigateWithUsername('/login')}
               style={{
                 color: 'white',
                 fontSize: isMobile ? '14px' : '12px',

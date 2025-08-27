@@ -40,7 +40,14 @@ function App() {
               <Route path="/contractor-registration" component={ContractorRegistration} />
               <Route path="/sales/:profileUrl" component={SalespersonProfile} />
               <Route path="/login" component={Login} />
+              
+              {/* Routes with username prefix for logged-in homeowners */}
+              <Route path="/:username/services" component={ServiceSelection} />
+              <Route path="/:username/browse-services" component={BrowseServices} />
+              <Route path="/:username/about" component={AboutUs} />
+              <Route path="/:username/contractor/:id" component={ContractorProfile} />
               <Route path="/:username" component={HomePage} />
+              
               <Route path="/contractor-portal">
                 <ProtectedRoute requiredRole="contractor">
                   <ContractorPortalEnhanced />

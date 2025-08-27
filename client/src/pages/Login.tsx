@@ -165,7 +165,7 @@ export default function Login() {
           case 'homeowner':
             // Both mobile and desktop homeowners get their username in the URL
             console.log('[LOGIN] Homeowner detected - redirecting with username');
-            setLocation(`/${userData.username}#contractors`);
+            setLocation(`/${userData.username}`);
             break;
           case 'contractor':
             setLocation("/contractor-portal");

@@ -31,7 +31,6 @@ const HomeownerBottomNav: React.FC<HomeownerBottomNavProps> = ({
                 <button
                   key={tab.id}
                   onClick={() => {
-                    window.location.hash = tab.id;
                     onTabChange(tab.id);
                   }}
                   className={`flex flex-col items-center justify-center px-3 py-2 rounded-xl min-w-0 relative flex-1 transition-all duration-200 group ${
