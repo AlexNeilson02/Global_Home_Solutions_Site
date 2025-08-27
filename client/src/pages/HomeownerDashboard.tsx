@@ -121,7 +121,7 @@ export default function HomeownerDashboard() {
               </div>
               <div>
                 <h1 className="text-xl font-semibold text-gray-900">
-                  Welcome back, {user?.fullName?.split(' ')[0]}!
+                  Welcome back!
                 </h1>
                 <p className="text-sm text-gray-500">Homeowner Dashboard</p>
               </div>
