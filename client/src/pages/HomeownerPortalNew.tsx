@@ -16,7 +16,7 @@ import { ChevronLeft, Edit2, Save, X, LogOut, User, Phone, Mail, MapPin, Calenda
 import BidRequestForm from '@/components/BidRequestForm';
 
 export default function HomeownerPortalNew() {
-  const { user, logout } = useAuth();
+  const { user, logout, isLoading } = useAuth();
   const [, setLocation] = useLocation();
   const [isMobile, setIsMobile] = useState(false);
   const [activeTab, setActiveTab] = useState('contractors');
@@ -52,12 +52,13 @@ export default function HomeownerPortalNew() {
     }
   }, [user]);
 
-  // Redirect if not a homeowner
+  // Redirect if not a homeowner - but wait for auth to load first
   useEffect(() => {
-    if (!user || user.role !== 'homeowner') {
+    // Only redirect if authentication has finished loading and user is not a homeowner
+    if (!isLoading && (!user || user.role !== 'homeowner')) {
       setLocation('/login');
     }
-  }, [user, setLocation]);
+  }, [user, setLocation, isLoading]);
 
   // Fetch homeowner's bid requests
   const { data: bidRequestsData, isLoading: bidsLoading } = useQuery<{bidRequests: any[]}>({
