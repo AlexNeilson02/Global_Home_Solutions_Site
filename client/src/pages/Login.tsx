@@ -163,14 +163,9 @@ export default function Login() {
         // Redirect based on role
         switch(userData.role) {
           case 'homeowner':
-            // Mobile homeowners go to main site's contractors section
-            if (isMobile) {
-              console.log('[LOGIN] Mobile homeowner detected - redirecting to contractors section');
-              setLocation("/#contractors");
-            } else {
-              // Desktop homeowners go to their personalized route
-              setLocation(`/${userData.username}`);
-            }
+            // Both mobile and desktop homeowners get their username in the URL
+            console.log('[LOGIN] Homeowner detected - redirecting with username');
+            setLocation(`/${userData.username}#contractors`);
             break;
           case 'contractor':
             setLocation("/contractor-portal");

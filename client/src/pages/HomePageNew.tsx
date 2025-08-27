@@ -8,6 +8,7 @@ import BidRequestForm from "@/components/BidRequestForm";
 import HomeownerBottomNav from "@/components/mobile/HomeownerBottomNav";
 import { TouchOptimizedButton } from "@/components/mobile/TouchOptimizations";
 import { useAuth } from "@/lib/auth-fixed";
+import ServiceSelection from "@/pages/ServiceSelection";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -435,8 +436,22 @@ export default function HomePage({ isHomeownerLoggedIn = false, homeownerData }:
     </div>
   );
 
+  // Check if we should show tab content instead of main page
+  const shouldShowTabContent = user && user.role === 'homeowner' && 
+    ['contractors', 'services', 'profile', 'bids'].includes(activeTab);
+
+  // Redirect to services page when services tab is active
+  useEffect(() => {
+    if (user && user.role === 'homeowner' && activeTab === 'services') {
+      navigateWithSalesperson('/services');
+    }
+  }, [activeTab, user]);
+
   return (
     <div className="homepage-container full-height smooth-scroll" style={{ height: '100vh', overflow: 'hidden', position: 'relative' }}>
+      {/* Only show main content if not viewing tabs */}
+      {!shouldShowTabContent && (
+        <>
       {/* About Us Link */}
       <Link 
         href="/about"
@@ -572,10 +587,15 @@ export default function HomePage({ isHomeownerLoggedIn = false, homeownerData }:
           </div>
         )}
       </div>
+      </>
+      )}
 
       {/* Render tab content for homeowners */}
       {user && user.role === 'homeowner' && activeTab === 'profile' && renderProfileContent()}
       {user && user.role === 'homeowner' && activeTab === 'bids' && renderBidsContent()}
+      {user && user.role === 'homeowner' && activeTab === 'contractors' && (
+        <ServiceSelection />
+      )}
 
       {/* Show bottom navigation only for homeowners on mobile */}
       {user && user.role === 'homeowner' && (

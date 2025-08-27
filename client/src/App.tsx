@@ -40,6 +40,7 @@ function App() {
               <Route path="/contractor-registration" component={ContractorRegistration} />
               <Route path="/sales/:profileUrl" component={SalespersonProfile} />
               <Route path="/login" component={Login} />
+              <Route path="/:username" component={HomePage} />
               <Route path="/contractor-portal">
                 <ProtectedRoute requiredRole="contractor">
                   <ContractorPortalEnhanced />
