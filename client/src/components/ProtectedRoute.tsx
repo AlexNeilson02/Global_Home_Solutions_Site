@@ -1,14 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation } from 'wouter';
-import { useQuery } from '@tanstack/react-query';
-
-interface User {
-  id: number;
-  username: string;
-  role: string;
-  fullName: string;
-  email: string;
-}
+import { useAuth } from '@/lib/auth-fixed';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -19,10 +11,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requir
   const [, navigate] = useLocation();
   const [isAuthorized, setIsAuthorized] = useState<boolean | null>(null);
 
-  const { data: user, isLoading, error } = useQuery<User>({
-    queryKey: ['/api/auth/user'],
-    retry: false,
-  });
+  const { user, isLoading, error } = useAuth();
 
   useEffect(() => {
     if (isLoading) return;
