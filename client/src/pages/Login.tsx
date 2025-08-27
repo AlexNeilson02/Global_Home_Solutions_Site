@@ -114,21 +114,70 @@ export default function Login() {
     setIsLoading(true);
     
     try {
-      console.log('[LOGIN] Calling login function...');
-      await login(data);
+      // Direct API login bypassing auth context issues
+      console.log('[LOGIN] Making direct API call...');
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: 'include',
+        body: JSON.stringify(data),
+      });
       
-      console.log('[LOGIN] Login successful!');
+      console.log('[LOGIN] API response status:', response.status);
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('[LOGIN] API error:', errorText);
+        throw new Error(errorText || "Login failed");
+      }
+      
+      console.log('[LOGIN] Login API successful!');
+      const result = await response.json();
+      console.log('[LOGIN] Login result:', result);
+      
       toast({
         title: "Login Successful!",
         description: `Welcome back!`,
         duration: 2000,
       });
 
-      // Small delay to let authentication context update, then redirect to homeowner portal
-      setTimeout(() => {
-        console.log('[LOGIN] Redirecting to homeowner portal...');
+      // Clear query cache and redirect
+      queryClient.clear();
+      await queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
+      
+      // Direct redirect based on credentials
+      console.log('[LOGIN] Redirecting to appropriate portal...');
+      
+      // Check user role from API
+      const userResponse = await fetch("/api/auth/user", {
+        credentials: 'include'
+      });
+      
+      if (userResponse.ok) {
+        const userData = await userResponse.json();
+        console.log('[LOGIN] User data:', userData);
+        
+        // Redirect based on role
+        switch(userData.role) {
+          case 'homeowner':
+            setLocation("/homeowner-portal");
+            break;
+          case 'contractor':
+            setLocation("/contractor-portal");
+            break;
+          case 'salesperson':
+            setLocation("/sales-portal");
+            break;
+          case 'admin':
+            setLocation("/admin-portal");
+            break;
+          default:
+            setLocation("/portals");
+        }
+      } else {
+        // Default redirect if can't get user data
         setLocation("/homeowner-portal");
-      }, 100);
+      }
       
     } catch (error) {
       console.error('[LOGIN] Login failed:', error);
