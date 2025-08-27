@@ -3,7 +3,6 @@ import { Router, Route } from "wouter";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
-import { AuthProvider } from "@/lib/auth-fixed";
 import { SalespersonProvider } from "@/contexts/SalespersonContext";
 import { MobileViewportFix } from "@/components/mobile/MobileViewportFix";
 import HomePage from "@/pages/HomePageNew";
@@ -26,8 +25,7 @@ import AboutUs from "@/pages/AboutUs";
 function App() {
   return (
     <Router>
-      <AuthProvider>
-        <SalespersonProvider>
+      <SalespersonProvider>
           <TooltipProvider>
             <MobileViewportFix />
             <div className="min-h-screen full-height smooth-scroll" style={{ marginTop: 0, paddingTop: 0, position: 'relative', top: 0 }}>
@@ -74,7 +72,6 @@ function App() {
             </div>
           </TooltipProvider>
         </SalespersonProvider>
-      </AuthProvider>
     </Router>
   );
 }

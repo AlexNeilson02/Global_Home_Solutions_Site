@@ -7,11 +7,11 @@ import { AuthProvider } from "./lib/auth-fixed";
 import { ThemeProvider } from "./components/ui/theme-provider";
 
 createRoot(document.getElementById("root")!).render(
-  <QueryClientProvider client={queryClient}>
-    <ThemeProvider defaultTheme="light">
+  <ThemeProvider defaultTheme="light">
+    <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <App />
       </AuthProvider>
-    </ThemeProvider>
-  </QueryClientProvider>
+    </QueryClientProvider>
+  </ThemeProvider>
 );
