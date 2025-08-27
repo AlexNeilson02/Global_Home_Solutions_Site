@@ -33,7 +33,6 @@ function App() {
               <Toaster />
               <Route path="/" component={HomePage} />
               <Route path="/about" component={AboutUs} />
-              <Route path="/:username" component={HomeownerRoute} />
               <Route path="/services" component={ServiceSelection} />
               <Route path="/browse-services" component={BrowseServices} />
               <Route path="/portals" component={Portals} />
