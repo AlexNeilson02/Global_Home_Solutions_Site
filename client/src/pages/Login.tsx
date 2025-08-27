@@ -164,7 +164,14 @@ export default function Login() {
         switch(userData.role) {
           case 'homeowner':
             console.log('[LOGIN] Homeowner detected - redirecting to portal');
+            console.log('[LOGIN] About to call setLocation with /homeowner-portal');
             setLocation('/homeowner-portal');
+            console.log('[LOGIN] setLocation called');
+            // Backup redirect in case setLocation doesn't work
+            setTimeout(() => {
+              console.log('[LOGIN] Backup redirect triggered');
+              window.location.href = '/homeowner-portal';
+            }, 100);
             break;
           case 'contractor':
             setLocation("/contractor-portal");
