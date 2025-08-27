@@ -37,6 +37,16 @@ const ServiceSelection = () => {
   const { salespersonId } = useSalesperson();
   const [trade, setTrade] = useState("");
   const [searchTriggered, setSearchTriggered] = useState(false);
+
+  // Check for pre-selected service from URL params
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const serviceParam = urlParams.get('service');
+    if (serviceParam) {
+      setTrade(serviceParam);
+      setSearchTriggered(true);
+    }
+  }, []);
   const [selectedContractor, setSelectedContractor] = useState<any>(null);
   const [isMobile, setIsMobile] = useState(false);
   const [activeTab, setActiveTab] = useState('services');
@@ -804,13 +814,12 @@ const ServiceSelection = () => {
       {/* Mobile Bottom Navigation */}
       {isMobile && (
         <HomeownerBottomNav 
-          activeTab={activeTab}
+          activeTab={'contractors'}
           onTabChange={(tab) => {
-            setActiveTab(tab);
             if (tab === 'contractors') {
-              navigateWithSalesperson('/');
+              // Stay on current page (/services)
             } else if (tab === 'services') {
-              // Stay on current page
+              navigateWithSalesperson('/mobile-services');
             } else if (tab === 'profile') {
               navigateWithSalesperson('/login');
             }

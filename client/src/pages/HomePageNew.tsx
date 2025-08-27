@@ -185,10 +185,10 @@ export default function HomePage() {
           activeTab={activeTab}
           onTabChange={(tab) => {
             setActiveTab(tab);
-            if (tab === 'services') {
+            if (tab === 'contractors') {
               navigateWithSalesperson('/services');
-            } else if (tab === 'contractors') {
-              navigateWithSalesperson('/');
+            } else if (tab === 'services') {
+              navigateWithSalesperson('/mobile-services');
             } else if (tab === 'profile') {
               navigateWithSalesperson('/login');
             }
