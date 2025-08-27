@@ -3,8 +3,10 @@ import { Router, Route } from "wouter";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
+import { MobileAppAuthWrapper } from "@/components/MobileAppAuthWrapper";
 import { SalespersonProvider } from "@/contexts/SalespersonContext";
 import { PlatformProvider } from "@/contexts/PlatformContext";
+import { AuthProvider } from "@/lib/auth";
 import { MobileViewportFix } from "@/components/mobile/MobileViewportFix";
 import HomePage from "@/pages/HomePageNew";
 import ContractorProfile from "@/pages/ContractorProfileDB";
@@ -26,11 +28,13 @@ function App() {
   return (
     <Router>
       <PlatformProvider>
-        <SalespersonProvider>
-          <TooltipProvider>
-            <MobileViewportFix />
-            <div className="min-h-screen full-height smooth-scroll" style={{ marginTop: 0, paddingTop: 0, position: 'relative', top: 0 }}>
-              <Toaster />
+        <AuthProvider>
+          <SalespersonProvider>
+            <TooltipProvider>
+              <MobileViewportFix />
+              <MobileAppAuthWrapper>
+                <div className="min-h-screen full-height smooth-scroll" style={{ marginTop: 0, paddingTop: 0, position: 'relative', top: 0 }}>
+                  <Toaster />
               <Route path="/" component={HomePage} />
               <Route path="/about" component={AboutUs} />
               <Route path="/services" component={ServiceSelection} />
@@ -65,9 +69,11 @@ function App() {
                   <Subscribe />
                 </ProtectedRoute>
               </Route>
-            </div>
-          </TooltipProvider>
-        </SalespersonProvider>
+                </div>
+              </MobileAppAuthWrapper>
+            </TooltipProvider>
+          </SalespersonProvider>
+        </AuthProvider>
       </PlatformProvider>
     </Router>
   );
