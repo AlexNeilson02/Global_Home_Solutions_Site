@@ -5,7 +5,6 @@ import { useSalesperson } from "@/contexts/SalespersonContext";
 import { ChevronLeft } from "lucide-react";
 import HomeownerBottomNav from "@/components/mobile/HomeownerBottomNav";
 import { TouchOptimizedButton } from "@/components/mobile/TouchOptimizations";
-import BidRequestForm from "@/components/BidRequestForm";
 import globalLogoPath from "@assets/GLOBAL HOME SOLUTIONS LOGO-01.png";
 import "../styles/HomePage.css";
 
@@ -40,9 +39,7 @@ const ServiceSelection = () => {
   const [searchTriggered, setSearchTriggered] = useState(false);
   const [selectedContractor, setSelectedContractor] = useState<any>(null);
   const [isMobile, setIsMobile] = useState(false);
-  const [activeTab, setActiveTab] = useState('contractors');
-  const [isBidRequestOpen, setIsBidRequestOpen] = useState(false);
-  const [bidRequestContractor, setBidRequestContractor] = useState<any>(null);
+  const [activeTab, setActiveTab] = useState('services');
 
   useEffect(() => {
     const checkMobile = () => {
@@ -53,16 +50,6 @@ const ServiceSelection = () => {
     window.addEventListener('resize', checkMobile);
     
     return () => window.removeEventListener('resize', checkMobile);
-  }, []);
-
-  // Check for category parameter in URL
-  useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const category = urlParams.get('category');
-    if (category) {
-      setTrade(category);
-      setSearchTriggered(true);
-    }
   }, []);
 
   const { data: serviceCategories } = useQuery<ServiceCategoriesResponse>({
@@ -783,8 +770,7 @@ const ServiceSelection = () => {
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
-                      setBidRequestContractor(contractor);
-                      setIsBidRequestOpen(true);
+                      navigateWithSalesperson(`/contractor/${contractor.id}`);
                     }}
                     style={{
                       backgroundColor: '#00aeef',
@@ -822,27 +808,13 @@ const ServiceSelection = () => {
           onTabChange={(tab) => {
             setActiveTab(tab);
             if (tab === 'contractors') {
-              // Stay on current page (this IS the contractors page)
+              navigateWithSalesperson('/');
             } else if (tab === 'services') {
-              navigateWithSalesperson('/browse-services');
+              // Stay on current page
             } else if (tab === 'profile') {
               navigateWithSalesperson('/login');
-            } else if (tab === 'bids') {
-              navigateWithSalesperson('/login'); // Redirect to login for now
             }
           }}
-        />
-      )}
-
-      {/* Bid Request Form Modal */}
-      {bidRequestContractor && (
-        <BidRequestForm
-          isOpen={isBidRequestOpen}
-          onClose={() => {
-            setIsBidRequestOpen(false);
-            setBidRequestContractor(null);
-          }}
-          contractor={bidRequestContractor}
         />
       )}
     </div>

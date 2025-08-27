@@ -10,8 +10,7 @@ import {
   CommissionRecord, InsertCommissionRecord,
   CommissionAdjustment, InsertCommissionAdjustment,
   CommissionPayment, InsertCommissionPayment,
-  EmailCommunication, InsertEmailCommunication,
-  UserActivity, InsertUserActivity
+  EmailCommunication, InsertEmailCommunication
 } from "@shared/schema";
 
 // Extend this interface with all required storage methods
@@ -29,10 +28,6 @@ export interface IStorage {
   getUserByRole(role: string): Promise<User | undefined>;
   updateStripeCustomerId(userId: number, stripeCustomerId: string): Promise<User | undefined>;
   updateUserStripeInfo(userId: number, stripeInfo: { customerId: string; subscriptionId: string }): Promise<User | undefined>;
-  
-  // User activity tracking methods
-  createUserActivity(activity: InsertUserActivity): Promise<UserActivity>;
-  getUserActivities(userId: number): Promise<UserActivity[]>;
 
   // Contractor methods
   getContractor(id: number): Promise<Contractor | undefined>;
@@ -87,7 +82,6 @@ export interface IStorage {
   getBidRequest(id: number): Promise<BidRequest | undefined>;
   getBidRequestsByContractorId(contractorId: number): Promise<BidRequest[]>;
   getBidRequestsBySalespersonId(salespersonId: number): Promise<BidRequest[]>;
-  getBidRequestsByHomeownerId(homeownerId: number): Promise<BidRequest[]>;
   getRecentBidRequests(limit: number): Promise<BidRequest[]>;
   updateBidRequestStatus(id: number, status: string): Promise<BidRequest | undefined>;
   updateBidRequestEmailSent(id: number, emailSent: boolean): Promise<BidRequest | undefined>;

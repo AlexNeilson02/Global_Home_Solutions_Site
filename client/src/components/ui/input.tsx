@@ -12,29 +12,6 @@ const Input = React.forwardRef<HTMLInputElement, React.ComponentProps<"input">>(
           className
         )}
         ref={ref}
-        style={{
-          pointerEvents: 'auto',
-          userSelect: 'text',
-          WebkitUserSelect: 'text',
-          MozUserSelect: 'text',
-          msUserSelect: 'text',
-          backgroundColor: '#ffffff',
-          color: '#000000 !important',
-          WebkitTextFillColor: '#000000 !important',
-          fontSize: '16px',
-          opacity: 1,
-          visibility: 'visible',
-          ...props.style
-        }}
-        onFocus={(e) => {
-          console.log('Input focused:', e.target);
-          props.onFocus?.(e);
-        }}
-        onClick={(e) => {
-          console.log('Input clicked:', e.target);
-          e.stopPropagation();
-          props.onClick?.(e);
-        }}
         {...props}
       />
     )

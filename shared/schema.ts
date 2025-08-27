@@ -36,7 +36,6 @@ export const users = pgTable("users", {
   email: text("email").notNull().unique(),
   fullName: text("full_name").notNull(),
   phone: text("phone"),
-  address: text("address"), // Address for homeowners
   role: text("role").notNull().default("homeowner"), // homeowner, contractor, salesperson, admin
   createdAt: timestamp("created_at").defaultNow(),
   avatarUrl: text("avatar_url"),
@@ -148,7 +147,6 @@ export const bidRequests = pgTable("bid_requests", {
   createdAt: timestamp("created_at").defaultNow(),
   contractorId: integer("contractor_id").notNull().references(() => contractors.id),
   salespersonId: integer("salesperson_id").references(() => salespersons.id),
-  homeownerId: integer("homeowner_id").references(() => users.id), // Link to authenticated homeowner
   fullName: text("full_name").notNull(),
   email: text("email").notNull(),
   phone: text("phone").notNull(),
@@ -184,20 +182,6 @@ export const pageVisits = pgTable("page_visits", {
   isVerifiedQrNfcVisit: boolean("is_verified_qr_nfc_visit").default(false),
   qrNfcSource: text("qr_nfc_source"), // 'qr_code', 'nfc_tag', null
   sessionTrackingId: text("session_tracking_id"), // Unique ID to link visits to bid requests
-});
-
-// User activity tracking table for logged-in users
-export const userActivities = pgTable("user_activities", {
-  id: serial("id").primaryKey(),
-  userId: integer("user_id").notNull().references(() => users.id),
-  activityType: text("activity_type").notNull(), // 'page_view', 'bid_request_sent', 'contractor_viewed', 'login', 'logout', etc.
-  path: text("path").notNull(),
-  timestamp: timestamp("timestamp").defaultNow(),
-  metadata: json("metadata").$type<Record<string, any>>().default({}), // Store additional data like contractor ID viewed, bid request ID, etc.
-  userAgent: text("user_agent"),
-  ipAddress: text("ip_address"),
-  sessionId: text("session_id"), // Track within a session
-  deviceType: text("device_type"), // 'mobile', 'tablet', 'desktop'
 });
 
 // Documents/Files table for organized file management
@@ -400,11 +384,6 @@ export const insertPageVisitSchema = createInsertSchema(pageVisits).omit({
   bidRequestId: true,
 });
 
-export const insertUserActivitySchema = createInsertSchema(userActivities).omit({
-  id: true,
-  timestamp: true,
-});
-
 export const insertDocumentSchema = createInsertSchema(documents).omit({
   id: true,
   createdAt: true,
@@ -450,11 +429,9 @@ export const usersRelations = relations(users, ({ many }) => ({
   salespersons: many(salespersons),
   testimonials: many(testimonials),
   projects: many(projects, { relationName: 'homeowner' }),
-  bidRequests: many(bidRequests, { relationName: 'homeownerBids' }),
   documents: many(documents),
   projectMilestones: many(projectMilestones),
   projectStatusUpdates: many(projectStatusUpdates),
-  userActivities: many(userActivities),
 }));
 
 export const contractorsRelations = relations(contractors, ({ one, many }) => ({
@@ -488,11 +465,6 @@ export const bidRequestsRelations = relations(bidRequests, ({ one, many }) => ({
   salesperson: one(salespersons, {
     fields: [bidRequests.salespersonId],
     references: [salespersons.id],
-  }),
-  homeowner: one(users, {
-    fields: [bidRequests.homeownerId],
-    references: [users.id],
-    relationName: 'homeownerBids',
   }),
   pageVisits: many(pageVisits),
 }));
@@ -612,13 +584,6 @@ export const emailCommunicationsRelations = relations(emailCommunications, ({ on
   }),
 }));
 
-export const userActivitiesRelations = relations(userActivities, ({ one }) => ({
-  user: one(users, {
-    fields: [userActivities.userId],
-    references: [users.id],
-  }),
-}));
-
 // Export types
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
@@ -640,9 +605,6 @@ export type InsertServiceCategory = z.infer<typeof insertServiceCategorySchema>;
 
 export type BidRequest = typeof bidRequests.$inferSelect;
 export type InsertBidRequest = z.infer<typeof insertBidRequestSchema>;
-
-export type UserActivity = typeof userActivities.$inferSelect;
-export type InsertUserActivity = z.infer<typeof insertUserActivitySchema>;
 
 export type PageVisit = typeof pageVisits.$inferSelect;
 export type InsertPageVisit = z.infer<typeof insertPageVisitSchema>;

@@ -1,5 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { apiRequest } from "./queryClient";
+import { queryClient } from "./queryClient";
 import { LoginData } from "@shared/schema";
 
 type User = {
@@ -9,142 +11,119 @@ type User = {
   email: string;
   role: string;
   avatarUrl?: string;
-  phone?: string;
-  address?: string;
 };
-
-// LoginData is now imported from shared schema
 
 type AuthContextType = {
   user: User | null;
   login: (data: LoginData) => Promise<void>;
   logout: () => Promise<void>;
   isLoading: boolean;
-  error: string | null;
+  error: Error | null;
 };
 
-const AuthContext = createContext<AuthContextType>({
+const defaultValue: AuthContextType = {
   user: null,
-  login: async () => { throw new Error("AuthProvider not initialized"); },
-  logout: async () => { throw new Error("AuthProvider not initialized"); },
+  login: async () => {},
+  logout: async () => {},
   isLoading: false,
   error: null
-});
+};
+
+const AuthContext = createContext<AuthContextType>(defaultValue);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [error, setError] = useState<string | null>(null);
-  const queryClient = useQueryClient();
-
-  // Don't clear localStorage on every mount - this was causing issues
-  // Only clear on logout
+  const [token, setToken] = useState<string | null>(localStorage.getItem("auth-token"));
+  const [error, setError] = useState<Error | null>(null);
 
   // Get current user data
-  const { data: user, isLoading, refetch } = useQuery<User | null>({
-    queryKey: ["/api/auth/user"],
-    queryFn: async () => {
-      console.log('🔍 Fetching user data...');
-      const response = await fetch("/api/auth/user", {
-        credentials: 'include' // Important for session-based auth
-      });
-      if (!response.ok) {
-        if (response.status === 401) {
-          console.log('⛔ Not authenticated');
-          return null; // Not authenticated
-        }
-        throw new Error('Failed to fetch user');
-      }
-      const userData = await response.json();
-      console.log('👤 User data received:', userData);
-      return userData;
-    },
+  const { data, isLoading } = useQuery<{ user: User, roleData: any }>({
+    queryKey: ["/api/users/me"],
+    enabled: !!token,
     staleTime: 1000 * 60 * 5, // 5 minutes
-    retry: false,
-    refetchOnMount: true,
-    refetchOnWindowFocus: false, // Disable refetch on window focus to avoid issues
-    enabled: true // Ensure query is enabled
   });
-  
-  // Debug the query result
-  useEffect(() => {
-    console.log('📊 Query result - user:', user, 'isLoading:', isLoading);
-  }, [user, isLoading]);
+
+  const user = data?.user || null;
 
   // Login mutation
   const loginMutation = useMutation({
     mutationFn: async (loginData: LoginData) => {
-      const response = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: 'include', // Important for session-based auth
-        body: JSON.stringify(loginData),
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(errorText || "Login failed");
-      }
-
-      return response.json();
+      const res = await apiRequest("POST", "/api/auth/login", loginData);
+      return res.json();
     },
-    onSuccess: async (data) => {
-      setError(null);
-      console.log('✅ Login successful, response:', data);
-      await refetch(); // Refetch user data after successful login
-      console.log('✅ User data refetched');
+    onSuccess: (data) => {
+      localStorage.setItem("auth-token", data.token);
+      setToken(data.token);
+      queryClient.invalidateQueries({ queryKey: ["/api/users/me"] });
     },
     onError: (err: Error) => {
-      setError(err.message);
+      setError(err);
     },
   });
 
   // Logout mutation
   const logoutMutation = useMutation({
     mutationFn: async () => {
-      try {
-        await fetch("/api/auth/logout", {
-          method: "POST",
-          credentials: 'include'
-        });
-      } catch (error) {
-        console.error("Logout request failed:", error);
+      if (token) {
+        try {
+          await apiRequest("POST", "/api/auth/logout", {});
+        } catch (error) {
+          // Continue with client-side logout even if server request fails
+          console.error("Logout request failed:", error);
+        }
       }
       return null;
     },
     onSuccess: () => {
-      setError(null);
+      localStorage.removeItem("auth-token");
+      setToken(null);
       queryClient.clear();
     },
   });
 
-  const login = React.useCallback(async (loginData: LoginData) => {
+  // Setup auth header for API requests
+  useEffect(() => {
+    const originalFetch = window.fetch;
+    window.fetch = async function(input: RequestInfo | URL, init?: RequestInit) {
+      let url = "";
+      if (typeof input === 'string') {
+        url = input;
+      } else if (input instanceof Request) {
+        url = input.url;
+      }
+      
+      if (url.includes('/api') && token) {
+        init = init || {};
+        init.headers = {
+          ...init.headers,
+          'Authorization': `Bearer ${token}`
+        };
+      }
+      
+      return originalFetch(input, init);
+    };
+    
+    return () => {
+      window.fetch = originalFetch;
+    };
+  }, [token]);
+
+  const login = async (loginData: LoginData) => {
     setError(null);
     await loginMutation.mutateAsync(loginData);
-  }, [loginMutation]);
+  };
 
-  const logout = React.useCallback(async () => {
+  const logout = async () => {
     await logoutMutation.mutateAsync();
-  }, [logoutMutation]);
-
-  // Debug logging for user state
-  useEffect(() => {
-    console.log('🔐 AuthContext - User state updated:', user);
-  }, [user]);
-
-  // Create a memoized context value to ensure proper re-renders
-  const contextValue = React.useMemo(() => ({
-    user: user ?? null,
-    login,
-    logout,
-    isLoading: isLoading || loginMutation.isPending,
-    error
-  }), [user, login, logout, isLoading, loginMutation.isPending, error]);
-
-  useEffect(() => {
-    console.log('🔐 AuthContext - Context value updated:', contextValue);
-  }, [contextValue]);
+  };
 
   return (
-    <AuthContext.Provider value={contextValue}>
+    <AuthContext.Provider value={{ 
+      user, 
+      login, 
+      logout, 
+      isLoading: isLoading || loginMutation.isPending, 
+      error 
+    }}>
       {children}
     </AuthContext.Provider>
   );
@@ -152,14 +131,5 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
 export function useAuth() {
   const context = useContext(AuthContext);
-  
-  // Force a re-render when context changes
-  const [, forceUpdate] = React.useState({});
-  
-  React.useEffect(() => {
-    console.log('🔄 useAuth hook - context changed:', context);
-    forceUpdate({});
-  }, [context.user]);
-  
   return context;
 }

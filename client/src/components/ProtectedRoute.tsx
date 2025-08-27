@@ -1,6 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation } from 'wouter';
-import { useAuth } from '@/lib/auth-fixed';
+import { useQuery } from '@tanstack/react-query';
+
+interface User {
+  id: number;
+  username: string;
+  role: string;
+  fullName: string;
+  email: string;
+}
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -11,7 +19,10 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requir
   const [, navigate] = useLocation();
   const [isAuthorized, setIsAuthorized] = useState<boolean | null>(null);
 
-  const { user, isLoading, error } = useAuth();
+  const { data: user, isLoading, error } = useQuery<User>({
+    queryKey: ['/api/auth/user'],
+    retry: false,
+  });
 
   useEffect(() => {
     if (isLoading) return;
@@ -35,9 +46,6 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requir
           break;
         case 'salesperson':
           navigate('/sales-portal');
-          break;
-        case 'homeowner':
-          navigate('/homeowner-portal');
           break;
         default:
           // Unknown role, redirect to portals for re-authentication

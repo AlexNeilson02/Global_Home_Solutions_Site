@@ -131,81 +131,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Homeowner routes - Profile management and bid tracking
-  apiRouter.patch("/homeowners/profile", isAuthenticated, requireRole(["homeowner"]), async (req: Request, res: Response) => {
-    try {
-      const user = req.user as User;
-      const updateData = req.body;
-      
-      // Only allow homeowners to update their own profile
-      const allowedFields = ['fullName', 'email', 'phone', 'address', 'avatarUrl'];
-      const filteredUpdate = Object.keys(updateData)
-        .filter(key => allowedFields.includes(key))
-        .reduce((obj, key) => {
-          obj[key] = updateData[key];
-          return obj;
-        }, {} as any);
-
-      if (Object.keys(filteredUpdate).length === 0) {
-        return res.status(400).json({ message: "No valid fields to update" });
-      }
-
-      const updatedUser = await storage.updateUser(user.id, filteredUpdate);
-      if (!updatedUser) {
-        return res.status(404).json({ message: "User not found" });
-      }
-
-      const { password, ...userInfo } = updatedUser;
-      res.json({ message: "Profile updated successfully", user: userInfo });
-    } catch (error) {
-      console.error("Error updating homeowner profile:", error);
-      res.status(500).json({ message: "Failed to update profile" });
-    }
-  });
-
-  apiRouter.get("/homeowners/bid-requests", isAuthenticated, requireRole(["homeowner"]), async (req: Request, res: Response) => {
-    try {
-      const user = req.user as User;
-      
-      // Get all bid requests for this homeowner
-      const bidRequests = await storage.getBidRequestsByHomeownerId(user.id);
-      
-      res.json({ bidRequests });
-    } catch (error) {
-      console.error("Error fetching homeowner bid requests:", error);
-      res.status(500).json({ message: "Failed to fetch bid requests" });
-    }
-  });
-
-  apiRouter.get("/homeowners/bid-requests/:id", isAuthenticated, requireRole(["homeowner"]), async (req: Request, res: Response) => {
-    try {
-      const user = req.user as User;
-      const bidRequestId = parseInt(req.params.id);
-      
-      const bidRequest = await storage.getBidRequest(bidRequestId);
-      if (!bidRequest) {
-        return res.status(404).json({ message: "Bid request not found" });
-      }
-
-      // Ensure the bid request belongs to this homeowner
-      if (bidRequest.homeownerId !== user.id) {
-        return res.status(403).json({ message: "Not authorized to view this bid request" });
-      }
-
-      // Get contractor details for the bid request
-      const contractor = await storage.getContractor(bidRequest.contractorId);
-      const bidRequestWithDetails = {
-        ...bidRequest,
-        contractor
-      };
-
-      res.json({ bidRequest: bidRequestWithDetails });
-    } catch (error) {
-      console.error("Error fetching bid request details:", error);
-      res.status(500).json({ message: "Failed to fetch bid request details" });
-    }
-  });
-
   // Contractors routes
   apiRouter.get("/contractors", async (req: Request, res: Response) => {
     try {
@@ -592,44 +517,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // User activity tracking route for logged-in users
-  apiRouter.post("/activity/track", isAuthenticated, async (req: Request, res: Response) => {
-    try {
-      const user = req.user as User;
-      const { activityType, path, metadata, userAgent, deviceType, sessionId } = req.body;
-      
-      // Create activity record
-      const activity = await storage.createUserActivity({
-        userId: user.id,
-        activityType: activityType || 'page_view',
-        path: path || req.headers.referer || '/',
-        metadata: metadata || {},
-        userAgent: userAgent || req.headers['user-agent'] || null,
-        ipAddress: req.ip || null,
-        sessionId: sessionId || null,
-        deviceType: deviceType || null,
-      });
-      
-      console.log(`📊 Tracked activity: ${activityType} for user ${user.username} at ${path}`);
-      
-      res.json({ success: true, activityId: activity.id });
-    } catch (error) {
-      console.error("Error tracking activity:", error);
-      res.status(500).json({ 
-        message: "Error tracking activity",
-        error: error instanceof Error ? error.message : 'Unknown error'
-      });
-    }
-  });
-
   // Bid requests routes
   apiRouter.post("/bid-requests", upload.array('media', 10), async (req: Request, res: Response) => {
     try {
       console.log('Processing bid request with body:', req.body);
-      
-      // Check if user is authenticated and is a homeowner
-      const authenticatedUser = req.user as User | undefined;
-      const isAuthenticatedHomeowner = authenticatedUser && authenticatedUser.role === 'homeowner';
       
       const {
         // New field names
@@ -655,22 +546,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         preferredTimeframe
       } = req.body;
 
-      // Use authenticated homeowner's info if available, otherwise use form data, then fallback to legacy fields
-      let finalFullName = fullName || customerName;
-      let finalEmail = email || customerEmail;
-      let finalPhone = phone || customerPhone;
-      let finalAddress = address || projectAddress;
+      // Use new fields if available, fallback to legacy fields for backward compatibility
+      const finalFullName = fullName || customerName;
+      const finalEmail = email || customerEmail;
+      const finalPhone = phone || customerPhone;
+      const finalAddress = address || projectAddress;
       const finalDescription = description || projectDescription;
       const finalTimeline = timeline || preferredTimeframe;
-      
-      // Pre-populate with authenticated homeowner's information if logged in and fields not explicitly provided
-      if (isAuthenticatedHomeowner) {
-        finalFullName = finalFullName || authenticatedUser.fullName;
-        finalEmail = finalEmail || authenticatedUser.email;
-        finalPhone = finalPhone || authenticatedUser.phone;
-        finalAddress = finalAddress || authenticatedUser.address;
-        console.log(`🏠 Authenticated homeowner ${authenticatedUser.fullName} creating bid request`);
-      }
       
       // Handle services requested - either array or single service
       let finalServicesRequested;
@@ -750,7 +632,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const bidRequestData = {
         contractorId: Number(contractorId),
         salespersonId: salespersonId ? Number(salespersonId) : null,
-        homeownerId: isAuthenticatedHomeowner ? authenticatedUser.id : null, // Link to authenticated homeowner
         fullName: finalFullName,
         email: finalEmail,
         phone: finalPhone,

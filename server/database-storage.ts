@@ -3,7 +3,7 @@ import { db } from "./db";
 import { 
   users, contractors, salespersons, projects, testimonials, serviceCategories, bidRequests, pageVisits,
   documents, projectMilestones, projectStatusUpdates, commissionRecords, commissionAdjustments, commissionPayments,
-  emailCommunications, userActivities,
+  emailCommunications,
   type User, type InsertUser,
   type Contractor, type InsertContractor,
   type Salesperson, type InsertSalesperson,
@@ -18,8 +18,7 @@ import {
   type CommissionRecord, type InsertCommissionRecord,
   type CommissionAdjustment, type InsertCommissionAdjustment,
   type CommissionPayment, type InsertCommissionPayment,
-  type EmailCommunication, type InsertEmailCommunication,
-  type UserActivity, type InsertUserActivity
+  type EmailCommunication, type InsertEmailCommunication
 } from "@shared/schema";
 import { IStorage } from "./storage";
 import { QRCodeService } from "./qr-service";
@@ -68,20 +67,6 @@ export class DatabaseStorage implements IStorage {
 
   async deleteUser(id: number): Promise<void> {
     await db.delete(users).where(eq(users.id, id));
-  }
-  
-  // User activity tracking
-  async createUserActivity(activity: InsertUserActivity): Promise<UserActivity> {
-    const [created] = await db.insert(userActivities).values(activity).returning();
-    return created;
-  }
-  
-  async getUserActivities(userId: number): Promise<UserActivity[]> {
-    return db
-      .select()
-      .from(userActivities)
-      .where(eq(userActivities.userId, userId))
-      .orderBy(desc(userActivities.timestamp));
   }
   
   async updateUserLastLogin(id: number): Promise<User | undefined> {
@@ -552,15 +537,6 @@ export class DatabaseStorage implements IStorage {
     return db.select().from(bidRequests)
       .where(and(
         eq(bidRequests.salespersonId, salespersonId),
-        ne(bidRequests.status, 'deleted')
-      ))
-      .orderBy(desc(bidRequests.createdAt));
-  }
-
-  async getBidRequestsByHomeownerId(homeownerId: number): Promise<BidRequest[]> {
-    return db.select().from(bidRequests)
-      .where(and(
-        eq(bidRequests.homeownerId, homeownerId),
         ne(bidRequests.status, 'deleted')
       ))
       .orderBy(desc(bidRequests.createdAt));
