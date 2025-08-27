@@ -56,6 +56,7 @@ export const contractors = pgTable("contractors", {
 
   hourlyRate: real("hourly_rate"),
   logoUrl: text("logo_url"),
+  bannerImageUrl: text("banner_image_url"),
   videoUrl: text("video_url"),
   mediaFiles: json("media_files").$type<{url: string, type: 'image' | 'video', name: string}[]>().default([]),
   ownerName: text("owner_name"),

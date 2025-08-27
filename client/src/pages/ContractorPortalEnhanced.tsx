@@ -178,6 +178,7 @@ const ContractorPortalEnhanced: React.FC = () => {
     phone: '',
     email: '',
     logoUrl: '',
+    bannerImageUrl: '',
     hourlyRate: 0,
     videoUrl: '',
     ownerName: '',
@@ -188,6 +189,8 @@ const ContractorPortalEnhanced: React.FC = () => {
   });
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [logoPreview, setLogoPreview] = useState<string>('');
+  const [bannerFile, setBannerFile] = useState<File | null>(null);
+  const [bannerPreview, setBannerPreview] = useState<string>('');
   const [mediaFiles, setMediaFiles] = useState<{url: string, type: 'image' | 'video', name: string}[]>([]);
 
   const [viewingBidDetails, setViewingBidDetails] = useState<any | null>(null);
@@ -203,6 +206,7 @@ const ContractorPortalEnhanced: React.FC = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const logoInputRef = useRef<HTMLInputElement>(null);
+  const bannerInputRef = useRef<HTMLInputElement>(null);
   const mediaInputRef = useRef<HTMLInputElement>(null);
 
   // Logout mutation
@@ -496,6 +500,7 @@ const ContractorPortalEnhanced: React.FC = () => {
         phone: contractor.phone || '',
         email: contractor.email || '',
         logoUrl: contractor.logoUrl || '',
+        bannerImageUrl: contractor.bannerImageUrl || '',
         hourlyRate: contractor.hourlyRate || 0,
         videoUrl: contractor.videoUrl || '',
         ownerName: contractor.ownerName || '',
@@ -505,6 +510,7 @@ const ContractorPortalEnhanced: React.FC = () => {
         twitter: contractor.twitter || ''
       });
       setLogoPreview(contractor.logoUrl || '');
+      setBannerPreview(contractor.bannerImageUrl || '');
       setMediaFiles(contractor.mediaFiles || []);
     }
   }, [contractor]);
@@ -529,6 +535,31 @@ const ContractorPortalEnhanced: React.FC = () => {
         const result = e.target?.result as string;
         setLogoPreview(result);
         setEditForm({...editForm, logoUrl: result});
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  // Handle banner image upload
+  const handleBannerUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      // Check file size (10MB limit for banner)
+      if (file.size > 10 * 1024 * 1024) {
+        toast({
+          title: "File too large",
+          description: "Banner image must be smaller than 10MB",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      setBannerFile(file);
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const result = e.target?.result as string;
+        setBannerPreview(result);
+        setEditForm({...editForm, bannerImageUrl: result});
       };
       reader.readAsDataURL(file);
     }
@@ -1312,6 +1343,43 @@ const ContractorPortalEnhanced: React.FC = () => {
                               className="hidden"
                             />
                             <p className="text-xs text-gray-500 mt-1">Max 5MB, JPG/PNG</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Banner Image Upload */}
+                      <div>
+                        <label className="block text-sm font-medium mb-2">Banner Image</label>
+                        <div className="flex items-start space-x-4">
+                          <div className="w-full h-32 bg-gray-100 dark:bg-gray-800 rounded-lg flex items-center justify-center overflow-hidden border-2 border-dashed border-gray-300 dark:border-gray-600">
+                            {bannerPreview ? (
+                              <img src={bannerPreview} alt="Banner Preview" className="w-full h-full object-cover" />
+                            ) : (
+                              <div className="text-center">
+                                <Camera className="h-8 w-8 text-gray-400 mx-auto mb-2" />
+                                <p className="text-sm text-gray-500">Banner Image Preview</p>
+                              </div>
+                            )}
+                          </div>
+                          <div className="flex flex-col space-y-2">
+                            <Button
+                              type="button"
+                              variant="outline"
+                              onClick={() => bannerInputRef.current?.click()}
+                              style={antiYellowInputStyles}
+                            >
+                              <Upload className="h-4 w-4 mr-2" />
+                              Upload Banner
+                            </Button>
+                            <input
+                              ref={bannerInputRef}
+                              type="file"
+                              accept="image/*"
+                              onChange={handleBannerUpload}
+                              className="hidden"
+                            />
+                            <p className="text-xs text-gray-500">Max 10MB, JPG/PNG</p>
+                            <p className="text-xs text-gray-400">Recommended: 1200x400px</p>
                           </div>
                         </div>
                       </div>
