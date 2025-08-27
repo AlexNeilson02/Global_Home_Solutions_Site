@@ -3,6 +3,7 @@ import { Router, Route } from "wouter";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
+import { AuthProvider } from "@/lib/auth-fixed";
 import { SalespersonProvider } from "@/contexts/SalespersonContext";
 import { MobileViewportFix } from "@/components/mobile/MobileViewportFix";
 import HomePage from "@/pages/HomePageNew";
@@ -25,53 +26,55 @@ import AboutUs from "@/pages/AboutUs";
 function App() {
   return (
     <Router>
-      <SalespersonProvider>
-        <TooltipProvider>
-          <MobileViewportFix />
-          <div className="min-h-screen full-height smooth-scroll" style={{ marginTop: 0, paddingTop: 0, position: 'relative', top: 0 }}>
-            <Toaster />
-            <Route path="/" component={HomePage} />
-            <Route path="/about" component={AboutUs} />
-            <Route path="/services" component={ServiceSelection} />
-            <Route path="/browse-services" component={BrowseServices} />
-            <Route path="/portals" component={Portals} />
-            <Route path="/contractor/:id" component={ContractorProfile} />
-            <Route path="/contractor-registration" component={ContractorRegistration} />
-            <Route path="/sales/:profileUrl" component={SalespersonProfile} />
-            <Route path="/login" component={Login} />
-            <Route path="/contractor-portal">
-              <ProtectedRoute requiredRole="contractor">
-                <ContractorPortalEnhanced />
-              </ProtectedRoute>
-            </Route>
-            <Route path="/sales-portal">
-              <ProtectedRoute requiredRole="salesperson">
-                <SalesPortalEnhanced />
-              </ProtectedRoute>
-            </Route>
-            <Route path="/admin-portal">
-              <ProtectedRoute requiredRole="admin">
-                <AdminPortalEnhanced />
-              </ProtectedRoute>
-            </Route>
-            <Route path="/homeowner-portal">
-              <ProtectedRoute requiredRole="homeowner">
-                <HomeownerPortal />
-              </ProtectedRoute>
-            </Route>
-            <Route path="/checkout">
-              <ProtectedRoute>
-                <Checkout />
-              </ProtectedRoute>
-            </Route>
-            <Route path="/subscribe">
-              <ProtectedRoute>
-                <Subscribe />
-              </ProtectedRoute>
-            </Route>
-          </div>
-        </TooltipProvider>
-      </SalespersonProvider>
+      <AuthProvider>
+        <SalespersonProvider>
+          <TooltipProvider>
+            <MobileViewportFix />
+            <div className="min-h-screen full-height smooth-scroll" style={{ marginTop: 0, paddingTop: 0, position: 'relative', top: 0 }}>
+              <Toaster />
+              <Route path="/" component={HomePage} />
+              <Route path="/about" component={AboutUs} />
+              <Route path="/services" component={ServiceSelection} />
+              <Route path="/browse-services" component={BrowseServices} />
+              <Route path="/portals" component={Portals} />
+              <Route path="/contractor/:id" component={ContractorProfile} />
+              <Route path="/contractor-registration" component={ContractorRegistration} />
+              <Route path="/sales/:profileUrl" component={SalespersonProfile} />
+              <Route path="/login" component={Login} />
+              <Route path="/contractor-portal">
+                <ProtectedRoute requiredRole="contractor">
+                  <ContractorPortalEnhanced />
+                </ProtectedRoute>
+              </Route>
+              <Route path="/sales-portal">
+                <ProtectedRoute requiredRole="salesperson">
+                  <SalesPortalEnhanced />
+                </ProtectedRoute>
+              </Route>
+              <Route path="/admin-portal">
+                <ProtectedRoute requiredRole="admin">
+                  <AdminPortalEnhanced />
+                </ProtectedRoute>
+              </Route>
+              <Route path="/homeowner-portal">
+                <ProtectedRoute requiredRole="homeowner">
+                  <HomeownerPortal />
+                </ProtectedRoute>
+              </Route>
+              <Route path="/checkout">
+                <ProtectedRoute>
+                  <Checkout />
+                </ProtectedRoute>
+              </Route>
+              <Route path="/subscribe">
+                <ProtectedRoute>
+                  <Subscribe />
+                </ProtectedRoute>
+              </Route>
+            </div>
+          </TooltipProvider>
+        </SalespersonProvider>
+      </AuthProvider>
     </Router>
   );
 }
