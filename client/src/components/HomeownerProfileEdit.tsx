@@ -76,14 +76,31 @@ export function HomeownerProfileEdit({ trigger }: HomeownerProfileEditProps) {
     },
   });
 
+  // Reset form when user data changes or dialog opens
+  useEffect(() => {
+    if (open && user) {
+      console.log('🔄 Resetting form with user data:', { fullName: user.fullName, phone: user.phone });
+      form.reset({
+        fullName: user.fullName || "",
+        phone: user.phone || "",
+      });
+    }
+  }, [open, user, form]);
+
   const updateProfile = useMutation({
     mutationFn: async (data: ProfileEditForm) => {
       if (!user) throw new Error("User not found");
       
-      return apiRequest(`/api/users/${user.id}`, {
+      console.log('🔄 Updating profile with data:', data);
+      console.log('📞 Making API call to:', `/api/users/${user.id}`);
+      
+      const result = await apiRequest(`/api/users/${user.id}`, {
         method: 'PATCH',
         body: JSON.stringify(data),
       });
+      
+      console.log('✅ Profile update successful:', result);
+      return result;
     },
     onSuccess: (updatedUser) => {
       toast({
@@ -111,7 +128,16 @@ export function HomeownerProfileEdit({ trigger }: HomeownerProfileEditProps) {
   });
 
   const onSubmit = async (data: ProfileEditForm) => {
-    await updateProfile.mutateAsync(data);
+    console.log('📝 Form submitted with data:', data);
+    console.log('👤 Current user:', user);
+    console.log('🔍 Form errors:', form.formState.errors);
+    console.log('✅ Form is valid:', form.formState.isValid);
+    
+    try {
+      await updateProfile.mutateAsync(data);
+    } catch (error) {
+      console.error('❌ Profile update failed:', error);
+    }
   };
 
   const defaultTrigger = (
