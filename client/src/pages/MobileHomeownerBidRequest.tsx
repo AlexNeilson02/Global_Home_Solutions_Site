@@ -145,7 +145,7 @@ export default function MobileHomeownerBidRequest() {
     if (!contractors?.contractors || selectedServices.length === 0) return [];
     
     return contractors.contractors.filter(contractor => 
-      contractor.specialties.some(specialty => 
+      contractor.specialties && contractor.specialties.some(specialty => 
         selectedServices.some(service => 
           specialty.toLowerCase().includes(service.toLowerCase()) ||
           service.toLowerCase().includes(specialty.toLowerCase())
