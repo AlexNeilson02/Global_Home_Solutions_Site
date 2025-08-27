@@ -1,5 +1,5 @@
 import React from 'react';
-import { Home, Users } from 'lucide-react';
+import { FileText, User } from 'lucide-react';
 
 interface HomeownerBottomNavProps {
   activeTab: string;
@@ -11,8 +11,8 @@ const HomeownerBottomNav: React.FC<HomeownerBottomNavProps> = ({
   onTabChange,
 }) => {
   const tabs = [
-    { id: 'contractors', label: 'Contractors', icon: Users },
-    { id: 'services', label: 'Services', icon: Home }
+    { id: 'requests', label: 'Bids', icon: FileText },
+    { id: 'profile', label: 'Profile', icon: User }
   ];
 
   return (

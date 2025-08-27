@@ -7,8 +7,10 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/lib/auth";
 import { usePlatform } from "@/contexts/PlatformContext";
+import { useLocation } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
 import { HomeownerProfileEdit } from "@/components/HomeownerProfileEdit";
+import HomeownerBottomNav from "@/components/mobile/HomeownerBottomNav";
 import { 
   Home, 
   Plus, 
@@ -41,6 +43,7 @@ export default function HomeownerDashboard() {
   const { user, logout } = useAuth();
   const { toast } = useToast();
   const { isMobileApp, isMobileWeb } = usePlatform();
+  const [, setLocation] = useLocation();
   const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState("requests");
 
@@ -138,22 +141,22 @@ export default function HomeownerDashboard() {
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className={`grid w-full ${isMobile ? 'grid-cols-2' : 'grid-cols-3'}`}>
-            <TabsTrigger value="requests" className="flex items-center gap-2">
-              <Home className="w-4 h-4" />
-              My Requests
-            </TabsTrigger>
-            <TabsTrigger value="new-request" className="flex items-center gap-2">
-              <Plus className="w-4 h-4" />
-              New Request
-            </TabsTrigger>
-            {!isMobile && (
+          {!isMobile && (
+            <TabsList className="grid w-full grid-cols-3">
+              <TabsTrigger value="requests" className="flex items-center gap-2">
+                <Home className="w-4 h-4" />
+                My Requests
+              </TabsTrigger>
+              <TabsTrigger value="new-request" className="flex items-center gap-2">
+                <Plus className="w-4 h-4" />
+                New Request
+              </TabsTrigger>
               <TabsTrigger value="profile" className="flex items-center gap-2">
                 <User className="w-4 h-4" />
                 Profile
               </TabsTrigger>
-            )}
-          </TabsList>
+            </TabsList>
+          )}
 
           {/* My Requests Tab */}
           <TabsContent value="requests" className="space-y-6">
@@ -239,29 +242,30 @@ export default function HomeownerDashboard() {
             </div>
           </TabsContent>
 
-          {/* New Request Tab */}
-          <TabsContent value="new-request">
-            <div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-6">Request Home Services</h2>
-              <Card>
-                <CardContent className="p-8 text-center">
-                  <Plus className="w-12 h-12 text-blue-600 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">
-                    Create New Service Request
-                  </h3>
-                  <p className="text-gray-500 mb-6">
-                    Find contractors for your home improvement needs.
-                  </p>
-                  <Button 
-                    className="bg-blue-600 hover:bg-blue-700"
-                    onClick={() => setLocation('/homeowner/request-service')}
-                  >
-                    Request Services
-                  </Button>
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
+          {!isMobile && (
+            <TabsContent value="new-request">
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900 mb-6">Request Home Services</h2>
+                <Card>
+                  <CardContent className="p-8 text-center">
+                    <Plus className="w-12 h-12 text-blue-600 mx-auto mb-4" />
+                    <h3 className="text-lg font-medium text-gray-900 mb-2">
+                      Create New Service Request
+                    </h3>
+                    <p className="text-gray-500 mb-6">
+                      Find contractors for your home improvement needs.
+                    </p>
+                    <Button 
+                      className="bg-blue-600 hover:bg-blue-700"
+                      onClick={() => setLocation('/homeowner/request-service')}
+                    >
+                      Request Services
+                    </Button>
+                  </CardContent>
+                </Card>
+              </div>
+            </TabsContent>
+          )}
 
           {/* Profile Tab */}
           <TabsContent value="profile">
@@ -306,18 +310,24 @@ export default function HomeownerDashboard() {
         </Tabs>
       </div>
 
-      {/* Mobile Bottom Navigation for Profile */}
+      {/* Mobile Bottom Navigation */}
       {isMobile && (
-        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 py-2">
-          <Button 
-            variant="outline" 
-            className="w-full"
-            onClick={() => setActiveTab("profile")}
-          >
-            <User className="w-4 h-4 mr-2" />
-            View Profile
-          </Button>
-        </div>
+        <>
+          <HomeownerBottomNav 
+            activeTab={activeTab}
+            onTabChange={setActiveTab}
+          />
+          {/* Floating Action Button for Creating Requests */}
+          <div className="fixed bottom-20 right-4 z-40">
+            <Button 
+              size="lg"
+              className="bg-blue-600 hover:bg-blue-700 rounded-full h-14 w-14 shadow-lg"
+              onClick={() => setLocation('/homeowner/request-service')}
+            >
+              <Plus className="w-6 h-6" />
+            </Button>
+          </div>
+        </>
       )}
     </div>
   );
