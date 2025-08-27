@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -28,6 +28,45 @@ export function HomeownerProfileEdit({ trigger }: HomeownerProfileEditProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
+
+  // Keyboard navigation support for profile edit dialog
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!open) return;
+      
+      switch (e.key) {
+        case 'Escape':
+          e.preventDefault();
+          setOpen(false);
+          break;
+      }
+    };
+
+    if (open) {
+      document.addEventListener('keydown', handleKeyDown);
+      return () => document.removeEventListener('keydown', handleKeyDown);
+    }
+  }, [open]);
+
+  // Handle dialog trigger click with proper event handling
+  const handleTriggerClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setOpen(true);
+  };
+
+  // Handle overlay click - close dialog
+  const handleOverlayClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setOpen(false);
+  };
+
+  // Handle content click - prevent closing
+  const handleContentClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
 
   const form = useForm<ProfileEditForm>({
     resolver: zodResolver(profileEditSchema),
@@ -76,18 +115,30 @@ export function HomeownerProfileEdit({ trigger }: HomeownerProfileEditProps) {
   };
 
   const defaultTrigger = (
-    <Button variant="outline" size="sm">
+    <Button 
+      variant="outline" 
+      size="sm"
+      onClick={handleTriggerClick}
+      type="button"
+    >
       <Edit className="w-4 h-4 mr-2" />
       Edit Profile
     </Button>
   );
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        {trigger || defaultTrigger}
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-md">
+    <div data-component="profile-edit-modal" className="profile-edit-overlay">
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogTrigger asChild>
+          <div onClick={handleTriggerClick}>
+            {trigger || defaultTrigger}
+          </div>
+        </DialogTrigger>
+        <DialogContent 
+          className="sm:max-w-md" 
+          onClick={handleContentClick}
+          data-component="profile-edit-modal"
+        >
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <User className="w-5 h-5 text-blue-600" />
@@ -157,7 +208,11 @@ export function HomeownerProfileEdit({ trigger }: HomeownerProfileEditProps) {
               <Button 
                 type="button" 
                 variant="outline" 
-                onClick={() => setOpen(false)}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setOpen(false);
+                }}
                 className="flex-1"
               >
                 Cancel
@@ -179,7 +234,8 @@ export function HomeownerProfileEdit({ trigger }: HomeownerProfileEditProps) {
             </div>
           </form>
         </Form>
-      </DialogContent>
-    </Dialog>
+        </DialogContent>
+      </Dialog>
+    </div>
   );
 }

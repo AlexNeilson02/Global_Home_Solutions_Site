@@ -90,9 +90,9 @@ html::after {
 
 /* Force remove any dialog/modal overlays that might interfere, except bid request form, login forms, admin portal dialogs, and media modals */
 [data-radix-popper-content-wrapper],
-[data-state="open"][role="dialog"]:not([data-component="bid-request-form"]):not([data-component="login-form"]):not([data-component="admin-portal-dialog"]):not([data-component="image-modal"]):not([data-component="video-modal"]),
-.fixed.inset-0.z-50.bg-black\/80:not(.bid-request-overlay):not(.login-overlay):not(.admin-portal-overlay):not(.image-modal-overlay):not(.video-modal-overlay),
-.fixed.inset-0.z-50.bg-black\/80.data-\[state\=open\]\:animate-in:not(.bid-request-overlay):not(.login-overlay):not(.admin-portal-overlay):not(.image-modal-overlay):not(.video-modal-overlay) {
+[data-state="open"][role="dialog"]:not([data-component="bid-request-form"]):not([data-component="login-form"]):not([data-component="admin-portal-dialog"]):not([data-component="image-modal"]):not([data-component="video-modal"]):not([data-component="profile-edit-modal"]),
+.fixed.inset-0.z-50.bg-black\/80:not(.bid-request-overlay):not(.login-overlay):not(.admin-portal-overlay):not(.image-modal-overlay):not(.video-modal-overlay):not(.profile-edit-overlay),
+.fixed.inset-0.z-50.bg-black\/80.data-\[state\=open\]\:animate-in:not(.bid-request-overlay):not(.login-overlay):not(.admin-portal-overlay):not(.image-modal-overlay):not(.video-modal-overlay):not(.profile-edit-overlay) {
   display: none !important;
   visibility: hidden !important;
   opacity: 0 !important;
@@ -1636,12 +1636,47 @@ div[role="tabpanel"] * {
   border-color: #e5e7eb !important;
 }
 
-/* Ensure login modal visibility - override any conflicting styles */
+/* Ensure login modal and profile edit modal visibility - override any conflicting styles */
 [data-radix-dialog-overlay] {
   position: fixed !important;
   inset: 0 !important;
   z-index: 50 !important;
   background-color: rgba(0, 0, 0, 0.8) !important;
+}
+
+/* Profile Edit Modal Specific Overrides - Nuclear Approach */
+[data-component="profile-edit-modal"] {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  z-index: 55 !important;
+}
+
+[data-component="profile-edit-modal"] [data-radix-dialog-overlay] {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 55 !important;
+  background-color: rgba(0, 0, 0, 0.8) !important;
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+[data-component="profile-edit-modal"] [data-radix-dialog-content] {
+  position: fixed !important;
+  left: 50% !important;
+  top: 50% !important;
+  z-index: 56 !important;
+  transform: translate(-50%, -50%) !important;
+  background-color: white !important;
+  padding: 1.5rem !important;
+  border-radius: 0.5rem !important;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+  max-width: 425px !important;
+  width: 100% !important;
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
 }
 
 [data-radix-dialog-content] {
