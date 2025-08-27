@@ -61,7 +61,7 @@ function App() {
               </Route>
               <Route path="/homeowner-portal">
                 <ProtectedRoute requiredRole="homeowner">
-                  <HomeownerPortal />
+                  <HomeownerPortalNew />
                 </ProtectedRoute>
               </Route>
               <Route path="/checkout">

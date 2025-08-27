@@ -13,7 +13,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ChevronLeft, Edit2, Save, X, LogOut, User, Phone, Mail, MapPin, Calendar, ClipboardList } from 'lucide-react';
-import { BidRequestForm } from '@/components/BidRequestForm';
+import BidRequestForm from '@/components/BidRequestForm';
 
 export default function HomeownerPortalNew() {
   const { user, logout } = useAuth();
@@ -388,7 +388,13 @@ export default function HomeownerPortalNew() {
               >
                 Browse Services
               </Button>
-              <BidRequestForm />
+              <Button 
+                onClick={() => setLocation('/services')} 
+                variant="outline"
+                className="w-full"
+              >
+                Find Contractors
+              </Button>
             </div>
           </Card>
 
