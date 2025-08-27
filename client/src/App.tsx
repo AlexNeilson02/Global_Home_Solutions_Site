@@ -12,6 +12,7 @@ import SalesPortalEnhanced from "@/pages/SalesPortalEnhanced";
 import AdminPortalEnhanced from "@/pages/AdminPortalEnhanced";
 import HomeownerPortal from "@/pages/HomeownerPortal";
 import HomeownerRoute from "@/pages/HomeownerRoute";
+import { UsernameRoute } from "@/components/UsernameRoute";
 
 import ContractorRegistration from "@/pages/ContractorRegistration";
 import SalespersonProfile from "@/pages/SalespersonProfile";
@@ -41,12 +42,8 @@ function App() {
               <Route path="/sales/:profileUrl" component={SalespersonProfile} />
               <Route path="/login" component={Login} />
               
-              {/* Routes with username prefix for logged-in homeowners */}
-              <Route path="/:username/services" component={ServiceSelection} />
-              <Route path="/:username/browse-services" component={BrowseServices} />
-              <Route path="/:username/about" component={AboutUs} />
-              <Route path="/:username/contractor/:id" component={ContractorProfile} />
-              <Route path="/:username" component={HomePage} />
+              {/* Username-based routes for logged-in homeowners */}
+              <UsernameRoute />
               
               <Route path="/contractor-portal">
                 <ProtectedRoute requiredRole="contractor">
