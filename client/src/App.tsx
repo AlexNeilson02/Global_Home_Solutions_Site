@@ -18,6 +18,8 @@ import ContractorRegistration from "@/pages/ContractorRegistration";
 import HomeownerRegistration from "@/pages/HomeownerRegistration";
 import HomeownerDashboard from "@/pages/HomeownerDashboard";
 import MobileHomeownerBidRequest from "@/pages/MobileHomeownerBidRequest";
+import MobileContractors from "@/pages/MobileContractors";
+import MobileAppServices from "@/pages/MobileAppServices";
 import SalespersonProfile from "@/pages/SalespersonProfile";
 import Login from "@/pages/Login";
 import Portals from "@/pages/Portals";
@@ -56,6 +58,16 @@ function App() {
               <Route path="/homeowner/request-service">
                 <ProtectedRoute requiredRole="homeowner">
                   <MobileHomeownerBidRequest />
+                </ProtectedRoute>
+              </Route>
+              <Route path="/homeowner/contractors">
+                <ProtectedRoute requiredRole="homeowner">
+                  <MobileContractors />
+                </ProtectedRoute>
+              </Route>
+              <Route path="/homeowner/services">
+                <ProtectedRoute requiredRole="homeowner">
+                  <MobileAppServices />
                 </ProtectedRoute>
               </Route>
               <Route path="/contractor-portal">

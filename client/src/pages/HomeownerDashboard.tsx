@@ -315,7 +315,15 @@ export default function HomeownerDashboard() {
         <>
           <HomeownerBottomNav 
             activeTab={activeTab}
-            onTabChange={setActiveTab}
+            onTabChange={(tab) => {
+              if (tab === 'contractors') {
+                setLocation('/homeowner/contractors');
+              } else if (tab === 'services') {
+                setLocation('/homeowner/services');
+              } else {
+                setActiveTab(tab);
+              }
+            }}
           />
           {/* Floating Action Button for Creating Requests */}
           <div className="fixed bottom-20 right-4 z-40">
