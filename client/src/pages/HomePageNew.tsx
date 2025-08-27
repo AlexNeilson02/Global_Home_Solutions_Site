@@ -454,6 +454,42 @@ export default function HomePage() {
         About Us
       </Link>
 
+      {/* Logout Button - Only show when user is logged in */}
+      {user && (
+        <button
+          onClick={async () => {
+            console.log('[HOME] Logging out user...');
+            await logout();
+            queryClient.clear();
+            toast({
+              title: "Logged Out",
+              description: "You have been logged out successfully.",
+            });
+          }}
+          style={{
+            position: 'absolute',
+            top: '20px',
+            right: '20px',
+            color: 'white',
+            textDecoration: 'none',
+            fontSize: '16px',
+            fontWeight: '600',
+            zIndex: 20,
+            padding: '12px 20px',
+            borderRadius: '25px',
+            backgroundColor: 'rgba(239, 68, 68, 0.8)',
+            backdropFilter: 'blur(10px)',
+            transition: 'all 0.3s ease',
+            border: '2px solid rgba(255, 255, 255, 0.3)',
+            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)',
+            cursor: 'pointer'
+          }}
+          className="hover:bg-red-600/90 hover:scale-105 hover:shadow-lg"
+        >
+          Logout ({user.username})
+        </button>
+      )}
+
       
       <header className="hero-header">
         <div className="hero-image-container">
