@@ -10,7 +10,16 @@ interface MobileAppAuthWrapperProps {
 export const MobileAppAuthWrapper: React.FC<MobileAppAuthWrapperProps> = ({ children }) => {
   const { isMobileApp, isLoading: platformLoading } = usePlatform();
   const { user, isLoading: authLoading } = useAuth();
-  const [, navigate] = useLocation();
+  const [location, navigate] = useLocation();
+
+  // Public pages that don't require authentication even for mobile app users
+  const publicPages = ['/', '/about', '/services', '/mobile-services', '/contractor'];
+
+  // Check if current page is public
+  const isPublicPage = publicPages.some(page => 
+    location === page || 
+    (page === '/contractor' && location.startsWith('/contractor/'))
+  );
 
   useEffect(() => {
     // Wait for both platform and auth to finish loading
@@ -18,13 +27,13 @@ export const MobileAppAuthWrapper: React.FC<MobileAppAuthWrapperProps> = ({ chil
       return;
     }
 
-    // Only enforce authentication for mobile app users
-    if (isMobileApp && !user) {
+    // Only enforce authentication for mobile app users on protected pages
+    if (isMobileApp && !user && !isPublicPage) {
       console.log('📱 Mobile app user not authenticated - redirecting to login');
       navigate('/login');
       return;
     }
-  }, [isMobileApp, user, platformLoading, authLoading, navigate]);
+  }, [isMobileApp, user, platformLoading, authLoading, navigate, location, isPublicPage]);
 
   // Show loading while determining platform and auth status
   if (platformLoading || (isMobileApp && authLoading)) {
@@ -61,12 +70,12 @@ export const MobileAppAuthWrapper: React.FC<MobileAppAuthWrapperProps> = ({ chil
     );
   }
 
-  // If mobile app user is not authenticated, don't render children
+  // If mobile app user is not authenticated and on a protected page, don't render children
   // (they will be redirected to login in the useEffect above)
-  if (isMobileApp && !user) {
+  if (isMobileApp && !user && !isPublicPage) {
     return null;
   }
 
-  // For mobile-web and desktop users, or authenticated mobile-app users, show content
+  // For mobile-web and desktop users, authenticated mobile-app users, or mobile-app users on public pages, show content
   return <>{children}</>;
 };
