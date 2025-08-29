@@ -95,7 +95,6 @@ export default function AboutUs() {
             {/* Image Section - Full Width at Top */}
             <div style={{
               width: '100%',
-              height: '300px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -106,8 +105,9 @@ export default function AboutUs() {
                 alt="Professional home services" 
                 style={{ 
                   width: '100%', 
-                  height: '100%', 
-                  objectFit: 'cover'
+                  height: 'auto', 
+                  objectFit: 'contain',
+                  maxHeight: '400px'
                 }} 
               />
             </div>
