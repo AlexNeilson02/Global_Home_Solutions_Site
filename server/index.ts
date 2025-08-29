@@ -77,19 +77,28 @@ app.use((req, res, next) => {
   // Register S3 test routes
   app.use('/api/s3', s3TestRouter);
   
-  // Seed the database with initial data
-  await seedDatabase();
+  // Only run database initialization in development environment
+  const isDevelopment = app.get("env") === "development" || process.env.NODE_ENV === "development";
   
-  // Seed commission data
-  await seedCommissionData();
-  
-  // Fix authentication credentials
-  const { fixAuthCredentials } = await import("./fix-auth");
-  await fixAuthCredentials();
-  
-  // Fix password hashing for existing users
-  const { fixUserPasswords } = await import("./fix-passwords");
-  await fixUserPasswords();
+  if (isDevelopment) {
+    console.log("Running in development mode - initializing database...");
+    
+    // Seed the database with initial data
+    await seedDatabase();
+    
+    // Seed commission data
+    await seedCommissionData();
+    
+    // Fix authentication credentials
+    const { fixAuthCredentials } = await import("./fix-auth");
+    await fixAuthCredentials();
+    
+    // Fix password hashing for existing users
+    const { fixUserPasswords } = await import("./fix-passwords");
+    await fixUserPasswords();
+  } else {
+    console.log("Running in production mode - skipping database seeding to preserve production data");
+  }
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     const status = err.status || err.statusCode || 500;
