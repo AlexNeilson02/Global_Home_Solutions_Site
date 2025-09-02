@@ -8,6 +8,7 @@ import { SalespersonProvider } from "@/contexts/SalespersonContext";
 import { PlatformProvider } from "@/contexts/PlatformContext";
 import { AuthProvider } from "@/lib/auth";
 import { MobileViewportFix } from "@/components/mobile/MobileViewportFix";
+import { PWAInstallPrompt } from "@/components/PWAInstallPrompt";
 import HomePage from "@/pages/HomePageNew";
 import ContractorProfile from "@/pages/ContractorProfileDB";
 import ContractorPortalEnhanced from "@/pages/ContractorPortalEnhanced";
@@ -40,6 +41,7 @@ function App() {
               <MobileAppAuthWrapper>
                 <div className="min-h-screen full-height smooth-scroll" style={{ marginTop: 0, paddingTop: 0, position: 'relative', top: 0 }}>
                   <Toaster />
+                  <PWAInstallPrompt />
               <Route path="/" component={HomePage} />
               <Route path="/about" component={AboutUs} />
               <Route path="/services" component={ServiceSelection} />
