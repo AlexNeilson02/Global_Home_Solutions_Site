@@ -953,13 +953,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Only allow updating specific fields for security
-      const allowedFields = ['fullName', 'phone'];
       const updateData: any = {};
       
-      for (const field of allowedFields) {
-        if (req.body[field] !== undefined) {
-          updateData[field] = req.body[field];
-        }
+      if (req.body.fullName !== undefined) {
+        updateData.fullName = req.body.fullName;
+      }
+      if (req.body.phone !== undefined) {
+        updateData.phone = req.body.phone;
       }
 
       if (Object.keys(updateData).length === 0) {
