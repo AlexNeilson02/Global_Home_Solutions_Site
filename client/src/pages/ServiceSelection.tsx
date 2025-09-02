@@ -136,19 +136,19 @@ const ServiceSelection = () => {
           left: '20px',
           display: 'flex',
           alignItems: 'center',
-          backgroundColor: '#f3f4f6',
+          backgroundColor: 'transparent',
           border: 'none',
           cursor: 'pointer',
           padding: '8px',
           borderRadius: '8px',
-          transition: 'background-color 0.2s ease',
+          transition: 'all 0.2s ease',
           zIndex: 1000
         }}
         onMouseOver={(e) => {
-          e.currentTarget.style.backgroundColor = '#e5e7eb';
+          e.currentTarget.style.transform = 'scale(1.05)';
         }}
         onMouseOut={(e) => {
-          e.currentTarget.style.backgroundColor = '#f3f4f6';
+          e.currentTarget.style.transform = 'scale(1)';
         }}
       >
         {isMobile ? (
@@ -160,7 +160,7 @@ const ServiceSelection = () => {
             src={globalLogoPath} 
             alt="Global Home Solutions" 
             style={{
-              height: '40px',
+              height: '60px',
               width: 'auto'
             }}
           />
