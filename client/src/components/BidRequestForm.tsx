@@ -200,6 +200,18 @@ export default function BidRequestForm({ isOpen, onClose, contractor }: BidReque
         });
         
         if (!response.ok) {
+          if (response.status === 429) {
+            // Handle spending cap error specifically
+            try {
+              const errorJson = await response.json();
+              if (errorJson.reason === 'monthly_spending_cap_reached') {
+                throw new Error(errorJson.message || "Not accepting Bid requests at this time");
+              }
+            } catch (parseError) {
+              // If JSON parsing fails, use generic message
+              throw new Error("Not accepting Bid requests at this time");
+            }
+          }
           const errorData = await response.text();
           throw new Error(`Failed to submit bid request: ${errorData}`);
         }
@@ -219,6 +231,18 @@ export default function BidRequestForm({ isOpen, onClose, contractor }: BidReque
         });
         
         if (!response.ok) {
+          if (response.status === 429) {
+            // Handle spending cap error specifically
+            try {
+              const errorJson = await response.json();
+              if (errorJson.reason === 'monthly_spending_cap_reached') {
+                throw new Error(errorJson.message || "Not accepting Bid requests at this time");
+              }
+            } catch (parseError) {
+              // If JSON parsing fails, use generic message
+              throw new Error("Not accepting Bid requests at this time");
+            }
+          }
           const errorData = await response.text();
           throw new Error(`Failed to submit bid request: ${errorData}`);
         }

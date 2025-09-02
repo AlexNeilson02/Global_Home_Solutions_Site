@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useSalesperson } from "@/contexts/SalespersonContext";
 import BidRequestForm from "@/components/BidRequestForm";
 import { ContractorVideoDisplay } from "@/components/ContractorVideoDisplay";
-import { ArrowLeft, Phone, Mail, Globe, MapPin, Star, CheckCircle, Play, User, X, ChevronLeft, ChevronRight } from "lucide-react";
+import { ArrowLeft, Phone, Mail, Globe, MapPin, Star, CheckCircle, Play, User, X, XCircle, ChevronLeft, ChevronRight } from "lucide-react";
 import { Dialog, DialogContent, DialogTrigger, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import "../styles/ContractorProfile.css";
 
@@ -22,6 +22,19 @@ export default function ContractorProfileDB() {
       const response = await fetch(`/api/contractors/${id}`);
       if (!response.ok) {
         throw new Error('Contractor not found');
+      }
+      return response.json();
+    },
+    enabled: !!id
+  });
+
+  // Get spending cap status
+  const { data: spendingStatus, isLoading: spendingLoading } = useQuery({
+    queryKey: ['/api/contractors', id, 'spending-status'],
+    queryFn: async () => {
+      const response = await fetch(`/api/contractors/${id}/spending-status`);
+      if (!response.ok) {
+        return null; // Don't fail if spending status isn't available
       }
       return response.json();
     },
@@ -153,8 +166,24 @@ export default function ContractorProfileDB() {
                     <div className="flex-1 min-w-0">
                       <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2 break-words leading-tight">{contractor.companyName}</h1>
                       <div className="flex items-center gap-2">
-                        <CheckCircle className="text-green-400" size={20} />
-                        <span className="text-green-400 font-medium">Available Now</span>
+                        {!spendingLoading && spendingStatus ? (
+                          spendingStatus.canAcceptBidRequests ? (
+                            <>
+                              <CheckCircle className="text-green-400" size={20} />
+                              <span className="text-green-400 font-medium">Available Now</span>
+                            </>
+                          ) : (
+                            <>
+                              <XCircle className="text-red-400" size={20} />
+                              <span className="text-red-400 font-medium">Not accepting Bid requests at this time</span>
+                            </>
+                          )
+                        ) : (
+                          <>
+                            <CheckCircle className="text-green-400" size={20} />
+                            <span className="text-green-400 font-medium">Available Now</span>
+                          </>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -192,17 +221,29 @@ export default function ContractorProfileDB() {
               <div className="text-center">
                 <h2 className="text-2xl font-bold text-white mb-4">Get Your Free Quote</h2>
                 <p className="text-slate-300 mb-6">
-                  Ready to get started? Request a personalized quote for your project and get connected with our professional team.
+                  {spendingStatus && !spendingStatus.canAcceptBidRequests 
+                    ? "This contractor has reached their monthly spending limit and is not accepting new bid requests at this time."
+                    : "Ready to get started? Request a personalized quote for your project and get connected with our professional team."
+                  }
                 </p>
                 <button 
                   onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
+                    if (spendingStatus && !spendingStatus.canAcceptBidRequests) return;
                     setShowBidForm(true);
                   }}
-                  className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold py-4 px-8 rounded-xl transition-all duration-200 transform hover:scale-105 shadow-lg text-lg"
+                  disabled={spendingStatus && !spendingStatus.canAcceptBidRequests}
+                  className={`font-bold py-4 px-8 rounded-xl transition-all duration-200 shadow-lg text-lg ${
+                    spendingStatus && !spendingStatus.canAcceptBidRequests
+                      ? "bg-gray-600 text-gray-300 cursor-not-allowed"
+                      : "bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white transform hover:scale-105"
+                  }`}
                 >
-                  Request Free Quote
+                  {spendingStatus && !spendingStatus.canAcceptBidRequests 
+                    ? "Not Accepting Requests" 
+                    : "Request Free Quote"
+                  }
                 </button>
               </div>
             </div>

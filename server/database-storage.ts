@@ -1188,6 +1188,43 @@ export class DatabaseStorage implements IStorage {
     return payment;
   }
 
+  async getContractorMonthlySpending(contractorId: number, year?: number, month?: number): Promise<number> {
+    // Get current date if year/month not provided
+    const now = new Date();
+    const targetYear = year ?? now.getFullYear();
+    const targetMonth = month ?? now.getMonth() + 1; // getMonth() returns 0-11, we want 1-12
+    
+    // Calculate start and end dates for the target month
+    const startDate = new Date(targetYear, targetMonth - 1, 1); // month-1 because Date constructor uses 0-11
+    const endDate = new Date(targetYear, targetMonth, 0, 23, 59, 59); // last day of month
+    
+    console.log(`Calculating monthly spending for contractor ${contractorId} from ${startDate.toISOString()} to ${endDate.toISOString()}`);
+    
+    // Get all commission records for bid requests associated with this contractor within the date range
+    // We need to join bid requests to get contractor information
+    const commissionRecordsQuery = db.select({
+      totalCommission: commissionRecords.totalCommission,
+      bidRequestId: commissionRecords.bidRequestId,
+      createdAt: commissionRecords.createdAt,
+    })
+      .from(commissionRecords)
+      .innerJoin(bidRequests, eq(commissionRecords.bidRequestId, bidRequests.id))
+      .where(
+        and(
+          eq(bidRequests.contractorId, contractorId),
+          between(commissionRecords.createdAt, startDate, endDate)
+        )
+      );
+
+    const records = await commissionRecordsQuery;
+    
+    // Sum up the total commissions (this represents what the contractor was charged)
+    const totalSpending = records.reduce((sum, record) => sum + (record.totalCommission || 0), 0);
+    
+    console.log(`Contractor ${contractorId} monthly spending: $${totalSpending} (${records.length} bid requests)`);
+    return totalSpending;
+  }
+
   async getCommissionSummaryBySalesperson(salespersonId: number, startDate?: Date, endDate?: Date): Promise<{
     totalEarned: number;
     pendingCommissions: number;

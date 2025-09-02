@@ -587,6 +587,48 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "All required fields must be provided" });
       }
 
+      // Check contractor's monthly spending cap before allowing new bid requests
+      try {
+        const contractor = await storage.getContractor(Number(contractorId));
+        if (contractor) {
+          const monthlySpending = await storage.getContractorMonthlySpending(Number(contractorId));
+          
+          console.log(`💰 Spending cap check - Contractor ${contractorId}: Current spending $${monthlySpending}, Cap $${contractor.monthlySpendCap}`);
+          
+          // Calculate the commission cost for the requested services to check if it would exceed the cap
+          let estimatedCommissionCost = 0;
+          for (const serviceName of finalServicesRequested) {
+            const serviceCategory = await storage.getServiceCategoryByName(serviceName);
+            const serviceCost = serviceCategory?.baseCost || 50; // Default $50 if no category found
+            estimatedCommissionCost += serviceCost;
+          }
+          
+          console.log(`💰 Estimated commission cost for this bid request: $${estimatedCommissionCost}`);
+          
+          // Check if adding this bid request would exceed the monthly spending cap
+          if (monthlySpending + estimatedCommissionCost > contractor.monthlySpendCap) {
+            console.log(`❌ SPENDING CAP EXCEEDED - Contractor ${contractorId} would exceed monthly cap of $${contractor.monthlySpendCap}`);
+            console.log(`Current spending: $${monthlySpending}, New bid cost: $${estimatedCommissionCost}, Total would be: $${monthlySpending + estimatedCommissionCost}`);
+            
+            return res.status(429).json({ 
+              message: "Not accepting Bid requests at this time", 
+              reason: "monthly_spending_cap_reached",
+              details: {
+                currentSpending: monthlySpending,
+                spendingCap: contractor.monthlySpendCap,
+                estimatedCost: estimatedCommissionCost
+              }
+            });
+          }
+          
+          console.log(`✅ SPENDING CAP OK - Contractor ${contractorId} can accept bid request (${monthlySpending + estimatedCommissionCost}/${contractor.monthlySpendCap})`);
+        }
+      } catch (capError) {
+        console.error('Error checking spending cap:', capError);
+        // Don't fail the bid request if spending cap check fails - log and continue
+        console.warn('⚠️  Continuing with bid request despite spending cap check error');
+      }
+
       // Process uploaded files
       const files = req.files as Express.Multer.File[];
       let mediaUrls: string[] = [];
@@ -1824,6 +1866,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error marking payment method as added:", error);
       res.status(500).json({ message: "Failed to update payment method status" });
+    }
+  });
+
+  // Get contractor spending cap status
+  apiRouter.get("/contractors/:contractorId/spending-status", async (req: Request, res: Response) => {
+    try {
+      const contractorId = parseInt(req.params.contractorId);
+      
+      const contractor = await storage.getContractor(contractorId);
+      if (!contractor) {
+        return res.status(404).json({ message: "Contractor not found" });
+      }
+      
+      const monthlySpending = await storage.getContractorMonthlySpending(contractorId);
+      
+      const status = {
+        monthlySpending,
+        spendingCap: contractor.monthlySpendCap,
+        percentageUsed: (monthlySpending / contractor.monthlySpendCap) * 100,
+        canAcceptBidRequests: monthlySpending < contractor.monthlySpendCap,
+        remainingBudget: contractor.monthlySpendCap - monthlySpending
+      };
+      
+      console.log(`Spending status for contractor ${contractorId}:`, status);
+      
+      res.json(status);
+    } catch (error) {
+      console.error("Error fetching spending status:", error);
+      res.status(500).json({ message: "Failed to fetch spending status" });
     }
   });
 

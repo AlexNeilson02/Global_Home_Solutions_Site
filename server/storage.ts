@@ -136,6 +136,9 @@ export interface IStorage {
     totalRecords: number;
   }>;
   
+  // Contractor spending methods
+  getContractorMonthlySpending(contractorId: number, year?: number, month?: number): Promise<number>;
+  
   // Email communication methods
   createEmailCommunication(email: InsertEmailCommunication): Promise<EmailCommunication>;
   getEmailCommunicationsByContractorId(contractorId: number, limit?: number): Promise<EmailCommunication[]>;
