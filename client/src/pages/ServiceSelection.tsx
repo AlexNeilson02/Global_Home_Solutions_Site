@@ -155,25 +155,15 @@ const ServiceSelection = () => {
           /* Mobile: Show only arrow */
           <ChevronLeft size={24} color="#111827" />
         ) : (
-          /* Desktop: Show logo and company name */
-          <>
-            <img 
-              src={globalLogoPath} 
-              alt="Global Home Solutions" 
-              style={{
-                height: '40px',
-                width: 'auto',
-                marginRight: '12px'
-              }}
-            />
-            <span style={{
-              fontSize: '20px',
-              fontWeight: 'bold',
-              color: '#111827'
-            }}>
-              Global Home Solutions
-            </span>
-          </>
+          /* Desktop: Show logo only */
+          <img 
+            src={globalLogoPath} 
+            alt="Global Home Solutions" 
+            style={{
+              height: '40px',
+              width: 'auto'
+            }}
+          />
         )}
       </button>
       <section className="search-section" style={{ 
