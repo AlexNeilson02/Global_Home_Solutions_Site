@@ -13,7 +13,6 @@ interface ContractorCardProps {
   specialties: string[];
   rating: number;
   reviewCount: number;
-  hourlyRate: number | null;
   logoUrl: string | null;
   videoUrl?: string | null;
   onGetQuote?: (id: number) => void;
@@ -26,7 +25,6 @@ export function ContractorCard({
   specialties,
   rating,
   reviewCount,
-  hourlyRate,
   logoUrl,
   videoUrl,
   onGetQuote
@@ -86,7 +84,7 @@ export function ContractorCard({
         <p className="text-sm text-muted-foreground mb-4">{description}</p>
         <div className="flex justify-between items-center">
           <span className="text-sm font-medium">
-            {hourlyRate ? `Starting at ${formatCurrency(hourlyRate)}/hr` : "Custom Quote"}
+            Custom Quote
           </span>
           <Button 
             size="sm" 

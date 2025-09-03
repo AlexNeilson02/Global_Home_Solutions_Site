@@ -179,7 +179,6 @@ const ContractorPortalEnhanced: React.FC = () => {
     email: '',
     logoUrl: '',
     bannerImageUrl: '',
-    hourlyRate: 0,
     videoUrl: '',
     ownerName: '',
     website: '',
@@ -501,7 +500,6 @@ const ContractorPortalEnhanced: React.FC = () => {
         email: contractor.email || '',
         logoUrl: contractor.logoUrl || '',
         bannerImageUrl: contractor.bannerImageUrl || '',
-        hourlyRate: contractor.hourlyRate || 0,
         videoUrl: contractor.videoUrl || '',
         ownerName: contractor.ownerName || '',
         website: contractor.website || '',
@@ -781,7 +779,6 @@ const ContractorPortalEnhanced: React.FC = () => {
         phone: contractor.phone || '',
         email: contractor.email || '',
         logoUrl: contractor.logoUrl || '',
-        hourlyRate: contractor.hourlyRate || 0,
         videoUrl: contractor.videoUrl || '',
         ownerName: contractor.ownerName || '',
         website: contractor.website || '',
@@ -1198,10 +1195,6 @@ const ContractorPortalEnhanced: React.FC = () => {
                               <Mail className="h-4 w-4 mr-2 text-gray-400" />
                               <span>{contractor?.email || 'No email'}</span>
                             </div>
-                            <div className="flex items-center">
-                              <DollarSign className="h-4 w-4 mr-2 text-gray-400" />
-                              <span>${contractor?.hourlyRate || 0}/hr</span>
-                            </div>
                           </div>
                           {contractor?.ownerName && (
                             <div className="mt-2">
@@ -1392,16 +1385,6 @@ const ContractorPortalEnhanced: React.FC = () => {
                             value={editForm.companyName}
                             onChange={(e) => setEditForm({...editForm, companyName: e.target.value})}
                             placeholder="Enter company name"
-                            style={antiYellowInputStyles}
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium mb-2">Hourly Rate ($)</label>
-                          <Input
-                            type="number"
-                            value={editForm.hourlyRate}
-                            onChange={(e) => setEditForm({...editForm, hourlyRate: parseFloat(e.target.value)})}
-                            placeholder="0"
                             style={antiYellowInputStyles}
                           />
                         </div>

@@ -202,7 +202,6 @@ export default function Home() {
                   specialties={contractor.specialties || []}
                   rating={contractor.rating || 0}
                   reviewCount={contractor.reviewCount || 0}
-                  hourlyRate={contractor.hourlyRate}
                   logoUrl={contractor.logoUrl}
                   onGetQuote={() => {}}
                 />

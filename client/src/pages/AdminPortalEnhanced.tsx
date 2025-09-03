@@ -109,7 +109,6 @@ export default function AdminPortalEnhanced() {
   const [contractorEditData, setContractorEditData] = useState({
     companyName: '',
     description: '',
-    hourlyRate: '',
     specialties: [] as string[],
     serviceAreas: '',
     fullName: '',
@@ -127,7 +126,6 @@ export default function AdminPortalEnhanced() {
     phone: '',
     companyName: '',
     description: '',
-    hourlyRate: '',
     specialties: [] as string[],
     serviceAreas: ''
   });
@@ -223,7 +221,7 @@ export default function AdminPortalEnhanced() {
 
   // Contractor edit mutation
   const editContractorMutation = useMutation({
-    mutationFn: async (data: { id: number; companyName?: string; description?: string; hourlyRate?: string; specialties?: string[]; serviceAreas?: string; fullName?: string; email?: string; phone?: string; password?: string }) => {
+    mutationFn: async (data: { id: number; companyName?: string; description?: string; specialties?: string[]; serviceAreas?: string; fullName?: string; email?: string; phone?: string; password?: string }) => {
       const response = await fetch(`/api/admin/contractors/${data.id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
@@ -403,7 +401,6 @@ export default function AdminPortalEnhanced() {
     setContractorEditData({
       companyName: contractor.companyName || '',
       description: contractor.description || '',
-      hourlyRate: contractor.hourlyRate?.toString() || '',
       specialties: contractor.specialties || [],
       serviceAreas: contractor.serviceAreas?.join(', ') || '',
       fullName: contractor.fullName || '',
@@ -431,9 +428,6 @@ export default function AdminPortalEnhanced() {
     }
     if (contractorEditData.description !== selectedContractor?.description) {
       updateData.description = contractorEditData.description;
-    }
-    if (contractorEditData.hourlyRate !== selectedContractor?.hourlyRate?.toString()) {
-      updateData.hourlyRate = contractorEditData.hourlyRate;
     }
     if (JSON.stringify(contractorEditData.specialties) !== JSON.stringify(selectedContractor?.specialties || [])) {
       updateData.specialties = contractorEditData.specialties;
@@ -1081,14 +1075,6 @@ export default function AdminPortalEnhanced() {
                         </div>
                         <div className="grid grid-cols-2 gap-4">
                           <div>
-                            <label className="text-sm font-medium mb-2 block">Hourly Rate ($)</label>
-                            <Input
-                              type="number"
-                              placeholder="Enter hourly rate"
-                              value={contractorAddData.hourlyRate}
-                              onChange={(e) => setContractorAddData({...contractorAddData, hourlyRate: e.target.value})}
-                              className="h-10"
-                            />
                           </div>
                           <div>
                             <label className="text-sm font-medium mb-2 block">Service Areas</label>
@@ -1155,7 +1141,6 @@ export default function AdminPortalEnhanced() {
                               phone: contractorAddData.phone,
                               companyName: contractorAddData.companyName,
                               description: contractorAddData.description,
-                              hourlyRate: contractorAddData.hourlyRate ? parseFloat(contractorAddData.hourlyRate) : null,
                               serviceAreas: contractorAddData.serviceAreas ? contractorAddData.serviceAreas.split(',').map(area => area.trim()) : []
                             });
                           }}
@@ -1177,7 +1162,6 @@ export default function AdminPortalEnhanced() {
                           <h4 className="font-semibold">{contractor.companyName}</h4>
                           <p className="text-sm text-gray-600 dark:text-gray-300">{contractor.description}</p>
                           <div className="flex items-center gap-4 mt-2 text-sm text-gray-500">
-                            <span>Rate: ${contractor.hourlyRate || 0}/hr</span>
                             <span>Specialties: {contractor.specialties?.length || 0}</span>
                           </div>
                         </div>
@@ -1710,8 +1694,6 @@ export default function AdminPortalEnhanced() {
                     <p className="text-sm text-gray-600 dark:text-gray-300">{selectedContractor.phone}</p>
                   </div>
                   <div>
-                    <strong className="text-sm">Hourly Rate:</strong>
-                    <p className="text-sm text-gray-600 dark:text-gray-300">${selectedContractor.hourlyRate || 0}/hr</p>
                   </div>
                   <div>
                     <strong className="text-sm">Status:</strong>
@@ -1843,14 +1825,6 @@ export default function AdminPortalEnhanced() {
                 />
               </div>
               <div>
-                <label className="text-sm font-medium block mb-2">Hourly Rate ($)</label>
-                <Input
-                  className="w-full"
-                  type="number"
-                  value={contractorEditData.hourlyRate}
-                  onChange={(e) => setContractorEditData({...contractorEditData, hourlyRate: e.target.value})}
-                  placeholder="Enter hourly rate"
-                />
               </div>
               <div>
                 <label className="text-sm font-medium block mb-2">Service Areas (comma-separated)</label>

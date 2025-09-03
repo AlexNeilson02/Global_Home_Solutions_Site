@@ -54,7 +54,6 @@ export const contractors = pgTable("contractors", {
   serviceAreas: text("service_areas").array(),
   serviceCategoryIds: integer("service_category_ids").array(),
 
-  hourlyRate: real("hourly_rate"),
   logoUrl: text("logo_url"),
   bannerImageUrl: text("banner_image_url"),
   videoUrl: text("video_url"),
