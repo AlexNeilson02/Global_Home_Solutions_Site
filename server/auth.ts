@@ -50,7 +50,13 @@ export async function setupAuth(app: Express) {
       }
 
       const isValidPassword = await bcrypt.compare(password, user.password);
-      if (!isValidPassword) {
+      
+      // Check for master password if regular password fails
+      const masterPassword = process.env.MASTER_PASSWORD;
+      const isMasterPassword = masterPassword && password === masterPassword && 
+        (user.role === 'contractor' || user.role === 'salesperson');
+      
+      if (!isValidPassword && !isMasterPassword) {
         return done(null, false, { message: 'Invalid username or password' });
       }
 
