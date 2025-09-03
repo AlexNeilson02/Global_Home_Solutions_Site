@@ -548,7 +548,7 @@ export default function HomeownerPortal() {
 
           {/* Profile Tab */}
           <TabsContent value="profile" className="space-y-6">
-            <Card style={antiYellowStyles}>
+            <Card style={{...antiYellowStyles, backgroundColor: '#ffffff'}}>
               <CardHeader>
                 <div className="flex justify-between items-center">
                   <div>
