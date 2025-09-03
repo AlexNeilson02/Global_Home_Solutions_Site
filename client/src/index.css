@@ -171,12 +171,23 @@ html {
 /* UNIVERSAL CARD WHITE BACKGROUND ENFORCEMENT */
 /* ========================================= */
 
-/* Force ALL card components to be white regardless of screen size */
-.card,
-[class*="card"]:not(.card-content):not(.card-header):not(.card-title):not(.card-description),
-[data-radix-card],
-[data-card],
-div[class*="bg-card"]:not([class*="text-card"]) {
+/* NUCLEAR-LEVEL CARD WHITE BACKGROUND ENFORCEMENT */
+/* Force ALL card components to be white regardless of screen size with maximum specificity */
+html .card,
+html [class*="card"]:not(.card-content):not(.card-header):not(.card-title):not(.card-description),
+html [data-radix-card],
+html [data-card],
+html div[class*="bg-card"]:not([class*="text-card"]),
+body .card,
+body [class*="card"]:not(.card-content):not(.card-header):not(.card-title):not(.card-description),
+body [data-radix-card],
+body [data-card],
+body div[class*="bg-card"]:not([class*="text-card"]),
+#root .card,
+#root [class*="card"]:not(.card-content):not(.card-header):not(.card-title):not(.card-description),
+#root [data-radix-card],
+#root [data-card],
+#root div[class*="bg-card"]:not([class*="text-card"]) {
   background-color: #ffffff !important;
   background: #ffffff !important;
   background-image: none !important;
@@ -184,13 +195,52 @@ div[class*="bg-card"]:not([class*="text-card"]) {
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06) !important;
 }
 
-/* Force Card component and sub-components to be white */
+/* NUCLEAR Force Card component and sub-components to be white with maximum specificity */
+html body #root [data-radix-card-root],
+html body #root [class*="CardContent"],
+html body #root [class*="CardHeader"],
+html body #root .bg-card,
 [data-radix-card-root],
 [class*="CardContent"],
 [class*="CardHeader"],
 .bg-card {
   background-color: #ffffff !important;
   background: #ffffff !important;
+  background-image: none !important;
+}
+
+/* NUCLEAR Browser autofill override for any forms inside cards */
+html body .card input:-webkit-autofill,
+html body .card input:-webkit-autofill:hover,
+html body .card input:-webkit-autofill:focus,
+html body .card input:-webkit-autofill:active,
+html body .card textarea:-webkit-autofill,
+html body .card textarea:-webkit-autofill:hover,
+html body .card textarea:-webkit-autofill:focus,
+html body .card textarea:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px white inset !important;
+  -webkit-text-fill-color: black !important;
+  background-color: white !important;
+  transition: background-color 5000s ease-in-out 0s !important;
+}
+
+/* NUCLEAR Parent element override - prevent any parent yellow bleeding */
+html body div:has(.card),
+html body section:has(.card),
+html body main:has(.card),
+html body article:has(.card) {
+  background-color: transparent !important;
+  background: transparent !important;
+  background-image: none !important;
+}
+
+/* NUCLEAR Form element override inside cards */
+html body .card form,
+html body .card div,
+html body .card section {
+  background-color: transparent !important;
+  background: transparent !important;
+  background-image: none !important;
 }
 
 /* ========================================= */
@@ -579,6 +629,21 @@ div[role="tabpanel"] * {
   /* Force white background for all card components */
   --card-background: #ffffff;
   --card-bg: #ffffff;
+  
+  /* Override any potential yellow variables */
+  --yellow: #ffffff;
+  --yellow-50: #ffffff;
+  --yellow-100: #ffffff;
+  --yellow-200: #ffffff;
+  --yellow-300: #ffffff;
+  --yellow-400: #ffffff;
+  --yellow-500: #ffffff;
+  --amber-50: #ffffff;
+  --amber-100: #ffffff;
+  --amber-200: #ffffff;
+  --amber-300: #ffffff;
+  --amber-400: #ffffff;
+  --amber-500: #ffffff;
 
   --popover: 255 255 255;
   --popover-foreground: 0 0 0; /* Black text */
