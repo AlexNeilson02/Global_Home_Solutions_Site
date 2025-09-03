@@ -16,9 +16,6 @@ import SalesPortalEnhanced from "@/pages/SalesPortalEnhanced";
 import AdminPortalEnhanced from "@/pages/AdminPortalEnhanced";
 
 import ContractorRegistration from "@/pages/ContractorRegistration";
-import HomeownerRegistration from "@/pages/HomeownerRegistration";
-import HomeownerPortal from "@/pages/HomeownerPortal";
-import MobileHomeownerBidRequest from "@/pages/MobileHomeownerBidRequest";
 import MobileContractors from "@/pages/MobileContractors";
 import MobileAppServices from "@/pages/MobileAppServices";
 import SalespersonProfile from "@/pages/SalespersonProfile";
@@ -49,29 +46,8 @@ function App() {
               <Route path="/portals" component={Portals} />
               <Route path="/contractor/:id" component={ContractorProfile} />
               <Route path="/contractor-registration" component={ContractorRegistration} />
-              <Route path="/homeowner-registration" component={HomeownerRegistration} />
               <Route path="/sales/:profileUrl" component={SalespersonProfile} />
               <Route path="/login" component={Login} />
-              <Route path="/homeowner-dashboard">
-                <ProtectedRoute requiredRole="homeowner">
-                  <HomeownerPortal />
-                </ProtectedRoute>
-              </Route>
-              <Route path="/homeowner/request-service">
-                <ProtectedRoute requiredRole="homeowner">
-                  <MobileHomeownerBidRequest />
-                </ProtectedRoute>
-              </Route>
-              <Route path="/homeowner/contractors">
-                <ProtectedRoute requiredRole="homeowner">
-                  <MobileContractors />
-                </ProtectedRoute>
-              </Route>
-              <Route path="/homeowner/services">
-                <ProtectedRoute requiredRole="homeowner">
-                  <MobileAppServices />
-                </ProtectedRoute>
-              </Route>
               <Route path="/contractor-portal">
                 <ProtectedRoute requiredRole="contractor">
                   <ContractorPortalEnhanced />
