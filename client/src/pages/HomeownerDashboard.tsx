@@ -335,6 +335,7 @@ export default function HomeownerDashboard() {
                   </div>
                   
                   <div className="pt-4 border-t">
+                    {console.log('Dashboard passing user to HomeownerProfileEdit:', user)}
                     <HomeownerProfileEdit user={user} />
                   </div>
                 </CardContent>
