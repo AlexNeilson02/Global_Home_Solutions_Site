@@ -13,7 +13,7 @@ export const MobileAppAuthWrapper: React.FC<MobileAppAuthWrapperProps> = ({ chil
   const [location, navigate] = useLocation();
 
   // Public pages that don't require authentication even for mobile app users
-  const publicPages = ['/', '/about', '/services', '/mobile-services', '/contractor'];
+  const publicPages = ['/', '/about', '/services', '/mobile-services', '/contractor', '/login'];
 
   // Check if current page is public
   const isPublicPage = publicPages.some(page => 
