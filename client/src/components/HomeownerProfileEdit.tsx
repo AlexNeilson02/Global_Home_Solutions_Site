@@ -39,15 +39,6 @@ export function HomeownerProfileEdit({ trigger, user: userProp }: HomeownerProfi
   // Use prop user if provided, otherwise fall back to auth user
   const user = userProp || authUser;
   
-  console.log('=== HomeownerProfileEdit Debug ===');
-  console.log('userProp received:', userProp);
-  console.log('authUser from hook:', authUser);
-  console.log('final user being used:', user);
-  console.log('user.fullName:', user?.fullName);
-  console.log('user.phone:', user?.phone);
-  console.log('user.email:', user?.email);
-  console.log('===================================');
-  
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);

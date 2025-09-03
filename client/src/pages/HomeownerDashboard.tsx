@@ -9,7 +9,7 @@ import { useAuth } from "@/lib/auth";
 import { usePlatform } from "@/contexts/PlatformContext";
 import { useLocation } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
-import { HomeownerProfileEdit } from "@/components/HomeownerProfileEdit";
+import { HomeownerProfileEditSimple } from "@/components/HomeownerProfileEditSimple";
 import HomeownerBottomNav from "@/components/mobile/HomeownerBottomNav";
 import { 
   Home, 
@@ -335,8 +335,7 @@ export default function HomeownerDashboard() {
                   </div>
                   
                   <div className="pt-4 border-t">
-                    {console.log('Dashboard passing user to HomeownerProfileEdit:', user)}
-                    <HomeownerProfileEdit user={user} />
+                    <HomeownerProfileEditSimple />
                   </div>
                 </CardContent>
               </Card>
