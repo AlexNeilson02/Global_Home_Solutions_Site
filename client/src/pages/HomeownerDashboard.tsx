@@ -281,26 +281,60 @@ export default function HomeownerDashboard() {
                     Manage your account details and contact information.
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="text-sm font-medium text-gray-700">Full Name</label>
-                      <p className="mt-1 text-sm text-gray-900">{user?.fullName}</p>
+                <CardContent className="space-y-6">
+                  {/* Profile Picture and Basic Info */}
+                  <div className="flex items-center space-x-6">
+                    <div className="w-24 h-24 rounded-full bg-gray-100 flex items-center justify-center overflow-hidden border-4 border-gray-200">
+                      {user?.avatarUrl ? (
+                        <img
+                          src={user.avatarUrl}
+                          alt={`${user.fullName}'s profile`}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <User className="w-10 h-10 text-gray-400" />
+                      )}
                     </div>
-                    <div>
-                      <label className="text-sm font-medium text-gray-700">Username</label>
-                      <p className="mt-1 text-sm text-gray-900">{user?.username}</p>
-                    </div>
-                    <div>
-                      <label className="text-sm font-medium text-gray-700">Email</label>
-                      <p className="mt-1 text-sm text-gray-900">{user?.email}</p>
-                    </div>
-                    <div>
-                      <label className="text-sm font-medium text-gray-700">Phone</label>
-                      <p className="mt-1 text-sm text-gray-900">{user?.phone || 'Not provided'}</p>
+                    <div className="flex-1">
+                      <h3 className="text-xl font-semibold text-gray-900">{user?.fullName}</h3>
+                      <p className="text-gray-600">@{user?.username}</p>
+                      <div className="flex items-center gap-2 mt-2">
+                        <Mail className="w-4 h-4 text-gray-500" />
+                        <span className="text-sm text-gray-600">{user?.email}</span>
+                      </div>
+                      {user?.phone && (
+                        <div className="flex items-center gap-2 mt-1">
+                          <Phone className="w-4 h-4 text-gray-500" />
+                          <span className="text-sm text-gray-600">{user.phone}</span>
+                        </div>
+                      )}
                     </div>
                   </div>
-                  <div className="pt-4">
+
+                  {/* Detailed Information */}
+                  <div className="border-t pt-6">
+                    <h4 className="text-lg font-medium text-gray-900 mb-4">Account Details</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="text-sm font-medium text-gray-700">Full Name</label>
+                        <p className="mt-1 text-sm text-gray-900">{user?.fullName}</p>
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium text-gray-700">Username</label>
+                        <p className="mt-1 text-sm text-gray-900">{user?.username}</p>
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium text-gray-700">Email</label>
+                        <p className="mt-1 text-sm text-gray-900">{user?.email}</p>
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium text-gray-700">Phone</label>
+                        <p className="mt-1 text-sm text-gray-900">{user?.phone || 'Not provided'}</p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="pt-4 border-t">
                     <HomeownerProfileEdit />
                   </div>
                 </CardContent>

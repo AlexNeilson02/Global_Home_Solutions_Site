@@ -10,11 +10,14 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/lib/auth";
 import { apiRequest } from "@/lib/queryClient";
-import { Edit, User, Mail, Phone, Save } from "lucide-react";
+import { Edit, User, Mail, Phone, Save, Upload, Camera } from "lucide-react";
+import { ObjectUploader } from "@/components/ObjectUploader";
+import type { UploadResult } from "@uppy/core";
 
 const profileEditSchema = z.object({
   fullName: z.string().min(2, "Full name must be at least 2 characters"),
   phone: z.string().min(10, "Please enter a valid phone number").optional().or(z.literal("")),
+  avatarUrl: z.string().optional(),
 });
 
 type ProfileEditForm = z.infer<typeof profileEditSchema>;
@@ -28,6 +31,8 @@ export function HomeownerProfileEdit({ trigger }: HomeownerProfileEditProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const [previewAvatar, setPreviewAvatar] = useState<string | null>(null);
 
   // Keyboard navigation support for profile edit dialog
   useEffect(() => {
@@ -73,6 +78,7 @@ export function HomeownerProfileEdit({ trigger }: HomeownerProfileEditProps) {
     defaultValues: {
       fullName: user?.fullName || "",
       phone: user?.phone || "",
+      avatarUrl: user?.avatarUrl || "",
     },
   });
 
@@ -83,7 +89,9 @@ export function HomeownerProfileEdit({ trigger }: HomeownerProfileEditProps) {
       form.reset({
         fullName: user.fullName || "",
         phone: user.phone || "",
+        avatarUrl: user.avatarUrl || "",
       });
+      setPreviewAvatar(user.avatarUrl || null);
     }
   }, [open, user, form]);
 
@@ -96,7 +104,7 @@ export function HomeownerProfileEdit({ trigger }: HomeownerProfileEditProps) {
       
       const result = await apiRequest(`/api/users/${user.id}`, {
         method: 'PATCH',
-        body: JSON.stringify(data),
+        body: JSON.stringify({ fullName: data.fullName, phone: data.phone }),
       });
       
       console.log('✅ Profile update successful:', result);
@@ -112,6 +120,7 @@ export function HomeownerProfileEdit({ trigger }: HomeownerProfileEditProps) {
       if (updatedUser) {
         localStorage.setItem('user', JSON.stringify(updatedUser));
       }
+      setPreviewAvatar(null);
       
       setOpen(false);
       
@@ -126,6 +135,71 @@ export function HomeownerProfileEdit({ trigger }: HomeownerProfileEditProps) {
       });
     },
   });
+
+  const handleGetUploadParameters = async () => {
+    const response = await fetch('/api/objects/upload', {
+      method: 'POST',
+      credentials: 'include',
+    });
+    if (!response.ok) {
+      throw new Error('Failed to get upload URL');
+    }
+    const data = await response.json();
+    return {
+      method: 'PUT' as const,
+      url: data.uploadURL,
+    };
+  };
+
+  const handleUploadComplete = async (result: UploadResult<Record<string, unknown>, Record<string, unknown>>) => {
+    if (!result.successful.length) {
+      toast({
+        title: "Upload Failed",
+        description: "No files were uploaded successfully",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setUploadingAvatar(true);
+    try {
+      const uploadedFile = result.successful[0];
+      const avatarUrl = uploadedFile.uploadURL;
+      
+      // Update avatar in database
+      const response = await apiRequest(`/api/users/${user?.id}/avatar`, {
+        method: 'PUT',
+        body: JSON.stringify({ avatarUrl }),
+      });
+      
+      if (response.success) {
+        form.setValue('avatarUrl', response.avatarUrl);
+        setPreviewAvatar(response.avatarUrl);
+        
+        // Update localStorage with the new user data
+        if (response.user) {
+          localStorage.setItem('user', JSON.stringify(response.user));
+        }
+        
+        toast({
+          title: "Avatar Updated",
+          description: "Your profile picture has been updated successfully.",
+        });
+        
+        // Refresh cached user data
+        queryClient.invalidateQueries({ queryKey: ['/api/auth/user'] });
+      }
+    } catch (error: any) {
+      console.error('Error updating avatar:', error);
+      toast({
+        title: "Avatar Update Failed",
+        description: error.message || "Failed to update profile picture",
+        variant: "destructive",
+      });
+    } finally {
+      setUploadingAvatar(false);
+    }
+  };
 
   const onSubmit = async (data: ProfileEditForm) => {
     console.log('📝 Form submitted with data:', data);
@@ -177,6 +251,53 @@ export function HomeownerProfileEdit({ trigger }: HomeownerProfileEditProps) {
         
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            {/* Profile Picture Section */}
+            <div className="space-y-4">
+              <FormLabel className="flex items-center gap-2">
+                <Camera className="w-4 h-4" />
+                Profile Picture
+              </FormLabel>
+              <div className="flex items-center space-x-4">
+                <div className="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center overflow-hidden">
+                  {previewAvatar || user?.avatarUrl ? (
+                    <img
+                      src={previewAvatar || user?.avatarUrl}
+                      alt="Profile"
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <User className="w-8 h-8 text-gray-400" />
+                  )}
+                </div>
+                <div className="flex-1">
+                  <ObjectUploader
+                    maxNumberOfFiles={1}
+                    maxFileSize={5242880} // 5MB limit for profile pictures
+                    onGetUploadParameters={handleGetUploadParameters}
+                    onComplete={handleUploadComplete}
+                    buttonClassName="bg-blue-600 hover:bg-blue-700 text-white"
+                  >
+                    <div className="flex items-center gap-2">
+                      {uploadingAvatar ? (
+                        <>
+                          <Upload className="w-4 h-4 animate-spin" />
+                          <span>Uploading...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Upload className="w-4 h-4" />
+                          <span>Upload Picture</span>
+                        </>
+                      )}
+                    </div>
+                  </ObjectUploader>
+                  <p className="text-xs text-gray-500 mt-1">
+                    JPG, PNG or GIF up to 5MB
+                  </p>
+                </div>
+              </div>
+            </div>
+
             <FormField
               control={form.control}
               name="fullName"

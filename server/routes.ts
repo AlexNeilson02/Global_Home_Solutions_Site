@@ -16,6 +16,11 @@ import {
   insertBidRequestSchema,
   type User
 } from "@shared/schema";
+import {
+  ObjectStorageService,
+  ObjectNotFoundError,
+} from "./objectStorage";
+import { ObjectPermission } from "./objectAcl";
 
 // Configure multer for file uploads
 const upload = multer({
@@ -71,6 +76,100 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Import and use Commission routes
   const { commissionRouter } = await import("./commission-routes");
   apiRouter.use("/commissions", commissionRouter);
+
+  // Object Storage Routes for Profile Pictures
+  // Endpoint for getting upload URL for profile pictures
+  apiRouter.post('/objects/upload', isAuthenticated, async (req, res) => {
+    try {
+      const objectStorageService = new ObjectStorageService();
+      const uploadURL = await objectStorageService.getObjectEntityUploadURL();
+      res.json({ uploadURL });
+    } catch (error) {
+      console.error('Error getting upload URL:', error);
+      res.status(500).json({ error: 'Failed to get upload URL' });
+    }
+  });
+
+  // Endpoint for serving public objects (like profile pictures from public directories)
+  apiRouter.get('/public-objects/:filePath(*)', async (req, res) => {
+    const filePath = req.params.filePath;
+    const objectStorageService = new ObjectStorageService();
+    try {
+      const file = await objectStorageService.searchPublicObject(filePath);
+      if (!file) {
+        return res.status(404).json({ error: 'File not found' });
+      }
+      objectStorageService.downloadObject(file, res);
+    } catch (error) {
+      console.error('Error searching for public object:', error);
+      return res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+
+  // Endpoint for serving private objects (profile pictures)
+  apiRouter.get('/objects/:objectPath(*)', isAuthenticated, async (req, res) => {
+    const userId = (req as any).user?.id?.toString();
+    const objectStorageService = new ObjectStorageService();
+    try {
+      const objectFile = await objectStorageService.getObjectEntityFile(
+        req.path,
+      );
+      const canAccess = await objectStorageService.canAccessObjectEntity({
+        objectFile,
+        userId: userId,
+        requestedPermission: ObjectPermission.READ,
+      });
+      if (!canAccess) {
+        return res.sendStatus(401);
+      }
+      objectStorageService.downloadObject(objectFile, res);
+    } catch (error) {
+      console.error('Error checking object access:', error);
+      if (error instanceof ObjectNotFoundError) {
+        return res.sendStatus(404);
+      }
+      return res.sendStatus(500);
+    }
+  });
+
+  // Endpoint for updating avatar after upload
+  apiRouter.put('/users/:id/avatar', isAuthenticated, async (req, res) => {
+    try {
+      const userId = parseInt(req.params.id);
+      const currentUser = (req as any).user;
+      
+      // Check if user is updating their own profile or is admin
+      if (currentUser.id !== userId && currentUser.role !== 'admin') {
+        return res.status(403).json({ error: 'Not authorized to update this profile' });
+      }
+      
+      if (!req.body.avatarUrl) {
+        return res.status(400).json({ error: 'avatarUrl is required' });
+      }
+      
+      const objectStorageService = new ObjectStorageService();
+      const objectPath = await objectStorageService.trySetObjectEntityAclPolicy(
+        req.body.avatarUrl,
+        {
+          owner: currentUser.id.toString(),
+          visibility: "public", // Profile pictures are public
+        },
+      );
+      
+      // Update user's avatar in database
+      await storage.updateUser(userId, { avatarUrl: objectPath });
+      const updatedUser = await storage.getUser(userId);
+      
+      res.json({
+        success: true,
+        user: updatedUser,
+        avatarUrl: objectPath
+      });
+    } catch (error) {
+      console.error('Error updating avatar:', error);
+      res.status(500).json({ error: 'Failed to update avatar' });
+    }
+  });
 
   // WebSocket connections for real-time notifications
   const contractorConnections = new Map<number, WebSocket[]>();
