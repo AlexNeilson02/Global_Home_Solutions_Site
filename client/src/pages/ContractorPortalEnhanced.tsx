@@ -291,6 +291,25 @@ const ContractorPortalEnhanced: React.FC = () => {
       window.history.replaceState({}, document.title, window.location.pathname);
       // Switch to email tab
       setActiveTab("email");
+    } else if (urlParams.get('gmail_error')) {
+      const errorMessage = urlParams.get('gmail_error');
+      let description = "Please try connecting again.";
+      
+      if (errorMessage === 'session_lost') {
+        description = "Your session expired during authentication. Please log out and log back in, then try connecting Gmail again.";
+      } else if (errorMessage === 'no_code') {
+        description = "Authorization was not completed. Please try the Gmail connection process again.";
+      } else if (errorMessage) {
+        description = `Error: ${decodeURIComponent(errorMessage)}`;
+      }
+      
+      toast({
+        title: "Gmail Connection Failed",
+        description,
+        variant: "destructive",
+      });
+      // Clean up URL
+      window.history.replaceState({}, document.title, window.location.pathname);
     }
   }, [toast, contractor?.id, queryClient]);
 

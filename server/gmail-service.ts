@@ -70,11 +70,28 @@ export class GmailService {
    */
   static async exchangeCodeForTokens(code: string, contractorId: number): Promise<void> {
     try {
+      console.log(`Exchanging authorization code for contractor ${contractorId}`, {
+        codeLength: code?.length,
+        hasOAuthClient: !!this.oauth2Client,
+        clientId: process.env.GOOGLE_CLIENT_ID?.substring(0, 20) + '...',
+        hasClientSecret: !!process.env.GOOGLE_CLIENT_SECRET
+      });
+
       const { tokens } = await this.oauth2Client.getToken(code);
       
+      console.log('Tokens received from Google:', {
+        hasAccessToken: !!tokens.access_token,
+        hasRefreshToken: !!tokens.refresh_token,
+        hasExpiry: !!tokens.expiry_date,
+        tokenType: tokens.token_type,
+        scope: tokens.scope
+      });
+      
       if (!tokens.access_token || !tokens.refresh_token) {
-        throw new Error('Failed to obtain valid tokens');
+        throw new Error('Failed to obtain valid tokens from Google OAuth');
       }
+
+      console.log(`Saving tokens to database for contractor ${contractorId}`);
 
       // Save tokens to contractor record
       await storage.updateContractor(contractorId, {
@@ -84,9 +101,14 @@ export class GmailService {
         gmailConnected: true
       });
 
-      console.log(`Gmail connected for contractor ${contractorId}`);
+      console.log(`Gmail successfully connected and saved for contractor ${contractorId}`);
     } catch (error) {
       console.error('Error exchanging code for tokens:', error);
+      console.error('Error details:', {
+        message: (error as Error).message,
+        name: (error as Error).name,
+        stack: (error as Error).stack?.split('\n').slice(0, 5)
+      });
       throw error;
     }
   }

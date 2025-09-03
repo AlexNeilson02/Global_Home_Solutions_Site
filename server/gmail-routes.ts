@@ -55,23 +55,62 @@ router.get('/callback', async (req: Request, res: Response) => {
   try {
     const { code, error, state } = req.query;
     
+    console.log('Gmail callback received:', { 
+      hasCode: !!code, 
+      hasError: !!error,
+      sessionId: req.sessionID?.substring(0, 8),
+      contractorId: (req.session as any)?.gmailContractorId
+    });
+    
     if (error) {
-      return res.status(400).json({ error: `Gmail authorization failed: ${error}` });
+      console.error('Gmail authorization error:', error);
+      const isActuallyProduction = process.env.REPLIT_DEV_DOMAIN?.includes('global-home-solutions.com') || 
+                                  process.env.NODE_ENV === 'production';
+      
+      const baseUrl = isActuallyProduction 
+        ? 'https://global-home-solutions.com'
+        : `https://${process.env.REPLIT_DEV_DOMAIN || 'localhost:5000'}`;
+      
+      return res.redirect(`${baseUrl}/contractor-portal?gmail_error=${encodeURIComponent(error as string)}`);
     }
     
     if (!code) {
-      return res.status(400).json({ error: 'No authorization code received' });
+      console.error('No authorization code received from Gmail');
+      const isActuallyProduction = process.env.REPLIT_DEV_DOMAIN?.includes('global-home-solutions.com') || 
+                                  process.env.NODE_ENV === 'production';
+      
+      const baseUrl = isActuallyProduction 
+        ? 'https://global-home-solutions.com'
+        : `https://${process.env.REPLIT_DEV_DOMAIN || 'localhost:5000'}`;
+      
+      return res.redirect(`${baseUrl}/contractor-portal?gmail_error=no_code`);
     }
 
     const contractorId = (req.session as any)?.gmailContractorId;
     if (!contractorId) {
-      return res.status(400).json({ error: 'No contractor ID found in session' });
+      console.error('No contractor ID found in session. Session data:', {
+        sessionID: req.sessionID,
+        sessionKeys: Object.keys(req.session || {}),
+        gmailContractorId: (req.session as any)?.gmailContractorId
+      });
+      
+      const isActuallyProduction = process.env.REPLIT_DEV_DOMAIN?.includes('global-home-solutions.com') || 
+                                  process.env.NODE_ENV === 'production';
+      
+      const baseUrl = isActuallyProduction 
+        ? 'https://global-home-solutions.com'
+        : `https://${process.env.REPLIT_DEV_DOMAIN || 'localhost:5000'}`;
+      
+      return res.redirect(`${baseUrl}/contractor-portal?gmail_error=session_lost`);
     }
 
+    console.log(`Attempting to exchange code for tokens for contractor ${contractorId}`);
     await GmailService.exchangeCodeForTokens(code as string, contractorId);
     
     // Clear the contractor ID from session
     delete (req.session as any).gmailContractorId;
+    
+    console.log(`Gmail successfully connected for contractor ${contractorId}`);
     
     // Redirect to contractor portal with success message
     const isActuallyProduction = process.env.REPLIT_DEV_DOMAIN?.includes('global-home-solutions.com') || 
@@ -84,7 +123,19 @@ router.get('/callback', async (req: Request, res: Response) => {
     res.redirect(`${baseUrl}/contractor-portal?gmail_connected=true`);
   } catch (error) {
     console.error('Gmail callback error:', error);
-    res.status(500).json({ error: 'Failed to connect Gmail account' });
+    console.error('Error details:', {
+      message: (error as Error).message,
+      stack: (error as Error).stack
+    });
+    
+    const isActuallyProduction = process.env.REPLIT_DEV_DOMAIN?.includes('global-home-solutions.com') || 
+                                process.env.NODE_ENV === 'production';
+    
+    const baseUrl = isActuallyProduction 
+      ? 'https://global-home-solutions.com'
+      : `https://${process.env.REPLIT_DEV_DOMAIN || 'localhost:5000'}`;
+    
+    res.redirect(`${baseUrl}/contractor-portal?gmail_error=${encodeURIComponent((error as Error).message)}`);
   }
 });
 
