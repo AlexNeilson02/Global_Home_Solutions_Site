@@ -34,6 +34,12 @@ export function HomeownerProfileEdit({ trigger }: HomeownerProfileEditProps) {
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const [previewAvatar, setPreviewAvatar] = useState<string | null>(null);
 
+  // Debug user data
+  console.log('🔍 HomeownerProfileEdit - Current user:', user);
+  console.log('🔍 User fullName:', user?.fullName);
+  console.log('🔍 User phone:', user?.phone);
+  console.log('🔍 User email:', user?.email);
+
   // Keyboard navigation support for profile edit dialog
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -76,17 +82,17 @@ export function HomeownerProfileEdit({ trigger }: HomeownerProfileEditProps) {
   const form = useForm<ProfileEditForm>({
     resolver: zodResolver(profileEditSchema),
     defaultValues: {
-      fullName: user?.fullName || "",
-      phone: user?.phone || "",
-      avatarUrl: user?.avatarUrl || "",
+      fullName: "",
+      phone: "",
+      avatarUrl: "",
     },
   });
 
   // Reset form when user data changes or dialog opens
   useEffect(() => {
-    if (open && user) {
+    if (user) {
       console.log('🔄 Current user data:', user);
-      console.log('🔄 Resetting form with user data:', { fullName: user.fullName, phone: user.phone, avatarUrl: user.avatarUrl });
+      console.log('🔄 Setting form values with user data:', { fullName: user.fullName, phone: user.phone, avatarUrl: user.avatarUrl });
       
       const formData = {
         fullName: user.fullName || "",
@@ -95,8 +101,23 @@ export function HomeownerProfileEdit({ trigger }: HomeownerProfileEditProps) {
       };
       
       console.log('📝 Form data being set:', formData);
-      form.reset(formData);
+      
+      // Set individual form values instead of reset
+      form.setValue('fullName', formData.fullName);
+      form.setValue('phone', formData.phone);
+      form.setValue('avatarUrl', formData.avatarUrl);
+      
       setPreviewAvatar(user.avatarUrl || null);
+    }
+  }, [user, form]);
+  
+  // Additional effect to ensure form is populated when dialog opens
+  useEffect(() => {
+    if (open && user) {
+      console.log('🚀 Dialog opened - ensuring form is populated');
+      form.setValue('fullName', user.fullName || "");
+      form.setValue('phone', user.phone || "");
+      form.setValue('avatarUrl', user.avatarUrl || "");
     }
   }, [open, user, form]);
 
@@ -312,7 +333,11 @@ export function HomeownerProfileEdit({ trigger }: HomeownerProfileEditProps) {
                     Full Name
                   </FormLabel>
                   <FormControl>
-                    <Input placeholder="Enter your full name" {...field} />
+                    <Input 
+                      placeholder="Enter your full name" 
+                      {...field} 
+                      value={field.value || user?.fullName || ""} 
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -348,6 +373,7 @@ export function HomeownerProfileEdit({ trigger }: HomeownerProfileEditProps) {
                       type="tel" 
                       placeholder="Enter your phone number" 
                       {...field} 
+                      value={field.value || user?.phone || ""}
                     />
                   </FormControl>
                   <FormMessage />
