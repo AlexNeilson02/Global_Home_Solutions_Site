@@ -168,6 +168,32 @@ html {
 @tailwind utilities;
 
 /* ========================================= */
+/* UNIVERSAL CARD WHITE BACKGROUND ENFORCEMENT */
+/* ========================================= */
+
+/* Force ALL card components to be white regardless of screen size */
+.card,
+[class*="card"]:not(.card-content):not(.card-header):not(.card-title):not(.card-description),
+[data-radix-card],
+[data-card],
+div[class*="bg-card"]:not([class*="text-card"]) {
+  background-color: #ffffff !important;
+  background: #ffffff !important;
+  background-image: none !important;
+  border: 1px solid #e5e7eb !important;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06) !important;
+}
+
+/* Force Card component and sub-components to be white */
+[data-radix-card-root],
+[class*="CardContent"],
+[class*="CardHeader"],
+.bg-card {
+  background-color: #ffffff !important;
+  background: #ffffff !important;
+}
+
+/* ========================================= */
 /* NUCLEAR YELLOW REMOVAL TACTICS */
 /* ========================================= */
 
@@ -549,6 +575,10 @@ div[role="tabpanel"] * {
   /* UI elements with subtle Apple styling */
   --card: 255 255 255; /* Pure white cards */
   --card-foreground: 0 0 0; /* Black text */
+  
+  /* Force white background for all card components */
+  --card-background: #ffffff;
+  --card-bg: #ffffff;
 
   --popover: 255 255 255;
   --popover-foreground: 0 0 0; /* Black text */
@@ -1825,7 +1855,8 @@ div[role="tabpanel"] * {
   }
 }
 
-/* Mobile-Only Card Background Fix - Force White Backgrounds */
+/* Universal Card Background Fix - Force White Backgrounds for ALL screen sizes */
+/* Mobile screens */
 @media (max-width: 768px) {
   /* Target all Card components and force white backgrounds */
   [data-radix-card],
@@ -1859,6 +1890,29 @@ div[role="tabpanel"] * {
   /* Override CSS variables for mobile cards */
   :root {
     --card: 0 0% 100% !important; /* Pure white */
+  }
+}
+
+/* Desktop and Tablet Card Background Fix */
+@media (min-width: 769px) and (max-width: 1535px) {
+  /* Target all Card components and force white backgrounds for regular desktop/tablet */
+  [data-radix-card],
+  [data-card],
+  .card,
+  [class*="card"]:not(.card-content):not(.card-header):not(.card-title):not(.card-description),
+  div[class*="bg-card"]:not([class*="text-card"]) {
+    background-color: #ffffff !important;
+    background: #ffffff !important;
+    border: 1px solid #e5e7eb !important;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06) !important;
+  }
+  
+  /* Force white background for all Card-related components */
+  [data-radix-card-root],
+  [class*="CardContent"],
+  [class*="CardHeader"] {
+    background-color: #ffffff !important;
+    background: #ffffff !important;
   }
 }
 
