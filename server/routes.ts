@@ -171,6 +171,50 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Endpoint for updating user profile information
+  apiRouter.patch('/users/:id', isAuthenticated, async (req, res) => {
+    try {
+      const userId = parseInt(req.params.id);
+      const currentUser = (req as any).user;
+      
+      // Check if user is updating their own profile or is admin
+      if (currentUser.id !== userId && currentUser.role !== 'admin') {
+        return res.status(403).json({ error: 'Not authorized to update this profile' });
+      }
+      
+      // Extract allowed fields for update
+      const { fullName, phone } = req.body;
+      const updateData: any = {};
+      
+      if (fullName !== undefined) updateData.fullName = fullName;
+      if (phone !== undefined) updateData.phone = phone;
+      
+      if (Object.keys(updateData).length === 0) {
+        return res.status(400).json({ error: 'No valid fields provided for update' });
+      }
+      
+      // Update user in database
+      await storage.updateUser(userId, updateData);
+      const updatedUser = await storage.getUser(userId);
+      
+      if (!updatedUser) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+      
+      // Remove password from response
+      const { password, ...userResponse } = updatedUser;
+      
+      res.json({
+        success: true,
+        user: userResponse,
+        message: 'Profile updated successfully'
+      });
+    } catch (error) {
+      console.error('Error updating user profile:', error);
+      res.status(500).json({ error: 'Failed to update profile' });
+    }
+  });
+
   // WebSocket connections for real-time notifications
   const contractorConnections = new Map<number, WebSocket[]>();
 
