@@ -606,7 +606,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           console.log(`💰 Estimated commission cost for this bid request: $${estimatedCommissionCost}`);
           
           // Check if adding this bid request would exceed the monthly spending cap
-          if (contractor.monthlySpendCap && monthlySpending + estimatedCommissionCost > contractor.monthlySpendCap) {
+          if (monthlySpending + estimatedCommissionCost > contractor.monthlySpendCap) {
             console.log(`❌ SPENDING CAP EXCEEDED - Contractor ${contractorId} would exceed monthly cap of $${contractor.monthlySpendCap}`);
             console.log(`Current spending: $${monthlySpending}, New bid cost: $${estimatedCommissionCost}, Total would be: $${monthlySpending + estimatedCommissionCost}`);
             
@@ -1883,10 +1883,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const status = {
         monthlySpending,
-        spendingCap: contractor.monthlySpendCap || 0,
-        percentageUsed: contractor.monthlySpendCap ? (monthlySpending / contractor.monthlySpendCap) * 100 : 0,
-        canAcceptBidRequests: contractor.monthlySpendCap ? monthlySpending < contractor.monthlySpendCap : true,
-        remainingBudget: contractor.monthlySpendCap ? contractor.monthlySpendCap - monthlySpending : 0
+        spendingCap: contractor.monthlySpendCap,
+        percentageUsed: (monthlySpending / contractor.monthlySpendCap) * 100,
+        canAcceptBidRequests: monthlySpending < contractor.monthlySpendCap,
+        remainingBudget: contractor.monthlySpendCap - monthlySpending
       };
       
       console.log(`Spending status for contractor ${contractorId}:`, status);

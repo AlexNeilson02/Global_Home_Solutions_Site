@@ -47,9 +47,6 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requir
         case 'salesperson':
           navigate('/sales-portal');
           break;
-        case 'homeowner':
-          navigate('/homeowner-dashboard');
-          break;
         default:
           // Unknown role, redirect to portals for re-authentication
           navigate('/portals');

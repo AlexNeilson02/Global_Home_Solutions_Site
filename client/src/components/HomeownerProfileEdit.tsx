@@ -94,7 +94,10 @@ export function HomeownerProfileEdit({ trigger }: HomeownerProfileEditProps) {
       console.log('🔄 Updating profile with data:', data);
       console.log('📞 Making API call to:', `/api/users/${user.id}`);
       
-      const result = await apiRequest(`/api/users/${user.id}`, 'PATCH', data);
+      const result = await apiRequest(`/api/users/${user.id}`, {
+        method: 'PATCH',
+        body: JSON.stringify(data),
+      });
       
       console.log('✅ Profile update successful:', result);
       return result;
