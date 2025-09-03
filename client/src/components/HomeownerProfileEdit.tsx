@@ -24,21 +24,26 @@ type ProfileEditForm = z.infer<typeof profileEditSchema>;
 
 interface HomeownerProfileEditProps {
   trigger?: React.ReactNode;
+  user?: {
+    id: number;
+    username: string;
+    fullName: string;
+    email: string;
+    phone?: string | null;
+    avatarUrl?: string | null;
+  } | null;
 }
 
-export function HomeownerProfileEdit({ trigger }: HomeownerProfileEditProps) {
-  const { user } = useAuth();
+export function HomeownerProfileEdit({ trigger, user: userProp }: HomeownerProfileEditProps) {
+  const { user: authUser } = useAuth();
+  // Use prop user if provided, otherwise fall back to auth user
+  const user = userProp || authUser;
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const [previewAvatar, setPreviewAvatar] = useState<string | null>(null);
 
-  // Debug user data
-  console.log('🔍 HomeownerProfileEdit - Current user:', user);
-  console.log('🔍 User fullName:', user?.fullName);
-  console.log('🔍 User phone:', user?.phone);
-  console.log('🔍 User email:', user?.email);
 
   // Keyboard navigation support for profile edit dialog
   useEffect(() => {
@@ -82,51 +87,28 @@ export function HomeownerProfileEdit({ trigger }: HomeownerProfileEditProps) {
   const form = useForm<ProfileEditForm>({
     resolver: zodResolver(profileEditSchema),
     defaultValues: {
-      fullName: "",
-      phone: "",
-      avatarUrl: "",
+      fullName: user?.fullName || "",
+      phone: user?.phone || "",
+      avatarUrl: user?.avatarUrl || "",
     },
   });
 
-  // Reset form when user data changes or dialog opens
+  // Reset form when dialog opens with current user data
   useEffect(() => {
-    if (user) {
-      console.log('🔄 Current user data:', user);
-      console.log('🔄 Setting form values with user data:', { fullName: user.fullName, phone: user.phone, avatarUrl: user.avatarUrl });
-      
-      const formData = {
+    if (open && user) {
+      form.reset({
         fullName: user.fullName || "",
         phone: user.phone || "",
         avatarUrl: user.avatarUrl || "",
-      };
-      
-      console.log('📝 Form data being set:', formData);
-      
-      // Set individual form values instead of reset
-      form.setValue('fullName', formData.fullName);
-      form.setValue('phone', formData.phone);
-      form.setValue('avatarUrl', formData.avatarUrl);
+      });
       
       setPreviewAvatar(user.avatarUrl || null);
     }
-  }, [user, form]);
-  
-  // Additional effect to ensure form is populated when dialog opens
-  useEffect(() => {
-    if (open && user) {
-      console.log('🚀 Dialog opened - ensuring form is populated');
-      form.setValue('fullName', user.fullName || "");
-      form.setValue('phone', user.phone || "");
-      form.setValue('avatarUrl', user.avatarUrl || "");
-    }
-  }, [open, user, form]);
+  }, [open]); // Only depend on open, not user or form to avoid loops
 
   const updateProfile = useMutation({
     mutationFn: async (data: ProfileEditForm) => {
       if (!user) throw new Error("User not found");
-      
-      console.log('🔄 Updating profile with data:', data);
-      console.log('📞 Making API call to:', `/api/users/${user.id}`);
       
       const response = await apiRequest('PATCH', `/api/users/${user.id}`, { 
         fullName: data.fullName, 
@@ -134,7 +116,6 @@ export function HomeownerProfileEdit({ trigger }: HomeownerProfileEditProps) {
       });
       const result = await response.json();
       
-      console.log('✅ Profile update successful:', result);
       return result;
     },
     onSuccess: (result) => {
@@ -227,15 +208,10 @@ export function HomeownerProfileEdit({ trigger }: HomeownerProfileEditProps) {
   };
 
   const onSubmit = async (data: ProfileEditForm) => {
-    console.log('📝 Form submitted with data:', data);
-    console.log('👤 Current user:', user);
-    console.log('🔍 Form errors:', form.formState.errors);
-    console.log('✅ Form is valid:', form.formState.isValid);
-    
     try {
       await updateProfile.mutateAsync(data);
     } catch (error) {
-      console.error('❌ Profile update failed:', error);
+      console.error('Profile update failed:', error);
     }
   };
 
@@ -336,7 +312,6 @@ export function HomeownerProfileEdit({ trigger }: HomeownerProfileEditProps) {
                     <Input 
                       placeholder="Enter your full name" 
                       {...field} 
-                      value={field.value || user?.fullName || ""} 
                     />
                   </FormControl>
                   <FormMessage />
@@ -373,7 +348,6 @@ export function HomeownerProfileEdit({ trigger }: HomeownerProfileEditProps) {
                       type="tel" 
                       placeholder="Enter your phone number" 
                       {...field} 
-                      value={field.value || user?.phone || ""}
                     />
                   </FormControl>
                   <FormMessage />

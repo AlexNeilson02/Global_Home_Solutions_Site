@@ -335,7 +335,7 @@ export default function HomeownerDashboard() {
                   </div>
                   
                   <div className="pt-4 border-t">
-                    <HomeownerProfileEdit />
+                    <HomeownerProfileEdit user={user} />
                   </div>
                 </CardContent>
               </Card>
