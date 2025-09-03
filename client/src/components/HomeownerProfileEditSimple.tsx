@@ -112,9 +112,9 @@ export function HomeownerProfileEditSimple() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" size="sm">
+        <Button variant="outline" size="sm" className="bg-green-500 text-white hover:bg-green-600">
           <Edit className="w-4 h-4 mr-2" />
-          Edit Profile
+          Edit Profile (NEW!)
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
