@@ -1073,19 +1073,15 @@ export default function AdminPortalEnhanced() {
                             className="min-h-[80px] resize-none"
                           />
                         </div>
-                        <div className="grid grid-cols-2 gap-4">
-                          <div>
-                          </div>
-                          <div>
-                            <label className="text-sm font-medium mb-2 block">Service Areas</label>
-                            <Input
-                              type="text"
-                              placeholder="Enter service areas (comma-separated)"
-                              value={contractorAddData.serviceAreas}
-                              onChange={(e) => setContractorAddData({...contractorAddData, serviceAreas: e.target.value})}
-                              className="h-10"
-                            />
-                          </div>
+                        <div>
+                          <label className="text-sm font-medium mb-2 block">Service Areas</label>
+                          <Input
+                            type="text"
+                            placeholder="Enter service areas (comma-separated)"
+                            value={contractorAddData.serviceAreas}
+                            onChange={(e) => setContractorAddData({...contractorAddData, serviceAreas: e.target.value})}
+                            className="h-10"
+                          />
                         </div>
                         <div className="grid grid-cols-2 gap-4">
                           <div>
