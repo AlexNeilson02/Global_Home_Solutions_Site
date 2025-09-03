@@ -30,11 +30,23 @@ export class GmailService {
   private static oauth2Client: OAuth2Client;
 
   static {
+    // Use production domain when actually deployed to production domain
+    const isActuallyProduction = process.env.REPLIT_DEV_DOMAIN?.includes('global-home-solutions.com') || 
+                                process.env.NODE_ENV === 'production';
+    
+    const redirectUri = process.env.GOOGLE_REDIRECT_URI || 
+      (isActuallyProduction 
+        ? 'https://global-home-solutions.com/api/gmail/callback'
+        : `https://${process.env.REPLIT_DEV_DOMAIN}/api/gmail/callback`);
+    
     this.oauth2Client = new OAuth2Client(
       process.env.GOOGLE_CLIENT_ID,
       process.env.GOOGLE_CLIENT_SECRET,
-      process.env.GOOGLE_REDIRECT_URI || `https://${process.env.REPLIT_DEV_DOMAIN}/api/gmail/callback`
+      redirectUri
     );
+    
+    console.log('Gmail OAuth configured with redirect URI:', redirectUri);
+    console.log('Environment check - isActuallyProduction:', isActuallyProduction);
   }
 
   /**

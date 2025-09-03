@@ -74,7 +74,14 @@ router.get('/callback', async (req: Request, res: Response) => {
     delete (req.session as any).gmailContractorId;
     
     // Redirect to contractor portal with success message
-    res.redirect(`https://${process.env.REPLIT_DEV_DOMAIN || 'localhost:5000'}/contractor-portal?gmail_connected=true`);
+    const isActuallyProduction = process.env.REPLIT_DEV_DOMAIN?.includes('global-home-solutions.com') || 
+                                process.env.NODE_ENV === 'production';
+    
+    const baseUrl = isActuallyProduction 
+      ? 'https://global-home-solutions.com'
+      : `https://${process.env.REPLIT_DEV_DOMAIN || 'localhost:5000'}`;
+    
+    res.redirect(`${baseUrl}/contractor-portal?gmail_connected=true`);
   } catch (error) {
     console.error('Gmail callback error:', error);
     res.status(500).json({ error: 'Failed to connect Gmail account' });
