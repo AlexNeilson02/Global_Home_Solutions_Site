@@ -88,3 +88,36 @@
   font-size: 1.1rem;
   margin: 0;
 }
+
+/* NUCLEAR CARD WHITE BACKGROUND OVERRIDE - Portal.css */
+/* Force ALL cards to be white - highest priority */
+.card,
+[class*="card"]:not(.card-content):not(.card-header):not(.card-title):not(.card-description),
+[data-radix-card],
+[data-card],
+div[class*="bg-card"]:not([class*="text-card"]),
+.portal-dashboard .card,
+.portal-dashboard [class*="card"]:not(.card-content):not(.card-header):not(.card-title):not(.card-description),
+.portal-dashboard [data-radix-card],
+.portal-dashboard [data-card],
+.portal-dashboard div[class*="bg-card"]:not([class*="text-card"]) {
+  background-color: #ffffff !important;
+  background: #ffffff !important;
+  background-image: none !important;
+  border: 1px solid #e5e7eb !important;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06) !important;
+}
+
+/* Force Card sub-components to be white */
+[data-radix-card-root],
+[class*="CardContent"],
+[class*="CardHeader"],
+.bg-card,
+.portal-dashboard [data-radix-card-root],
+.portal-dashboard [class*="CardContent"],
+.portal-dashboard [class*="CardHeader"],
+.portal-dashboard .bg-card {
+  background-color: #ffffff !important;
+  background: #ffffff !important;
+  background-image: none !important;
+}
