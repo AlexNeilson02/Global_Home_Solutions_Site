@@ -85,12 +85,17 @@ export function HomeownerProfileEdit({ trigger }: HomeownerProfileEditProps) {
   // Reset form when user data changes or dialog opens
   useEffect(() => {
     if (open && user) {
-      console.log('🔄 Resetting form with user data:', { fullName: user.fullName, phone: user.phone });
-      form.reset({
+      console.log('🔄 Current user data:', user);
+      console.log('🔄 Resetting form with user data:', { fullName: user.fullName, phone: user.phone, avatarUrl: user.avatarUrl });
+      
+      const formData = {
         fullName: user.fullName || "",
         phone: user.phone || "",
         avatarUrl: user.avatarUrl || "",
-      });
+      };
+      
+      console.log('📝 Form data being set:', formData);
+      form.reset(formData);
       setPreviewAvatar(user.avatarUrl || null);
     }
   }, [open, user, form]);
