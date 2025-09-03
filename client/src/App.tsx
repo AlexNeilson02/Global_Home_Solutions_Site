@@ -36,7 +36,7 @@ function App() {
             <TooltipProvider>
               <MobileViewportFix />
               <MobileAppAuthWrapper>
-                <div className="min-h-screen full-height smooth-scroll" style={{ marginTop: 0, paddingTop: 0, position: 'relative', top: 0 }}>
+                <div className="min-h-screen full-height smooth-scroll" style={{ marginTop: 0, paddingTop: 0, position: 'relative', top: 0, backgroundColor: 'red' }}>
                   <Toaster />
                   <PWAInstallPrompt />
               <Route path="/" component={HomePage} />
