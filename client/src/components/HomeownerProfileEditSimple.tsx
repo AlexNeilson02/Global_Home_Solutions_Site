@@ -112,9 +112,19 @@ export function HomeownerProfileEditSimple() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" size="sm" className="bg-green-500 text-white hover:bg-green-600">
+        <Button 
+          variant="outline" 
+          size="sm" 
+          style={{ 
+            backgroundColor: '#10b981', 
+            color: 'white', 
+            border: '2px solid #10b981' 
+          }}
+          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#059669'}
+          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#10b981'}
+        >
           <Edit className="w-4 h-4 mr-2" />
-          Edit Profile (NEW!)
+          Edit Profile (NEW VERSION!)
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
