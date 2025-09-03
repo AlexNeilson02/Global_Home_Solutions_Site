@@ -48,9 +48,9 @@ export default function ContractorProfileDB() {
     const from = urlParams.get('from');
     
     if (from === 'homeowner-contractors') {
-      return { path: '/homeowner/contractors', label: 'Back to Contractors' };
+      return { path: '/', label: 'Back to Home' }; // HOMEOWNER ROUTES REMOVED
     } else if (from === 'homeowner-dashboard') {
-      return { path: '/homeowner-dashboard', label: 'Back to Dashboard' };
+      return { path: '/', label: 'Back to Home' }; // HOMEOWNER ROUTES REMOVED
     } else {
       return { path: '/services', label: 'Back to Services' };
     }

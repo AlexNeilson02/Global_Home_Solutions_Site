@@ -72,12 +72,12 @@ const MobileAppServices = () => {
   const categorizedServices = categorizeServices(services);
 
   const goBack = () => {
-    setLocation('/homeowner-dashboard');
+    setLocation('/'); // HOMEOWNER PORTAL REMOVED
   };
 
   const handleServiceSelect = (serviceName: string) => {
     // Navigate to bid request form with pre-selected service
-    setLocation(`/homeowner/request-service?service=${encodeURIComponent(serviceName)}`);
+    setLocation('/'); // HOMEOWNER ROUTES REMOVED
   };
 
   return (

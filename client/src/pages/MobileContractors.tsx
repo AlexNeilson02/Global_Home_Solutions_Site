@@ -30,7 +30,7 @@ const MobileContractors = () => {
   });
 
   const goBack = () => {
-    setLocation('/homeowner-dashboard');
+    setLocation('/'); // HOMEOWNER PORTAL REMOVED
   };
 
   const viewContractor = (contractorId: number) => {

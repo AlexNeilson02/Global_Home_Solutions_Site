@@ -65,7 +65,7 @@ export default function Login() {
           setLocation("/admin-portal");
           break;
         case "homeowner":
-          setLocation("/homeowner-dashboard");
+          setLocation("/"); // 🔴 HOMEOWNER PORTAL REMOVED
           break;
         default:
           setLocation("/");
