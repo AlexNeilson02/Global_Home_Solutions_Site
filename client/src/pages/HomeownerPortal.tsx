@@ -213,14 +213,14 @@ export default function HomeownerPortal() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="bg-white shadow-sm border-b">
+      <div className="bg-red-600 shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <h1 className="text-2xl font-bold text-gray-900">Homeowner Portal</h1>
-              <span className="text-gray-500">Welcome, {user?.fullName || user?.username}</span>
+              <h1 className="text-2xl font-bold text-white">🏠 NEW HOMEOWNER PORTAL 🏠</h1>
+              <span className="text-red-100">Welcome, {user?.fullName || user?.username}</span>
             </div>
-            <Button onClick={handleLogout} variant="outline">
+            <Button onClick={handleLogout} className="bg-white text-red-600 hover:bg-gray-100">
               Logout
             </Button>
           </div>
