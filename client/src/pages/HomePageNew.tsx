@@ -117,6 +117,36 @@ export default function HomePage() {
         About Us
       </Link>
 
+      {/* Desktop User Menu - Top Right */}
+      {!isMobile && user && (
+        <div className="fixed top-5 right-5 z-20 flex space-x-2">
+          {user.role === 'homeowner' && (
+            <button
+              onClick={() => navigateWithSalesperson('/homeowner-portal')}
+              className="px-4 py-2 bg-green-500/80 backdrop-blur-sm text-white border border-white/30 hover:bg-green-600/80 rounded-md transition-all duration-300"
+            >
+              My Portal
+            </button>
+          )}
+          <button
+            onClick={logout}
+            className="px-4 py-2 bg-white/20 backdrop-blur-sm text-white border border-white/30 hover:bg-white/30 rounded-md transition-all duration-300"
+          >
+            Logout
+          </button>
+        </div>
+      )}
+
+      {/* Desktop Login Button - Top Right */}
+      {!isMobile && !user && (
+        <button
+          onClick={() => navigateWithSalesperson('/login')}
+          className="fixed top-5 right-5 z-20 px-4 py-2 bg-white/20 backdrop-blur-sm text-white border border-white/30 hover:bg-white/30 rounded-md transition-all duration-300"
+        >
+          Login
+        </button>
+      )}
+
       {/* Mobile Login Button - Top Right */}
       {isMobile && !user && (
         <TouchOptimizedButton
@@ -130,7 +160,16 @@ export default function HomePage() {
 
       {/* Mobile User Menu - Top Right */}
       {isMobile && user && (
-        <div className="mobile-nav-show fixed top-5 right-5 z-20">
+        <div className="mobile-nav-show fixed top-5 right-5 z-20 flex space-x-2">
+          {user.role === 'homeowner' && (
+            <TouchOptimizedButton
+              onClick={() => navigateWithSalesperson('/homeowner-portal')}
+              size="sm"
+              className="bg-green-500/80 backdrop-blur-sm text-white border border-white/30 hover:bg-green-600/80 touch-target"
+            >
+              My Portal
+            </TouchOptimizedButton>
+          )}
           <TouchOptimizedButton
             onClick={logout}
             size="sm"
@@ -160,21 +199,31 @@ export default function HomePage() {
         {isMobile ? (
           <TouchOptimizedButton
             onClick={() => {
-              setShowBottomNav(true);
-              navigateWithSalesperson('/services');
+              if (user && user.role === 'homeowner') {
+                navigateWithSalesperson('/homeowner-portal?tab=contractors');
+              } else {
+                setShowBottomNav(true);
+                navigateWithSalesperson('/services');
+              }
             }}
             size="lg"
             className="find-contractor-btn touch-target no-select tap-highlight"
             style={{ backgroundColor: '#00adee', borderColor: '#00adee' }}
           >
-            Find a Contractor
+            {user && user.role === 'homeowner' ? 'Browse Contractors' : 'Find a Contractor'}
           </TouchOptimizedButton>
         ) : (
           <button 
-            onClick={() => navigateWithSalesperson('/services')}
+            onClick={() => {
+              if (user && user.role === 'homeowner') {
+                navigateWithSalesperson('/homeowner-portal?tab=contractors');
+              } else {
+                navigateWithSalesperson('/services');
+              }
+            }}
             className="find-contractor-btn"
           >
-            Find a Contractor
+            {user && user.role === 'homeowner' ? 'Browse Contractors' : 'Find a Contractor'}
           </button>
         )}
       </div>

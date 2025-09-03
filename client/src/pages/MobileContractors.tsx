@@ -30,7 +30,7 @@ const MobileContractors = () => {
   });
 
   const goBack = () => {
-    setLocation('/'); // HOMEOWNER PORTAL REMOVED
+    setLocation('/homeowner-portal');
   };
 
   const viewContractor = (contractorId: number) => {
