@@ -102,23 +102,24 @@ export function HomeownerProfileEdit({ trigger }: HomeownerProfileEditProps) {
       console.log('🔄 Updating profile with data:', data);
       console.log('📞 Making API call to:', `/api/users/${user.id}`);
       
-      const result = await apiRequest(`/api/users/${user.id}`, {
-        method: 'PATCH',
-        body: JSON.stringify({ fullName: data.fullName, phone: data.phone }),
+      const response = await apiRequest('PATCH', `/api/users/${user.id}`, { 
+        fullName: data.fullName, 
+        phone: data.phone 
       });
+      const result = await response.json();
       
       console.log('✅ Profile update successful:', result);
       return result;
     },
-    onSuccess: (updatedUser) => {
+    onSuccess: (result) => {
       toast({
         title: "Profile Updated",
         description: "Your profile has been updated successfully.",
       });
       
-      // Update localStorage and close modal
-      if (updatedUser) {
-        localStorage.setItem('user', JSON.stringify(updatedUser));
+      // Update localStorage with the updated user data
+      if (result.user) {
+        localStorage.setItem('user', JSON.stringify(result.user));
       }
       setPreviewAvatar(null);
       
@@ -167,10 +168,8 @@ export function HomeownerProfileEdit({ trigger }: HomeownerProfileEditProps) {
       const avatarUrl = uploadedFile.uploadURL;
       
       // Update avatar in database
-      const response = await apiRequest(`/api/users/${user?.id}/avatar`, {
-        method: 'PUT',
-        body: JSON.stringify({ avatarUrl }),
-      });
+      const avatarResponse = await apiRequest('PUT', `/api/users/${user?.id}/avatar`, { avatarUrl });
+      const response = await avatarResponse.json();
       
       if (response.success) {
         form.setValue('avatarUrl', response.avatarUrl);
