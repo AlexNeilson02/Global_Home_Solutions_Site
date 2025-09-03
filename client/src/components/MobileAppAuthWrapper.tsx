@@ -27,6 +27,8 @@ export const MobileAppAuthWrapper: React.FC<MobileAppAuthWrapperProps> = ({ chil
       return;
     }
 
+    console.log('🔍 Debug: location =', location, 'isPublicPage =', isPublicPage, 'isMobileApp =', isMobileApp, 'user =', !!user);
+
     // Only enforce authentication for mobile app users on protected pages
     if (isMobileApp && !user && !isPublicPage) {
       console.log('📱 Mobile app user not authenticated - redirecting to login');
