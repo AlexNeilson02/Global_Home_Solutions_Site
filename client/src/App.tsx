@@ -17,7 +17,7 @@ import AdminPortalEnhanced from "@/pages/AdminPortalEnhanced";
 
 import ContractorRegistration from "@/pages/ContractorRegistration";
 import HomeownerRegistration from "@/pages/HomeownerRegistration";
-import HomeownerDashboard from "@/pages/HomeownerDashboard";
+import HomeownerPortal from "@/pages/HomeownerPortal";
 import MobileHomeownerBidRequest from "@/pages/MobileHomeownerBidRequest";
 import MobileContractors from "@/pages/MobileContractors";
 import MobileAppServices from "@/pages/MobileAppServices";
@@ -54,7 +54,7 @@ function App() {
               <Route path="/login" component={Login} />
               <Route path="/homeowner-dashboard">
                 <ProtectedRoute requiredRole="homeowner">
-                  <HomeownerDashboard />
+                  <HomeownerPortal />
                 </ProtectedRoute>
               </Route>
               <Route path="/homeowner/request-service">
