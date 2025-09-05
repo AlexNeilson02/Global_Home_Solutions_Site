@@ -263,7 +263,7 @@ export async function seedDatabase() {
       description: 'Quality home renovations with over 15 years of experience',
       specialties: ['Kitchen Remodeling', 'Bathroom Renovations', 'Basement Finishing'],
 
-      hourlyRate: 75,
+
       logoUrl: null,
       isVerified: true,
       isActive: true,
@@ -276,7 +276,7 @@ export async function seedDatabase() {
       description: 'Licensed electrical contractor specializing in residential and commercial work',
       specialties: ['Electrical', 'Lighting', 'Panel Upgrades'],
 
-      hourlyRate: 85,
+
       logoUrl: null,
       isVerified: true,
       isActive: true,
@@ -290,7 +290,6 @@ export async function seedDatabase() {
       description: 'Family-owned plumbing specialists serving the valley for over 15 years. We provide top-quality residential and commercial plumbing services with 24/7 emergency support.',
       specialties: ['Plumbing', 'Emergency Repairs', 'Water Heaters'],
 
-      hourlyRate: 90,
       logoUrl: 'https://images.unsplash.com/photo-1607472586893-edb57bdc0e39?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=300&q=80',
       isVerified: true,
       isActive: true,
@@ -304,7 +303,6 @@ export async function seedDatabase() {
       description: 'Commercial and residential electrical experts with over 20 years of experience. Specializing in modern electrical installations and smart home solutions.',
       specialties: ['Electrical', 'Smart Home', 'Commercial'],
 
-      hourlyRate: 95,
       logoUrl: 'https://images.unsplash.com/photo-1621905251189-08b45d6a269e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=300&q=80',
       isVerified: true,
       isActive: true,
@@ -318,7 +316,6 @@ export async function seedDatabase() {
       description: 'Expert flooring installation and refinishing services. We work with hardwood, tile, carpet, and luxury vinyl with guaranteed craftsmanship.',
       specialties: ['Flooring', 'Hardwood', 'Tile', 'Carpet'],
 
-      hourlyRate: 65,
       logoUrl: 'https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=300&q=80',
       isVerified: true,
       isActive: true,
@@ -332,7 +329,6 @@ export async function seedDatabase() {
       description: 'Professional concrete contractors specializing in driveways, patios, foundations, and decorative concrete work.',
       specialties: ['Concrete', 'Driveways', 'Patios', 'Foundations'],
 
-      hourlyRate: 70,
       logoUrl: 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=300&q=80',
       isVerified: true,
       isActive: false, // This was marked as "sold out" in the original data
@@ -346,7 +342,6 @@ export async function seedDatabase() {
       description: 'Complete roofing services including installation, repair, and maintenance. Storm damage specialists with insurance claim assistance.',
       specialties: ['Roofing', 'Storm Damage', 'Insurance Claims'],
 
-      hourlyRate: 80,
       logoUrl: 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=300&q=80',
       isVerified: true,
       isActive: true,
@@ -360,7 +355,7 @@ export async function seedDatabase() {
       description: 'Heating, ventilation, and air conditioning experts. Energy-efficient solutions for residential and commercial properties.',
       specialties: ['HVAC', 'Heating', 'Air Conditioning', 'Energy Efficiency'],
 
-      hourlyRate: 85,
+
       logoUrl: 'https://images.unsplash.com/photo-1621905251918-48416bd8575a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=300&q=80',
       isVerified: true,
       isActive: true,
@@ -382,7 +377,6 @@ export async function seedDatabase() {
       companyName: 'Watermelon Window Washing',
       description: 'Professional window cleaning services for residential and commercial properties. Streak-free results guaranteed!',
       specialties: ['Window Cleaning', 'Pressure Washing', 'Gutter Cleaning'],
-      hourlyRate: 45,
       logoUrl: null,
       isVerified: true,
       isActive: true,
@@ -404,7 +398,7 @@ export async function seedDatabase() {
       companyName: 'Vault Pest Control',
       description: 'Comprehensive pest control solutions for homes and businesses. Safe, effective, and environmentally responsible treatments.',
       specialties: ['Pest Control', 'Termite Treatment', 'Rodent Control'],
-      hourlyRate: 75,
+
       logoUrl: null,
       isVerified: true,
       isActive: true,
@@ -426,7 +420,7 @@ export async function seedDatabase() {
       companyName: 'Continental Concrete',
       description: 'Premium concrete and masonry services. Specializing in driveways, patios, foundations, and decorative concrete work.',
       specialties: ['Concrete', 'Masonry', 'Driveways', 'Decorative Concrete'],
-      hourlyRate: 85,
+
       logoUrl: null,
       isVerified: true,
       isActive: true,

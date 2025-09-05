@@ -606,8 +606,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
           console.log(`💰 Estimated commission cost for this bid request: $${estimatedCommissionCost}`);
           
           // Check if adding this bid request would exceed the monthly spending cap
-          if (monthlySpending + estimatedCommissionCost > contractor.monthlySpendCap) {
-            console.log(`❌ SPENDING CAP EXCEEDED - Contractor ${contractorId} would exceed monthly cap of $${contractor.monthlySpendCap}`);
+          const spendingCap = contractor.monthlySpendCap || 1000; // Default cap if null
+          if (monthlySpending + estimatedCommissionCost > spendingCap) {
+            console.log(`❌ SPENDING CAP EXCEEDED - Contractor ${contractorId} would exceed monthly cap of $${spendingCap}`);
             console.log(`Current spending: $${monthlySpending}, New bid cost: $${estimatedCommissionCost}, Total would be: $${monthlySpending + estimatedCommissionCost}`);
             
             return res.status(429).json({ 
@@ -615,13 +616,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
               reason: "monthly_spending_cap_reached",
               details: {
                 currentSpending: monthlySpending,
-                spendingCap: contractor.monthlySpendCap,
+                spendingCap: spendingCap,
                 estimatedCost: estimatedCommissionCost
               }
             });
           }
           
-          console.log(`✅ SPENDING CAP OK - Contractor ${contractorId} can accept bid request (${monthlySpending + estimatedCommissionCost}/${contractor.monthlySpendCap})`);
+          console.log(`✅ SPENDING CAP OK - Contractor ${contractorId} can accept bid request (${monthlySpending + estimatedCommissionCost}/${spendingCap})`);
         }
       } catch (capError) {
         console.error('Error checking spending cap:', capError);
@@ -1881,12 +1882,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const monthlySpending = await storage.getContractorMonthlySpending(contractorId);
       
+      const spendingCap = contractor.monthlySpendCap || 1000; // Default cap if null
       const status = {
         monthlySpending,
-        spendingCap: contractor.monthlySpendCap,
-        percentageUsed: (monthlySpending / contractor.monthlySpendCap) * 100,
-        canAcceptBidRequests: monthlySpending < contractor.monthlySpendCap,
-        remainingBudget: contractor.monthlySpendCap - monthlySpending
+        spendingCap: spendingCap,
+        percentageUsed: (monthlySpending / spendingCap) * 100,
+        canAcceptBidRequests: monthlySpending < spendingCap,
+        remainingBudget: spendingCap - monthlySpending
       };
       
       console.log(`Spending status for contractor ${contractorId}:`, status);
