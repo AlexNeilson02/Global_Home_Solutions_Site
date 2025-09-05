@@ -39,6 +39,7 @@ Preferred communication style: Simple, everyday language.
 
 ### Recent Changes (January 2025)
 - **QR Code System Redesign**: Modified QR code generation to direct all salespeople to homepage with unique ?ref={profileUrl} tracking parameter instead of individual landing pages (/sales/{profileUrl}). This maintains lead attribution while providing a unified customer experience. Updated Sales Portal UI to reflect "Tracking URL" terminology and improved instructions for QR code usage.
+- **Service Worker Caching Fix for Development**: Fixed aggressive browser caching issue that was preventing development changes from appearing. Service worker now only registers in production mode. In development mode, the system automatically unregisters any existing service workers and clears all browser caches on page load, ensuring fresh content is always served during development.
 
 ### Recent Changes (August 2025)
 - **Contact Customer Workflow Enhancement**: Fixed the contractor portal's "Contact Customer" functionality to properly redirect users to the email tab with auto-composed emails before marking customers as contacted. The system now switches from the bid request tab to the email tab, automatically composes an email with customer details pre-filled, and only marks the bid request as "contacted" after the email is actually sent. Removed duplicate contractor-dashboard.tsx file - system now uses ContractorPortalEnhanced.tsx exclusively for contractor portal functionality.
