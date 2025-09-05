@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useLocation } from "wouter";
-import { ChevronLeft, Star, ExternalLink, Phone, Mail } from "lucide-react";
+import { ChevronLeft, Star, ExternalLink, Phone, Mail, Search, X } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -24,10 +24,20 @@ interface ContractorsResponse {
 
 const MobileContractors = () => {
   const [, setLocation] = useLocation();
+  const [searchFilter, setSearchFilter] = useState("");
 
   const { data: contractors } = useQuery<ContractorsResponse>({
     queryKey: ["/api/contractors"],
   });
+
+  // Check for service filter from URL params
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const serviceParam = urlParams.get('service');
+    if (serviceParam) {
+      setSearchFilter(serviceParam);
+    }
+  }, []);
 
   const goBack = () => {
     setLocation('/homeowner-dashboard');
@@ -37,7 +47,24 @@ const MobileContractors = () => {
     setLocation(`/contractor/${contractorId}?from=homeowner-contractors`);
   };
 
-  const contractorsList = contractors?.contractors || [];
+  // Filter contractors based on search term
+  const getFilteredContractors = () => {
+    const contractorsList = contractors?.contractors || [];
+    
+    if (!searchFilter.trim()) {
+      return contractorsList;
+    }
+    
+    return contractorsList.filter((contractor) => 
+      contractor.specialties && 
+      Array.isArray(contractor.specialties) &&
+      contractor.specialties.some((specialty: string) => 
+        specialty.toLowerCase().includes(searchFilter.toLowerCase())
+      )
+    );
+  };
+
+  const filteredContractors = getFilteredContractors();
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -54,10 +81,37 @@ const MobileContractors = () => {
         </div>
       </div>
 
+      {/* Search Filter */}
+      <div className="p-4 bg-white border-b">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+          <input
+            type="text"
+            placeholder="Search by service (e.g., concrete, plumbing, roofing...)"
+            value={searchFilter}
+            onChange={(e) => setSearchFilter(e.target.value)}
+            className="w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          />
+          {searchFilter && (
+            <button
+              onClick={() => setSearchFilter("")}
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          )}
+        </div>
+        {searchFilter && (
+          <p className="mt-2 text-sm text-gray-600">
+            Showing contractors who specialize in "{searchFilter}"
+          </p>
+        )}
+      </div>
+
       {/* Content */}
       <div className="p-4 space-y-4 pb-24">
-        {contractorsList.length > 0 ? (
-          contractorsList.map((contractor) => (
+        {filteredContractors.length > 0 ? (
+          filteredContractors.map((contractor) => (
             <Card key={contractor.id} className="overflow-hidden bg-slate-800 border-slate-700" style={{ backgroundColor: '#1e293b' }}>
               <CardContent className="p-0">
                 {/* Banner Image */}
@@ -176,14 +230,28 @@ const MobileContractors = () => {
         ) : (
           <div className="text-center py-12">
             <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <ChevronLeft className="w-8 h-8 text-gray-400" />
+              <Search className="w-8 h-8 text-gray-400" />
             </div>
             <h3 className="text-lg font-medium text-gray-900 mb-2">
-              No contractors available
+              {searchFilter 
+                ? `No contractors found for "${searchFilter}"`
+                : "No contractors available"
+              }
             </h3>
             <p className="text-gray-500">
-              Please check back later for contractor listings.
+              {searchFilter 
+                ? "Try a different search term or clear the filter to see all contractors."
+                : "Please check back later for contractor listings."
+              }
             </p>
+            {searchFilter && (
+              <button
+                onClick={() => setSearchFilter("")}
+                className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              >
+                Clear Filter
+              </button>
+            )}
           </div>
         )}
       </div>
