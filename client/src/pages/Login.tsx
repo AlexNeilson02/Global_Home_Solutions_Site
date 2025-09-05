@@ -37,52 +37,47 @@ export default function Login() {
       // Use the AuthProvider's login method
       await login(data);
       
-      // Get user data after successful login to determine redirect
-      const response = await fetch("/api/users/me", {
-        credentials: 'include',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem("auth-token")}`
-        }
-      });
-      
-      if (response.ok) {
-        const userData = await response.json();
-        const user = userData.user || userData; // Handle both response formats
-        
-        if (user && user.fullName) {
-          toast({
-            title: "Login Successful!",
-            description: `Welcome back, ${user.fullName}!`,
-          });
-        } else {
-          toast({
-            title: "Login Successful!",
-            description: "Welcome back!",
-          });
-        }
+      // Wait for the auth state to update and get the user
+      setTimeout(() => {
+        const response = fetch("/api/auth/user", { credentials: 'include' })
+          .then(res => res.json())
+          .then(userData => {
+            if (userData && userData.fullName) {
+              toast({
+                title: "Login Successful!",
+                description: `Welcome back, ${userData.fullName}!`,
+              });
+            } else {
+              toast({
+                title: "Login Successful!",
+                description: "Welcome back!",
+              });
+            }
 
-        // Redirect based on user role
-        const userRole = user?.role;
-        switch (userRole) {
-          case "contractor":
-            setLocation("/contractor-portal");
-            break;
-          case "salesperson":
-            setLocation("/sales-portal");
-            break;
-          case "admin":
-            setLocation("/admin-portal");
-            break;
-          case "homeowner":
-            setLocation("/homeowner-dashboard");
-            break;
-          default:
+            // Redirect based on user role
+            switch (userData?.role) {
+              case "contractor":
+                setLocation("/contractor-portal");
+                break;
+              case "salesperson":
+                setLocation("/sales-portal");
+                break;
+              case "admin":
+                setLocation("/admin-portal");
+                break;
+              case "homeowner":
+                setLocation("/homeowner-dashboard");
+                break;
+              default:
+                setLocation("/");
+            }
+          })
+          .catch(() => {
+            // Fallback redirect
             setLocation("/");
-        }
-      } else {
-        // Fallback redirect if we can't get user data
-        setLocation("/");
-      }
+          });
+      }, 100);
+      
     } catch (error) {
       toast({
         title: "Login Failed",

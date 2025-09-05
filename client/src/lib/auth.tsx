@@ -36,24 +36,33 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [error, setError] = useState<Error | null>(null);
 
   // Get current user data
-  const { data, isLoading } = useQuery<{ user: User, roleData: any }>({
-    queryKey: ["/api/users/me"],
+  const { data, isLoading } = useQuery<User>({
+    queryKey: ["/api/auth/user"],
     enabled: !!token,
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
 
-  const user = data?.user || null;
+  const user = data || null;
 
   // Login mutation
   const loginMutation = useMutation({
     mutationFn: async (loginData: LoginData) => {
-      const res = await apiRequest("POST", "/api/auth/login", loginData);
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify(loginData),
+      });
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.message || 'Login failed');
+      }
       return res.json();
     },
     onSuccess: (data) => {
-      localStorage.setItem("auth-token", data.token);
-      setToken(data.token);
-      queryClient.invalidateQueries({ queryKey: ["/api/users/me"] });
+      localStorage.setItem("auth-token", "session");
+      setToken("session");
+      queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
     },
     onError: (err: Error) => {
       setError(err);
@@ -65,7 +74,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     mutationFn: async () => {
       if (token) {
         try {
-          await apiRequest("POST", "/api/auth/logout", {});
+          await fetch("/api/auth/logout", {
+            method: "POST",
+            credentials: "include",
+          });
         } catch (error) {
           // Continue with client-side logout even if server request fails
           console.error("Logout request failed:", error);
@@ -80,32 +92,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     },
   });
 
-  // Setup auth header for API requests
+  // Initialize token on first load if user has a session
   useEffect(() => {
-    const originalFetch = window.fetch;
-    window.fetch = async function(input: RequestInfo | URL, init?: RequestInit) {
-      let url = "";
-      if (typeof input === 'string') {
-        url = input;
-      } else if (input instanceof Request) {
-        url = input.url;
-      }
-      
-      if (url.includes('/api') && token) {
-        init = init || {};
-        init.headers = {
-          ...init.headers,
-          'Authorization': `Bearer ${token}`
-        };
-      }
-      
-      return originalFetch(input, init);
-    };
-    
-    return () => {
-      window.fetch = originalFetch;
-    };
-  }, [token]);
+    if (!token) {
+      fetch('/api/auth/user', { credentials: 'include' })
+        .then(response => {
+          if (response.ok) {
+            localStorage.setItem("auth-token", "session");
+            setToken("session");
+          }
+        })
+        .catch(() => {
+          // User not authenticated, ignore
+        });
+    }
+  }, []);
 
   const login = async (loginData: LoginData) => {
     setError(null);
