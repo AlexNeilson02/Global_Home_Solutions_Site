@@ -515,6 +515,65 @@ div[role="tabpanel"] * {
   color: black !important;
 }
 
+/* Tactic 19: LOGIN FORM NUCLEAR WHITE FORCE - All Screen Sizes */
+/* Force login form to always be white regardless of screen size */
+.min-h-screen.bg-gray-50,
+.min-h-screen.bg-gray-50 *,
+.min-h-screen.bg-gray-50 .max-w-md,
+.min-h-screen.bg-gray-50 .max-w-md *,
+.min-h-screen.bg-gray-50 .card,
+.min-h-screen.bg-gray-50 .card *,
+.min-h-screen.bg-gray-50 form,
+.min-h-screen.bg-gray-50 form *,
+.min-h-screen.bg-gray-50 [role="form"],
+.min-h-screen.bg-gray-50 [role="form"] * {
+  background-color: white !important;
+  background: white !important;
+  outline: none !important;
+  outline-color: transparent !important;
+  border-color: #e5e7eb !important;
+}
+
+/* Specific card targeting for login form */
+.min-h-screen.bg-gray-50 .max-w-md .card,
+.min-h-screen.bg-gray-50 .max-w-md .card * {
+  background-color: white !important;
+  background: white !important;
+}
+
+/* Login form content area targeting */
+.min-h-screen .card,
+.min-h-screen .card *,
+.min-h-screen .card-content,
+.min-h-screen .card-content *,
+.min-h-screen .card-header,
+.min-h-screen .card-header * {
+  background-color: white !important;
+  background: white !important;
+  color: black !important;
+}
+
+/* Responsive overrides for all screen sizes */
+@media (min-width: 1px) {
+  .min-h-screen .card,
+  .min-h-screen .card *,
+  .min-h-screen form,
+  .min-h-screen form * {
+    background-color: white !important;
+    background: white !important;
+  }
+}
+
+@media (max-width: 9999px) {
+  .min-h-screen .card,
+  .min-h-screen .card *,
+  .min-h-screen form,
+  .min-h-screen form * {
+    background-color: white !important;
+    background: white !important;
+  }
+}
+
 /* Mobile Navigation Overrides */
 @media (max-width: 640px) {
   .mobile-nav-show {
