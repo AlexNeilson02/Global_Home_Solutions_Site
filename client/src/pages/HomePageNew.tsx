@@ -226,6 +226,22 @@ export default function HomePage() {
             {user && user.role === 'homeowner' ? 'Browse Contractors' : 'Find a Contractor'}
           </button>
         )}
+        
+        {/* Login Link Text */}
+        <div className="text-center mt-4">
+          <p 
+            onClick={() => {
+              if (isMobile) {
+                navigateWithSalesperson('/login');
+              } else {
+                navigateWithSalesperson('/portals');
+              }
+            }}
+            className="text-white text-sm cursor-pointer hover:underline"
+          >
+            Have an account? Log in?
+          </p>
+        </div>
       </div>
 
       {/* Mobile Bottom Navigation - Only show after Find a Contractor is pressed */}
