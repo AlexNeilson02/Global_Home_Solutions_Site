@@ -10,6 +10,28 @@ import { seedCommissionData } from "./seed-commission-data";
 
 const app = express();
 
+// Development-only cache prevention middleware (MUST BE FIRST)
+const isDevelopment = process.env.NODE_ENV === "development" || app.get("env") === "development";
+if (isDevelopment) {
+  // Block service worker completely in development
+  app.get('/sw.js', (req, res) => {
+    res.status(404).send('Service worker disabled in development');
+  });
+  
+  // Aggressive no-cache headers for ALL responses in development
+  app.use((req, res, next) => {
+    res.set({
+      'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0',
+      'Pragma': 'no-cache',
+      'Expires': '0',
+      'Surrogate-Control': 'no-store',
+      'X-Accel-Expires': '0',
+      'X-Cache-Enabled': 'False'
+    });
+    next();
+  });
+}
+
 // Add CORS configuration for deployment
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
