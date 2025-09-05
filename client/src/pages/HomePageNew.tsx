@@ -238,6 +238,18 @@ export default function HomePage() {
               }
             }}
             className="text-white text-sm cursor-pointer hover:underline"
+            style={{
+              color: '#ffffff',
+              fontSize: '14px',
+              marginTop: '16px',
+              textDecoration: 'none',
+              zIndex: 20,
+              position: 'relative',
+              backgroundColor: 'rgba(0, 0, 0, 0.3)',
+              padding: '8px 16px',
+              borderRadius: '20px',
+              display: 'inline-block'
+            }}
           >
             Have an account? Log in?
           </p>
