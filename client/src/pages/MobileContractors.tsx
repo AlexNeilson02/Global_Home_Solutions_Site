@@ -58,7 +58,7 @@ const MobileContractors = () => {
       <div className="p-4 space-y-4 pb-24">
         {contractorsList.length > 0 ? (
           contractorsList.map((contractor) => (
-            <Card key={contractor.id} className="overflow-hidden">
+            <Card key={contractor.id} className="overflow-hidden bg-slate-800 border-slate-700" style={{ backgroundColor: '#1e293b' }}>
               <CardContent className="p-0">
                 {/* Banner Image */}
                 {contractor.bannerImage && (

@@ -47,15 +47,23 @@ export default function Login() {
       
       if (response.ok) {
         const userData = await response.json();
-        const user = userData.user;
+        const user = userData.user || userData; // Handle both response formats
         
-        toast({
-          title: "Login Successful!",
-          description: `Welcome back, ${user.fullName}!`,
-        });
+        if (user && user.fullName) {
+          toast({
+            title: "Login Successful!",
+            description: `Welcome back, ${user.fullName}!`,
+          });
+        } else {
+          toast({
+            title: "Login Successful!",
+            description: "Welcome back!",
+          });
+        }
 
         // Redirect based on user role
-        switch (user.role) {
+        const userRole = user?.role;
+        switch (userRole) {
           case "contractor":
             setLocation("/contractor-portal");
             break;
