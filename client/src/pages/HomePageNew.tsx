@@ -228,7 +228,14 @@ export default function HomePage() {
         )}
         
         {/* Login Link Text */}
-        <div className="text-center mt-4">
+        <div 
+          className="text-center mt-4"
+          style={{
+            position: 'relative',
+            zIndex: 999,
+            marginTop: '20px'
+          }}
+        >
           <p 
             onClick={() => {
               if (isMobile) {
@@ -239,16 +246,21 @@ export default function HomePage() {
             }}
             className="text-white text-sm cursor-pointer hover:underline"
             style={{
-              color: '#ffffff',
-              fontSize: '14px',
-              marginTop: '16px',
+              color: '#ffffff !important',
+              fontSize: '16px',
+              fontWeight: '500',
               textDecoration: 'none',
-              zIndex: 20,
+              zIndex: 1000,
               position: 'relative',
-              backgroundColor: 'rgba(0, 0, 0, 0.3)',
-              padding: '8px 16px',
-              borderRadius: '20px',
-              display: 'inline-block'
+              backgroundColor: 'rgba(0, 0, 0, 0.6)',
+              padding: '12px 24px',
+              borderRadius: '25px',
+              display: 'inline-block',
+              border: '2px solid rgba(255, 255, 255, 0.3)',
+              backdropFilter: 'blur(10px)',
+              WebkitBackdropFilter: 'blur(10px)',
+              textShadow: '1px 1px 2px rgba(0, 0, 0, 0.8)',
+              boxShadow: '0 4px 15px rgba(0, 0, 0, 0.3)'
             }}
           >
             Have an account? Log in?
