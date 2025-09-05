@@ -321,7 +321,7 @@ export default function ContractorProfileDB() {
           <div className="lg:col-span-1">
             <div className="sticky top-8 space-y-6">
               {/* Contact Information */}
-              <div className="bg-slate-800 rounded-2xl shadow-lg p-6 border border-slate-700" style={{ backgroundColor: '#1e293b' }}>
+              <div className="bg-slate-800 rounded-2xl shadow-lg p-6 border border-slate-700">
                 <h3 className="text-xl font-bold text-white mb-4">Contact Information</h3>
                 <div className="space-y-4">
                   <div className="flex items-center gap-3">
