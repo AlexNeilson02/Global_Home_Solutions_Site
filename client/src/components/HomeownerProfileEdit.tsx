@@ -79,7 +79,7 @@ export function HomeownerProfileEdit({ trigger }: HomeownerProfileEditProps) {
   // Reset form when user data changes or dialog opens
   useEffect(() => {
     if (open && user) {
-      console.log('🔄 Resetting form with user data:', { fullName: user.fullName, phone: user.phone });
+      console.log('🔄 Resetting form with user data:', { fullName: user.fullName || user.username, phone: user.phone });
       form.reset({
         fullName: user.fullName || "",
         phone: user.phone || "",

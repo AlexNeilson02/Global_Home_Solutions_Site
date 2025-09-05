@@ -53,7 +53,7 @@ export function QRCodeDisplay({ salesperson, user }: QRCodeDisplayProps) {
       // Create a download link for the QR code
       const link = document.createElement('a');
       link.href = salesperson.qrCodeUrl;
-      link.download = `${user.fullName?.replace(/\s+/g, '_')}_QR_Code.png`;
+      link.download = `${(user.fullName || user.username)?.replace(/\s+/g, '_')}_QR_Code.png`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -75,8 +75,8 @@ export function QRCodeDisplay({ salesperson, user }: QRCodeDisplayProps) {
     if (navigator.share) {
       try {
         await navigator.share({
-          title: `${user.fullName} - Global Home Solutions`,
-          text: `Get a quote for your home improvement project from ${user.fullName}`,
+          title: `${user.fullName || user.username} - Global Home Solutions`,
+          text: `Get a quote for your home improvement project from ${user.fullName || user.username}`,
           url: landingPageUrl,
         });
       } catch (error) {
