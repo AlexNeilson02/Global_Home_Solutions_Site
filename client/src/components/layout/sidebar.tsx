@@ -88,13 +88,13 @@ export function Sidebar({ className }: SidebarProps) {
           <div className="apple-card p-4 !shadow-apple-sm">
             <div className="flex items-center space-x-3">
               <Avatar className="h-12 w-12 rounded-apple shadow-apple-sm">
-                <AvatarImage src={user.avatarUrl || ""} alt={user.fullName} />
+                <AvatarImage src={user.avatarUrl || ""} alt={user.fullName || user.username} />
                 <AvatarFallback className="bg-primary/10 text-primary font-medium">
-                  {getInitials(user.fullName)}
+                  {getInitials(user.fullName || user.username)}
                 </AvatarFallback>
               </Avatar>
               <div className="flex-1 min-w-0">
-                <h4 className="font-semibold text-sm text-foreground truncate">{user.fullName}</h4>
+                <h4 className="font-semibold text-sm text-foreground truncate">{user.fullName || user.username}</h4>
                 <p className="text-xs text-muted-foreground capitalize">{user.role}</p>
               </div>
             </div>

@@ -66,14 +66,14 @@ export function Header() {
                     <DropdownMenuTrigger asChild>
                       <Button variant="ghost" size="icon" className="rounded-full">
                         <Avatar className="h-8 w-8">
-                          <AvatarImage src={user.avatarUrl || ""} alt={user.fullName} />
-                          <AvatarFallback>{getInitials(user.fullName)}</AvatarFallback>
+                          <AvatarImage src={user.avatarUrl || ""} alt={user.fullName || user.username} />
+                          <AvatarFallback>{getInitials(user.fullName || user.username)}</AvatarFallback>
                         </Avatar>
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                       <div className="px-4 py-2">
-                        <p className="font-medium">{user.fullName}</p>
+                        <p className="font-medium">{user.fullName || user.username}</p>
                         <p className="text-sm text-muted-foreground">{user.email}</p>
                       </div>
                       <DropdownMenuSeparator />
