@@ -21,7 +21,8 @@ import {
   Mail,
   Phone,
   MapPin,
-  Edit
+  Edit,
+  ArrowLeft
 } from "lucide-react";
 
 interface BidRequest {
@@ -270,6 +271,20 @@ export default function HomeownerDashboard() {
           {/* Profile Tab */}
           <TabsContent value="profile">
             <div>
+              {/* Mobile Back Button */}
+              {isMobile && (
+                <div className="flex items-center gap-3 mb-4">
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    onClick={() => setActiveTab('requests')}
+                    className="flex items-center gap-2 text-gray-600 hover:text-gray-900 p-2"
+                  >
+                    <ArrowLeft className="w-5 h-5" />
+                    Back
+                  </Button>
+                </div>
+              )}
               <h2 className="text-2xl font-bold text-gray-900 mb-6">Profile Settings</h2>
               <Card>
                 <CardHeader>
