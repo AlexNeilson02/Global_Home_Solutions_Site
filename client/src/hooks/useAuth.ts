@@ -51,7 +51,7 @@ export function useAuth() {
       queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
       toast({
         title: "Login successful",
-        description: `Welcome back, ${data.user.fullName}!`,
+        description: `Welcome back${data.user?.fullName ? `, ${data.user.fullName}` : ''}!`,
       });
     },
     onError: (error: any) => {
