@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
 import { useLocation, Link } from "wouter";
+import { useAuth } from "@/lib/auth";
 
 const loginSchema = z.object({
   username: z.string().min(1, "Username is required"),
@@ -19,6 +20,7 @@ type LoginForm = z.infer<typeof loginSchema>;
 export default function Login() {
   const { toast } = useToast();
   const [, setLocation] = useLocation();
+  const { login, isLoading: authLoading } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
 
   const form = useForm<LoginForm>({
@@ -32,43 +34,46 @@ export default function Login() {
   const onSubmit = async (data: LoginForm) => {
     setIsLoading(true);
     try {
-      const response = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.text();
-        throw new Error(errorData || "Login failed");
-      }
-
-      const result = await response.json();
+      // Use the AuthProvider's login method
+      await login(data);
       
-      // Store the authentication token
-      localStorage.setItem("auth-token", result.token);
-      
-      toast({
-        title: "Login Successful!",
-        description: `Welcome back, ${result.user.fullName}!`,
+      // Get user data after successful login to determine redirect
+      const response = await fetch("/api/users/me", {
+        credentials: 'include',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem("auth-token")}`
+        }
       });
+      
+      if (response.ok) {
+        const userData = await response.json();
+        const user = userData.user;
+        
+        toast({
+          title: "Login Successful!",
+          description: `Welcome back, ${user.fullName}!`,
+        });
 
-      // Redirect based on user role
-      switch (result.user.role) {
-        case "contractor":
-          setLocation("/contractor-portal");
-          break;
-        case "salesperson":
-          setLocation("/sales-portal");
-          break;
-        case "admin":
-          setLocation("/admin-portal");
-          break;
-        case "homeowner":
-          setLocation("/homeowner-dashboard");
-          break;
-        default:
-          setLocation("/");
+        // Redirect based on user role
+        switch (user.role) {
+          case "contractor":
+            setLocation("/contractor-portal");
+            break;
+          case "salesperson":
+            setLocation("/sales-portal");
+            break;
+          case "admin":
+            setLocation("/admin-portal");
+            break;
+          case "homeowner":
+            setLocation("/homeowner-dashboard");
+            break;
+          default:
+            setLocation("/");
+        }
+      } else {
+        // Fallback redirect if we can't get user data
+        setLocation("/");
       }
     } catch (error) {
       toast({
@@ -128,9 +133,9 @@ export default function Login() {
                 <Button 
                   type="submit" 
                   className="w-full bg-blue-600 hover:bg-blue-700"
-                  disabled={isLoading}
+                  disabled={isLoading || authLoading}
                 >
-                  {isLoading ? "Signing in..." : "Sign In"}
+                  {(isLoading || authLoading) ? "Signing in..." : "Sign In"}
                 </Button>
 
                 <div className="text-center space-y-2">

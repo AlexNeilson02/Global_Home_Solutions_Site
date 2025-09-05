@@ -17,8 +17,6 @@ const HomeownerBottomNav: React.FC<HomeownerBottomNavProps> = ({
     { id: 'profile', label: 'Profile', icon: User }
   ];
 
-  // Debug: Ensure Profile tab is always rendered
-  console.log('HomeownerBottomNav: activeTab =', activeTab, 'tabs =', tabs.map(t => t.id));
 
   return (
     <>
