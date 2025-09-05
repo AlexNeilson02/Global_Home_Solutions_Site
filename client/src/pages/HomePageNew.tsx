@@ -155,7 +155,8 @@ export default function HomePage() {
         bottom: isMobile ? '25%' : '15%', 
         left: '50%', 
         transform: 'translateX(-50%)', 
-        zIndex: 10 
+        zIndex: 10,
+        textAlign: 'center'
       }}>
         {isMobile ? (
           <TouchOptimizedButton
@@ -177,6 +178,26 @@ export default function HomePage() {
             Find a Contractor
           </button>
         )}
+        
+        {/* Have an account? Log in link */}
+        <div style={{ marginTop: '15px' }}>
+          <button
+            onClick={() => navigateWithSalesperson(isMobile ? '/login' : '/portals')}
+            style={{
+              background: 'none',
+              border: 'none',
+              color: 'white',
+              fontSize: '14px',
+              textDecoration: 'underline',
+              cursor: 'pointer',
+              padding: '5px',
+              fontFamily: 'inherit'
+            }}
+            className="hover:opacity-80 transition-opacity"
+          >
+            Have an account? Log in
+          </button>
+        </div>
       </div>
 
       {/* Mobile Bottom Navigation - Only show after Find a Contractor is pressed */}
