@@ -1,4 +1,4 @@
-const CACHE_NAME = 'global-home-solutions-v1';
+const CACHE_NAME = 'global-home-solutions-v2';
 const urlsToCache = [
   '/',
   '/static/js/bundle.js',
