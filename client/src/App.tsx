@@ -14,9 +14,11 @@ import ContractorProfile from "@/pages/ContractorProfileDB";
 import ContractorPortalEnhanced from "@/pages/ContractorPortalEnhanced";
 import SalesPortalEnhanced from "@/pages/SalesPortalEnhanced";
 import AdminPortalEnhanced from "@/pages/AdminPortalEnhanced";
-import HomeownerPortal from "@/pages/HomeownerPortal";
 
 import ContractorRegistration from "@/pages/ContractorRegistration";
+import HomeownerRegistration from "@/pages/HomeownerRegistration";
+import HomeownerDashboard from "@/pages/HomeownerDashboard";
+import MobileHomeownerBidRequest from "@/pages/MobileHomeownerBidRequest";
 import MobileContractors from "@/pages/MobileContractors";
 import MobileAppServices from "@/pages/MobileAppServices";
 import SalespersonProfile from "@/pages/SalespersonProfile";
@@ -37,7 +39,7 @@ function App() {
             <TooltipProvider>
               <MobileViewportFix />
               <MobileAppAuthWrapper>
-                <div className="min-h-screen full-height smooth-scroll" style={{ marginTop: 0, paddingTop: 0, position: 'relative', top: 0, backgroundColor: 'red' }}>
+                <div className="min-h-screen full-height smooth-scroll" style={{ marginTop: 0, paddingTop: 0, position: 'relative', top: 0 }}>
                   <Toaster />
                   <PWAInstallPrompt />
               <Route path="/" component={HomePage} />
@@ -47,8 +49,29 @@ function App() {
               <Route path="/portals" component={Portals} />
               <Route path="/contractor/:id" component={ContractorProfile} />
               <Route path="/contractor-registration" component={ContractorRegistration} />
+              <Route path="/homeowner-registration" component={HomeownerRegistration} />
               <Route path="/sales/:profileUrl" component={SalespersonProfile} />
               <Route path="/login" component={Login} />
+              <Route path="/homeowner-dashboard">
+                <ProtectedRoute requiredRole="homeowner">
+                  <HomeownerDashboard />
+                </ProtectedRoute>
+              </Route>
+              <Route path="/homeowner/request-service">
+                <ProtectedRoute requiredRole="homeowner">
+                  <MobileHomeownerBidRequest />
+                </ProtectedRoute>
+              </Route>
+              <Route path="/homeowner/contractors">
+                <ProtectedRoute requiredRole="homeowner">
+                  <MobileContractors />
+                </ProtectedRoute>
+              </Route>
+              <Route path="/homeowner/services">
+                <ProtectedRoute requiredRole="homeowner">
+                  <MobileAppServices />
+                </ProtectedRoute>
+              </Route>
               <Route path="/contractor-portal">
                 <ProtectedRoute requiredRole="contractor">
                   <ContractorPortalEnhanced />
@@ -62,11 +85,6 @@ function App() {
               <Route path="/admin-portal">
                 <ProtectedRoute requiredRole="admin">
                   <AdminPortalEnhanced />
-                </ProtectedRoute>
-              </Route>
-              <Route path="/homeowner-portal">
-                <ProtectedRoute requiredRole="homeowner">
-                  <HomeownerPortal />
                 </ProtectedRoute>
               </Route>
               <Route path="/checkout">

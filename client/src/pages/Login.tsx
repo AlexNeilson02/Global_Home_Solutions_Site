@@ -65,7 +65,7 @@ export default function Login() {
           setLocation("/admin-portal");
           break;
         case "homeowner":
-          setLocation("/homeowner-portal");
+          setLocation("/homeowner-dashboard");
           break;
         default:
           setLocation("/");
@@ -84,14 +84,7 @@ export default function Login() {
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
-        <Card 
-          className="bg-white border border-gray-200 shadow-sm" 
-          style={{
-            backgroundColor: '#ffffff !important',
-            background: '#ffffff',
-            backgroundImage: 'none'
-          }}
-        >
+        <Card>
           <CardHeader className="text-center">
             <CardTitle className="text-3xl font-bold text-blue-900">
               Portal Login
@@ -148,6 +141,11 @@ export default function Login() {
                     <Link href="/homeowner-registration">
                       <Button variant="outline" className="w-full bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100">
                         Register as Homeowner
+                      </Button>
+                    </Link>
+                    <Link href="/contractor-registration">
+                      <Button variant="outline" className="w-full">
+                        Register as Contractor
                       </Button>
                     </Link>
                   </div>

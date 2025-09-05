@@ -72,12 +72,12 @@ const MobileAppServices = () => {
   const categorizedServices = categorizeServices(services);
 
   const goBack = () => {
-    setLocation('/homeowner-portal');
+    setLocation('/homeowner-dashboard');
   };
 
   const handleServiceSelect = (serviceName: string) => {
-    // Navigate to homeowner portal contractors tab with pre-selected service
-    setLocation('/homeowner-portal?tab=contractors&service=' + encodeURIComponent(serviceName));
+    // Navigate to bid request form with pre-selected service
+    setLocation(`/homeowner/request-service?service=${encodeURIComponent(serviceName)}`);
   };
 
   return (

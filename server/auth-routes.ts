@@ -120,8 +120,6 @@ function getRedirectUrl(role: string): string {
       return "/contractor-portal";
     case "salesperson":
       return "/sales-portal";
-    case "homeowner":
-      return "/homeowner-portal";
     default:
       return "/";
   }

@@ -35,41 +35,6 @@ const HomePage: React.FC = () => {
               SEARCH
             </button>
           </div>
-          
-          {/* Login Link Text */}
-          <div className="text-center mt-6">
-            <p 
-              onClick={() => {
-                // Check if mobile using window.innerWidth
-                const isMobile = window.innerWidth <= 768;
-                if (isMobile) {
-                  window.location.href = '/login';
-                } else {
-                  window.location.href = '/portals';
-                }
-              }}
-              className="text-white text-sm cursor-pointer hover:underline"
-              style={{
-                color: '#ffffff !important',
-                fontSize: '16px',
-                fontWeight: '500',
-                textDecoration: 'none',
-                zIndex: 1000,
-                position: 'relative',
-                backgroundColor: 'rgba(0, 0, 0, 0.6)',
-                padding: '12px 24px',
-                borderRadius: '25px',
-                display: 'inline-block',
-                border: '2px solid rgba(255, 255, 255, 0.3)',
-                backdropFilter: 'blur(10px)',
-                WebkitBackdropFilter: 'blur(10px)',
-                textShadow: '1px 1px 2px rgba(0, 0, 0, 0.8)',
-                boxShadow: '0 4px 15px rgba(0, 0, 0, 0.3)'
-              }}
-            >
-              Have an account? Log in?
-            </p>
-          </div>
         </div>
 
         {/* Contractor Categories */}

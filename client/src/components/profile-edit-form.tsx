@@ -208,7 +208,7 @@ export default function ProfileEditForm({ userData, roleData, userType, onSucces
   return (
     <Card className="w-full max-w-2xl mx-auto">
       <CardHeader>
-        <CardTitle style={{color: 'red', fontSize: '24px'}}>🔴 TESTING - Edit Profile 🔴</CardTitle>
+        <CardTitle>Edit Profile</CardTitle>
         <CardDescription>
           Update your personal information and how others see you on the platform.
         </CardDescription>
@@ -236,7 +236,7 @@ export default function ProfileEditForm({ userData, roleData, userType, onSucces
                               type="button" 
                               variant="outline" 
                               size="sm" 
-                              className="mt-2 bg-red-500 text-white hover:bg-red-600 border-red-500"
+                              className="mt-2"
                               onClick={() => {
                                 // Create a file input element
                                 const input = document.createElement('input');

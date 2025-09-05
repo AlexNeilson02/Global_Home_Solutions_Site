@@ -117,36 +117,6 @@ export default function HomePage() {
         About Us
       </Link>
 
-      {/* Desktop User Menu - Top Right */}
-      {!isMobile && user && (
-        <div className="fixed top-5 right-5 z-20 flex space-x-2">
-          {user.role === 'homeowner' && (
-            <button
-              onClick={() => navigateWithSalesperson('/homeowner-portal')}
-              className="px-4 py-2 bg-green-500/80 backdrop-blur-sm text-white border border-white/30 hover:bg-green-600/80 rounded-md transition-all duration-300"
-            >
-              My Portal
-            </button>
-          )}
-          <button
-            onClick={logout}
-            className="px-4 py-2 bg-white/20 backdrop-blur-sm text-white border border-white/30 hover:bg-white/30 rounded-md transition-all duration-300"
-          >
-            Logout
-          </button>
-        </div>
-      )}
-
-      {/* Desktop Login Button - Top Right */}
-      {!isMobile && !user && (
-        <button
-          onClick={() => navigateWithSalesperson('/login')}
-          className="fixed top-5 right-5 z-20 px-4 py-2 bg-white/20 backdrop-blur-sm text-white border border-white/30 hover:bg-white/30 rounded-md transition-all duration-300"
-        >
-          Login
-        </button>
-      )}
-
       {/* Mobile Login Button - Top Right */}
       {isMobile && !user && (
         <TouchOptimizedButton
@@ -160,16 +130,7 @@ export default function HomePage() {
 
       {/* Mobile User Menu - Top Right */}
       {isMobile && user && (
-        <div className="mobile-nav-show fixed top-5 right-5 z-20 flex space-x-2">
-          {user.role === 'homeowner' && (
-            <TouchOptimizedButton
-              onClick={() => navigateWithSalesperson('/homeowner-portal')}
-              size="sm"
-              className="bg-green-500/80 backdrop-blur-sm text-white border border-white/30 hover:bg-green-600/80 touch-target"
-            >
-              My Portal
-            </TouchOptimizedButton>
-          )}
+        <div className="mobile-nav-show fixed top-5 right-5 z-20">
           <TouchOptimizedButton
             onClick={logout}
             size="sm"
@@ -199,73 +160,23 @@ export default function HomePage() {
         {isMobile ? (
           <TouchOptimizedButton
             onClick={() => {
-              if (user && user.role === 'homeowner') {
-                navigateWithSalesperson('/homeowner-portal?tab=contractors');
-              } else {
-                setShowBottomNav(true);
-                navigateWithSalesperson('/services');
-              }
+              setShowBottomNav(true);
+              navigateWithSalesperson('/services');
             }}
             size="lg"
             className="find-contractor-btn touch-target no-select tap-highlight"
             style={{ backgroundColor: '#00adee', borderColor: '#00adee' }}
           >
-            {user && user.role === 'homeowner' ? 'Browse Contractors' : 'Find a Contractor'}
+            Find a Contractor
           </TouchOptimizedButton>
         ) : (
           <button 
-            onClick={() => {
-              if (user && user.role === 'homeowner') {
-                navigateWithSalesperson('/homeowner-portal?tab=contractors');
-              } else {
-                navigateWithSalesperson('/services');
-              }
-            }}
+            onClick={() => navigateWithSalesperson('/services')}
             className="find-contractor-btn"
           >
-            {user && user.role === 'homeowner' ? 'Browse Contractors' : 'Find a Contractor'}
+            Find a Contractor
           </button>
         )}
-        
-        {/* Login Link Text */}
-        <div 
-          className="text-center mt-4"
-          style={{
-            position: 'relative',
-            zIndex: 999,
-            marginTop: '20px'
-          }}
-        >
-          <p 
-            onClick={() => {
-              if (isMobile) {
-                navigateWithSalesperson('/login');
-              } else {
-                navigateWithSalesperson('/portals');
-              }
-            }}
-            className="text-white text-sm cursor-pointer hover:underline"
-            style={{
-              color: '#ffffff !important',
-              fontSize: '16px',
-              fontWeight: '500',
-              textDecoration: 'none',
-              zIndex: 1000,
-              position: 'relative',
-              backgroundColor: 'rgba(0, 0, 0, 0.6)',
-              padding: '12px 24px',
-              borderRadius: '25px',
-              display: 'inline-block',
-              border: '2px solid rgba(255, 255, 255, 0.3)',
-              backdropFilter: 'blur(10px)',
-              WebkitBackdropFilter: 'blur(10px)',
-              textShadow: '1px 1px 2px rgba(0, 0, 0, 0.8)',
-              boxShadow: '0 4px 15px rgba(0, 0, 0, 0.3)'
-            }}
-          >
-            Have an account? Log in?
-          </p>
-        </div>
       </div>
 
       {/* Mobile Bottom Navigation - Only show after Find a Contractor is pressed */}

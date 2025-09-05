@@ -293,7 +293,7 @@ const SalesPortalEnhanced: React.FC = () => {
   ];
 
   const statusDistribution = [
-    { name: 'Pending', value: bidRequests.filter((b: any) => b.status === 'pending').length, color: '#6b7280' },
+    { name: 'Pending', value: bidRequests.filter((b: any) => b.status === 'pending').length, color: '#f59e0b' },
     { name: 'Contacted', value: bidRequests.filter((b: any) => b.status === 'contacted').length, color: '#3b82f6' },
     { name: 'Completed', value: bidRequests.filter((b: any) => b.status === 'completed').length, color: '#10b981' }
   ];
