@@ -526,7 +526,17 @@ div[role="tabpanel"] * {
 .min-h-screen.bg-gray-50 form,
 .min-h-screen.bg-gray-50 form *,
 .min-h-screen.bg-gray-50 [role="form"],
-.min-h-screen.bg-gray-50 [role="form"] * {
+.min-h-screen.bg-gray-50 [role="form"] *,
+.min-h-screen.bg-gray-100,
+.min-h-screen.bg-gray-100 *,
+.min-h-screen.bg-gray-100 .max-w-md,
+.min-h-screen.bg-gray-100 .max-w-md *,
+.min-h-screen.bg-gray-100 .card,
+.min-h-screen.bg-gray-100 .card *,
+.min-h-screen.bg-gray-100 form,
+.min-h-screen.bg-gray-100 form *,
+.min-h-screen.bg-gray-100 [role="form"],
+.min-h-screen.bg-gray-100 [role="form"] * {
   background-color: white !important;
   background: white !important;
   outline: none !important;
@@ -534,9 +544,11 @@ div[role="tabpanel"] * {
   border-color: #e5e7eb !important;
 }
 
-/* Specific card targeting for login form */
+/* Specific card targeting for login form - both bg classes */
 .min-h-screen.bg-gray-50 .max-w-md .card,
-.min-h-screen.bg-gray-50 .max-w-md .card * {
+.min-h-screen.bg-gray-50 .max-w-md .card *,
+.min-h-screen.bg-gray-100 .max-w-md .card,
+.min-h-screen.bg-gray-100 .max-w-md .card * {
   background-color: white !important;
   background: white !important;
 }
@@ -553,14 +565,29 @@ div[role="tabpanel"] * {
   color: black !important;
 }
 
+/* Ultra-aggressive login form targeting - catch ALL variations */
+div[class*="min-h-screen"] div[class*="card"],
+div[class*="min-h-screen"] div[class*="card"] *,
+div[class*="min-h-screen"] form,
+div[class*="min-h-screen"] form *,
+div[class*="min-h-screen"] div[class*="max-w-md"],
+div[class*="min-h-screen"] div[class*="max-w-md"] * {
+  background-color: white !important;
+  background: white !important;
+  background-image: none !important;
+}
+
 /* Responsive overrides for all screen sizes */
 @media (min-width: 1px) {
   .min-h-screen .card,
   .min-h-screen .card *,
   .min-h-screen form,
-  .min-h-screen form * {
+  .min-h-screen form *,
+  div[class*="min-h-screen"] div[class*="card"],
+  div[class*="min-h-screen"] div[class*="card"] * {
     background-color: white !important;
     background: white !important;
+    background-image: none !important;
   }
 }
 
@@ -568,10 +595,20 @@ div[role="tabpanel"] * {
   .min-h-screen .card,
   .min-h-screen .card *,
   .min-h-screen form,
-  .min-h-screen form * {
+  .min-h-screen form *,
+  div[class*="min-h-screen"] div[class*="card"],
+  div[class*="min-h-screen"] div[class*="card"] * {
     background-color: white !important;
     background: white !important;
+    background-image: none !important;
   }
+}
+
+/* Emergency override for any yellow that sneaks through */
+*[style*="background"][style*="yellow"],
+*[style*="background-color"][style*="yellow"] {
+  background-color: white !important;
+  background: white !important;
 }
 
 /* Mobile Navigation Overrides */
