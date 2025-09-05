@@ -143,11 +143,6 @@ export default function Login() {
                         Register as Homeowner
                       </Button>
                     </Link>
-                    <Link href="/contractor-registration">
-                      <Button variant="outline" className="w-full">
-                        Register as Contractor
-                      </Button>
-                    </Link>
                   </div>
                 </div>
               </form>
