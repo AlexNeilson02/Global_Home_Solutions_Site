@@ -198,19 +198,6 @@ export default function HomePage() {
             Have an account? Log in
           </button>
         </div>
-        
-        {/* TEST CHANGE - VISIBLE RED TEXT TO CONFIRM UPDATES WORK */}
-        <div style={{ 
-          marginTop: '10px', 
-          color: 'red', 
-          fontSize: '16px', 
-          fontWeight: 'bold',
-          backgroundColor: 'yellow',
-          padding: '10px',
-          border: '2px solid red'
-        }}>
-          🔴 TEST: Changes are working! This red text confirms updates are visible.
-        </div>
       </div>
 
       {/* Mobile Bottom Navigation - Only show after Find a Contractor is pressed */}
