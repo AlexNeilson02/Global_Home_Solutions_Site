@@ -105,13 +105,38 @@ const ServiceSelection = () => {
     
     const contractorsList = Array.isArray(contractors.contractors) ? contractors.contractors : [];
     
+    // Improved matching logic for better service-specialty matching
+    const normalizeText = (text: string) => {
+      return text.toLowerCase()
+        .replace(/[^\w\s]/g, ' ') // Replace punctuation with spaces
+        .replace(/\s+/g, ' ')     // Normalize multiple spaces
+        .trim();
+    };
+    
+    const getKeywords = (text: string) => {
+      return normalizeText(text).split(' ').filter(word => word.length > 2);
+    };
+    
+    const selectedServiceKeywords = getKeywords(trade);
+    
     return contractorsList
       .filter((contractor: any) => 
         contractor.specialties && 
         Array.isArray(contractor.specialties) &&
-        contractor.specialties.some((specialty: string) => 
-          specialty.toLowerCase().includes(trade.toLowerCase())
-        )
+        contractor.specialties.some((specialty: string) => {
+          const specialtyKeywords = getKeywords(specialty);
+          
+          // Check if there's significant keyword overlap
+          const matchingKeywords = selectedServiceKeywords.filter(keyword =>
+            specialtyKeywords.some(specKeyword => 
+              specKeyword.includes(keyword) || keyword.includes(specKeyword)
+            )
+          );
+          
+          // Match if at least 2 keywords overlap or if there's one significant keyword match
+          return matchingKeywords.length >= 2 || 
+                 matchingKeywords.some(keyword => keyword.length > 4);
+        })
       )
       .slice(0, 5);
   };
