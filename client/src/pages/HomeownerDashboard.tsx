@@ -231,7 +231,7 @@ export default function HomeownerDashboard() {
                     </p>
                     <Button 
                       onClick={() => setLocation('/homeowner/request-service')}
-                      className="bg-blue-600 hover:bg-blue-700"
+                      className="bg-[#2563eb] hover:bg-[#1d4ed8]"
                     >
                       <Plus className="w-4 h-4 mr-2" />
                       Create Request
@@ -256,7 +256,7 @@ export default function HomeownerDashboard() {
                       Find contractors for your home improvement needs.
                     </p>
                     <Button 
-                      className="bg-blue-600 hover:bg-blue-700"
+                      className="bg-[#2563eb] hover:bg-[#1d4ed8]"
                       onClick={() => setLocation('/homeowner/request-service')}
                     >
                       Request Services
@@ -329,7 +329,7 @@ export default function HomeownerDashboard() {
           <div className="fixed bottom-20 right-4 z-40">
             <Button 
               size="lg"
-              className="bg-blue-600 hover:bg-blue-700 rounded-full h-14 w-14 shadow-lg"
+              className="bg-[#2563eb] hover:bg-[#1d4ed8] rounded-full h-14 w-14 shadow-lg"
               onClick={() => setLocation('/homeowner/request-service')}
             >
               <Plus className="w-6 h-6" />
