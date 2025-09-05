@@ -155,7 +155,7 @@ export default function HomePage() {
         bottom: isMobile ? '25%' : '15%', 
         left: '50%', 
         transform: 'translateX(-50%)', 
-        zIndex: 10,
+        zIndex: 99,
         textAlign: 'center'
       }}>
         {isMobile ? (
