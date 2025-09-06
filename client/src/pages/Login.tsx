@@ -35,53 +35,63 @@ export default function Login() {
     setIsLoading(true);
     try {
       // Use the AuthProvider's login method
-      await login(data);
+      const user = await login(data);
       
-      // Wait for the auth state to update and get the user
-      setTimeout(() => {
-        const response = fetch("/api/auth/user", { credentials: 'include' })
-          .then(res => res.json())
-          .then(userData => {
-            if (userData && userData.fullName) {
-              toast({
-                title: "Login Successful!",
-                description: `Welcome back, ${userData.fullName}!`,
-              });
-            } else {
-              toast({
-                title: "Login Successful!",
-                description: "Welcome back!",
-              });
-            }
+      // Show success message
+      if (user && user.fullName) {
+        toast({
+          title: "Login Successful!",
+          description: `Welcome back, ${user.fullName}!`,
+        });
+      } else {
+        toast({
+          title: "Login Successful!",
+          description: "Welcome back!",
+        });
+      }
 
-            // Redirect based on user role
-            switch (userData?.role) {
-              case "contractor":
-                setLocation("/contractor-portal");
-                break;
-              case "salesperson":
-                setLocation("/sales-portal");
-                break;
-              case "admin":
-                setLocation("/admin-portal");
-                break;
-              case "homeowner":
-                setLocation("/homeowner-dashboard");
-                break;
-              default:
-                setLocation("/");
-            }
-          })
-          .catch(() => {
-            // Fallback redirect
-            setLocation("/");
-          });
-      }, 100);
+      // Small delay for toast to show before redirect
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      // Redirect based on user role
+      switch (user?.role) {
+        case "contractor":
+          setLocation("/contractor-portal");
+          break;
+        case "salesperson":
+          setLocation("/sales-portal");
+          break;
+        case "admin":
+          setLocation("/admin-portal");
+          break;
+        case "homeowner":
+          setLocation("/homeowner-dashboard");
+          break;
+        default:
+          setLocation("/");
+      }
       
     } catch (error) {
+      console.error("Login error:", error);
+      
+      // Provide specific error messages based on error type
+      let errorMessage = "An unexpected error occurred. Please try again.";
+      
+      if (error instanceof Error) {
+        if (error.message.includes("fetch")) {
+          errorMessage = "Unable to connect to the server. Please check your internet connection and try again.";
+        } else if (error.message.includes("401") || error.message.includes("Invalid")) {
+          errorMessage = "Invalid username or password. Please check your credentials and try again.";
+        } else if (error.message.includes("500")) {
+          errorMessage = "Server error. Please try again in a few moments.";
+        } else {
+          errorMessage = error.message;
+        }
+      }
+      
       toast({
         title: "Login Failed",
-        description: error instanceof Error ? error.message : "Invalid username or password",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {

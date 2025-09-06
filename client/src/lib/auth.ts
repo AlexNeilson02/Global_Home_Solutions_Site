@@ -45,7 +45,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           // Verify session is still valid with server
           try {
             const response = await fetch('/api/auth/user', {
-              credentials: 'include' // Important for session cookies
+              credentials: 'include', // Important for session cookies
+              // Add timeout to prevent hanging requests
+              signal: AbortSignal.timeout(5000)
             });
             
             if (response.ok) {
@@ -54,12 +56,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               localStorage.setItem('user', JSON.stringify(serverUser));
             } else {
               // Session expired, clear stored user
+              console.log("Session expired, clearing stored user");
               localStorage.removeItem('user');
               setUser(null);
             }
           } catch (error) {
-            console.warn("Could not verify session:", error);
+            console.warn("Could not verify session (network may be offline):", error);
             // Keep stored user if network error, but don't fail
+            // This allows offline mode to work
             setUser(parsedUser);
           }
         } catch (err) {
@@ -80,28 +84,54 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       console.log("Sending login request to API...");
       
-      // Call the real API endpoint
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include', // Important for session cookies
-        body: JSON.stringify(loginData),
-      });
+      let response;
+      try {
+        // Call the real API endpoint
+        response = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include', // Important for session cookies
+          body: JSON.stringify(loginData),
+        });
+      } catch (fetchError) {
+        console.error("Network error during login:", fetchError);
+        throw new Error("Unable to connect to server. Please check your internet connection and try again.");
+      }
       
       console.log("Login response status:", response.status);
       
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Login failed');
+        let errorMessage = 'Login failed';
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.message || errorMessage;
+        } catch {
+          // If we can't parse the error response, use status-based message
+          if (response.status === 401) {
+            errorMessage = 'Invalid username or password';
+          } else if (response.status === 500) {
+            errorMessage = 'Server error. Please try again later.';
+          } else if (response.status === 404) {
+            errorMessage = 'Login service not available. Please try again later.';
+          }
+        }
+        throw new Error(errorMessage);
       }
       
-      const data = await response.json();
+      let data;
+      try {
+        data = await response.json();
+      } catch (parseError) {
+        console.error("Error parsing login response:", parseError);
+        throw new Error("Invalid response from server. Please try again.");
+      }
+      
       console.log("Login response data:", data);
       
       if (!data.user) {
-        throw new Error("Server didn't return user data");
+        throw new Error("Server didn't return user data. Please try again.");
       }
       
       // Store user in localStorage for persistence (session-based auth, no token needed)
