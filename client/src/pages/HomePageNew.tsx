@@ -175,7 +175,7 @@ export default function HomePage() {
             onClick={() => navigateWithSalesperson('/services')}
             className="find-contractor-btn"
           >
-            Find a Contrator
+            Find a Contractor
           </button>
         )}
         
