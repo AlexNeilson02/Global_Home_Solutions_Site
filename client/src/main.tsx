@@ -10,14 +10,35 @@ import { ThemeProvider } from "./components/ui/theme-provider";
 if (import.meta.env.DEV) {
   // Clear ALL browser storage on every page load in development
   (async () => {
-    console.log('Development mode: Clearing all caches and storage...');
+    console.log('Development mode: Aggressive cache clearing and service worker removal...');
     
-    // 1. Unregister ALL service workers
+    // 1. Force unregister ALL service workers with extreme prejudice
     if ('serviceWorker' in navigator) {
-      const registrations = await navigator.serviceWorker.getRegistrations();
-      for (const registration of registrations) {
-        await registration.unregister();
-        console.log('Service worker unregistered:', registration.scope);
+      try {
+        // Get all service worker registrations
+        const registrations = await navigator.serviceWorker.getRegistrations();
+        console.log(`Found ${registrations.length} service worker registrations to remove`);
+        
+        // Unregister each one
+        for (const registration of registrations) {
+          await registration.unregister();
+          console.log('Service worker unregistered:', registration.scope);
+        }
+        
+        // Force reload the service worker controller if it exists
+        if (navigator.serviceWorker.controller) {
+          console.log('Posting message to active service worker to self-destruct');
+          navigator.serviceWorker.controller.postMessage({ action: 'SKIP_WAITING' });
+        }
+        
+        // Listen for any new service worker installations and immediately unregister them
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+          console.log('Service worker controller changed - forcing page reload');
+          window.location.reload();
+        });
+        
+      } catch (error) {
+        console.warn('Service worker cleanup error:', error);
       }
     }
     
@@ -63,7 +84,30 @@ if (import.meta.env.DEV) {
       window.history.replaceState({}, '', newUrl);
     }
     
-    console.log('All caches and storage cleared for development');
+    // 7. Force disable any remaining service worker functionality
+    if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+      console.log('Active service worker detected - posting kill message');
+      navigator.serviceWorker.controller.postMessage({ 
+        action: 'FORCE_DISABLE',
+        timestamp: Date.now()
+      });
+    }
+    
+    // 8. Override fetch to detect any service worker interference
+    const originalFetch = window.fetch;
+    window.fetch = function(...args) {
+      console.log('Fetch intercepted:', args[0]);
+      return originalFetch.apply(this, args).catch(error => {
+        console.error('Fetch error details:', {
+          url: args[0],
+          error: error.message,
+          stack: error.stack
+        });
+        throw error;
+      });
+    };
+    
+    console.log('All caches and storage cleared for development - service workers aggressively removed');
   })();
 } else {
   // Production: Register service worker normally

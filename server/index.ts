@@ -26,7 +26,12 @@ if (isDevelopment) {
       'Expires': '0',
       'Surrogate-Control': 'no-store',
       'X-Accel-Expires': '0',
-      'X-Cache-Enabled': 'False'
+      'X-Cache-Enabled': 'False',
+      'X-Development-Mode': 'true',
+      'X-Timestamp': Date.now().toString(),
+      // Additional headers to prevent any caching
+      'Clear-Site-Data': '"cache", "storage"',
+      'X-Content-Type-Options': 'nosniff'
     });
     next();
   });

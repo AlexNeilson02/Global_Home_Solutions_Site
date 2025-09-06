@@ -6,22 +6,57 @@ const isDevelopment = self.location.hostname === 'localhost' ||
                      self.location.port === '5000';
 
 if (isDevelopment) {
-  console.log('Service Worker: Development environment detected - disabling all functionality');
+  console.log('Service Worker: Development environment detected - FORCE DISABLING and SELF-DESTRUCTING');
   
-  // Override all event listeners to do nothing in development
+  // Listen for messages from main thread to self-destruct
+  self.addEventListener('message', (event) => {
+    if (event.data && (event.data.action === 'SKIP_WAITING' || event.data.action === 'FORCE_DISABLE')) {
+      console.log('Service Worker: Received self-destruct command');
+      self.skipWaiting();
+      // Force unregister this service worker
+      self.registration.unregister().then(() => {
+        console.log('Service Worker: Successfully self-destructed');
+      }).catch(err => {
+        console.log('Service Worker: Self-destruct failed:', err);
+      });
+    }
+  });
+  
+  // Override all event listeners to do absolutely nothing in development
   self.addEventListener('install', (event) => {
-    console.log('Service Worker: Skipping install in development');
+    console.log('Service Worker: DEVELOPMENT - Immediately skipping installation');
     self.skipWaiting();
+    // Immediately unregister this service worker
+    event.waitUntil(
+      self.registration.unregister().then(() => {
+        console.log('Service Worker: Unregistered during install');
+      })
+    );
   });
   
   self.addEventListener('activate', (event) => {
-    console.log('Service Worker: Skipping activation in development');
-    event.waitUntil(self.clients.claim());
+    console.log('Service Worker: DEVELOPMENT - Force claiming and unregistering');
+    event.waitUntil(
+      Promise.all([
+        self.clients.claim(),
+        self.registration.unregister()
+      ]).then(() => {
+        console.log('Service Worker: Claimed clients and unregistered');
+      })
+    );
   });
   
   self.addEventListener('fetch', (event) => {
-    // Do nothing - let all requests pass through normally
-    console.log('Service Worker: Allowing passthrough for:', event.request.url);
+    // Absolutely do nothing - let all requests pass through
+    console.log('Service Worker: DEVELOPMENT - Passthrough for:', event.request.url);
+    // Don't call event.respondWith() - let browser handle naturally
+  });
+  
+  // Force immediate self-destruction
+  self.registration.unregister().then(() => {
+    console.log('Service Worker: Initial self-destruct completed');
+  }).catch(err => {
+    console.log('Service Worker: Initial self-destruct failed:', err);
   });
   
   // Exit early - don't register any production functionality
