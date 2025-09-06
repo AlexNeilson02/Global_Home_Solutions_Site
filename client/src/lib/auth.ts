@@ -44,11 +44,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           
           // Verify session is still valid with server
           try {
+            // Create timeout for older browsers that don't support AbortSignal.timeout
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 5000);
+            
             const response = await fetch('/api/auth/user', {
               credentials: 'include', // Important for session cookies
-              // Add timeout to prevent hanging requests
-              signal: AbortSignal.timeout(5000)
+              signal: controller.signal
             });
+            
+            clearTimeout(timeoutId);
             
             if (response.ok) {
               const serverUser = await response.json();
