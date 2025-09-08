@@ -17,7 +17,9 @@ export function RefundRequestForm({ contractorId }: RefundRequestFormProps) {
   const [formData, setFormData] = useState({
     amount: '',
     reason: '',
-    description: ''
+    description: '',
+    bidRequestId: '',
+    refundDate: ''
   });
   const [showForm, setShowForm] = useState(false);
   
@@ -31,6 +33,16 @@ export function RefundRequestForm({ contractorId }: RefundRequestFormProps) {
     enabled: !!contractorId,
   });
 
+  // Fetch bid requests for this contractor to populate dropdown
+  const { data: bidRequestsData, isLoading: loadingBidRequests } = useQuery({
+    queryKey: ['contractor-bid-requests', contractorId],
+    queryFn: async () => {
+      const response = await apiRequest('GET', `/api/bid-requests/contractor/${contractorId}`);
+      return response.json();
+    },
+    enabled: !!contractorId,
+  });
+
   // Create refund request mutation
   const createRefundMutation = useMutation({
     mutationFn: (data: any) => apiRequest('POST', '/api/refunds', data),
@@ -39,7 +51,7 @@ export function RefundRequestForm({ contractorId }: RefundRequestFormProps) {
         title: "Refund Request Submitted",
         description: "Your refund request has been submitted for review.",
       });
-      setFormData({ amount: '', reason: '', description: '' });
+      setFormData({ amount: '', reason: '', description: '', bidRequestId: '', refundDate: '' });
       setShowForm(false);
       queryClient.invalidateQueries({ queryKey: ['refund-requests'] });
     },
@@ -88,6 +100,8 @@ export function RefundRequestForm({ contractorId }: RefundRequestFormProps) {
       amount,
       reason: formData.reason,
       description: formData.description,
+      bidRequestId: formData.bidRequestId || null,
+      refundDate: formData.refundDate || null,
     });
   };
 
@@ -197,7 +211,7 @@ export function RefundRequestForm({ contractorId }: RefundRequestFormProps) {
                 size="sm"
                 onClick={() => {
                   setShowForm(false);
-                  setFormData({ amount: '', reason: '', description: '' });
+                  setFormData({ amount: '', reason: '', description: '', bidRequestId: '', refundDate: '' });
                 }}
               >
                 Cancel
@@ -237,6 +251,42 @@ export function RefundRequestForm({ contractorId }: RefundRequestFormProps) {
                   <option value="Cancellation">Cancellation</option>
                   <option value="Other">Other</option>
                 </select>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="bidRequest">Related Project</Label>
+                <select
+                  id="bidRequest"
+                  value={formData.bidRequestId}
+                  onChange={(e) => setFormData({ ...formData, bidRequestId: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                >
+                  <option value="">Select a project (optional)</option>
+                  {loadingBidRequests ? (
+                    <option value="">Loading projects...</option>
+                  ) : (
+                    <>
+                      {(bidRequestsData?.bidRequests || []).map((bidRequest: any) => (
+                        <option key={bidRequest.id} value={bidRequest.id}>
+                          {bidRequest.projectType} - {new Date(bidRequest.requestedAt).toLocaleDateString()}
+                        </option>
+                      ))}
+                      <option value="not_listed">Project not listed here</option>
+                    </>
+                  )}
+                </select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="refundDate">Refund Date</Label>
+                <Input
+                  id="refundDate"
+                  type="date"
+                  value={formData.refundDate}
+                  onChange={(e) => setFormData({ ...formData, refundDate: e.target.value })}
+                />
               </div>
             </div>
 
