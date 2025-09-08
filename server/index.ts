@@ -18,20 +18,11 @@ if (isDevelopment) {
     res.status(404).send('Service worker disabled in development');
   });
   
-  // Aggressive no-cache headers for ALL responses in development
+  // Standard no-cache headers for development
   app.use((req, res, next) => {
     res.set({
-      'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0',
-      'Pragma': 'no-cache',
-      'Expires': '0',
-      'Surrogate-Control': 'no-store',
-      'X-Accel-Expires': '0',
-      'X-Cache-Enabled': 'False',
-      'X-Development-Mode': 'true',
-      'X-Timestamp': Date.now().toString(),
-      // Additional headers to prevent any caching
-      'Clear-Site-Data': '"cache", "storage"',
-      'X-Content-Type-Options': 'nosniff'
+      'Cache-Control': 'no-cache, must-revalidate',
+      'Pragma': 'no-cache'
     });
     next();
   });
