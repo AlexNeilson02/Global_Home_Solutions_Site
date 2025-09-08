@@ -126,10 +126,11 @@ const AdminPortal: React.FC = () => {
 
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
             {/* Desktop Navigation - Only show on desktop */}
-            <TabsList className="hidden sm:grid w-full grid-cols-5">
+            <TabsList className="hidden sm:grid w-full grid-cols-6">
               <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
               <TabsTrigger value="users">User Management</TabsTrigger>
               <TabsTrigger value="contractors">Contractors</TabsTrigger>
+              <TabsTrigger value="refunds">Refunds</TabsTrigger>
               <TabsTrigger value="analytics">Analytics</TabsTrigger>
               <TabsTrigger value="settings">Settings</TabsTrigger>
             </TabsList>

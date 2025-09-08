@@ -31,11 +31,16 @@ import {
   Target,
   Star,
   MapPin,
-  FileText
+  FileText,
+  RefreshCw,
+  Clock,
+  CheckCircle,
+  AlertCircle
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
 import AnalyticsDashboard from "@/components/AnalyticsDashboard";
+import { RefundManagement } from "@/components/RefundManagement";
 
 export default function AdminPortalEnhanced() {
   const [, navigate] = useLocation();
@@ -693,16 +698,17 @@ export default function AdminPortalEnhanced() {
         {/* Main Content */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6 pb-20 sm:pb-0">
           {/* Desktop/Tablet Navigation - Hidden on mobile */}
-          <TabsList className="hidden sm:grid w-full grid-cols-4">
+          <TabsList className="hidden sm:grid w-full grid-cols-5">
             <TabsTrigger value="salespersons">Sales Representatives</TabsTrigger>
             <TabsTrigger value="contractors">Contractors</TabsTrigger>
             <TabsTrigger value="bid-requests">Bid Requests</TabsTrigger>
+            <TabsTrigger value="refunds">Refunds</TabsTrigger>
             <TabsTrigger value="analytics">Analytics</TabsTrigger>
           </TabsList>
 
           {/* Mobile Navigation - Fixed bottom bar, shown only on mobile */}
           <div className="sm:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 z-50">
-            <div className="grid grid-cols-4 h-16">
+            <div className="grid grid-cols-5 h-16">
               <button
                 onClick={() => setActiveTab("salespersons")}
                 className={`flex flex-col items-center justify-center gap-1 text-xs hover:bg-gray-100 dark:hover:bg-gray-800 ${
@@ -729,6 +735,15 @@ export default function AdminPortalEnhanced() {
               >
                 <Target className="h-5 w-5" />
                 <span>Bids</span>
+              </button>
+              <button
+                onClick={() => setActiveTab("refunds")}
+                className={`flex flex-col items-center justify-center gap-1 text-xs hover:bg-gray-100 dark:hover:bg-gray-800 ${
+                  activeTab === "refunds" ? "text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950" : ""
+                }`}
+              >
+                <RefreshCw className="h-5 w-5" />
+                <span>Refunds</span>
               </button>
               <button
                 onClick={() => setActiveTab("analytics")}
@@ -1337,6 +1352,24 @@ export default function AdminPortalEnhanced() {
                   </TableBody>
                   </Table>
                 </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Refunds Tab */}
+          <TabsContent value="refunds">
+            <Card style={antiYellowStyles}>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <RefreshCw className="h-5 w-5" />
+                  Refund Request Management
+                </CardTitle>
+                <CardDescription>
+                  Review and manage contractor refund requests
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <RefundManagement />
               </CardContent>
             </Card>
           </TabsContent>
