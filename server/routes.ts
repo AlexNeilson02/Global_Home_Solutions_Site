@@ -72,6 +72,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   const { commissionRouter } = await import("./commission-routes");
   apiRouter.use("/commissions", commissionRouter);
 
+  // Import and use Refund routes
+  const { refundRouter } = await import("./refund-routes");
+  apiRouter.use("/refunds", refundRouter);
+
   // WebSocket connections for real-time notifications
   const contractorConnections = new Map<number, WebSocket[]>();
 

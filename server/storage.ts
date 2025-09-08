@@ -10,7 +10,8 @@ import {
   CommissionRecord, InsertCommissionRecord,
   CommissionAdjustment, InsertCommissionAdjustment,
   CommissionPayment, InsertCommissionPayment,
-  EmailCommunication, InsertEmailCommunication
+  EmailCommunication, InsertEmailCommunication,
+  RefundRequest, InsertRefundRequest
 } from "@shared/schema";
 
 // Extend this interface with all required storage methods
@@ -144,6 +145,16 @@ export interface IStorage {
   getEmailCommunicationsByContractorId(contractorId: number, limit?: number): Promise<EmailCommunication[]>;
   getEmailCommunicationsByBidRequestId(bidRequestId: number): Promise<EmailCommunication[]>;
   updateEmailCommunication(id: number, email: Partial<EmailCommunication>): Promise<EmailCommunication | undefined>;
+  
+  // Refund request methods
+  createRefundRequest(refundRequest: InsertRefundRequest): Promise<RefundRequest>;
+  getRefundRequest(id: number): Promise<RefundRequest | undefined>;
+  getRefundRequestsByContractorId(contractorId: number): Promise<RefundRequest[]>;
+  getAllRefundRequests(): Promise<RefundRequest[]>;
+  getPendingRefundRequests(): Promise<RefundRequest[]>;
+  updateRefundRequestStatus(id: number, status: string, reviewedBy?: number, reviewNotes?: string): Promise<RefundRequest | undefined>;
+  updateRefundRequestProcessing(id: number, stripeRefundId: string, processedAt: Date): Promise<RefundRequest | undefined>;
+  updateRefundDeductionTracking(id: number, deductionApplied: boolean, deductionAmount?: number, salespersonDeduction?: number, companyDeduction?: number): Promise<RefundRequest | undefined>;
 }
 
 // In-memory implementation of the storage interface

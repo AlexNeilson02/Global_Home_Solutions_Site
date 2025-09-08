@@ -3,7 +3,7 @@ import { db } from "./db";
 import { 
   users, contractors, salespersons, projects, testimonials, serviceCategories, bidRequests, pageVisits,
   documents, projectMilestones, projectStatusUpdates, commissionRecords, commissionAdjustments, commissionPayments,
-  emailCommunications,
+  emailCommunications, refundRequests,
   type User, type InsertUser,
   type Contractor, type InsertContractor,
   type Salesperson, type InsertSalesperson,
@@ -18,7 +18,8 @@ import {
   type CommissionRecord, type InsertCommissionRecord,
   type CommissionAdjustment, type InsertCommissionAdjustment,
   type CommissionPayment, type InsertCommissionPayment,
-  type EmailCommunication, type InsertEmailCommunication
+  type EmailCommunication, type InsertEmailCommunication,
+  type RefundRequest, type InsertRefundRequest
 } from "@shared/schema";
 import { IStorage } from "./storage";
 import { QRCodeService } from "./qr-service";
@@ -1356,6 +1357,95 @@ export class DatabaseStorage implements IStorage {
       .where(eq(emailCommunications.id, id))
       .returning();
     return email;
+  }
+
+  // Refund request methods
+  async createRefundRequest(refundRequestData: InsertRefundRequest): Promise<RefundRequest> {
+    const [refundRequest] = await db.insert(refundRequests).values(refundRequestData).returning();
+    return refundRequest;
+  }
+
+  async getRefundRequest(id: number): Promise<RefundRequest | undefined> {
+    const [refundRequest] = await db.select().from(refundRequests).where(eq(refundRequests.id, id));
+    return refundRequest;
+  }
+
+  async getRefundRequestsByContractorId(contractorId: number): Promise<RefundRequest[]> {
+    return db
+      .select()
+      .from(refundRequests)
+      .where(eq(refundRequests.contractorId, contractorId))
+      .orderBy(desc(refundRequests.createdAt));
+  }
+
+  async getAllRefundRequests(): Promise<RefundRequest[]> {
+    return db
+      .select()
+      .from(refundRequests)
+      .orderBy(desc(refundRequests.createdAt));
+  }
+
+  async getPendingRefundRequests(): Promise<RefundRequest[]> {
+    return db
+      .select()
+      .from(refundRequests)
+      .where(eq(refundRequests.status, 'pending'))
+      .orderBy(desc(refundRequests.createdAt));
+  }
+
+  async updateRefundRequestStatus(id: number, status: string, reviewedBy?: number, reviewNotes?: string): Promise<RefundRequest | undefined> {
+    const updateData: any = { 
+      status,
+      updatedAt: new Date()
+    };
+    
+    if (reviewedBy) {
+      updateData.reviewedBy = reviewedBy;
+      updateData.reviewedAt = new Date();
+    }
+    
+    if (reviewNotes) {
+      updateData.reviewNotes = reviewNotes;
+    }
+
+    const [refundRequest] = await db
+      .update(refundRequests)
+      .set(updateData)
+      .where(eq(refundRequests.id, id))
+      .returning();
+    return refundRequest;
+  }
+
+  async updateRefundRequestProcessing(id: number, stripeRefundId: string, processedAt: Date): Promise<RefundRequest | undefined> {
+    const [refundRequest] = await db
+      .update(refundRequests)
+      .set({ 
+        stripeRefundId,
+        processedAt,
+        status: 'processed',
+        updatedAt: new Date()
+      })
+      .where(eq(refundRequests.id, id))
+      .returning();
+    return refundRequest;
+  }
+
+  async updateRefundDeductionTracking(id: number, deductionApplied: boolean, deductionAmount?: number, salespersonDeduction?: number, companyDeduction?: number): Promise<RefundRequest | undefined> {
+    const updateData: any = { 
+      deductionApplied,
+      updatedAt: new Date()
+    };
+    
+    if (deductionAmount !== undefined) updateData.deductionAmount = deductionAmount;
+    if (salespersonDeduction !== undefined) updateData.salespersonDeduction = salespersonDeduction;
+    if (companyDeduction !== undefined) updateData.companyDeduction = companyDeduction;
+
+    const [refundRequest] = await db
+      .update(refundRequests)
+      .set(updateData)
+      .where(eq(refundRequests.id, id))
+      .returning();
+    return refundRequest;
   }
 }
 
