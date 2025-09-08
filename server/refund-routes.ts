@@ -27,6 +27,15 @@ const createRefundRequestSchema = insertRefundRequestSchema.extend({
     const parsed = parseInt(val.toString());
     return isNaN(parsed) ? null : parsed;
   }),
+  refundDate: z.union([z.string(), z.date(), z.null()]).optional().transform(val => {
+    if (!val || val === '') return null;
+    if (val instanceof Date) return val;
+    if (typeof val === 'string') {
+      const parsed = new Date(val);
+      return isNaN(parsed.getTime()) ? null : parsed;
+    }
+    return null;
+  }),
 });
 
 const reviewRefundSchema = z.object({

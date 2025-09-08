@@ -267,7 +267,7 @@ export function RefundRequestForm({ contractorId }: RefundRequestFormProps) {
                     <>
                       {((bidRequestsData as any)?.bidRequests || []).map((bidRequest: any) => (
                         <option key={bidRequest.id} value={bidRequest.id}>
-                          {bidRequest.projectType} - {new Date(bidRequest.requestedAt).toLocaleDateString()}
+                          {bidRequest.servicesRequested?.[0] || 'Service Request'} - {bidRequest.fullName} - {new Date(bidRequest.createdAt).toLocaleDateString()}
                         </option>
                       ))}
                       <option value="not_listed">Project not listed here</option>
