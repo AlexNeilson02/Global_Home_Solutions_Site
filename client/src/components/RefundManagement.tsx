@@ -419,34 +419,25 @@ export function RefundManagement() {
 
       {/* Review Modal - Custom Implementation */}
       {reviewModalOpen && (
-        <div 
+        <div
           style={{
             position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            backgroundColor: 'rgba(0, 0, 0, 0.5)',
-            zIndex: 999999,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center'
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            backgroundColor: 'white',
+            borderRadius: '8px',
+            padding: '24px',
+            width: '90vw',
+            maxWidth: '600px',
+            maxHeight: '90vh',
+            overflow: 'auto',
+            border: '3px solid #3b82f6',
+            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+            zIndex: 999999
           }}
+          onClick={(e) => e.stopPropagation()}
         >
-          <div
-            style={{
-              backgroundColor: 'white',
-              borderRadius: '8px',
-              padding: '24px',
-              width: '90vw',
-              maxWidth: '600px',
-              maxHeight: '90vh',
-              overflow: 'auto',
-              border: '2px solid #e5e7eb',
-              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)'
-            }}
-            onClick={(e) => e.stopPropagation()}
-          >
             {/* Header */}
             <div className="flex justify-between items-center mb-4">
               <div>
@@ -571,7 +562,6 @@ export function RefundManagement() {
               </div>
             </form>
           )}
-          </div>
         </div>
       )}
     </div>
