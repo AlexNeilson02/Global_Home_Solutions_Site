@@ -29,7 +29,8 @@ import {
   BarChart3,
   CreditCard,
   Loader2,
-  Settings
+  Settings,
+  RefreshCw
 } from "lucide-react";
 import { Elements, useStripe, useElements, PaymentElement } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
@@ -39,6 +40,7 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pi
 import ProjectTimeline from "@/components/ProjectTimeline";
 import AnalyticsDashboard from "@/components/AnalyticsDashboard";
 import GmailIntegration from "@/components/GmailIntegration";
+import { RefundRequestForm } from "@/components/RefundRequestForm";
 
 // Initialize Stripe
 const stripePublicKey = import.meta.env.VITE_STRIPE_PUBLIC_KEY;
@@ -2178,6 +2180,22 @@ const ContractorPortalEnhanced: React.FC = () => {
                       Canceling will disable automated commission processing and reduce profile visibility.
                     </p>
                   </div>
+                </CardContent>
+              </Card>
+
+              {/* Refund Request Section */}
+              <Card style={antiYellowStyles}>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <RefreshCw className="h-5 w-5" />
+                    Request Refund
+                  </CardTitle>
+                  <CardDescription>
+                    Submit a formal refund request for review by our team
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <RefundRequestForm contractorId={contractor?.id} />
                 </CardContent>
               </Card>
             </TabsContent>
