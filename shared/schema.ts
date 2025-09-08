@@ -341,6 +341,10 @@ export const refundRequests = pgTable("refund_requests", {
   amount: real("amount").notNull(), // Amount to refund in dollars
   reason: text("reason").notNull(), // Reason for refund request
   description: text("description"), // Additional details
+  refundDate: timestamp("refund_date"), // Date when the refund should occur
+  
+  // Bid request association
+  bidRequestId: integer("bid_request_id").references(() => bidRequests.id), // Link to specific bid request
   
   // Original transaction references
   stripePaymentIntentId: text("stripe_payment_intent_id"), // Original Stripe payment
