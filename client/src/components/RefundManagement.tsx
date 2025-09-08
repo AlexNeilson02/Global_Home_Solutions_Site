@@ -400,8 +400,10 @@ export function RefundManagement() {
                           size="sm"
                           variant="outline"
                           onClick={() => {
+                            console.log('Review button clicked for request:', request.id);
                             setSelectedRequest(request);
                             setReviewModalOpen(true);
+                            console.log('Modal should be open now');
                           }}
                         >
                           <Eye className="h-4 w-4 mr-1" />
@@ -418,9 +420,11 @@ export function RefundManagement() {
       </div>
 
       {/* Review Modal */}
+      {console.log('ReviewModal render - reviewModalOpen:', reviewModalOpen, 'selectedRequest:', selectedRequest?.id)}
       <Dialog 
         open={reviewModalOpen} 
         onOpenChange={(open) => {
+          console.log('Dialog onOpenChange called with:', open);
           if (!open) {
             setReviewModalOpen(false);
             setSelectedRequest(null);
