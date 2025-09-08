@@ -26,6 +26,8 @@ interface RefundRequest {
   amount: number;
   reason: string;
   description?: string;
+  bidRequestId?: number;
+  refundDate?: string;
   status: 'pending' | 'approved' | 'rejected' | 'processed' | 'failed';
   requestedAt: string;
   requestedBy: number;
@@ -45,6 +47,11 @@ interface RefundRequest {
     fullName: string;
     email: string;
   };
+  bidRequest?: {
+    id: number;
+    projectType: string;
+    requestedAt: string;
+  };
 }
 
 export function RefundManagement() {
@@ -52,7 +59,8 @@ export function RefundManagement() {
   const [reviewModalOpen, setReviewModalOpen] = useState(false);
   const [reviewData, setReviewData] = useState({
     status: 'approved' as 'approved' | 'rejected',
-    reviewNotes: ''
+    reviewNotes: '',
+    bidRequestId: ''
   });
 
   const { toast } = useToast();
@@ -76,12 +84,23 @@ export function RefundManagement() {
     },
   });
 
+  // Fetch all bid requests for selection dropdown
+  const { data: bidRequestsData, isLoading: loadingBidRequests } = useQuery({
+    queryKey: ['all-bid-requests'],
+    queryFn: async () => {
+      const response = await apiRequest('GET', '/api/bid-requests');
+      return response.json();
+    },
+    enabled: reviewModalOpen, // Only fetch when modal is open
+  });
+
   // Review refund request mutation
   const reviewRefundMutation = useMutation({
-    mutationFn: (data: { id: number; status: string; reviewNotes: string }) => 
+    mutationFn: (data: { id: number; status: string; reviewNotes: string; bidRequestId?: string }) => 
       apiRequest('PATCH', `/api/refunds/${data.id}/review`, {
         status: data.status,
-        reviewNotes: data.reviewNotes
+        reviewNotes: data.reviewNotes,
+        bidRequestId: data.bidRequestId || null
       }),
     onSuccess: () => {
       toast({
@@ -90,7 +109,7 @@ export function RefundManagement() {
       });
       setReviewModalOpen(false);
       setSelectedRequest(null);
-      setReviewData({ status: 'approved', reviewNotes: '' });
+      setReviewData({ status: 'approved', reviewNotes: '', bidRequestId: '' });
       queryClient.invalidateQueries({ queryKey: ['refund-requests'] });
     },
     onError: (error: any) => {
@@ -131,7 +150,8 @@ export function RefundManagement() {
     reviewRefundMutation.mutate({
       id: selectedRequest.id,
       status: reviewData.status,
-      reviewNotes: reviewData.reviewNotes
+      reviewNotes: reviewData.reviewNotes,
+      bidRequestId: reviewData.bidRequestId
     });
   };
 
@@ -450,7 +470,7 @@ export function RefundManagement() {
                 onClick={() => {
                   setReviewModalOpen(false);
                   setSelectedRequest(null);
-                  setReviewData({ status: 'approved', reviewNotes: '' });
+                  setReviewData({ status: 'approved', reviewNotes: '', bidRequestId: '' });
                 }}
                 className="text-gray-400 hover:text-gray-600 text-xl"
               >
@@ -487,6 +507,56 @@ export function RefundManagement() {
                     <p className="text-sm text-gray-600">{selectedRequest.description}</p>
                   </div>
                 )}
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label className="text-sm font-medium text-gray-700">Associated Project</Label>
+                    {selectedRequest.bidRequest ? (
+                      <p className="text-sm">
+                        {selectedRequest.bidRequest.projectType} - {new Date(selectedRequest.bidRequest.requestedAt).toLocaleDateString()}
+                      </p>
+                    ) : selectedRequest.bidRequestId === -1 ? (
+                      <p className="text-sm italic text-gray-500">Project not listed</p>
+                    ) : (
+                      <p className="text-sm italic text-gray-500">No project selected</p>
+                    )}
+                  </div>
+                  <div>
+                    <Label className="text-sm font-medium text-gray-700">Refund Date</Label>
+                    <p className="text-sm">
+                      {selectedRequest.refundDate ? new Date(selectedRequest.refundDate).toLocaleDateString() : 'Not specified'}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Bid Request Override (Admin Only) */}
+              <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                <div className="space-y-3">
+                  <Label className="text-sm font-medium text-blue-800">Admin Override: Associate with Project</Label>
+                  <p className="text-sm text-blue-700">
+                    Select a project to link this refund to for proper commission deductions
+                  </p>
+                  <select
+                    value={reviewData.bidRequestId}
+                    onChange={(e) => setReviewData({ ...reviewData, bidRequestId: e.target.value })}
+                    className="w-full px-3 py-2 border border-blue-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+                  >
+                    <option value="">Select a project (optional)</option>
+                    {loadingBidRequests ? (
+                      <option value="">Loading projects...</option>
+                    ) : (
+                      <>
+                        {(bidRequestsData?.bidRequests || []).map((bidRequest: any) => (
+                          <option key={bidRequest.id} value={bidRequest.id}>
+                            {bidRequest.projectType} - {bidRequest.contractor?.companyName || 'Unknown Contractor'} - {new Date(bidRequest.requestedAt).toLocaleDateString()}
+                          </option>
+                        ))}
+                        <option value="not_listed">Mark as "Project not listed"</option>
+                      </>
+                    )}
+                  </select>
+                </div>
               </div>
 
               {/* Review Decision */}
