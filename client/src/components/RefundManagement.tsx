@@ -26,12 +26,15 @@ interface RefundRequest {
   amount: number;
   reason: string;
   description?: string;
-  status: 'pending' | 'approved' | 'rejected' | 'processed';
+  status: 'pending' | 'approved' | 'rejected' | 'processed' | 'failed';
   requestedAt: string;
   requestedBy: number;
   reviewedBy?: number;
   reviewedAt?: string;
   reviewNotes?: string;
+  processedAt?: string;
+  stripePaymentIntentId?: string;
+  stripeRefundId?: string;
   contractor?: {
     id: number;
     companyName: string;
@@ -99,6 +102,28 @@ export function RefundManagement() {
     },
   });
 
+  // Process refund mutation (actually execute the Stripe refund)
+  const processRefundMutation = useMutation({
+    mutationFn: async (id: number) => {
+      const response = await apiRequest('POST', `/api/refunds/${id}/process`);
+      return response.json();
+    },
+    onSuccess: (data) => {
+      toast({
+        title: "Success",
+        description: `Refund processed successfully through Stripe. Refund ID: ${data.stripeRefund?.id}`,
+      });
+      queryClient.invalidateQueries({ queryKey: ['refund-requests'] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to process refund",
+        variant: "destructive",
+      });
+    }
+  });
+
   const handleReviewSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedRequest) return;
@@ -120,6 +145,8 @@ export function RefundManagement() {
         return <AlertCircle className="h-4 w-4 text-red-600" />;
       case 'processed':
         return <CheckCircle className="h-4 w-4 text-blue-600" />;
+      case 'failed':
+        return <AlertCircle className="h-4 w-4 text-red-600" />;
       default:
         return <Clock className="h-4 w-4 text-gray-600" />;
     }
@@ -135,6 +162,8 @@ export function RefundManagement() {
         return <Badge variant="secondary" className="bg-red-100 text-red-700">Rejected</Badge>;
       case 'processed':
         return <Badge variant="secondary" className="bg-blue-100 text-blue-700">Processed</Badge>;
+      case 'failed':
+        return <Badge variant="secondary" className="bg-red-100 text-red-700">Failed</Badge>;
       default:
         return <Badge variant="secondary">{status}</Badge>;
     }
@@ -299,6 +328,7 @@ export function RefundManagement() {
                 <TableHead>Status</TableHead>
                 <TableHead>Requested</TableHead>
                 <TableHead>Reviewed</TableHead>
+                <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -345,6 +375,38 @@ export function RefundManagement() {
                         <p>{new Date(request.reviewedAt).toLocaleDateString()}</p>
                       ) : (
                         <span className="text-gray-400">-</span>
+                      )}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex gap-2">
+                      {request.status === 'approved' && !request.processedAt && (
+                        <Button
+                          size="sm"
+                          variant="default"
+                          onClick={() => processRefundMutation.mutate(request.id)}
+                          disabled={processRefundMutation.isPending}
+                        >
+                          {processRefundMutation.isPending ? (
+                            <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                          ) : (
+                            <DollarSign className="h-4 w-4 mr-1" />
+                          )}
+                          Process Refund
+                        </Button>
+                      )}
+                      {request.status === 'pending' && (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => {
+                            setSelectedRequest(request);
+                            setReviewModalOpen(true);
+                          }}
+                        >
+                          <Eye className="h-4 w-4 mr-1" />
+                          Review
+                        </Button>
                       )}
                     </div>
                   </TableCell>

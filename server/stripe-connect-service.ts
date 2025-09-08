@@ -210,4 +210,42 @@ export class StripeConnectService {
       throw error;
     }
   }
+
+  /**
+   * Process a refund for a payment intent
+   * @param paymentIntentId The Stripe payment intent ID to refund
+   * @param amount Amount to refund in cents (optional - defaults to full amount)
+   * @param reason Reason for the refund
+   * @returns The refund object from Stripe
+   */
+  async processRefund(
+    paymentIntentId: string,
+    amount?: number,
+    reason: string = 'requested_by_customer'
+  ): Promise<Stripe.Refund> {
+    try {
+      console.log(`Processing refund for payment intent: ${paymentIntentId}, amount: $${amount ? amount/100 : 'full'}`);
+
+      const refundData: Stripe.RefundCreateParams = {
+        payment_intent: paymentIntentId,
+        reason: reason as Stripe.RefundCreateParams.Reason,
+        metadata: {
+          refund_source: 'refund_request_system',
+          processed_at: new Date().toISOString(),
+        },
+      };
+
+      if (amount) {
+        refundData.amount = amount;
+      }
+
+      const refund = await this.stripe.refunds.create(refundData);
+
+      console.log(`✅ Refund processed successfully: ${refund.id} for $${refund.amount/100}`);
+      return refund;
+    } catch (error) {
+      console.error('Error processing refund:', error);
+      throw error;
+    }
+  }
 }

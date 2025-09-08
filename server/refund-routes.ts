@@ -3,8 +3,15 @@ import { storage } from "./database-storage";
 import { isAuthenticated, requireRole } from "./auth";
 import { z } from "zod";
 import { insertRefundRequestSchema } from "@shared/schema";
+import { StripeConnectService } from "./stripe-connect-service";
 
 export const refundRouter = Router();
+
+// Initialize Stripe Connect service if configured
+let stripeConnectService: StripeConnectService | null = null;
+if (process.env.STRIPE_SECRET_KEY) {
+  stripeConnectService = new StripeConnectService(process.env.STRIPE_SECRET_KEY);
+}
 
 // Validation schemas
 const createRefundRequestSchema = insertRefundRequestSchema.extend({
@@ -243,5 +250,78 @@ refundRouter.get('/:id', isAuthenticated, async (req: Request, res: Response) =>
   } catch (error) {
     console.error('Error fetching refund request:', error);
     res.status(500).json({ error: 'Failed to fetch refund request' });
+  }
+});
+
+// Process a refund (actually execute the Stripe refund) - admin only
+refundRouter.post('/:id/process', isAuthenticated, requireRole(['admin']), async (req: Request, res: Response) => {
+  try {
+    if (!stripeConnectService) {
+      return res.status(500).json({ error: 'Stripe Connect not configured' });
+    }
+
+    const refundRequestId = parseInt(req.params.id);
+    const user = req.user as any;
+
+    const refundRequest = await storage.getRefundRequest(refundRequestId);
+    if (!refundRequest) {
+      return res.status(404).json({ message: "Refund request not found" });
+    }
+
+    if (refundRequest.status !== 'approved') {
+      return res.status(400).json({ message: "Can only process approved refund requests" });
+    }
+
+    if (refundRequest.processedAt) {
+      return res.status(400).json({ message: "Refund has already been processed" });
+    }
+
+    if (!refundRequest.stripePaymentIntentId) {
+      return res.status(400).json({ message: "No Stripe payment intent ID found for this refund request" });
+    }
+
+    try {
+      // Process the refund through Stripe
+      const refund = await stripeConnectService.processRefund(
+        refundRequest.stripePaymentIntentId,
+        Math.round(refundRequest.amount * 100), // Convert to cents
+        'requested_by_customer'
+      );
+
+      // Update the refund request with Stripe refund details
+      const updatedRequest = await storage.updateRefundRequestProcessing(
+        refundRequestId,
+        refund.id,
+        new Date()
+      );
+
+      res.json({
+        message: 'Refund processed successfully',
+        refundRequest: updatedRequest,
+        stripeRefund: {
+          id: refund.id,
+          amount: refund.amount / 100,
+          status: refund.status
+        }
+      });
+    } catch (stripeError: any) {
+      console.error('Stripe refund processing failed:', stripeError);
+      
+      // Update the refund request to reflect the failure
+      await storage.updateRefundRequestStatus(
+        refundRequestId,
+        'failed',
+        user.id,
+        `Stripe refund failed: ${stripeError.message}`
+      );
+
+      return res.status(400).json({
+        error: 'Failed to process refund through Stripe',
+        details: stripeError.message
+      });
+    }
+  } catch (error) {
+    console.error('Error processing refund:', error);
+    res.status(500).json({ error: 'Failed to process refund' });
   }
 });
