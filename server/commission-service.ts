@@ -435,4 +435,203 @@ export class CommissionService {
       topEarners
     };
   }
+
+  /**
+   * Apply approved refund deductions to commission amounts
+   */
+  static async applyRefundDeductions(
+    salespersonId: number | null,
+    salesmanAmount: number,
+    corpAmount: number
+  ): Promise<{
+    adjustedSalesmanAmount: number;
+    adjustedCorpAmount: number;
+    deductionsApplied: { refundRequestId: number; salespersonDeduction: number; companyDeduction: number }[];
+  }> {
+    try {
+      // Get all approved refunds that haven't been fully deducted yet
+      const approvedRefunds = await storage.getPendingRefundDeductions();
+      
+      let adjustedSalesmanAmount = salesmanAmount;
+      let adjustedCorpAmount = corpAmount;
+      const deductionsApplied = [];
+
+      // Apply deductions from oldest refunds first
+      for (const refund of approvedRefunds) {
+        if (adjustedSalesmanAmount <= 0 && adjustedCorpAmount <= 0) {
+          break; // No more commission to deduct from
+        }
+
+        // Calculate remaining deduction needed for this refund
+        const currentlyDeducted = (refund.salespersonDeduction || 0) + (refund.companyDeduction || 0);
+        const remainingRefundAmount = refund.amount - currentlyDeducted;
+        if (remainingRefundAmount <= 0) {
+          continue; // This refund has been fully deducted
+        }
+
+        // Split the deduction 50/50 between salesperson and company
+        const refundSalespersonPortion = remainingRefundAmount * 0.5;
+        const refundCompanyPortion = remainingRefundAmount * 0.5;
+
+        // Apply salesperson deduction if there's a salesperson and remaining commission
+        let actualSalespersonDeduction = 0;
+        if (salespersonId && adjustedSalesmanAmount > 0) {
+          actualSalespersonDeduction = Math.min(refundSalespersonPortion, adjustedSalesmanAmount);
+          adjustedSalesmanAmount -= actualSalespersonDeduction;
+        }
+
+        // Apply company deduction if there's remaining commission
+        let actualCompanyDeduction = 0;
+        if (adjustedCorpAmount > 0) {
+          actualCompanyDeduction = Math.min(refundCompanyPortion, adjustedCorpAmount);
+          adjustedCorpAmount -= actualCompanyDeduction;
+        }
+
+        // Record the deduction if any amount was actually deducted
+        const totalDeducted = actualSalespersonDeduction + actualCompanyDeduction;
+        if (totalDeducted > 0) {
+          deductionsApplied.push({
+            refundRequestId: refund.id,
+            salespersonDeduction: actualSalespersonDeduction,
+            companyDeduction: actualCompanyDeduction
+          });
+
+          // Calculate new total deductions
+          const previousTotalDeducted = (refund.salespersonDeduction || 0) + (refund.companyDeduction || 0);
+          const newTotalDeducted = previousTotalDeducted + totalDeducted;
+          
+          // Update the refund request with the new deduction amounts
+          await storage.updateRefundDeductionTracking(
+            refund.id,
+            newTotalDeducted >= refund.amount, // Fully deducted?
+            totalDeducted,
+            (refund.salespersonDeduction || 0) + actualSalespersonDeduction,
+            (refund.companyDeduction || 0) + actualCompanyDeduction
+          );
+
+          console.log(`✅ Applied refund deduction: $${totalDeducted} from refund request ${refund.id}`);
+          console.log(`   → Salesperson deduction: $${actualSalespersonDeduction}`);
+          console.log(`   → Company deduction: $${actualCompanyDeduction}`);
+        }
+      }
+
+      return {
+        adjustedSalesmanAmount: Math.max(0, adjustedSalesmanAmount),
+        adjustedCorpAmount: Math.max(0, adjustedCorpAmount),
+        deductionsApplied
+      };
+
+    } catch (error) {
+      console.error('Error applying refund deductions:', error);
+      // Return original amounts if there's an error
+      return {
+        adjustedSalesmanAmount: salesmanAmount,
+        adjustedCorpAmount: corpAmount,
+        deductionsApplied: []
+      };
+    }
+  }
+
+  /**
+   * Enhanced commission payment processing with refund deductions
+   */
+  static async processCommissionPaymentWithDeductions(commissionRecordId: number): Promise<void> {
+    try {
+      const commissionRecord = await storage.getCommissionRecord(commissionRecordId);
+      if (!commissionRecord) return;
+
+      // Apply refund deductions to the commission amounts
+      const deductionResult = await this.applyRefundDeductions(
+        commissionRecord.salespersonId,
+        commissionRecord.salesmanAmount,
+        commissionRecord.corpAmount
+      );
+
+      // Update commission record with adjusted amounts
+      const adjustedCommission = {
+        ...commissionRecord,
+        salesmanAmount: deductionResult.adjustedSalesmanAmount,
+        corpAmount: deductionResult.adjustedCorpAmount
+      };
+
+      // Mark commission as paid with adjusted amounts
+      await storage.updateCommissionRecordPayment(
+        commissionRecordId,
+        'paid',
+        new Date()
+      );
+
+      // Create payment records for each recipient with adjusted amounts
+      const recipients = [];
+
+      // Add salesperson payment only if there's a salesperson and adjusted amount > 0
+      if (adjustedCommission.salespersonId && adjustedCommission.salesmanAmount > 0) {
+        recipients.push({
+          recipientId: adjustedCommission.salespersonId,
+          recipientType: 'salesperson',
+          amount: adjustedCommission.salesmanAmount,
+          originalAmount: commissionRecord.salesmanAmount,
+          deducted: commissionRecord.salesmanAmount - adjustedCommission.salesmanAmount
+        });
+      }
+
+      // Add override manager if exists (no deductions applied to override)
+      if (adjustedCommission.overrideManagerId && adjustedCommission.overrideAmount > 0) {
+        recipients.push({
+          recipientId: adjustedCommission.overrideManagerId,
+          recipientType: 'override',
+          amount: adjustedCommission.overrideAmount,
+          originalAmount: adjustedCommission.overrideAmount,
+          deducted: 0
+        });
+      }
+
+      // Add corp payment (admin gets corp commission) with deductions
+      const adminUsers = await storage.getUsersByRole('admin');
+      if (adminUsers.length > 0 && adjustedCommission.corpAmount > 0) {
+        recipients.push({
+          recipientId: adminUsers[0].id,
+          recipientType: 'corp',
+          amount: adjustedCommission.corpAmount,
+          originalAmount: commissionRecord.corpAmount,
+          deducted: commissionRecord.corpAmount - adjustedCommission.corpAmount
+        });
+      }
+
+      // Create payment records with deduction notes
+      for (const recipient of recipients) {
+        const notes = recipient.deducted > 0 
+          ? `Original: $${recipient.originalAmount.toFixed(2)}, Refund deductions: $${recipient.deducted.toFixed(2)}, Net: $${recipient.amount.toFixed(2)}`
+          : undefined;
+
+        await storage.createCommissionPayment({
+          recipientId: recipient.recipientId,
+          recipientType: recipient.recipientType,
+          totalAmount: recipient.amount,
+          commissionRecordIds: [commissionRecordId],
+          paymentMethod: 'system',
+          status: 'completed',
+          scheduledDate: new Date(),
+          notes: notes
+        });
+      }
+
+      // Log deduction summary
+      if (deductionResult.deductionsApplied.length > 0) {
+        console.log(`💰 Commission payment processed with refund deductions for record ${commissionRecordId}`);
+        console.log(`   → Original salesperson amount: $${commissionRecord.salesmanAmount}`);
+        console.log(`   → Adjusted salesperson amount: $${adjustedCommission.salesmanAmount}`);
+        console.log(`   → Original company amount: $${commissionRecord.corpAmount}`);
+        console.log(`   → Adjusted company amount: $${adjustedCommission.corpAmount}`);
+        console.log(`   → Total deductions applied: ${deductionResult.deductionsApplied.length} refund(s)`);
+      } else {
+        console.log(`Commission payment processed without deductions for record ${commissionRecordId}`);
+      }
+
+    } catch (error) {
+      console.error('Error processing commission payment with deductions:', error);
+      // Fallback to regular payment processing
+      await this.processCommissionPayment(commissionRecordId);
+    }
+  }
 }

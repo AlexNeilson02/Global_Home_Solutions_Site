@@ -1,4 +1,4 @@
-import { eq, and, desc, sql, asc, count, avg, max, lt, gt, between, ne, getTableColumns } from "drizzle-orm";
+import { eq, and, or, desc, sql, asc, count, avg, max, lt, gt, between, ne, getTableColumns, isNull } from "drizzle-orm";
 import { db } from "./db";
 import { 
   users, contractors, salespersons, projects, testimonials, serviceCategories, bidRequests, pageVisits,
@@ -1391,6 +1391,20 @@ export class DatabaseStorage implements IStorage {
       .from(refundRequests)
       .where(eq(refundRequests.status, 'pending'))
       .orderBy(desc(refundRequests.createdAt));
+  }
+
+  async getPendingRefundDeductions(): Promise<RefundRequest[]> {
+    return db
+      .select()
+      .from(refundRequests)
+      .where(and(
+        eq(refundRequests.status, 'approved'),
+        or(
+          isNull(refundRequests.deductionApplied),
+          eq(refundRequests.deductionApplied, false)
+        )
+      ))
+      .orderBy(asc(refundRequests.createdAt)); // Oldest first for fair deduction order
   }
 
   async updateRefundRequestStatus(id: number, status: string, reviewedBy?: number, reviewNotes?: string): Promise<RefundRequest | undefined> {

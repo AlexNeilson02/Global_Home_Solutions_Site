@@ -152,6 +152,7 @@ export interface IStorage {
   getRefundRequestsByContractorId(contractorId: number): Promise<RefundRequest[]>;
   getAllRefundRequests(): Promise<RefundRequest[]>;
   getPendingRefundRequests(): Promise<RefundRequest[]>;
+  getPendingRefundDeductions(): Promise<RefundRequest[]>;
   updateRefundRequestStatus(id: number, status: string, reviewedBy?: number, reviewNotes?: string): Promise<RefundRequest | undefined>;
   updateRefundRequestProcessing(id: number, stripeRefundId: string, processedAt: Date): Promise<RefundRequest | undefined>;
   updateRefundDeductionTracking(id: number, deductionApplied: boolean, deductionAmount?: number, salespersonDeduction?: number, companyDeduction?: number): Promise<RefundRequest | undefined>;
@@ -659,6 +660,17 @@ export class MemStorage implements IStorage {
       rating: 5
     });
   }
+
+  // Refund request stub methods (not implemented in MemStorage)
+  async createRefundRequest(): Promise<any> { throw new Error("Not implemented in MemStorage"); }
+  async getRefundRequest(): Promise<any> { throw new Error("Not implemented in MemStorage"); }
+  async getRefundRequestsByContractorId(): Promise<any[]> { return []; }
+  async getAllRefundRequests(): Promise<any[]> { return []; }
+  async getPendingRefundRequests(): Promise<any[]> { return []; }
+  async getPendingRefundDeductions(): Promise<any[]> { return []; }
+  async updateRefundRequestStatus(): Promise<any> { throw new Error("Not implemented in MemStorage"); }
+  async updateRefundRequestProcessing(): Promise<any> { throw new Error("Not implemented in MemStorage"); }
+  async updateRefundDeductionTracking(): Promise<any> { throw new Error("Not implemented in MemStorage"); }
 }
 
 import { DatabaseStorage } from "./database-storage";
