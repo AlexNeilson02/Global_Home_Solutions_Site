@@ -400,10 +400,8 @@ export function RefundManagement() {
                           size="sm"
                           variant="outline"
                           onClick={() => {
-                            console.log('Review button clicked for request:', request.id);
                             setSelectedRequest(request);
                             setReviewModalOpen(true);
-                            console.log('Modal should be open now');
                           }}
                         >
                           <Eye className="h-4 w-4 mr-1" />
@@ -420,11 +418,9 @@ export function RefundManagement() {
       </div>
 
       {/* Review Modal */}
-      {console.log('ReviewModal render - reviewModalOpen:', reviewModalOpen, 'selectedRequest:', selectedRequest?.id)}
       <Dialog 
         open={reviewModalOpen} 
         onOpenChange={(open) => {
-          console.log('Dialog onOpenChange called with:', open);
           if (!open) {
             setReviewModalOpen(false);
             setSelectedRequest(null);
@@ -433,7 +429,13 @@ export function RefundManagement() {
         }}
       >
         <DialogContent 
-          className="sm:max-w-[600px]"
+          className="sm:max-w-[600px] z-[9999]"
+          style={{
+            zIndex: 9999,
+            position: 'fixed',
+            backgroundColor: 'white',
+            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)'
+          }}
           onInteractOutside={(e) => {
             // Always prevent closing on outside clicks
             e.preventDefault();
