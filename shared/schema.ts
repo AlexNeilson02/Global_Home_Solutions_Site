@@ -331,6 +331,46 @@ export const emailCommunications = pgTable("email_communications", {
   gmailLabels: text("gmail_labels").array(),
 });
 
+// Refund requests table for contractor refund management
+export const refundRequests = pgTable("refund_requests", {
+  id: serial("id").primaryKey(),
+  contractorId: integer("contractor_id").notNull().references(() => contractors.id),
+  requestedBy: integer("requested_by").notNull().references(() => users.id),
+  
+  // Refund details
+  amount: real("amount").notNull(), // Amount to refund in dollars
+  reason: text("reason").notNull(), // Reason for refund request
+  description: text("description"), // Additional details
+  
+  // Original transaction references
+  stripePaymentIntentId: text("stripe_payment_intent_id"), // Original Stripe payment
+  stripeSubscriptionId: text("stripe_subscription_id"), // If subscription related
+  commissionRecordIds: integer("commission_record_ids").array(), // Related commission records
+  
+  // Request status and workflow
+  status: text("status").notNull().default("pending"), // pending, approved, rejected, processed
+  requestedAt: timestamp("requested_at").defaultNow(),
+  
+  // Admin approval workflow
+  reviewedBy: integer("reviewed_by").references(() => users.id), // Super admin who reviewed
+  reviewedAt: timestamp("reviewed_at"),
+  reviewNotes: text("review_notes"), // Admin notes on approval/rejection
+  
+  // Processing status
+  processedAt: timestamp("processed_at"),
+  stripeRefundId: text("stripe_refund_id"), // Stripe refund transaction ID when processed
+  
+  // Future revenue deduction tracking
+  deductionApplied: boolean("deduction_applied").default(false),
+  deductionAmount: real("deduction_amount"), // Amount to deduct from future revenue
+  salespersonDeduction: real("salesperson_deduction"), // Amount to deduct from salesperson
+  companyDeduction: real("company_deduction"), // Amount to deduct from company
+  
+  // Metadata
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 // Insert schemas
 export const insertServiceCategorySchema = createInsertSchema(serviceCategories).omit({
   id: true,
@@ -421,6 +461,15 @@ export const insertEmailCommunicationSchema = createInsertSchema(emailCommunicat
   id: true,
   receivedAt: true,
   createdAt: true,
+});
+
+export const insertRefundRequestSchema = createInsertSchema(refundRequests).omit({
+  id: true,
+  requestedAt: true,
+  reviewedAt: true,
+  processedAt: true,
+  createdAt: true,
+  updatedAt: true,
 });
 
 // Relations - these are required for Drizzle ORM
@@ -584,6 +633,21 @@ export const emailCommunicationsRelations = relations(emailCommunications, ({ on
   }),
 }));
 
+export const refundRequestsRelations = relations(refundRequests, ({ one }) => ({
+  contractor: one(contractors, {
+    fields: [refundRequests.contractorId],
+    references: [contractors.id],
+  }),
+  requestedByUser: one(users, {
+    fields: [refundRequests.requestedBy],
+    references: [users.id],
+  }),
+  reviewedByUser: one(users, {
+    fields: [refundRequests.reviewedBy],
+    references: [users.id],
+  }),
+}));
+
 // Export types
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
@@ -629,6 +693,9 @@ export type InsertCommissionPayment = z.infer<typeof insertCommissionPaymentSche
 
 export type EmailCommunication = typeof emailCommunications.$inferSelect;
 export type InsertEmailCommunication = z.infer<typeof insertEmailCommunicationSchema>;
+
+export type RefundRequest = typeof refundRequests.$inferSelect;
+export type InsertRefundRequest = z.infer<typeof insertRefundRequestSchema>;
 
 // Extended schemas for login
 export const loginSchema = z.object({
