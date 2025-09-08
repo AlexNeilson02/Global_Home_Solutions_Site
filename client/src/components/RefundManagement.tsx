@@ -429,12 +429,23 @@ export function RefundManagement() {
         }}
       >
         <DialogContent 
-          className="sm:max-w-[600px] z-[9999]"
+          className="sm:max-w-[600px]"
           style={{
-            zIndex: 9999,
+            zIndex: '999999 !important',
             position: 'fixed',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
             backgroundColor: 'white',
-            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)'
+            border: '3px solid red',
+            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.8)',
+            display: 'block !important',
+            visibility: 'visible !important',
+            opacity: '1 !important',
+            width: '90vw',
+            maxWidth: '600px',
+            maxHeight: '90vh',
+            overflow: 'auto'
           }}
           onInteractOutside={(e) => {
             // Always prevent closing on outside clicks
