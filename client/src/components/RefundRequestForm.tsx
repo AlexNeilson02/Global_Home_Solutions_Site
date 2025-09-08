@@ -36,10 +36,7 @@ export function RefundRequestForm({ contractorId }: RefundRequestFormProps) {
   // Fetch bid requests for this contractor to populate dropdown
   const { data: bidRequestsData, isLoading: loadingBidRequests } = useQuery({
     queryKey: ['contractor-bid-requests', contractorId],
-    queryFn: async () => {
-      const response = await apiRequest('GET', `/api/bid-requests/contractor/${contractorId}`);
-      return response.json();
-    },
+    queryFn: () => apiRequest('GET', `/api/refunds/bid-requests/contractor/${contractorId}`),
     enabled: !!contractorId,
   });
 

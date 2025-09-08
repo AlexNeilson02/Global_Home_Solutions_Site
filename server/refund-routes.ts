@@ -21,6 +21,12 @@ if (process.env.STRIPE_SECRET_KEY) {
 const createRefundRequestSchema = insertRefundRequestSchema.extend({
   reason: z.string().min(1, "Reason is required"),
   amount: z.number().positive("Amount must be positive"),
+  bidRequestId: z.union([z.number(), z.string(), z.null()]).optional().transform(val => {
+    if (!val || val === '' || val === 'not_listed') return null;
+    if (typeof val === 'number') return val;
+    const parsed = parseInt(val.toString());
+    return isNaN(parsed) ? null : parsed;
+  }),
 });
 
 const reviewRefundSchema = z.object({
