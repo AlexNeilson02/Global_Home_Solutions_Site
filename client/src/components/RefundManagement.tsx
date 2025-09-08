@@ -417,52 +417,55 @@ export function RefundManagement() {
         </div>
       </div>
 
-      {/* Review Modal */}
-      <Dialog 
-        open={reviewModalOpen} 
-        onOpenChange={(open) => {
-          if (!open) {
-            setReviewModalOpen(false);
-            setSelectedRequest(null);
-            setReviewData({ status: 'approved', reviewNotes: '' });
-          }
-        }}
-      >
-        <DialogContent 
-          className="sm:max-w-[600px]"
+      {/* Review Modal - Custom Implementation */}
+      {reviewModalOpen && (
+        <div 
           style={{
-            zIndex: '999999 !important',
             position: 'fixed',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            backgroundColor: 'white',
-            border: '3px solid red',
-            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.8)',
-            display: 'block !important',
-            visibility: 'visible !important',
-            opacity: '1 !important',
-            width: '90vw',
-            maxWidth: '600px',
-            maxHeight: '90vh',
-            overflow: 'auto'
-          }}
-          onInteractOutside={(e) => {
-            // Always prevent closing on outside clicks
-            e.preventDefault();
-            e.stopPropagation();
-          }}
-          onEscapeKeyDown={(e) => {
-            // Always prevent escape key from closing
-            e.preventDefault();
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            zIndex: 999999,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
           }}
         >
-          <DialogHeader>
-            <DialogTitle>Review Refund Request</DialogTitle>
-            <DialogDescription>
-              Approve or reject the refund request from {selectedRequest?.contractor?.companyName}
-            </DialogDescription>
-          </DialogHeader>
+          <div
+            style={{
+              backgroundColor: 'white',
+              borderRadius: '8px',
+              padding: '24px',
+              width: '90vw',
+              maxWidth: '600px',
+              maxHeight: '90vh',
+              overflow: 'auto',
+              border: '2px solid #e5e7eb',
+              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div className="flex justify-between items-center mb-4">
+              <div>
+                <h2 className="text-lg font-semibold">Review Refund Request</h2>
+                <p className="text-sm text-gray-600">
+                  Approve or reject the refund request from {selectedRequest?.contractor?.companyName}
+                </p>
+              </div>
+              <button 
+                onClick={() => {
+                  setReviewModalOpen(false);
+                  setSelectedRequest(null);
+                  setReviewData({ status: 'approved', reviewNotes: '' });
+                }}
+                className="text-gray-400 hover:text-gray-600 text-xl"
+              >
+                ×
+              </button>
+            </div>
           
           {selectedRequest && (
             <form onSubmit={handleReviewSubmit} className="space-y-6">
@@ -568,8 +571,9 @@ export function RefundManagement() {
               </div>
             </form>
           )}
-        </DialogContent>
-      </Dialog>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
