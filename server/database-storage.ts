@@ -1461,6 +1461,25 @@ export class DatabaseStorage implements IStorage {
       .returning();
     return refundRequest;
   }
+
+  async updateRefundRequestBidAssociation(id: number, bidRequestId: number | null): Promise<RefundRequest | undefined> {
+    const [refundRequest] = await db
+      .update(refundRequests)
+      .set({ 
+        bidRequestId,
+        updatedAt: new Date()
+      })
+      .where(eq(refundRequests.id, id))
+      .returning();
+    return refundRequest;
+  }
+
+  async getAllBidRequests(): Promise<BidRequest[]> {
+    return db
+      .select()
+      .from(bidRequests)
+      .orderBy(desc(bidRequests.requestedAt));
+  }
 }
 
 export const storage = new DatabaseStorage();

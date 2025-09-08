@@ -26,6 +26,11 @@ const createRefundRequestSchema = insertRefundRequestSchema.extend({
 const reviewRefundSchema = z.object({
   status: z.enum(['approved', 'rejected']),
   reviewNotes: z.string().optional(),
+  bidRequestId: z.string().nullable().optional().transform(val => {
+    if (!val || val === '' || val === 'not_listed') return null;
+    const parsed = parseInt(val);
+    return isNaN(parsed) ? null : parsed;
+  }),
 });
 
 // Get refund requests for a contractor
@@ -188,13 +193,19 @@ refundRouter.patch('/:id/review', isAuthenticated, requireRole(['admin']), async
       return res.status(400).json({ message: "Can only review pending refund requests" });
     }
 
-    // Update refund request status
+    // Update refund request status and bid request association
     const updatedRequest = await storage.updateRefundRequestStatus(
       refundRequestId,
       validatedData.status,
       user.id,
       validatedData.reviewNotes
     );
+
+    // Handle bid request association override by admin
+    if (validatedData.bidRequestId !== undefined) {
+      await storage.updateRefundRequestBidAssociation(refundRequestId, validatedData.bidRequestId);
+      console.log(`Admin updated bid request association for refund ${refundRequestId} to bid request ${validatedData.bidRequestId}`);
+    }
 
     // If approved, handle Stripe refund processing or manual refund
     if (validatedData.status === 'approved') {
@@ -275,6 +286,59 @@ refundRouter.patch('/:id/review', isAuthenticated, requireRole(['admin']), async
     }
     console.error('Error reviewing refund request:', error);
     res.status(500).json({ error: 'Failed to review refund request' });
+  }
+});
+
+// Get bid requests for a contractor (for refund form dropdown)
+refundRouter.get('/bid-requests/contractor/:contractorId', isAuthenticated, async (req: Request, res: Response) => {
+  try {
+    const contractorId = parseInt(req.params.contractorId);
+    const user = req.user as any;
+
+    // Check permissions - contractor or admin
+    const contractor = await storage.getContractor(contractorId);
+    if (!contractor) {
+      return res.status(404).json({ message: "Contractor not found" });
+    }
+
+    if (user.role !== 'admin' && contractor.userId !== user.id) {
+      return res.status(403).json({ message: "Forbidden - Can only view your own bid requests" });
+    }
+
+    // Get bid requests for this contractor
+    const bidRequests = await storage.getBidRequestsByContractorId(contractorId);
+    
+    res.json({ bidRequests });
+  } catch (error) {
+    console.error('Error fetching contractor bid requests:', error);
+    res.status(500).json({ error: 'Failed to fetch bid requests' });
+  }
+});
+
+// Get all bid requests (for admin override dropdown)
+refundRouter.get('/bid-requests', isAuthenticated, requireRole(['admin']), async (req: Request, res: Response) => {
+  try {
+    const bidRequests = await storage.getAllBidRequests();
+    
+    // Enrich with contractor info for better display
+    const enrichedRequests = await Promise.all(
+      bidRequests.map(async (bidRequest: any) => {
+        const contractor = bidRequest.contractorId ? await storage.getContractor(bidRequest.contractorId) : null;
+        return {
+          ...bidRequest,
+          contractor: contractor ? {
+            id: contractor.id,
+            companyName: contractor.companyName,
+            userId: contractor.userId
+          } : null
+        };
+      })
+    );
+
+    res.json({ bidRequests: enrichedRequests });
+  } catch (error) {
+    console.error('Error fetching all bid requests:', error);
+    res.status(500).json({ error: 'Failed to fetch bid requests' });
   }
 });
 
