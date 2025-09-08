@@ -141,7 +141,7 @@ export function RefundRequestForm({ contractorId }: RefundRequestFormProps) {
     );
   }
 
-  const existingRequests = refundRequests?.refundRequests || [];
+  const existingRequests = (refundRequests as any)?.refundRequests || [];
 
   return (
     <div className="space-y-6">
@@ -265,7 +265,7 @@ export function RefundRequestForm({ contractorId }: RefundRequestFormProps) {
                     <option value="">Loading projects...</option>
                   ) : (
                     <>
-                      {(bidRequestsData?.bidRequests || []).map((bidRequest: any) => (
+                      {((bidRequestsData as any)?.bidRequests || []).map((bidRequest: any) => (
                         <option key={bidRequest.id} value={bidRequest.id}>
                           {bidRequest.projectType} - {new Date(bidRequest.requestedAt).toLocaleDateString()}
                         </option>
