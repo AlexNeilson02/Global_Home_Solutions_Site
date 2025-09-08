@@ -101,19 +101,19 @@ app.use((req, res, next) => {
   if (isDevelopment) {
     console.log("Running in development mode - initializing database...");
     
-    // Seed the database with initial data
-    await seedDatabase();
-    
-    // Seed commission data
-    await seedCommissionData();
-    
-    // Fix authentication credentials
-    const { fixAuthCredentials } = await import("./fix-auth");
-    await fixAuthCredentials();
-    
-    // Fix password hashing for existing users
-    const { fixUserPasswords } = await import("./fix-passwords");
-    await fixUserPasswords();
+    // Run all database operations in parallel for faster startup
+    await Promise.all([
+      seedDatabase(),
+      seedCommissionData(),
+      (async () => {
+        const { fixAuthCredentials } = await import("./fix-auth");
+        await fixAuthCredentials();
+      })(),
+      (async () => {
+        const { fixUserPasswords } = await import("./fix-passwords");
+        await fixUserPasswords();
+      })()
+    ]);
   } else {
     console.log("Running in production mode - skipping database seeding to preserve production data");
   }

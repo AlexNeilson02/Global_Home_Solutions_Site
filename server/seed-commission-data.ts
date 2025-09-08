@@ -70,6 +70,15 @@ const commissionData = [
 ];
 
 export async function seedCommissionData() {
+  // Check if commission data is already seeded by checking if any service has commission data
+  const existingServices = await storage.getAllServiceCategories();
+  const hasCommissionData = existingServices.some((service: any) => service.baseCost > 0);
+  
+  if (hasCommissionData) {
+    console.log("Commission data already seeded. Skipping...");
+    return;
+  }
+  
   console.log("Updating service categories with commission data...");
   
   for (const commissionInfo of commissionData) {
