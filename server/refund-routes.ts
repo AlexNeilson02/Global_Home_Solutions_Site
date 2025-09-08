@@ -4,13 +4,17 @@ import { isAuthenticated, requireRole } from "./auth";
 import { z } from "zod";
 import { insertRefundRequestSchema } from "@shared/schema";
 import { StripeConnectService } from "./stripe-connect-service";
+import Stripe from "stripe";
 
 export const refundRouter = Router();
 
 // Initialize Stripe Connect service if configured
 let stripeConnectService: StripeConnectService | null = null;
 if (process.env.STRIPE_SECRET_KEY) {
-  stripeConnectService = new StripeConnectService(process.env.STRIPE_SECRET_KEY);
+  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+    apiVersion: '2024-06-20'
+  });
+  stripeConnectService = new StripeConnectService(stripe);
 }
 
 // Validation schemas
@@ -147,12 +151,13 @@ refundRouter.post('/', isAuthenticated, async (req: Request, res: Response) => {
       return res.status(403).json({ message: "Forbidden - Can only create refund requests for your own company" });
     }
 
-    // Create refund request
+    // Create refund request 
     const refundRequest = await storage.createRefundRequest({
       ...validatedData,
       requestedBy: user.id,
-      status: 'pending'
-    });
+      status: 'pending',
+      requestedAt: new Date()
+    } as any);
 
     res.status(201).json({ 
       message: "Refund request created successfully", 
@@ -191,13 +196,59 @@ refundRouter.patch('/:id/review', isAuthenticated, requireRole(['admin']), async
       validatedData.reviewNotes
     );
 
-    // If approved, we'll handle the actual refund processing and revenue deduction in separate endpoints
-    // This allows for a two-step process: approve -> process
+    // If approved, automatically process the Stripe refund
+    if (validatedData.status === 'approved' && stripeConnectService && refundRequest.stripePaymentIntentId) {
+      try {
+        console.log(`Processing Stripe refund for payment intent: ${refundRequest.stripePaymentIntentId}, amount: $${refundRequest.amount}`);
+        
+        // Process the refund through Stripe
+        const stripeRefund = await stripeConnectService.processRefund(
+          refundRequest.stripePaymentIntentId,
+          Math.round(refundRequest.amount * 100), // Convert to cents
+          'requested_by_customer'
+        );
 
-    res.json({ 
-      message: `Refund request ${validatedData.status} successfully`, 
-      refundRequest: updatedRequest 
-    });
+        console.log(`Stripe refund processed successfully:`, stripeRefund);
+
+        // Update the refund request with Stripe refund details
+        await storage.updateRefundRequestProcessing(
+          refundRequestId,
+          stripeRefund.id,
+          new Date()
+        );
+
+        res.json({ 
+          message: `Refund request approved and processed successfully through Stripe`, 
+          refundRequest: updatedRequest,
+          stripeRefund: {
+            id: stripeRefund.id,
+            amount: stripeRefund.amount / 100,
+            status: stripeRefund.status
+          }
+        });
+      } catch (stripeError: any) {
+        console.error('Stripe refund processing failed:', stripeError);
+        
+        // Update the refund request to reflect the failure
+        await storage.updateRefundRequestStatus(
+          refundRequestId,
+          'approved_pending_stripe',
+          user.id,
+          `Approved but Stripe refund failed: ${stripeError.message}`
+        );
+
+        res.json({ 
+          message: `Refund request approved but Stripe processing failed: ${stripeError.message}`, 
+          refundRequest: updatedRequest,
+          error: stripeError.message
+        });
+      }
+    } else {
+      res.json({ 
+        message: `Refund request ${validatedData.status} successfully`, 
+        refundRequest: updatedRequest 
+      });
+    }
   } catch (error) {
     if (error instanceof z.ZodError) {
       return res.status(400).json({ error: 'Invalid request data', details: error.errors });
