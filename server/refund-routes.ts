@@ -12,14 +12,14 @@ export const refundRouter = Router();
 let stripeConnectService: StripeConnectService | null = null;
 if (process.env.STRIPE_SECRET_KEY) {
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-    apiVersion: '2024-06-20'
+    apiVersion: '2025-07-30.basil'
   });
   stripeConnectService = new StripeConnectService(stripe);
 }
 
 // Validation schemas
 const createRefundRequestSchema = insertRefundRequestSchema.extend({
-  reason: z.string().min(10, "Reason must be at least 10 characters"),
+  reason: z.string().min(1, "Reason is required"),
   amount: z.number().positive("Amount must be positive"),
 });
 
