@@ -465,11 +465,19 @@ export const insertEmailCommunicationSchema = createInsertSchema(emailCommunicat
 
 export const insertRefundRequestSchema = createInsertSchema(refundRequests).omit({
   id: true,
+  requestedBy: true, // Set by server from user session
   requestedAt: true,
   reviewedAt: true,
   processedAt: true,
   createdAt: true,
   updatedAt: true,
+  status: true, // Status is set by server
+  deductionApplied: true, // Has default value
+  reviewedBy: true, // Set during review process
+  stripeRefundId: true, // Set during processing
+  deductionAmount: true, // Set during deduction process
+  salespersonDeduction: true, // Set during deduction process  
+  companyDeduction: true, // Set during deduction process
 });
 
 // Relations - these are required for Drizzle ORM
