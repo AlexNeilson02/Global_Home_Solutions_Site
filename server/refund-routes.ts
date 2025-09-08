@@ -18,7 +18,9 @@ if (process.env.STRIPE_SECRET_KEY) {
 }
 
 // Validation schemas
-const createRefundRequestSchema = insertRefundRequestSchema.extend({
+const createRefundRequestSchema = insertRefundRequestSchema.omit({
+  refundDate: true,
+}).extend({
   reason: z.string().min(1, "Reason is required"),
   amount: z.number().positive("Amount must be positive"),
   bidRequestId: z.union([z.number(), z.string(), z.null()]).optional().transform(val => {
