@@ -160,8 +160,6 @@ refundRouter.post('/', isAuthenticated, async (req: Request, res: Response) => {
     });
   } catch (error) {
     if (error instanceof z.ZodError) {
-      console.error('Zod validation error details:', JSON.stringify(error.errors, null, 2));
-      console.error('Request body received:', JSON.stringify(req.body, null, 2));
       return res.status(400).json({ error: 'Invalid request data', details: error.errors });
     }
     console.error('Error creating refund request:', error);

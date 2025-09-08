@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -50,6 +50,7 @@ interface RefundRequest {
 export function RefundManagement() {
   const [selectedRequest, setSelectedRequest] = useState<RefundRequest | null>(null);
   const [reviewModalOpen, setReviewModalOpen] = useState(false);
+  const [dialogReady, setDialogReady] = useState(false);
   const [reviewData, setReviewData] = useState({
     status: 'approved' as 'approved' | 'rejected',
     reviewNotes: ''
@@ -57,6 +58,18 @@ export function RefundManagement() {
 
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  // Prevent immediate closing on open
+  useEffect(() => {
+    if (reviewModalOpen) {
+      const timer = setTimeout(() => {
+        setDialogReady(true);
+      }, 100);
+      return () => clearTimeout(timer);
+    } else {
+      setDialogReady(false);
+    }
+  }, [reviewModalOpen]);
 
   // Fetch pending refund requests
   const { data: pendingRequests, isLoading: loadingPending } = useQuery({
@@ -418,8 +431,36 @@ export function RefundManagement() {
       </div>
 
       {/* Review Modal */}
-      <Dialog open={reviewModalOpen} onOpenChange={setReviewModalOpen}>
-        <DialogContent className="sm:max-w-[600px]">
+      <Dialog 
+        open={reviewModalOpen} 
+        onOpenChange={(open) => {
+          if (!open && dialogReady) {
+            setReviewModalOpen(false);
+            setSelectedRequest(null);
+            setReviewData({ status: 'approved', reviewNotes: '' });
+          }
+        }}
+      >
+        <DialogContent 
+          className="sm:max-w-[600px]"
+          onInteractOutside={(e) => {
+            // Prevent closing on outside clicks if not ready
+            if (!dialogReady) {
+              e.preventDefault();
+              e.stopPropagation();
+            }
+          }}
+          onEscapeKeyDown={(e) => {
+            // Allow escape key to close only when ready
+            if (dialogReady) {
+              setReviewModalOpen(false);
+              setSelectedRequest(null);
+              setReviewData({ status: 'approved', reviewNotes: '' });
+            } else {
+              e.preventDefault();
+            }
+          }}
+        >
           <DialogHeader>
             <DialogTitle>Review Refund Request</DialogTitle>
             <DialogDescription>
