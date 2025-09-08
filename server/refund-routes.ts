@@ -196,51 +196,71 @@ refundRouter.patch('/:id/review', isAuthenticated, requireRole(['admin']), async
       validatedData.reviewNotes
     );
 
-    // If approved, automatically process the Stripe refund
-    if (validatedData.status === 'approved' && stripeConnectService && refundRequest.stripePaymentIntentId) {
-      try {
-        console.log(`Processing Stripe refund for payment intent: ${refundRequest.stripePaymentIntentId}, amount: $${refundRequest.amount}`);
+    // If approved, handle Stripe refund processing or manual refund
+    if (validatedData.status === 'approved') {
+      if (stripeConnectService && refundRequest.stripePaymentIntentId) {
+        // Case 1: Has payment intent - process through Stripe
+        try {
+          console.log(`Processing Stripe refund for payment intent: ${refundRequest.stripePaymentIntentId}, amount: $${refundRequest.amount}`);
+          
+          // Process the refund through Stripe
+          const stripeRefund = await stripeConnectService.processRefund(
+            refundRequest.stripePaymentIntentId,
+            Math.round(refundRequest.amount * 100), // Convert to cents
+            'requested_by_customer'
+          );
+
+          console.log(`Stripe refund processed successfully:`, stripeRefund);
+
+          // Update the refund request with Stripe refund details
+          await storage.updateRefundRequestProcessing(
+            refundRequestId,
+            stripeRefund.id,
+            new Date()
+          );
+
+          res.json({ 
+            message: `Refund request approved and processed successfully through Stripe`, 
+            refundRequest: updatedRequest,
+            stripeRefund: {
+              id: stripeRefund.id,
+              amount: stripeRefund.amount / 100,
+              status: stripeRefund.status
+            }
+          });
+        } catch (stripeError: any) {
+          console.error('Stripe refund processing failed:', stripeError);
+          
+          // Update the refund request to reflect the failure
+          await storage.updateRefundRequestStatus(
+            refundRequestId,
+            'approved_pending_stripe',
+            user.id,
+            `Approved but Stripe refund failed: ${stripeError.message}`
+          );
+
+          res.json({ 
+            message: `Refund request approved but Stripe processing failed: ${stripeError.message}`, 
+            refundRequest: updatedRequest,
+            error: stripeError.message
+          });
+        }
+      } else {
+        // Case 2: No payment intent - approve for manual processing
+        console.log(`Refund request ${refundRequestId} approved for manual processing - no payment intent ID found`);
         
-        // Process the refund through Stripe
-        const stripeRefund = await stripeConnectService.processRefund(
-          refundRequest.stripePaymentIntentId,
-          Math.round(refundRequest.amount * 100), // Convert to cents
-          'requested_by_customer'
-        );
-
-        console.log(`Stripe refund processed successfully:`, stripeRefund);
-
-        // Update the refund request with Stripe refund details
-        await storage.updateRefundRequestProcessing(
-          refundRequestId,
-          stripeRefund.id,
-          new Date()
-        );
-
-        res.json({ 
-          message: `Refund request approved and processed successfully through Stripe`, 
-          refundRequest: updatedRequest,
-          stripeRefund: {
-            id: stripeRefund.id,
-            amount: stripeRefund.amount / 100,
-            status: stripeRefund.status
-          }
-        });
-      } catch (stripeError: any) {
-        console.error('Stripe refund processing failed:', stripeError);
-        
-        // Update the refund request to reflect the failure
+        // Update status to show it needs manual processing
         await storage.updateRefundRequestStatus(
           refundRequestId,
-          'approved_pending_stripe',
+          'approved_manual',
           user.id,
-          `Approved but Stripe refund failed: ${stripeError.message}`
+          `Approved for manual refund - no payment intent found. Amount: $${refundRequest.amount}. Please process this refund manually through Stripe dashboard or other payment method.`
         );
 
         res.json({ 
-          message: `Refund request approved but Stripe processing failed: ${stripeError.message}`, 
+          message: `Refund request approved for manual processing - no payment intent found. Please process $${refundRequest.amount} refund manually through Stripe dashboard.`, 
           refundRequest: updatedRequest,
-          error: stripeError.message
+          requiresManualProcessing: true
         });
       }
     } else {
