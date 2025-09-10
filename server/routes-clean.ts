@@ -514,6 +514,91 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Retroactive attribution - link email to salesperson from previous bid requests
+  // This endpoint checks if a customer email has been used in previous bid requests with salesperson attribution
+  // and creates permanent attribution if found. Used during homeowner registration.
+  apiRouter.post("/customer-attribution/retroactive", async (req: Request, res: Response) => {
+    try {
+      const { customerEmail } = req.body;
+      
+      if (!customerEmail || typeof customerEmail !== 'string') {
+        return res.status(400).json({ message: "Customer email is required" });
+      }
+
+      const normalizedEmail = customerEmail.toLowerCase().trim();
+      console.log('🔍 Checking retroactive attribution for email:', normalizedEmail);
+
+      // Look for bid requests with this email that have salesperson attribution
+      const bidRequests = await storage.getBidRequestsByEmail(normalizedEmail);
+      
+      if (!bidRequests || bidRequests.length === 0) {
+        console.log('ℹ️ No previous bid requests found for email');
+        return res.json({ 
+          attributionCreated: false, 
+          message: "No previous bid requests found" 
+        });
+      }
+
+      // Find the first bid request with salesperson attribution
+      const attributedBidRequest = bidRequests.find(bid => bid.salespersonId);
+      
+      if (!attributedBidRequest) {
+        console.log('ℹ️ No salesperson attribution found in previous bid requests');
+        return res.json({ 
+          attributionCreated: false, 
+          message: "No salesperson attribution found in previous bid requests" 
+        });
+      }
+
+      console.log('✅ Found attributed bid request:', {
+        bidId: attributedBidRequest.id,
+        salespersonId: attributedBidRequest.salespersonId,
+        email: normalizedEmail
+      });
+
+      // Import the service dynamically
+      const { CustomerAttributionService } = await import('./customer-attribution-service');
+      const attributionService = new CustomerAttributionService(storage);
+      
+      // Check if permanent attribution already exists
+      const existingAttribution = await attributionService.getCustomerAttribution(normalizedEmail);
+      if (existingAttribution?.attributionType === 'permanent') {
+        console.log('✅ Permanent attribution already exists');
+        return res.json({ 
+          attributionCreated: false, 
+          message: "Permanent attribution already exists" 
+        });
+      }
+
+      // Create permanent attribution based on the bid request
+      const upgraded = await attributionService.upgradeToPermanentAttribution(
+        normalizedEmail, 
+        attributedBidRequest.salespersonId!
+      );
+
+      if (upgraded) {
+        console.log('✅ Retroactive permanent attribution created successfully');
+        return res.json({ 
+          attributionCreated: true, 
+          salespersonId: attributedBidRequest.salespersonId,
+          message: "Permanent attribution created from previous bid request" 
+        });
+      } else {
+        console.warn('⚠️ Failed to create retroactive attribution');
+        return res.status(500).json({ 
+          attributionCreated: false, 
+          message: "Failed to create attribution" 
+        });
+      }
+    } catch (error) {
+      console.error("Error in retroactive attribution:", error);
+      res.status(500).json({ 
+        attributionCreated: false, 
+        message: "Error processing retroactive attribution" 
+      });
+    }
+  });
+
   // Bid requests routes
   apiRouter.post("/bid-requests", upload.array('media', 10), async (req: Request, res: Response) => {
     try {

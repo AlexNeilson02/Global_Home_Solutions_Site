@@ -70,10 +70,49 @@ export default function HomeownerRegistration() {
 
       const result = await response.json();
       
-      toast({
-        title: "Registration Successful!",
-        description: "Your homeowner account has been created. Please log in.",
-      });
+      // Check for retroactive attribution - link this email to salesperson from previous bid requests
+      try {
+        console.log('🔍 Checking for retroactive attribution for email:', data.email);
+        
+        const attributionResponse = await fetch("/api/customer-attribution/retroactive", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            customerEmail: data.email
+          }),
+        });
+        
+        if (attributionResponse.ok) {
+          const attributionResult = await attributionResponse.json();
+          if (attributionResult.attributionCreated) {
+            console.log('✅ Retroactive attribution created:', attributionResult);
+            toast({
+              title: "Registration Successful!",
+              description: "Your account has been created and linked to your previous bid requests.",
+            });
+          } else {
+            console.log('ℹ️ No retroactive attribution needed');
+            toast({
+              title: "Registration Successful!",
+              description: "Your homeowner account has been created. Please log in.",
+            });
+          }
+        } else {
+          // Attribution failed but registration succeeded - continue with normal flow
+          console.warn('⚠️ Retroactive attribution check failed, but registration succeeded');
+          toast({
+            title: "Registration Successful!",
+            description: "Your homeowner account has been created. Please log in.",
+          });
+        }
+      } catch (attributionError) {
+        // Attribution failed but registration succeeded - continue with normal flow
+        console.warn('⚠️ Retroactive attribution error:', attributionError);
+        toast({
+          title: "Registration Successful!",
+          description: "Your homeowner account has been created. Please log in.",
+        });
+      }
 
       // Redirect to login
       setLocation("/login");

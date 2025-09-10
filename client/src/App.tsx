@@ -44,61 +44,61 @@ function App() {
                   <div className="min-h-screen full-height smooth-scroll" style={{ marginTop: 0, paddingTop: 0, position: 'relative', top: 0 }}>
                     <Toaster />
                     <PostBidPWAPrompt />
-              <Route path="/" component={HomePage} />
-              <Route path="/about" component={AboutUs} />
-              <Route path="/services" component={ServiceSelection} />
-              <Route path="/mobile-services" component={MobileServices} />
-              <Route path="/portals" component={Portals} />
-              <Route path="/contractor/:id" component={ContractorProfile} />
-              <Route path="/contractor-registration" component={ContractorRegistration} />
-              <Route path="/homeowner-registration" component={HomeownerRegistration} />
-              <Route path="/sales/:profileUrl" component={SalespersonProfile} />
-              <Route path="/login" component={Login} />
-              <Route path="/homeowner-dashboard">
-                <ProtectedRoute requiredRole="homeowner">
-                  <HomeownerDashboard />
-                </ProtectedRoute>
-              </Route>
-              <Route path="/homeowner/request-service">
-                <ProtectedRoute requiredRole="homeowner">
-                  <MobileHomeownerBidRequest />
-                </ProtectedRoute>
-              </Route>
-              <Route path="/homeowner/contractors">
-                <ProtectedRoute requiredRole="homeowner">
-                  <MobileContractors />
-                </ProtectedRoute>
-              </Route>
-              <Route path="/homeowner/services">
-                <ProtectedRoute requiredRole="homeowner">
-                  <MobileAppServices />
-                </ProtectedRoute>
-              </Route>
-              <Route path="/contractor-portal">
-                <ProtectedRoute requiredRole="contractor">
-                  <ContractorPortalEnhanced />
-                </ProtectedRoute>
-              </Route>
-              <Route path="/sales-portal">
-                <ProtectedRoute requiredRole="salesperson">
-                  <SalesPortalEnhanced />
-                </ProtectedRoute>
-              </Route>
-              <Route path="/admin-portal">
-                <ProtectedRoute requiredRole="admin">
-                  <AdminPortalEnhanced />
-                </ProtectedRoute>
-              </Route>
-              <Route path="/checkout">
-                <ProtectedRoute>
-                  <Checkout />
-                </ProtectedRoute>
-              </Route>
-              <Route path="/subscribe">
-                <ProtectedRoute>
-                  <Subscribe />
-                </ProtectedRoute>
-              </Route>
+                    <Route path="/" component={HomePage} />
+                    <Route path="/about" component={AboutUs} />
+                    <Route path="/services" component={ServiceSelection} />
+                    <Route path="/mobile-services" component={MobileServices} />
+                    <Route path="/portals" component={Portals} />
+                    <Route path="/contractor/:id" component={ContractorProfile} />
+                    <Route path="/contractor-registration" component={ContractorRegistration} />
+                    <Route path="/homeowner-registration" component={HomeownerRegistration} />
+                    <Route path="/sales/:profileUrl" component={SalespersonProfile} />
+                    <Route path="/login" component={Login} />
+                    <Route path="/homeowner-dashboard">
+                      <ProtectedRoute requiredRole="homeowner">
+                        <HomeownerDashboard />
+                      </ProtectedRoute>
+                    </Route>
+                    <Route path="/homeowner/request-service">
+                      <ProtectedRoute requiredRole="homeowner">
+                        <MobileHomeownerBidRequest />
+                      </ProtectedRoute>
+                    </Route>
+                    <Route path="/homeowner/contractors">
+                      <ProtectedRoute requiredRole="homeowner">
+                        <MobileContractors />
+                      </ProtectedRoute>
+                    </Route>
+                    <Route path="/homeowner/services">
+                      <ProtectedRoute requiredRole="homeowner">
+                        <MobileAppServices />
+                      </ProtectedRoute>
+                    </Route>
+                    <Route path="/contractor-portal">
+                      <ProtectedRoute requiredRole="contractor">
+                        <ContractorPortalEnhanced />
+                      </ProtectedRoute>
+                    </Route>
+                    <Route path="/sales-portal">
+                      <ProtectedRoute requiredRole="salesperson">
+                        <SalesPortalEnhanced />
+                      </ProtectedRoute>
+                    </Route>
+                    <Route path="/admin-portal">
+                      <ProtectedRoute requiredRole="admin">
+                        <AdminPortalEnhanced />
+                      </ProtectedRoute>
+                    </Route>
+                    <Route path="/checkout">
+                      <ProtectedRoute>
+                        <Checkout />
+                      </ProtectedRoute>
+                    </Route>
+                    <Route path="/subscribe">
+                      <ProtectedRoute>
+                        <Subscribe />
+                      </ProtectedRoute>
+                    </Route>
                   </div>
                 </MobileAppAuthWrapper>
               </TooltipProvider>

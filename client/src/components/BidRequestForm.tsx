@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { useSalesperson } from "@/contexts/SalespersonContext";
+import { usePostBidPWA } from "@/contexts/PostBidPWAContext";
 import { useAuth } from "@/lib/auth";
 import { apiRequest } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
@@ -57,6 +58,7 @@ export default function BidRequestForm({ isOpen, onClose, contractor }: BidReque
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { salespersonId } = useSalesperson();
+  const { triggerPostBidPWA } = usePostBidPWA();
   const { user } = useAuth();
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
   const [filePreviewUrls, setFilePreviewUrls] = useState<string[]>([]);
@@ -341,6 +343,9 @@ export default function BidRequestForm({ isOpen, onClose, contractor }: BidReque
       });
       form.reset();
       onClose();
+      
+      // Trigger post-bid PWA install prompt (only on web, not if already in PWA)
+      triggerPostBidPWA();
     },
     onError: (error: Error) => {
       console.error("Bid request submission error:", error);
