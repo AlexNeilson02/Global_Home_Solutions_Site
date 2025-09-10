@@ -13,10 +13,12 @@ export const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({
   onDismiss, 
   className = '' 
 }) => {
+  // Always call hooks first to maintain consistent hook order
   const { isInstallable, isInstalled, install } = usePWA();
   const [isInstalling, setIsInstalling] = useState(false);
   const [isDismissed, setIsDismissed] = useState(false);
 
+  // Define all functions after hooks
   const handleInstall = async () => {
     setIsInstalling(true);
     try {
@@ -34,8 +36,11 @@ export const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({
     onDismiss?.();
   };
 
-  // Don't show if not installable, already installed, or dismissed
-  if (!isInstallable || isInstalled || isDismissed) {
+  // Compute visibility state
+  const shouldShow = isInstallable && !isInstalled && !isDismissed;
+
+  // Early return after all hooks and function definitions
+  if (!shouldShow) {
     return null;
   }
 
@@ -115,10 +120,6 @@ export const PWAInstallButton: React.FC<{ className?: string }> = ({ className =
   const { isInstallable, isInstalled, install } = usePWA();
   const [isInstalling, setIsInstalling] = useState(false);
 
-  if (!isInstallable || isInstalled) {
-    return null;
-  }
-
   const handleInstall = async () => {
     setIsInstalling(true);
     try {
@@ -127,6 +128,10 @@ export const PWAInstallButton: React.FC<{ className?: string }> = ({ className =
       setIsInstalling(false);
     }
   };
+
+  if (!isInstallable || isInstalled) {
+    return null;
+  }
 
   return (
     <Button
