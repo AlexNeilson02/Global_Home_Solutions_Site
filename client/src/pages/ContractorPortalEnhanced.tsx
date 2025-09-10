@@ -2347,16 +2347,33 @@ const ContractorPortalEnhanced: React.FC = () => {
 
       {/* Media Viewer Modal */}
       {viewingMedia && (
-        <div className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50 p-4">
-          <div className="relative max-w-4xl w-full max-h-[90vh] bg-white dark:bg-gray-800 rounded-lg overflow-hidden">
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50 p-4"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              setViewingMedia(null);
+            }
+          }}
+          onKeyDown={(e) => {
+            if (e.key === 'Escape') {
+              setViewingMedia(null);
+            }
+          }}
+          tabIndex={0}
+        >
+          <div 
+            className="relative max-w-4xl w-full max-h-[90vh] bg-white dark:bg-gray-800 rounded-lg overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="absolute top-4 right-4 z-10">
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => setViewingMedia(null)}
-                className="bg-white/10 hover:bg-white/20 text-white"
+                className="bg-black/50 hover:bg-black/70 text-white rounded-full p-2 w-10 h-10 flex items-center justify-center"
+                data-testid="close-media-viewer"
               >
-                <X className="h-4 w-4" />
+                <X className="h-5 w-5" />
               </Button>
             </div>
             
