@@ -98,7 +98,7 @@ export function RefundRequestForm({ contractorId }: RefundRequestFormProps) {
       reason: formData.reason,
       description: formData.description,
       bidRequestId: formData.bidRequestId || null,
-      refundDate: formData.refundDate || null,
+      refundDate: formData.refundDate ? new Date(formData.refundDate) : null,
     });
   };
 
