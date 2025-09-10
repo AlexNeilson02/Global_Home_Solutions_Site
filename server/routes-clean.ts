@@ -518,10 +518,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // This endpoint checks if a customer email has been used in previous bid requests with salesperson attribution
   // and creates permanent attribution if found. Used during homeowner registration.
   apiRouter.post("/customer-attribution/retroactive", async (req: Request, res: Response) => {
+    console.log('🎯 RETROACTIVE ATTRIBUTION ENDPOINT CALLED!');
+    console.log('📝 Request body:', req.body);
     try {
       const { customerEmail } = req.body;
+      console.log('📧 Customer email from body:', customerEmail);
       
       if (!customerEmail || typeof customerEmail !== 'string') {
+        console.log('❌ Invalid email - missing or not string');
         return res.status(400).json({ message: "Customer email is required" });
       }
 
@@ -530,6 +534,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Look for bid requests with this email that have salesperson attribution
       const bidRequests = await storage.getBidRequestsByEmail(normalizedEmail);
+      console.log('📊 Found bid requests for retroactive attribution:', bidRequests.length);
+      console.log('📋 Bid requests data:', bidRequests.map(bid => ({ 
+        id: bid.id, 
+        email: bid.email, 
+        salespersonId: bid.salespersonId, 
+        createdAt: bid.createdAt 
+      })));
       
       if (!bidRequests || bidRequests.length === 0) {
         console.log('ℹ️ No previous bid requests found for email');

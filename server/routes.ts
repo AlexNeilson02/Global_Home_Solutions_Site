@@ -76,6 +76,100 @@ export async function registerRoutes(app: Express): Promise<Server> {
   const { refundRouter } = await import("./refund-routes");
   apiRouter.use("/refunds", refundRouter);
 
+  // Customer Attribution - Retroactive attribution endpoint
+  apiRouter.post("/customer-attribution/retroactive", async (req: Request, res: Response) => {
+    console.log('🎯 RETROACTIVE ATTRIBUTION ENDPOINT CALLED!');
+    console.log('📝 Request body:', req.body);
+    try {
+      const { customerEmail } = req.body;
+      console.log('📧 Customer email from body:', customerEmail);
+      
+      if (!customerEmail || typeof customerEmail !== 'string') {
+        console.log('❌ Invalid email - missing or not string');
+        return res.status(400).json({ message: "Customer email is required" });
+      }
+
+      const normalizedEmail = customerEmail.toLowerCase().trim();
+      console.log('🔍 Checking retroactive attribution for email:', normalizedEmail);
+
+      // Look for bid requests with this email that have salesperson attribution
+      const bidRequests = await storage.getBidRequestsByEmail(normalizedEmail);
+      console.log('📊 Found bid requests for retroactive attribution:', bidRequests.length);
+      console.log('📋 Bid requests data:', bidRequests.map(bid => ({ 
+        id: bid.id, 
+        email: bid.email, 
+        salespersonId: bid.salespersonId, 
+        createdAt: bid.createdAt 
+      })));
+      
+      if (!bidRequests || bidRequests.length === 0) {
+        console.log('ℹ️ No previous bid requests found for email');
+        return res.json({ 
+          attributionCreated: false, 
+          message: "No previous bid requests found" 
+        });
+      }
+
+      // Find the first bid request with salesperson attribution
+      const attributedBidRequest = bidRequests.find(bid => bid.salespersonId);
+      
+      if (!attributedBidRequest) {
+        console.log('ℹ️ No salesperson attribution found in previous bid requests');
+        return res.json({ 
+          attributionCreated: false, 
+          message: "No salesperson attribution found in previous bid requests" 
+        });
+      }
+
+      console.log('✅ Found attributed bid request:', {
+        bidId: attributedBidRequest.id,
+        salespersonId: attributedBidRequest.salespersonId,
+        email: normalizedEmail
+      });
+
+      // Import the service dynamically
+      const { CustomerAttributionService } = await import('./customer-attribution-service');
+      const attributionService = new CustomerAttributionService(storage);
+      
+      // Check if permanent attribution already exists
+      const existingAttribution = await attributionService.getCustomerAttribution(normalizedEmail);
+      if (existingAttribution?.attributionType === 'permanent') {
+        console.log('✅ Permanent attribution already exists');
+        return res.json({ 
+          attributionCreated: false, 
+          message: "Permanent attribution already exists" 
+        });
+      }
+
+      // Create permanent attribution based on the bid request
+      const upgraded = await attributionService.upgradeToPermanentAttribution(
+        normalizedEmail, 
+        attributedBidRequest.salespersonId!
+      );
+
+      if (upgraded) {
+        console.log('✅ Retroactive permanent attribution created successfully');
+        return res.json({ 
+          attributionCreated: true, 
+          salespersonId: attributedBidRequest.salespersonId,
+          message: "Permanent attribution created from previous bid request" 
+        });
+      } else {
+        console.warn('⚠️ Failed to create retroactive attribution');
+        return res.status(500).json({ 
+          attributionCreated: false, 
+          message: "Failed to create attribution" 
+        });
+      }
+    } catch (error) {
+      console.error("Error in retroactive attribution:", error);
+      res.status(500).json({ 
+        attributionCreated: false, 
+        message: "Error processing retroactive attribution" 
+      });
+    }
+  });
+
   // WebSocket connections for real-time notifications
   const contractorConnections = new Map<number, WebSocket[]>();
 
