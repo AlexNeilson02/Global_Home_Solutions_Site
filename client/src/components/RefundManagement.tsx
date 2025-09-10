@@ -432,7 +432,7 @@ export function RefundManagement() {
                           variant="default"
                           onClick={() => processRefundMutation.mutate(request.id)}
                           disabled={processRefundMutation.isPending}
-                          className="text-[#000000]"
+                          className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-apple transition-all duration-200 ease-apple focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 hover:scale-105 active:scale-95 border bg-primary border-primary hover:bg-primary/90 hover:border-primary/90 shadow-apple-md font-semibold h-9 px-4 py-2 text-xs text-[#000000]"
                         >
                           {processRefundMutation.isPending ? (
                             <Loader2 className="h-4 w-4 mr-1 animate-spin" />
