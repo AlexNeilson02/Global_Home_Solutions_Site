@@ -517,7 +517,44 @@ export class DatabaseStorage implements IStorage {
   
   // Bid Request methods
   async createBidRequest(bidRequest: InsertBidRequest): Promise<BidRequest> {
-    const [request] = await db.insert(bidRequests).values(bidRequest).returning();
+    // Normalize email for consistent attribution lookup
+    const normalizedEmail = bidRequest.email.toLowerCase().trim();
+    
+    // Log the attribution logic for debugging
+    console.log('🔍 Creating bid request with auto-attribution for email:', normalizedEmail);
+    console.log('📥 Session salesperson ID provided:', bidRequest.salespersonId);
+    
+    // Use COALESCE to auto-populate salesperson_id:
+    // 1. First try permanent attribution from customer_attributions table
+    // 2. Fall back to session salesperson ID from request  
+    // 3. Default to null if neither exists
+    const insertedRequest = await db.insert(bidRequests).values({
+      ...bidRequest,
+      email: normalizedEmail,
+      salespersonId: sql`COALESCE(
+        (SELECT salesperson_id 
+         FROM customer_attributions 
+         WHERE customer_email = ${normalizedEmail} 
+         AND attribution_type = 'permanent' 
+         AND is_active = true 
+         ORDER BY permanent_attribution_date DESC 
+         LIMIT 1),
+        ${bidRequest.salespersonId}
+      )`
+    }).returning();
+    
+    const [request] = insertedRequest;
+    
+    // Log the final attribution result
+    console.log('✅ Bid request created with final salesperson_id:', request.salespersonId);
+    if (request.salespersonId && request.salespersonId !== bidRequest.salespersonId) {
+      console.log('🎯 AUTO-ATTRIBUTED: Used permanent attribution instead of session attribution');
+    } else if (request.salespersonId === bidRequest.salespersonId) {
+      console.log('📱 SESSION-ATTRIBUTED: Used session salesperson ID (no permanent attribution found)');
+    } else {
+      console.log('🚫 NO-ATTRIBUTION: No permanent or session attribution available');
+    }
+    
     return request;
   }
   

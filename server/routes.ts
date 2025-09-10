@@ -777,12 +777,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
 
+      // Normalize email for consistent attribution lookup  
+      const normalizedEmail = finalEmail.toLowerCase().trim();
+      
       // Create bid request with correct field names for database schema
+      // Note: salespersonId here is the session/fallback ID - storage layer will auto-populate
+      // permanent attribution if it exists using COALESCE subquery
       const bidRequestData = {
         contractorId: Number(contractorId),
-        salespersonId: salespersonId ? Number(salespersonId) : null,
+        salespersonId: salespersonId ? Number(salespersonId) : null, // Session fallback only
         fullName: finalFullName,
-        email: finalEmail,
+        email: normalizedEmail, // Use normalized email
         phone: finalPhone,
         address: finalAddress,
         servicesRequested: finalServicesRequested,
@@ -794,6 +799,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         sessionTrackingId: sessionTrackingId,
         isCommissionEligible: isCommissionEligible
       };
+      
+      console.log('🎯 Auto-attribution: Session salesperson ID:', salespersonId || 'none');
+      console.log('📧 Auto-attribution: Normalized email:', normalizedEmail);
 
       console.log('Creating bid request with data:', bidRequestData);
       const bidRequest = await storage.createBidRequest(bidRequestData);
