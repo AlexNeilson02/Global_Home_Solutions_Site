@@ -41,6 +41,7 @@ import { useToast } from "@/hooks/use-toast";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
 import AnalyticsDashboard from "@/components/AnalyticsDashboard";
 import { RefundManagement } from "@/components/RefundManagement";
+import { RefundHistory } from "@/components/RefundHistory";
 
 export default function AdminPortalEnhanced() {
   const [, navigate] = useLocation();
@@ -1358,20 +1359,26 @@ export default function AdminPortalEnhanced() {
 
           {/* Refunds Tab */}
           <TabsContent value="refunds">
-            <Card style={antiYellowStyles}>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <RefreshCw className="h-5 w-5" />
-                  Refund Request Management
-                </CardTitle>
-                <CardDescription>
-                  Review and manage contractor refund requests
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <RefundManagement />
-              </CardContent>
-            </Card>
+            <div className="space-y-6">
+              {/* Refund History */}
+              <RefundHistory type="admin" />
+              
+              {/* Refund Management for pending reviews */}
+              <Card style={antiYellowStyles}>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <RefreshCw className="h-5 w-5" />
+                    Pending Refund Reviews
+                  </CardTitle>
+                  <CardDescription>
+                    Review and approve/reject pending refund requests
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <RefundManagement />
+                </CardContent>
+              </Card>
+            </div>
           </TabsContent>
 
           {/* Analytics Tab */}

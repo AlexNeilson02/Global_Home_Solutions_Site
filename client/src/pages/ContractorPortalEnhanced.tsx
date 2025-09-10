@@ -41,6 +41,7 @@ import ProjectTimeline from "@/components/ProjectTimeline";
 import AnalyticsDashboard from "@/components/AnalyticsDashboard";
 import GmailIntegration from "@/components/GmailIntegration";
 import { RefundRequestForm } from "@/components/RefundRequestForm";
+import { RefundHistory } from "@/components/RefundHistory";
 
 // Initialize Stripe
 const stripePublicKey = import.meta.env.VITE_STRIPE_PUBLIC_KEY;
@@ -988,13 +989,14 @@ const ContractorPortalEnhanced: React.FC = () => {
             }}
           >
             {/* Desktop/Tablet Navigation - Hidden on mobile */}
-            <TabsList className="hidden sm:grid w-full grid-cols-7">
+            <TabsList className="hidden sm:grid w-full grid-cols-8">
               <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
               <TabsTrigger value="profile">Company Profile</TabsTrigger>
               <TabsTrigger value="projects">Sent Bids</TabsTrigger>
               <TabsTrigger value="bids">Bid Requests</TabsTrigger>
               <TabsTrigger value="email">Email</TabsTrigger>
               <TabsTrigger value="subscription">Subscription</TabsTrigger>
+              <TabsTrigger value="refunds">Refunds</TabsTrigger>
               <TabsTrigger value="analytics">Analytics</TabsTrigger>
             </TabsList>
 
@@ -1055,6 +1057,15 @@ const ContractorPortalEnhanced: React.FC = () => {
                 >
                   <CreditCard className="h-4 w-4" />
                   <span>Subscription</span>
+                </button>
+                <button
+                  onClick={() => setActiveTab("refunds")}
+                  className={`flex flex-col items-center justify-center gap-1 text-xs hover:bg-gray-100 dark:hover:bg-gray-800 px-4 min-w-[80px] flex-shrink-0 ${
+                    activeTab === "refunds" ? "text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950" : ""
+                  }`}
+                >
+                  <RefreshCw className="h-4 w-4" />
+                  <span>Refunds</span>
                 </button>
                 <button
                   onClick={() => setActiveTab("analytics")}
@@ -2198,6 +2209,11 @@ const ContractorPortalEnhanced: React.FC = () => {
                   <RefundRequestForm contractorId={contractor?.id} />
                 </CardContent>
               </Card>
+            </TabsContent>
+
+            {/* Refunds Tab */}
+            <TabsContent value="refunds" className="space-y-6">
+              <RefundHistory type="contractor" contractorId={contractor?.id} />
             </TabsContent>
 
             {/* Analytics Tab */}
