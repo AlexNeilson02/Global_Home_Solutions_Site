@@ -15,6 +15,7 @@ import { useAuth } from "@/lib/auth";
 import { usePlatform } from "@/contexts/PlatformContext";
 import { useLocation } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
+import HomeownerBottomNav from "@/components/mobile/HomeownerBottomNav";
 import { 
   ArrowLeft, 
   Home, 
@@ -66,6 +67,7 @@ export default function MobileHomeownerBidRequest() {
   const [step, setStep] = useState(1);
   const [selectedServices, setSelectedServices] = useState<string[]>([]);
   const [selectedContractors, setSelectedContractors] = useState<number[]>([]);
+  const [activeTab, setActiveTab] = useState("requests");
   
   const form = useForm<BidRequestForm>({
     resolver: zodResolver(bidRequestSchema),
@@ -590,6 +592,22 @@ export default function MobileHomeownerBidRequest() {
           </Form>
         )}
       </div>
+
+      {/* Bottom Navigation */}
+      <HomeownerBottomNav 
+        activeTab={activeTab}
+        onTabChange={(tab) => {
+          if (tab === 'contractors') {
+            setLocation('/homeowner/contractors');
+          } else if (tab === 'services') {
+            setLocation('/homeowner/services');
+          } else if (tab === 'requests') {
+            setLocation('/homeowner-dashboard');
+          } else if (tab === 'profile') {
+            setLocation('/homeowner-dashboard?tab=profile');
+          }
+        }}
+      />
     </div>
   );
 }

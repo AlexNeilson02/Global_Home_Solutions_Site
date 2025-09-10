@@ -5,6 +5,7 @@ import { ChevronLeft, Star, ExternalLink, Phone, Mail, Search, X } from "lucide-
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import HomeownerBottomNav from "@/components/mobile/HomeownerBottomNav";
 
 interface ContractorsResponse {
   contractors: Array<{
@@ -25,6 +26,7 @@ interface ContractorsResponse {
 const MobileContractors = () => {
   const [, setLocation] = useLocation();
   const [searchFilter, setSearchFilter] = useState("");
+  const [activeTab, setActiveTab] = useState("contractors");
 
   const { data: contractors } = useQuery<ContractorsResponse>({
     queryKey: ["/api/contractors"],
@@ -255,6 +257,22 @@ const MobileContractors = () => {
           </div>
         )}
       </div>
+
+      {/* Bottom Navigation */}
+      <HomeownerBottomNav 
+        activeTab={activeTab}
+        onTabChange={(tab) => {
+          if (tab === 'contractors') {
+            setActiveTab('contractors');
+          } else if (tab === 'services') {
+            setLocation('/homeowner/services');
+          } else if (tab === 'requests') {
+            setLocation('/homeowner-dashboard');
+          } else if (tab === 'profile') {
+            setLocation('/homeowner-dashboard?tab=profile');
+          }
+        }}
+      />
     </div>
   );
 };

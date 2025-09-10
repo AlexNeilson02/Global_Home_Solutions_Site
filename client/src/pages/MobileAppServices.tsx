@@ -4,6 +4,7 @@ import { useLocation } from "wouter";
 import { ChevronLeft, Home } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import HomeownerBottomNav from "@/components/mobile/HomeownerBottomNav";
 
 interface ServiceCategoriesResponse {
   services: Array<{
@@ -14,6 +15,7 @@ interface ServiceCategoriesResponse {
 
 const MobileAppServices = () => {
   const [, setLocation] = useLocation();
+  const [activeTab, setActiveTab] = useState("services");
 
   const { data: serviceCategories } = useQuery<ServiceCategoriesResponse>({
     queryKey: ["/api/service-categories"],
@@ -148,6 +150,22 @@ const MobileAppServices = () => {
           </div>
         )}
       </div>
+
+      {/* Bottom Navigation */}
+      <HomeownerBottomNav 
+        activeTab={activeTab}
+        onTabChange={(tab) => {
+          if (tab === 'contractors') {
+            setLocation('/homeowner/contractors');
+          } else if (tab === 'services') {
+            setActiveTab('services');
+          } else if (tab === 'requests') {
+            setLocation('/homeowner-dashboard');
+          } else if (tab === 'profile') {
+            setLocation('/homeowner-dashboard?tab=profile');
+          }
+        }}
+      />
     </div>
   );
 };
