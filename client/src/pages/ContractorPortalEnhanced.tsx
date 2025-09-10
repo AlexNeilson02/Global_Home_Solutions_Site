@@ -801,6 +801,7 @@ const ContractorPortalEnhanced: React.FC = () => {
         phone: contractor.phone || '',
         email: contractor.email || '',
         logoUrl: contractor.logoUrl || '',
+        bannerImageUrl: contractor.bannerImageUrl || '',
         videoUrl: contractor.videoUrl || '',
         ownerName: contractor.ownerName || '',
         website: contractor.website || '',
