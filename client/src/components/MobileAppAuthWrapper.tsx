@@ -29,11 +29,35 @@ export const MobileAppAuthWrapper: React.FC<MobileAppAuthWrapperProps> = ({ chil
 
     console.log('🔍 Debug: location =', location, 'isPublicPage =', isPublicPage, 'isMobileApp =', isMobileApp, 'user =', !!user);
 
-    // Only enforce authentication for mobile app users on protected pages
-    if (isMobileApp && !user && !isPublicPage) {
-      console.log('📱 Mobile app user not authenticated - redirecting to login');
-      navigate('/login');
-      return;
+    // For mobile app users only
+    if (isMobileApp) {
+      if (!user && !isPublicPage) {
+        // Not authenticated and on protected page - redirect to login
+        console.log('📱 Mobile app user not authenticated - redirecting to login');
+        navigate('/login');
+        return;
+      } else if (user && isPublicPage && location === '/') {
+        // Authenticated user on homepage - redirect to their dashboard
+        console.log('📱 Authenticated mobile app user on homepage - redirecting to dashboard');
+        switch (user.role) {
+          case 'homeowner':
+            navigate('/homeowner-dashboard');
+            break;
+          case 'contractor':
+            navigate('/contractor-portal');
+            break;
+          case 'salesperson':
+            navigate('/sales-portal');
+            break;
+          case 'admin':
+            navigate('/admin-portal');
+            break;
+          default:
+            console.log('📱 Unknown user role, staying on homepage');
+            break;
+        }
+        return;
+      }
     }
   }, [isMobileApp, user, platformLoading, authLoading, navigate, location, isPublicPage]);
 
