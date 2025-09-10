@@ -79,7 +79,7 @@ export function RefundManagement() {
   const { data: allRequests, isLoading: loadingAll } = useQuery({
     queryKey: ['refund-requests', 'all'],
     queryFn: async () => {
-      const response = await apiRequest('GET', '/api/refunds');
+      const response = await apiRequest('GET', '/api/refunds/all');
       return response.json();
     },
   });
