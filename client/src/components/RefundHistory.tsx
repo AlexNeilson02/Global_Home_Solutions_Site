@@ -195,7 +195,7 @@ export function RefundHistory({ type, contractorId }: RefundHistoryProps) {
                           )}
                           {request.refundDate && (
                             <div className="text-xs text-gray-500">
-                              Refund Date: {formatDate(request.refundDate)}
+                              Date Charged: {formatDate(request.refundDate)}
                             </div>
                           )}
                         </div>

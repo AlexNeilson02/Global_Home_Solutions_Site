@@ -277,7 +277,7 @@ export function RefundRequestForm({ contractorId }: RefundRequestFormProps) {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="refundDate">Refund Date</Label>
+                <Label htmlFor="refundDate">Date Charged</Label>
                 <Input
                   id="refundDate"
                   type="date"
