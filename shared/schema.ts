@@ -760,3 +760,30 @@ export const loginSchema = z.object({
 });
 
 export type LoginData = z.infer<typeof loginSchema>;
+
+// Customer Attribution API validation schemas
+export const customerAttributionUpgradeSchema = z.object({
+  customerEmail: z.string().email("Invalid email format").min(1, "Customer email is required"),
+  salespersonId: z.number().int().positive("Invalid salesperson ID"),
+  sessionToken: z.string().optional(), // Optional signed token for verification
+});
+
+export const customerAttributionQuerySchema = z.object({
+  email: z.string().email("Invalid email format").min(1, "Email is required"),
+});
+
+export const sessionAttributionCreateSchema = z.object({
+  salespersonId: z.number().int().positive("Invalid salesperson ID"),
+  attributionSource: z.enum(['qr_code', 'nfc_tag', 'web_link'], {
+    required_error: "Attribution source is required",
+    invalid_type_error: "Invalid attribution source"
+  }),
+  customerName: z.string().optional(),
+  customerPhone: z.string().optional(),
+  sessionId: z.string().optional(), // Browser session ID for tracking
+});
+
+// Customer attribution API types
+export type CustomerAttributionUpgrade = z.infer<typeof customerAttributionUpgradeSchema>;
+export type CustomerAttributionQuery = z.infer<typeof customerAttributionQuerySchema>;
+export type SessionAttributionCreate = z.infer<typeof sessionAttributionCreateSchema>;

@@ -13,6 +13,8 @@ import {
   insertProjectSchema, 
   insertTestimonialSchema,
   insertBidRequestSchema,
+  customerAttributionUpgradeSchema,
+  customerAttributionQuerySchema,
   type User
 } from "@shared/schema";
 
@@ -351,6 +353,164 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error tracking visit:", error);
       res.status(500).json({ message: "Error tracking visit" });
+    }
+  });
+
+  // Customer Attribution routes - SECURED
+  // This endpoint allows customers to upgrade their session attribution to permanent
+  // when they install the PWA. Requires authentication to prevent unauthorized access.
+  apiRouter.post("/customer-attribution/upgrade", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      // Validate input with Zod schema
+      const validationResult = customerAttributionUpgradeSchema.safeParse(req.body);
+      if (!validationResult.success) {
+        return res.status(400).json({ 
+          message: "Invalid input data", 
+          errors: validationResult.error.errors 
+        });
+      }
+
+      const { customerEmail, salespersonId } = validationResult.data;
+      const user = req.user as User;
+
+      // Security check: Only allow customers to upgrade their own attribution
+      // or salespeople/admins to upgrade attributions for their customers
+      if (user.role === 'homeowner' && user.email !== customerEmail) {
+        return res.status(403).json({ 
+          message: "Forbidden - You can only upgrade your own customer attribution" 
+        });
+      }
+      
+      if (user.role === 'salesperson') {
+        // Verify the salesperson is trying to upgrade attribution to themselves
+        const salesperson = await storage.getSalespersonByUserId(user.id);
+        if (!salesperson || salesperson.id !== salespersonId) {
+          return res.status(403).json({ 
+            message: "Forbidden - You can only upgrade attributions to yourself" 
+          });
+        }
+      }
+
+      // Admin role can upgrade any attribution (no additional checks needed)
+
+      // Import the service dynamically to avoid circular dependencies
+      const { CustomerAttributionService } = await import('./customer-attribution-service');
+      const attributionService = new CustomerAttributionService(storage);
+      
+      // CRITICAL SECURITY: Verify existing session attribution matches salesperson
+      const existingAttribution = await attributionService.getCustomerAttribution(customerEmail);
+      if (!existingAttribution) {
+        return res.status(404).json({ 
+          message: "No session attribution found for this customer",
+          requiresSessionFirst: true
+        });
+      }
+      
+      if (existingAttribution.salespersonId !== salespersonId) {
+        return res.status(409).json({ 
+          message: "Attribution salesperson mismatch - session attribution is for different salesperson",
+          sessionSalespersonId: existingAttribution.salespersonId,
+          requestedSalespersonId: salespersonId
+        });
+      }
+      
+      if (existingAttribution.attributionType === 'permanent') {
+        return res.status(200).json({ 
+          success: true, 
+          message: "Attribution already permanent",
+          alreadyPermanent: true
+        });
+      }
+      
+      // Upgrade the customer attribution to permanent
+      const success = await attributionService.upgradeToPermanentAttribution(customerEmail, salespersonId);
+      
+      if (success) {
+        console.log(`🎉 PWA Installation - Attribution upgraded to permanent for salesperson ${salespersonId}`);
+        res.json({ 
+          success: true, 
+          message: "Attribution upgraded to permanent",
+          attributionType: "permanent"
+        });
+      } else {
+        console.warn(`⚠️ PWA Installation - Failed to upgrade attribution`);
+        res.status(500).json({ 
+          success: false, 
+          message: "Internal error upgrading attribution to permanent" 
+        });
+      }
+    } catch (error) {
+      console.error("Error upgrading customer attribution:", error);
+      res.status(500).json({ message: "Error upgrading customer attribution" });
+    }
+  });
+
+  // Get customer attribution status - SECURED
+  // Only authenticated users can check attribution status, and only for themselves or their customers
+  apiRouter.get("/customer-attribution/:email", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      // Validate email parameter
+      const validationResult = customerAttributionQuerySchema.safeParse({ email: req.params.email });
+      if (!validationResult.success) {
+        return res.status(400).json({ 
+          message: "Invalid email format", 
+          errors: validationResult.error.errors 
+        });
+      }
+
+      const customerEmail = validationResult.data.email;
+      const user = req.user as User;
+
+      // Security check: Only allow access to own attribution or authorized users
+      if (user.role === 'homeowner' && user.email !== customerEmail) {
+        return res.status(403).json({ 
+          message: "Forbidden - You can only check your own attribution status" 
+        });
+      }
+      
+      // Salespeople can only check attribution for their own customers
+      if (user.role === 'salesperson') {
+        const salesperson = await storage.getSalespersonByUserId(user.id);
+        if (!salesperson) {
+          return res.status(403).json({ message: "Salesperson profile not found" });
+        }
+        
+        // Verify this customer is attributed to this salesperson
+        const { CustomerAttributionService } = await import('./customer-attribution-service');
+        const attributionService = new CustomerAttributionService(storage);
+        const attribution = await attributionService.getCustomerAttribution(customerEmail);
+        
+        if (!attribution || attribution.salespersonId !== salesperson.id) {
+          return res.status(403).json({ 
+            message: "Forbidden - Customer not attributed to you" 
+          });
+        }
+      }
+      
+      // Admin role can check any attribution (no additional checks needed)
+
+      // Import the service dynamically
+      const { CustomerAttributionService } = await import('./customer-attribution-service');
+      const attributionService = new CustomerAttributionService(storage);
+      
+      const attribution = await attributionService.getCustomerAttribution(customerEmail);
+      const hasPermanent = await attributionService.hasPermanentAttribution(customerEmail);
+      
+      // Return limited information to protect privacy
+      res.json({
+        hasAttribution: !!attribution,
+        attributionType: attribution?.attributionType || null,
+        hasPermanentAttribution: hasPermanent,
+        createdAt: attribution?.createdAt || null,
+        permanentAttributionDate: attribution?.permanentAttributionDate || null,
+        // Only include salesperson info for authorized users
+        ...(user.role === 'admin' || user.role === 'salesperson' ? {
+          salespersonId: attribution?.salespersonId || null
+        } : {})
+      });
+    } catch (error) {
+      console.error("Error getting customer attribution:", error);
+      res.status(500).json({ message: "Error getting customer attribution" });
     }
   });
 
