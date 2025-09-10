@@ -361,20 +361,7 @@ export function CommissionDashboard({ salespersonId }: CommissionDashboardProps)
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-blue-600">50%</div>
-                    <div className="text-sm text-muted-foreground">Salesperson</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-purple-600">10%</div>
-                    <div className="text-sm text-muted-foreground">Override/Manager</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-gray-600">40%</div>
-                    <div className="text-sm text-muted-foreground">Corporate</div>
-                  </div>
-                </div>
+                
                 
                 {Array.isArray(rates) && rates.length > 0 && (
                   <div className="space-y-2">
