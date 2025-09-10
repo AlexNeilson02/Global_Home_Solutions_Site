@@ -6,9 +6,10 @@ import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { MobileAppAuthWrapper } from "@/components/MobileAppAuthWrapper";
 import { SalespersonProvider } from "@/contexts/SalespersonContext";
 import { PlatformProvider } from "@/contexts/PlatformContext";
+import { PostBidPWAProvider } from "@/contexts/PostBidPWAContext";
 import { AuthProvider } from "@/lib/auth";
 import { MobileViewportFix } from "@/components/mobile/MobileViewportFix";
-import { PWAInstallPrompt } from "@/components/PWAInstallPrompt";
+import { PostBidPWAPrompt } from "@/components/PostBidPWAPrompt";
 import HomePage from "@/pages/HomePageNew";
 import ContractorProfile from "@/pages/ContractorProfileDB";
 import ContractorPortalEnhanced from "@/pages/ContractorPortalEnhanced";
@@ -36,12 +37,13 @@ function App() {
       <PlatformProvider>
         <AuthProvider>
           <SalespersonProvider>
-            <TooltipProvider>
-              <MobileViewportFix />
-              <MobileAppAuthWrapper>
-                <div className="min-h-screen full-height smooth-scroll" style={{ marginTop: 0, paddingTop: 0, position: 'relative', top: 0 }}>
-                  <Toaster />
-                  <PWAInstallPrompt />
+            <PostBidPWAProvider>
+              <TooltipProvider>
+                <MobileViewportFix />
+                <MobileAppAuthWrapper>
+                  <div className="min-h-screen full-height smooth-scroll" style={{ marginTop: 0, paddingTop: 0, position: 'relative', top: 0 }}>
+                    <Toaster />
+                    <PostBidPWAPrompt />
               <Route path="/" component={HomePage} />
               <Route path="/about" component={AboutUs} />
               <Route path="/services" component={ServiceSelection} />
@@ -97,9 +99,10 @@ function App() {
                   <Subscribe />
                 </ProtectedRoute>
               </Route>
-                </div>
-              </MobileAppAuthWrapper>
-            </TooltipProvider>
+                  </div>
+                </MobileAppAuthWrapper>
+              </TooltipProvider>
+            </PostBidPWAProvider>
           </SalespersonProvider>
         </AuthProvider>
       </PlatformProvider>
