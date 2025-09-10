@@ -4,6 +4,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { useSalesperson } from "@/contexts/SalespersonContext";
+import { useAuth } from "@/lib/auth";
+import { apiRequest } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -26,7 +28,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { Upload, X, Image, Video, File } from "lucide-react";
+import { Upload, X, Image, Video, File, Loader2 } from "lucide-react";
 
 const bidRequestSchema = z.object({
   customerName: z.string().min(2, "Name must be at least 2 characters"),
@@ -55,9 +57,14 @@ export default function BidRequestForm({ isOpen, onClose, contractor }: BidReque
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { salespersonId } = useSalesperson();
+  const { user } = useAuth();
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
   const [filePreviewUrls, setFilePreviewUrls] = useState<string[]>([]);
   const [dialogReady, setDialogReady] = useState(false);
+  const [resolvedSalespersonId, setResolvedSalespersonId] = useState<number | null>(null);
+  const [attributionResolved, setAttributionResolved] = useState(false);
+  const [attributionLoading, setAttributionLoading] = useState(false);
+  const [attributionSource, setAttributionSource] = useState<'permanent' | 'session' | 'none'>('none');
 
   // Prevent immediate closing on open
   React.useEffect(() => {
@@ -70,10 +77,88 @@ export default function BidRequestForm({ isOpen, onClose, contractor }: BidReque
       setDialogReady(false);
     }
   }, [isOpen]);
+
+  // Check if app is running in PWA mode
+  const isPWAMode = () => {
+    return window.matchMedia('(display-mode: standalone)').matches || 
+           (window.navigator as any).standalone === true;
+  };
+
+  // Resolve attribution: check permanent attribution first in PWA mode, fallback to session
+  React.useEffect(() => {
+    const resolveAttribution = async () => {
+      if (!isOpen) {
+        setAttributionResolved(false);
+        setAttributionLoading(false);
+        setAttributionSource('none');
+        return;
+      }
+
+      setAttributionLoading(true);
+      setAttributionResolved(false);
+      setAttributionSource('none');
+
+      try {
+        // In PWA mode, check for permanent attribution first
+        if (isPWAMode() && user?.email) {
+          console.log('🏠 PWA Mode: Checking for permanent customer attribution', { email: user.email });
+          
+          try {
+            const attribution = await apiRequest('GET', `/api/customer-attribution/${encodeURIComponent(user.email)}`) as {
+              hasPermanentAttribution: boolean;
+              salespersonId: number | null;
+              attributionType: string | null;
+              customerEmail: string;
+            };
+            
+            if (attribution.hasPermanentAttribution && attribution.salespersonId) {
+              console.log('✅ PWA Mode: Found permanent attribution', {
+                salespersonId: attribution.salespersonId,
+                type: attribution.attributionType
+              });
+              setResolvedSalespersonId(attribution.salespersonId);
+              setAttributionSource('permanent');
+              setAttributionResolved(true);
+              setAttributionLoading(false);
+              return;
+            } else {
+              console.log('⚠️ PWA Mode: No permanent attribution found, checking session attribution');
+            }
+          } catch (error) {
+            console.warn('⚠️ PWA Mode: Error checking permanent attribution:', error);
+          }
+        }
+
+        // Fallback: use session attribution (existing behavior)
+        if (salespersonId !== null && salespersonId !== undefined && !isNaN(salespersonId)) {
+          console.log('📱 Using session attribution', { salespersonId });
+          setResolvedSalespersonId(salespersonId);
+          setAttributionSource('session');
+        } else {
+          console.log('❌ No attribution available (session or permanent)');
+          setResolvedSalespersonId(null);
+          setAttributionSource('none');
+        }
+        
+        setAttributionResolved(true);
+        setAttributionLoading(false);
+      } catch (error) {
+        console.error('❌ Error resolving attribution:', error);
+        setAttributionResolved(true); // Still mark as resolved to prevent hanging
+        setAttributionLoading(false);
+        setAttributionSource('none');
+      }
+    };
+
+    resolveAttribution();
+  }, [isOpen, user?.email, salespersonId]);
   
-  // Simple check for salesperson commission assignment
+  // Enhanced commission assignment check
   const shouldAssignCommission = () => {
-    return salespersonId !== null && salespersonId !== undefined && !isNaN(salespersonId);
+    return attributionResolved && 
+           resolvedSalespersonId !== null && 
+           resolvedSalespersonId !== undefined && 
+           !isNaN(resolvedSalespersonId);
   };
 
   // Fetch available services from the database
@@ -181,9 +266,9 @@ export default function BidRequestForm({ isOpen, onClose, contractor }: BidReque
         formData.append('budget', data.budget || '');
         formData.append('contractorId', data.contractorId.toString());
         
-        // Add salesperson attribution for commission tracking (only if URL parameter present)
+        // Add salesperson attribution for commission tracking (permanent or session)
         if (shouldAssignCommission()) {
-          formData.append('salespersonId', salespersonId!.toString());
+          formData.append('salespersonId', resolvedSalespersonId!.toString());
         }
         
         // Add files
@@ -220,8 +305,8 @@ export default function BidRequestForm({ isOpen, onClose, contractor }: BidReque
         // Use regular JSON for requests without files
         const submissionData = {
           ...data,
-          // Add salesperson attribution for commission tracking (only if URL parameter present)
-          ...(shouldAssignCommission() && { salespersonId: salespersonId })
+          // Add salesperson attribution for commission tracking (permanent or session)
+          ...(shouldAssignCommission() && { salespersonId: resolvedSalespersonId })
         };
         
         const response = await fetch("/api/bid-requests", {
@@ -268,8 +353,25 @@ export default function BidRequestForm({ isOpen, onClose, contractor }: BidReque
   });
 
   const onSubmit = (data: BidRequestForm) => {
+    // CRITICAL: Block submission if attribution not resolved to prevent race condition
+    if (!attributionResolved) {
+      console.error('🚨 BLOCKED: Attempt to submit bid request before attribution resolution completed');
+      toast({
+        title: "Please wait",
+        description: "Still checking for attribution... please wait a moment.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     console.log('=== BID REQUEST SUBMISSION DEBUG ===');
-    console.log('Salesperson ID from URL:', salespersonId);
+    console.log('PWA Mode:', isPWAMode());
+    console.log('User Email:', user?.email);
+    console.log('Session Salesperson ID:', salespersonId);
+    console.log('Resolved Salesperson ID:', resolvedSalespersonId);
+    console.log('Attribution Resolved:', attributionResolved);
+    console.log('Attribution Loading:', attributionLoading);
+    console.log('Attribution Source:', attributionSource);
     console.log('Should assign commission:', shouldAssignCommission());
     console.log('===================================');
     
@@ -284,12 +386,13 @@ export default function BidRequestForm({ isOpen, onClose, contractor }: BidReque
       preferredTimeframe: data.preferredTimeframe,
       budget: data.budget,
       contractorId: contractor.id,
-      // Only add salesperson ID if present in URL parameter
-      ...(shouldAssignCommission() && { salespersonId: salespersonId })
+      // Add resolved salesperson ID (permanent or session attribution)
+      ...(shouldAssignCommission() && { salespersonId: resolvedSalespersonId })
     };
     
     console.log('🚀 BidRequestForm - Final backend data:', backendData);
     console.log('🎯 Salesperson ID being sent:', backendData.salespersonId || 'NONE - NO COMMISSION TRACKING');
+    console.log('📊 ACTUAL Attribution source used:', attributionSource.toUpperCase());
     
     submitBidRequest.mutate(backendData);
   };
@@ -334,6 +437,18 @@ export default function BidRequestForm({ isOpen, onClose, contractor }: BidReque
             Fill out the form below to request a bid for your project. 
             {contractor.companyName} specializes in: {contractor.specialties?.join(", ")}
           </DialogDescription>
+          
+          {/* Attribution Loading State */}
+          {attributionLoading && (
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mt-2">
+              <div className="flex items-center gap-2">
+                <Loader2 className="h-4 w-4 animate-spin text-blue-600" />
+                <span className="text-sm text-blue-800 font-medium">
+                  Checking commission attribution...
+                </span>
+              </div>
+            </div>
+          )}
         </DialogHeader>
         
         <Form {...form}>
@@ -563,10 +678,20 @@ export default function BidRequestForm({ isOpen, onClose, contractor }: BidReque
               </Button>
               <Button 
                 type="submit" 
-                disabled={submitBidRequest.isPending}
+                disabled={!attributionResolved || attributionLoading || submitBidRequest.isPending}
                 className="bg-blue-600 hover:bg-blue-700 text-white font-semibold disabled:opacity-50"
+                data-testid="button-submit-bid-request"
               >
-                {submitBidRequest.isPending ? "Sending..." : "Send Bid Request"}
+                {attributionLoading ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                    Checking attribution...
+                  </>
+                ) : submitBidRequest.isPending ? (
+                  "Sending..."
+                ) : (
+                  "Send Bid Request"
+                )}
               </Button>
             </div>
           </form>
