@@ -200,6 +200,20 @@ const ContractorPortalEnhanced: React.FC = () => {
   const [viewingBidDetails, setViewingBidDetails] = useState<any | null>(null);
   const [viewingMedia, setViewingMedia] = useState<{url: string, type: 'image' | 'video', index: number, allMedia: any[]} | null>(null);
   const [newServiceArea, setNewServiceArea] = useState('');
+
+  // Handle Escape key for media viewer
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && viewingMedia) {
+        setViewingMedia(null);
+      }
+    };
+
+    if (viewingMedia) {
+      document.addEventListener('keydown', handleEscape);
+      return () => document.removeEventListener('keydown', handleEscape);
+    }
+  }, [viewingMedia]);
   
   // Subscription state
   const [subscriptionStatus, setSubscriptionStatus] = useState<'active' | 'inactive' | 'loading'>('loading');
@@ -2354,12 +2368,6 @@ const ContractorPortalEnhanced: React.FC = () => {
               setViewingMedia(null);
             }
           }}
-          onKeyDown={(e) => {
-            if (e.key === 'Escape') {
-              setViewingMedia(null);
-            }
-          }}
-          tabIndex={0}
         >
           <div 
             className="relative max-w-4xl w-full max-h-[90vh] bg-white dark:bg-gray-800 rounded-lg overflow-hidden"
