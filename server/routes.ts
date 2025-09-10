@@ -471,7 +471,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // All QR codes now point to homepage with unique salesperson tracking
-      const baseUrl = process.env.BASE_URL || `${req.protocol}://${req.get('host')}`;
+      const baseUrl = 'https://global-home-solutions.com';
       const landingPageUrl = `${baseUrl}/?ref=${salesperson.profileUrl}`;
       
       // Generate QR code as data URL

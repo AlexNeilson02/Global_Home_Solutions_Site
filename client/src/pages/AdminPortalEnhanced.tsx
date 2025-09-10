@@ -1450,7 +1450,7 @@ export default function AdminPortalEnhanced() {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="text-sm font-medium text-gray-600">Tracking URL</label>
-                    <p className="text-base">{selectedSalesperson.profileUrl ? `${window.location.origin}/?ref=${selectedSalesperson.profileUrl}` : 'No tracking URL available'}</p>
+                    <p className="text-base">{selectedSalesperson.profileUrl ? `https://global-home-solutions.com/?ref=${selectedSalesperson.profileUrl}` : 'No tracking URL available'}</p>
                   </div>
                   <div>
                     <label className="text-sm font-medium text-gray-600">Status</label>

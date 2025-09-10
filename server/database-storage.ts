@@ -275,11 +275,9 @@ export class DatabaseStorage implements IStorage {
     
     // Generate QR code for this salesperson
     try {
-      const baseUrl = process.env.NODE_ENV === 'production' 
-        ? process.env.PRODUCTION_URL || 'https://your-domain.com'
-        : 'http://localhost:5000';
+      const baseUrl = 'https://global-home-solutions.com';
       
-      const landingPageUrl = QRCodeService.generateLandingPageUrl(baseUrl, salesperson.profileUrl);
+      const landingPageUrl = `${baseUrl}/?ref=${salesperson.profileUrl}`;
       const qrCodeDataURL = await QRCodeService.generateQRCode(landingPageUrl);
       
       // Update the salesperson with the QR code

@@ -299,7 +299,7 @@ const SalesPortalEnhanced: React.FC = () => {
   ];
 
   const profileUrl = salesperson?.profileUrl ? 
-    `${window.location.origin}/?ref=${salesperson.profileUrl}` : '';
+    `https://global-home-solutions.com/?ref=${salesperson.profileUrl}` : '';
 
   return (
     <div 
