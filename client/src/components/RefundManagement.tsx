@@ -522,7 +522,7 @@ export function RefundManagement() {
                     )}
                   </div>
                   <div>
-                    <Label className="text-sm font-medium text-gray-700">Refund Date</Label>
+                    <Label className="text-sm font-medium text-gray-700">Date Charged</Label>
                     <p className="text-sm">
                       {selectedRequest.refundDate ? new Date(selectedRequest.refundDate).toLocaleDateString() : 'Not specified'}
                     </p>

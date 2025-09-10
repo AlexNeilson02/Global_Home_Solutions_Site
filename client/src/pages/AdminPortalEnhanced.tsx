@@ -1359,26 +1359,20 @@ export default function AdminPortalEnhanced() {
 
           {/* Refunds Tab */}
           <TabsContent value="refunds">
-            <div className="space-y-6">
-              {/* Refund History */}
-              <RefundHistory type="admin" />
-              
-              {/* Refund Management for pending reviews */}
-              <Card style={antiYellowStyles}>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <RefreshCw className="h-5 w-5" />
-                    Pending Refund Reviews
-                  </CardTitle>
-                  <CardDescription>
-                    Review and approve/reject pending refund requests
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <RefundManagement />
-                </CardContent>
-              </Card>
-            </div>
+            <Card style={antiYellowStyles}>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <RefreshCw className="h-5 w-5" />
+                  Refund Request Management
+                </CardTitle>
+                <CardDescription>
+                  Review and manage all contractor refund requests
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <RefundManagement />
+              </CardContent>
+            </Card>
           </TabsContent>
 
           {/* Analytics Tab */}
