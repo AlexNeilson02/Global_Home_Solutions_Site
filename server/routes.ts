@@ -76,8 +76,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   const { refundRouter } = await import("./refund-routes");
   apiRouter.use("/refunds", refundRouter);
 
-  // Customer Attribution - Retroactive attribution endpoint
-  apiRouter.post("/customer-attribution/retroactive", async (req: Request, res: Response) => {
+  // Customer Attribution - Retroactive attribution endpoint (requires authentication)
+  apiRouter.post("/customer-attribution/retroactive", isAuthenticated, async (req: Request, res: Response) => {
     console.log('🎯 RETROACTIVE ATTRIBUTION ENDPOINT CALLED!');
     console.log('📝 Request body:', req.body);
     try {
@@ -90,6 +90,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const normalizedEmail = customerEmail.toLowerCase().trim();
+      
+      // Verify the authenticated user owns this email address
+      const user = req.user as User;
+      if (user.email !== normalizedEmail) {
+        console.log('❌ Email mismatch - user trying to create attribution for different email');
+        return res.status(403).json({ message: "You can only create attribution for your own email address" });
+      }
+      
       console.log('🔍 Checking retroactive attribution for email:', normalizedEmail);
 
       // Look for bid requests with this email that have salesperson attribution
