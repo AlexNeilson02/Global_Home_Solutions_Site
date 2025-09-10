@@ -35,46 +35,64 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // Check for existing user session on initial load
   useEffect(() => {
     const checkAuth = async () => {
+      console.log("🔐 PWA Auth: Starting authentication check...");
       const storedUser = localStorage.getItem('user');
       
       if (storedUser) {
         try {
           const parsedUser = JSON.parse(storedUser);
-          console.log("Loaded stored user:", parsedUser);
+          console.log("🔐 PWA Auth: Found stored user:", parsedUser.username);
           
-          // Verify session is still valid with server
+          // Set user immediately from localStorage for better UX (no flash)
+          setUser(parsedUser);
+          
+          // Verify session is still valid with server (with longer timeout for PWA)
           try {
-            // Create timeout for older browsers that don't support AbortSignal.timeout
+            // Increased timeout for PWA context (was 5000ms, now 15000ms)
             const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 5000);
+            const timeoutId = setTimeout(() => {
+              console.warn("🔐 PWA Auth: Session check timeout after 15s");
+              controller.abort();
+            }, 15000);
             
+            console.log("🔐 PWA Auth: Verifying session with server...");
             const response = await fetch('/api/auth/user', {
               credentials: 'include', // Important for session cookies
-              signal: controller.signal
+              signal: controller.signal,
+              cache: 'no-cache' // Prevent caching issues in PWA
             });
             
             clearTimeout(timeoutId);
             
             if (response.ok) {
               const serverUser = await response.json();
+              console.log("✅ PWA Auth: Session verified successfully");
               setUser(serverUser);
               localStorage.setItem('user', JSON.stringify(serverUser));
             } else {
               // Session expired, clear stored user
-              console.log("Session expired, clearing stored user");
+              console.warn("❌ PWA Auth: Session expired on server, status:", response.status);
               localStorage.removeItem('user');
               setUser(null);
             }
           } catch (error) {
-            console.warn("Could not verify session (network may be offline):", error);
-            // Keep stored user if network error, but don't fail
-            // This allows offline mode to work
+            // Check if it's a timeout or network error
+            if (error.name === 'AbortError') {
+              console.warn("⏰ PWA Auth: Session check timed out - keeping stored user for offline use");
+            } else {
+              console.warn("🌐 PWA Auth: Network error during session check:", error.message);
+            }
+            // Keep stored user if network error or timeout - allows offline/PWA use
+            console.log("🔄 PWA Auth: Using cached user data due to network issue");
             setUser(parsedUser);
           }
         } catch (err) {
-          console.error("Error parsing stored user:", err);
+          console.error("💥 PWA Auth: Error parsing stored user:", err);
           localStorage.removeItem('user');
+          setUser(null);
         }
+      } else {
+        console.log("🔐 PWA Auth: No stored user found");
       }
     };
     

@@ -23,6 +23,7 @@ export function getSession() {
     store: sessionStore,
     resave: false,
     saveUninitialized: false,
+    rolling: true, // Extend session on each request
     cookie: {
       httpOnly: true,
       secure: false, // Disable secure cookies for Replit deployment
