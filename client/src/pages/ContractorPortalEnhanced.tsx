@@ -30,7 +30,8 @@ import {
   CreditCard,
   Loader2,
   Settings,
-  RefreshCw
+  RefreshCw,
+  Video
 } from "lucide-react";
 import { Elements, useStripe, useElements, PaymentElement } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
@@ -2263,6 +2264,62 @@ const ContractorPortalEnhanced: React.FC = () => {
                 <p><strong>Budget:</strong> {viewingBidDetails.budget}</p>
                 <p><strong>Timeline:</strong> {viewingBidDetails.timeline}</p>
                 <p><strong>Status:</strong> <Badge variant="outline">{viewingBidDetails.status}</Badge></p>
+
+                {/* Project Photos Section */}
+                {viewingBidDetails.mediaFiles && viewingBidDetails.mediaFiles.length > 0 && (
+                  <div className="space-y-3">
+                    <h4 className="font-semibold flex items-center gap-2">
+                      <Camera className="h-4 w-4" />
+                      Project Photos ({viewingBidDetails.mediaFiles.length})
+                    </h4>
+                    <div className="grid grid-cols-3 gap-3">
+                      {viewingBidDetails.mediaFiles.map((media: any, index: number) => (
+                        <div 
+                          key={index} 
+                          className="relative group cursor-pointer border rounded-lg overflow-hidden hover:shadow-md transition-shadow"
+                          onClick={() => setViewingMedia({
+                            url: media.url,
+                            type: media.type,
+                            index,
+                            allMedia: viewingBidDetails.mediaFiles
+                          })}
+                        >
+                          {media.type === 'image' ? (
+                            <div className="relative">
+                              <img
+                                src={media.url}
+                                alt={`Project photo ${index + 1}`}
+                                className="w-full h-24 object-cover"
+                              />
+                              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
+                                <Eye className="h-4 w-4 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="h-24 bg-gray-100 flex items-center justify-center group-hover:bg-gray-200 transition-colors">
+                              <div className="text-center">
+                                <Video className="h-6 w-6 text-gray-500 mx-auto mb-1" />
+                                <p className="text-xs text-gray-600">Video</p>
+                              </div>
+                              <div className="absolute inset-0 flex items-center justify-center">
+                                <Eye className="h-4 w-4 text-gray-600 opacity-0 group-hover:opacity-100 transition-opacity" />
+                              </div>
+                            </div>
+                          )}
+                          
+                          <div className="p-2 bg-gray-50">
+                            <p className="text-xs font-medium truncate">{media.name || `File ${index + 1}`}</p>
+                            {media.size && (
+                              <p className="text-xs text-gray-500">
+                                {(media.size / 1024 / 1024).toFixed(1)} MB
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
