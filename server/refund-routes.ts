@@ -477,3 +477,47 @@ refundRouter.post('/:id/process', isAuthenticated, requireRole(['admin']), async
     res.status(500).json({ error: 'Failed to process refund' });
   }
 });
+
+// Mark a manually approved refund as processed - admin only
+refundRouter.post('/:id/mark-processed', isAuthenticated, requireRole(['admin']), async (req: Request, res: Response) => {
+  try {
+    const refundRequestId = parseInt(req.params.id);
+    const user = req.user as any;
+
+    const refundRequest = await storage.getRefundRequest(refundRequestId);
+    if (!refundRequest) {
+      return res.status(404).json({ message: "Refund request not found" });
+    }
+
+    if (refundRequest.status !== 'approved_manual') {
+      return res.status(400).json({ message: "Can only mark manually approved refund requests as processed" });
+    }
+
+    if (refundRequest.processedAt) {
+      return res.status(400).json({ message: "Refund has already been processed" });
+    }
+
+    // Update the refund request as processed without Stripe refund ID
+    const updatedRequest = await storage.updateRefundRequestStatus(
+      refundRequestId,
+      'processed',
+      user.id,
+      `Manually marked as processed by admin. Refund of $${refundRequest.amount} was handled outside the system.`
+    );
+
+    // Also set the processed timestamp
+    await storage.updateRefundRequestProcessing(
+      refundRequestId,
+      'manual_processing', // Use a placeholder since no Stripe refund ID
+      new Date()
+    );
+
+    res.json({
+      message: 'Refund marked as processed successfully',
+      refundRequest: updatedRequest
+    });
+  } catch (error) {
+    console.error('Error marking refund as processed:', error);
+    res.status(500).json({ error: 'Failed to mark refund as processed' });
+  }
+});

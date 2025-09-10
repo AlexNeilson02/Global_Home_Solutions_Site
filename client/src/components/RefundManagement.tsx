@@ -28,7 +28,7 @@ interface RefundRequest {
   description?: string;
   bidRequestId?: number;
   refundDate?: string;
-  status: 'pending' | 'approved' | 'rejected' | 'processed' | 'failed';
+  status: 'pending' | 'approved' | 'approved_manual' | 'rejected' | 'processed' | 'failed';
   requestedAt: string;
   requestedBy: number;
   reviewedBy?: number;
@@ -143,6 +143,28 @@ export function RefundManagement() {
     }
   });
 
+  // Mark as processed mutation (for manual refunds)
+  const markAsProcessedMutation = useMutation({
+    mutationFn: async (id: number) => {
+      const response = await apiRequest('POST', `/api/refunds/${id}/mark-processed`);
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Success",
+        description: "Refund marked as processed successfully.",
+      });
+      queryClient.invalidateQueries({ queryKey: ['refund-requests'] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to mark refund as processed",
+        variant: "destructive",
+      });
+    }
+  });
+
   const handleReviewSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedRequest) return;
@@ -161,6 +183,8 @@ export function RefundManagement() {
         return <Clock className="h-4 w-4 text-yellow-600" />;
       case 'approved':
         return <CheckCircle className="h-4 w-4 text-green-600" />;
+      case 'approved_manual':
+        return <Clock className="h-4 w-4 text-orange-600" />;
       case 'rejected':
         return <AlertCircle className="h-4 w-4 text-red-600" />;
       case 'processed':
@@ -178,6 +202,8 @@ export function RefundManagement() {
         return <Badge variant="secondary" className="bg-yellow-100 text-yellow-700">Pending Review</Badge>;
       case 'approved':
         return <Badge variant="secondary" className="bg-green-100 text-green-700">Approved</Badge>;
+      case 'approved_manual':
+        return <Badge variant="secondary" className="bg-orange-100 text-orange-700">Manual Processing</Badge>;
       case 'rejected':
         return <Badge variant="secondary" className="bg-red-100 text-red-700">Rejected</Badge>;
       case 'processed':
@@ -406,6 +432,7 @@ export function RefundManagement() {
                           variant="default"
                           onClick={() => processRefundMutation.mutate(request.id)}
                           disabled={processRefundMutation.isPending}
+                          className="text-[#000000]"
                         >
                           {processRefundMutation.isPending ? (
                             <Loader2 className="h-4 w-4 mr-1 animate-spin" />
@@ -413,6 +440,22 @@ export function RefundManagement() {
                             <DollarSign className="h-4 w-4 mr-1" />
                           )}
                           Process Refund
+                        </Button>
+                      )}
+                      {request.status === 'approved_manual' && !request.processedAt && (
+                        <Button
+                          size="sm"
+                          variant="secondary"
+                          onClick={() => markAsProcessedMutation.mutate(request.id)}
+                          disabled={markAsProcessedMutation.isPending}
+                          className="bg-blue-100 text-blue-700 hover:bg-blue-200"
+                        >
+                          {markAsProcessedMutation.isPending ? (
+                            <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                          ) : (
+                            <CheckCircle className="h-4 w-4 mr-1" />
+                          )}
+                          Mark as Processed
                         </Button>
                       )}
                       {request.status === 'pending' && (

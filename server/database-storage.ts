@@ -1431,14 +1431,20 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateRefundRequestProcessing(id: number, stripeRefundId: string, processedAt: Date): Promise<RefundRequest | undefined> {
+    const updateData: any = { 
+      processedAt,
+      status: 'processed',
+      updatedAt: new Date()
+    };
+    
+    // Only set stripeRefundId if it's not a manual processing placeholder
+    if (stripeRefundId !== 'manual_processing') {
+      updateData.stripeRefundId = stripeRefundId;
+    }
+
     const [refundRequest] = await db
       .update(refundRequests)
-      .set({ 
-        stripeRefundId,
-        processedAt,
-        status: 'processed',
-        updatedAt: new Date()
-      })
+      .set(updateData)
       .where(eq(refundRequests.id, id))
       .returning();
     return refundRequest;
