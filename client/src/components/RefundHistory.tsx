@@ -53,10 +53,14 @@ export function RefundHistory({ type, contractorId }: RefundHistoryProps) {
         return <Clock className="h-4 w-4 text-yellow-600" />;
       case 'approved':
         return <CheckCircle className="h-4 w-4 text-green-600" />;
+      case 'approved_manual':
+        return <Clock className="h-4 w-4 text-orange-600" />;
       case 'rejected':
         return <AlertCircle className="h-4 w-4 text-red-600" />;
       case 'processed':
         return <CheckCircle className="h-4 w-4 text-blue-600" />;
+      case 'failed':
+        return <AlertCircle className="h-4 w-4 text-red-600" />;
       default:
         return <Clock className="h-4 w-4 text-gray-600" />;
     }
@@ -68,10 +72,14 @@ export function RefundHistory({ type, contractorId }: RefundHistoryProps) {
         return <Badge variant="secondary" className="bg-yellow-100 text-yellow-700">Pending Review</Badge>;
       case 'approved':
         return <Badge variant="secondary" className="bg-green-100 text-green-700">Approved</Badge>;
+      case 'approved_manual':
+        return <Badge variant="secondary" className="bg-orange-100 text-orange-700">Approved (Manual)</Badge>;
       case 'rejected':
         return <Badge variant="secondary" className="bg-red-100 text-red-700">Rejected</Badge>;
       case 'processed':
         return <Badge variant="secondary" className="bg-blue-100 text-blue-700">Processed</Badge>;
+      case 'failed':
+        return <Badge variant="secondary" className="bg-red-100 text-red-700">Failed</Badge>;
       default:
         return <Badge variant="secondary">{status}</Badge>;
     }
@@ -151,8 +159,10 @@ export function RefundHistory({ type, contractorId }: RefundHistoryProps) {
                 <SelectItem value="all">All Status</SelectItem>
                 <SelectItem value="pending">Pending</SelectItem>
                 <SelectItem value="approved">Approved</SelectItem>
+                <SelectItem value="approved_manual">Approved (Manual)</SelectItem>
                 <SelectItem value="rejected">Rejected</SelectItem>
                 <SelectItem value="processed">Processed</SelectItem>
+                <SelectItem value="failed">Failed</SelectItem>
               </SelectContent>
             </Select>
           </div>
