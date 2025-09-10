@@ -28,7 +28,9 @@ import {
   User,
   CheckCircle,
   X,
-  Plus
+  Plus,
+  Upload,
+  Camera
 } from "lucide-react";
 
 const bidRequestSchema = z.object({
@@ -69,6 +71,64 @@ export default function MobileHomeownerBidRequest() {
   const [selectedServices, setSelectedServices] = useState<string[]>([]);
   const [selectedContractors, setSelectedContractors] = useState<number[]>([]);
   const [activeTab, setActiveTab] = useState("requests");
+  const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
+  const [filePreviewUrls, setFilePreviewUrls] = useState<string[]>([]);
+
+  // Handle file upload
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(event.target.files || []);
+    const validFiles = files.filter(file => {
+      const isValidType = file.type.startsWith('image/') || file.type.startsWith('video/');
+      const isValidSize = file.size <= 50 * 1024 * 1024; // 50MB limit
+      
+      if (!isValidType) {
+        toast({
+          title: "Invalid file type",
+          description: "Please upload only images or videos",
+          variant: "destructive",
+        });
+        return false;
+      }
+      
+      if (!isValidSize) {
+        toast({
+          title: "File too large",
+          description: "Please upload files smaller than 50MB",
+          variant: "destructive",
+        });
+        return false;
+      }
+      
+      return true;
+    });
+
+    if (validFiles.length > 0) {
+      setUploadedFiles(prev => [...prev, ...validFiles]);
+      
+      // Create preview URLs for images
+      validFiles.forEach(file => {
+        if (file.type.startsWith('image/')) {
+          const url = URL.createObjectURL(file);
+          setFilePreviewUrls(prev => [...prev, url]);
+        }
+      });
+
+      toast({
+        title: "Files uploaded",
+        description: `${validFiles.length} file(s) added successfully`,
+      });
+    }
+  };
+
+  const removeFile = (index: number) => {
+    const fileToRemove = uploadedFiles[index];
+    if (fileToRemove && fileToRemove.type.startsWith('image/')) {
+      URL.revokeObjectURL(filePreviewUrls[index]);
+    }
+    
+    setUploadedFiles(prev => prev.filter((_, i) => i !== index));
+    setFilePreviewUrls(prev => prev.filter((_, i) => i !== index));
+  };
   
   const form = useForm<BidRequestForm>({
     resolver: zodResolver(bidRequestSchema),
@@ -108,12 +168,49 @@ export default function MobileHomeownerBidRequest() {
   // Submit bid request mutation
   const submitBidRequest = useMutation({
     mutationFn: async (data: BidRequestForm & { contractorId: number }) => {
-      return apiRequest('POST', '/api/bid-requests', {
+      const allFieldsData = {
         fullName: user?.fullName || "",
         email: user?.email || "",
         phone: user?.phone || "",
         ...data
-      });
+      };
+
+      // If there are files, use FormData; otherwise use JSON
+      if (uploadedFiles.length > 0) {
+        const formDataMultipart = new FormData();
+        
+        // Add form fields
+        formDataMultipart.append('fullName', allFieldsData.fullName);
+        formDataMultipart.append('email', allFieldsData.email);
+        formDataMultipart.append('phone', allFieldsData.phone);
+        formDataMultipart.append('servicesRequested', JSON.stringify(allFieldsData.servicesRequested));
+        formDataMultipart.append('description', allFieldsData.description);
+        formDataMultipart.append('address', allFieldsData.address);
+        formDataMultipart.append('timeline', allFieldsData.timeline);
+        formDataMultipart.append('budget', allFieldsData.budget || '');
+        formDataMultipart.append('preferredContactMethod', allFieldsData.preferredContactMethod);
+        formDataMultipart.append('additionalInformation', allFieldsData.additionalInformation || '');
+        formDataMultipart.append('contractorId', allFieldsData.contractorId.toString());
+        
+        // Add files
+        uploadedFiles.forEach(file => {
+          formDataMultipart.append('media', file);
+        });
+
+        const response = await fetch("/api/bid-requests", {
+          method: "POST",
+          body: formDataMultipart, // Use FormData for file uploads
+        });
+        
+        if (!response.ok) {
+          throw new Error("Failed to submit bid request");
+        }
+        
+        return response.json();
+      } else {
+        // No files, use regular JSON
+        return apiRequest('POST', '/api/bid-requests', allFieldsData);
+      }
     },
     onSuccess: () => {
       toast({
@@ -554,6 +651,87 @@ export default function MobileHomeownerBidRequest() {
                       </FormItem>
                     )}
                   />
+
+                  {/* Photo Upload Section */}
+                  <div className="space-y-4">
+                    <div>
+                      <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                        <Camera className="w-4 h-4" />
+                        Photos (Optional)
+                      </label>
+                      <p className="text-sm text-gray-500 mt-1">
+                        Add photos to help contractors better understand your project
+                      </p>
+                    </div>
+                    
+                    <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-500 transition-colors">
+                      <input
+                        type="file"
+                        multiple
+                        accept="image/*,video/*"
+                        onChange={handleFileUpload}
+                        className="hidden"
+                        id="file-upload"
+                      />
+                      <label htmlFor="file-upload" className="cursor-pointer">
+                        <Upload className="w-8 h-8 mx-auto text-gray-400 mb-2" />
+                        <div className="text-sm text-gray-600">
+                          <span className="font-medium text-blue-600 hover:text-blue-500">
+                            Click to upload
+                          </span>{" "}
+                          or drag and drop
+                        </div>
+                        <p className="text-xs text-gray-500 mt-1">
+                          PNG, JPG, MP4 up to 50MB
+                        </p>
+                      </label>
+                    </div>
+
+                    {/* File Previews */}
+                    {uploadedFiles.length > 0 && (
+                      <div className="space-y-3">
+                        <h4 className="text-sm font-medium text-gray-700">
+                          Uploaded Files ({uploadedFiles.length})
+                        </h4>
+                        <div className="space-y-2">
+                          {uploadedFiles.map((file, index) => (
+                            <div key={index} className="flex items-center justify-between bg-gray-50 p-3 rounded-lg">
+                              <div className="flex items-center space-x-3">
+                                {file.type.startsWith('image/') ? (
+                                  <img
+                                    src={filePreviewUrls[index]}
+                                    alt={file.name}
+                                    className="w-12 h-12 object-cover rounded"
+                                  />
+                                ) : (
+                                  <div className="w-12 h-12 bg-gray-200 rounded flex items-center justify-center">
+                                    <FileText className="w-6 h-6 text-gray-500" />
+                                  </div>
+                                )}
+                                <div>
+                                  <p className="text-sm font-medium text-gray-900 truncate max-w-[200px]">
+                                    {file.name}
+                                  </p>
+                                  <p className="text-xs text-gray-500">
+                                    {(file.size / 1024 / 1024).toFixed(1)} MB
+                                  </p>
+                                </div>
+                              </div>
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => removeFile(index)}
+                                className="text-red-600 hover:text-red-700"
+                              >
+                                <X className="w-4 h-4" />
+                              </Button>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </CardContent>
               </Card>
 
