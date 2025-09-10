@@ -177,6 +177,7 @@ const ContractorPortalEnhanced: React.FC = () => {
     companyName: '',
     description: '',
     specialties: [] as string[],
+    serviceCategoryIds: [] as number[],
     serviceAreas: [] as string[],
     phone: '',
     email: '',
@@ -517,6 +518,7 @@ const ContractorPortalEnhanced: React.FC = () => {
         companyName: contractor.companyName || '',
         description: contractor.description || '',
         specialties: contractor.specialties || [],
+        serviceCategoryIds: contractor.serviceCategoryIds || [],
         serviceAreas: contractor.serviceAreas || [],
         phone: contractor.phone || '',
         email: contractor.email || '',
@@ -701,9 +703,18 @@ const ContractorPortalEnhanced: React.FC = () => {
   const removeSpecialty = (specialty: string) => {
     try {
       const currentSpecialties = Array.isArray(editForm.specialties) ? editForm.specialties : [];
+      const currentServiceIds = Array.isArray(editForm.serviceCategoryIds) ? editForm.serviceCategoryIds : [];
+      
+      // Find the service category ID for this specialty name
+      const serviceCategory = serviceCategories?.find((cat: any) => cat.name === specialty);
+      const serviceIdToRemove = serviceCategory?.id;
+      
       setEditForm(prev => ({
         ...prev,
-        specialties: currentSpecialties.filter(s => s !== specialty)
+        specialties: currentSpecialties.filter(s => s !== specialty),
+        serviceCategoryIds: serviceIdToRemove 
+          ? currentServiceIds.filter(id => id !== serviceIdToRemove)
+          : currentServiceIds
       }));
     } catch (error) {
       console.error('Error removing specialty:', error);
@@ -797,6 +808,7 @@ const ContractorPortalEnhanced: React.FC = () => {
         companyName: contractor.companyName || '',
         description: contractor.description || '',
         specialties: contractor.specialties || [],
+        serviceCategoryIds: contractor.serviceCategoryIds || [],
         serviceAreas: contractor.serviceAreas || [],
         phone: contractor.phone || '',
         email: contractor.email || '',
@@ -1522,10 +1534,19 @@ const ContractorPortalEnhanced: React.FC = () => {
                                   const value = e.target.value;
                                   if (value && typeof value === 'string') {
                                     const currentSpecialties = Array.isArray(editForm.specialties) ? editForm.specialties : [];
+                                    const currentServiceIds = Array.isArray(editForm.serviceCategoryIds) ? editForm.serviceCategoryIds : [];
+                                    
                                     if (!currentSpecialties.includes(value)) {
+                                      // Find the service category ID for this specialty name
+                                      const serviceCategory = serviceCategories?.find((cat: any) => cat.name === value);
+                                      const serviceId = serviceCategory?.id;
+                                      
                                       setEditForm(prev => ({
                                         ...prev,
-                                        specialties: [...currentSpecialties, value]
+                                        specialties: [...currentSpecialties, value],
+                                        serviceCategoryIds: serviceId && !currentServiceIds.includes(serviceId)
+                                          ? [...currentServiceIds, serviceId]
+                                          : currentServiceIds
                                       }));
                                     }
                                   }
