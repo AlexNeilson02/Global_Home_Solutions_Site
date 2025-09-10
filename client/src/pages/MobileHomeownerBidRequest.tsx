@@ -468,21 +468,12 @@ export default function MobileHomeownerBidRequest() {
                           <Calendar className="w-4 h-4" />
                           Timeline *
                         </FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="When do you need this done?" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="ASAP">ASAP</SelectItem>
-                            <SelectItem value="Within 1 week">Within 1 week</SelectItem>
-                            <SelectItem value="Within 2 weeks">Within 2 weeks</SelectItem>
-                            <SelectItem value="Within 1 month">Within 1 month</SelectItem>
-                            <SelectItem value="Within 3 months">Within 3 months</SelectItem>
-                            <SelectItem value="Flexible">Flexible</SelectItem>
-                          </SelectContent>
-                        </Select>
+                        <FormControl>
+                          <Input 
+                            placeholder="When do you need this done? (e.g., ASAP, Within 1 week, Flexible)"
+                            {...field}
+                          />
+                        </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
@@ -497,21 +488,12 @@ export default function MobileHomeownerBidRequest() {
                           <DollarSign className="w-4 h-4" />
                           Budget (Optional)
                         </FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="What's your budget range?" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="Under $500">Under $500</SelectItem>
-                            <SelectItem value="$500 - $1,000">$500 - $1,000</SelectItem>
-                            <SelectItem value="$1,000 - $5,000">$1,000 - $5,000</SelectItem>
-                            <SelectItem value="$5,000 - $10,000">$5,000 - $10,000</SelectItem>
-                            <SelectItem value="$10,000 - $25,000">$10,000 - $25,000</SelectItem>
-                            <SelectItem value="Over $25,000">Over $25,000</SelectItem>
-                          </SelectContent>
-                        </Select>
+                        <FormControl>
+                          <Input 
+                            placeholder="What's your budget? (e.g., $5,000, Under $1,000, Flexible)"
+                            {...field}
+                          />
+                        </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
@@ -530,6 +512,12 @@ export default function MobileHomeownerBidRequest() {
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
+                            <SelectItem value="text">
+                              <div className="flex items-center gap-2">
+                                <Phone className="w-4 h-4" />
+                                Text
+                              </div>
+                            </SelectItem>
                             <SelectItem value="phone">
                               <div className="flex items-center gap-2">
                                 <Phone className="w-4 h-4" />
