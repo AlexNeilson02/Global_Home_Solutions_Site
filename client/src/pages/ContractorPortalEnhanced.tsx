@@ -2266,14 +2266,32 @@ const ContractorPortalEnhanced: React.FC = () => {
                 <p><strong>Status:</strong> <Badge variant="outline">{viewingBidDetails.status}</Badge></p>
 
                 {/* Project Photos Section */}
-                {viewingBidDetails.mediaFiles && viewingBidDetails.mediaFiles.length > 0 && (
+                {(() => {
+                  // Parse media files from additionalInformation
+                  let mediaFiles = [];
+                  if (viewingBidDetails.additionalInformation) {
+                    try {
+                      const parsed = JSON.parse(viewingBidDetails.additionalInformation);
+                      if (parsed.mediaUrls && Array.isArray(parsed.mediaUrls)) {
+                        mediaFiles = parsed.mediaUrls.map((url: string, index: number) => ({
+                          url,
+                          type: url.startsWith('data:image/') ? 'image' : 'video',
+                          name: `File ${index + 1}`
+                        }));
+                      }
+                    } catch (e) {
+                      console.log('Could not parse media files from additionalInformation');
+                    }
+                  }
+                  
+                  return mediaFiles.length > 0 && (
                   <div className="space-y-3">
                     <h4 className="font-semibold flex items-center gap-2">
                       <Camera className="h-4 w-4" />
-                      Project Photos ({viewingBidDetails.mediaFiles.length})
+                      Project Photos ({mediaFiles.length})
                     </h4>
                     <div className="grid grid-cols-3 gap-3">
-                      {viewingBidDetails.mediaFiles.map((media: any, index: number) => (
+                      {mediaFiles.map((media: any, index: number) => (
                         <div 
                           key={index} 
                           className="relative group cursor-pointer border rounded-lg overflow-hidden hover:shadow-md transition-shadow"
@@ -2281,7 +2299,7 @@ const ContractorPortalEnhanced: React.FC = () => {
                             url: media.url,
                             type: media.type,
                             index,
-                            allMedia: viewingBidDetails.mediaFiles
+                            allMedia: mediaFiles
                           })}
                         >
                           {media.type === 'image' ? (
@@ -2319,7 +2337,8 @@ const ContractorPortalEnhanced: React.FC = () => {
                       ))}
                     </div>
                   </div>
-                )}
+                  );
+                })()}
               </div>
             </div>
           </div>
