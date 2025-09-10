@@ -877,26 +877,6 @@ const SalesPortalEnhanced: React.FC = () => {
                         </Button>
                       </div>
                     </div>
-                    
-                    <div>
-                      <label className="block text-sm font-medium mb-2">NFC ID</label>
-                      <div className="flex gap-2">
-                        <Input 
-                          value={salesperson?.nfcId || ''} 
-                          readOnly 
-                          className="flex-1"
-                          style={antiYellowInputStyles}
-                        />
-                        <Button 
-                          onClick={() => copyToClipboard(salesperson?.nfcId || '', 'NFC ID')}
-                          variant="outline"
-                          size="sm"
-                          style={antiYellowInputStyles}
-                        >
-                          <Copy className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </div>
 
                     {profileUrl && (
                       <div className="pt-4">
