@@ -2,7 +2,7 @@ import { eq, and, or, desc, sql, asc, count, avg, max, lt, gt, between, ne, getT
 import { db } from "./db";
 import { 
   users, contractors, salespersons, projects, testimonials, serviceCategories, bidRequests, pageVisits,
-  documents, projectMilestones, projectStatusUpdates, commissionRecords, commissionAdjustments, commissionPayments,
+  customerAttributions, documents, projectMilestones, projectStatusUpdates, commissionRecords, commissionAdjustments, commissionPayments,
   emailCommunications, refundRequests,
   type User, type InsertUser,
   type Contractor, type InsertContractor,
@@ -12,6 +12,7 @@ import {
   type ServiceCategory, type InsertServiceCategory,
   type BidRequest, type InsertBidRequest,
   type PageVisit, type InsertPageVisit,
+  type CustomerAttribution, type InsertCustomerAttribution,
   type Document, type InsertDocument,
   type ProjectMilestone, type InsertProjectMilestone,
   type ProjectStatusUpdate, type InsertProjectStatusUpdate,
@@ -707,6 +708,127 @@ export class DatabaseStorage implements IStorage {
       .limit(1);
     
     return visit;
+  }
+
+  // Customer Attribution methods
+  async createCustomerAttribution(attribution: InsertCustomerAttribution): Promise<CustomerAttribution> {
+    // Normalize email to lowercase for consistency
+    const normalizedAttribution = {
+      ...attribution,
+      customerEmail: attribution.customerEmail.toLowerCase()
+    };
+    const [customerAttribution] = await db.insert(customerAttributions).values(normalizedAttribution).returning();
+    return customerAttribution;
+  }
+
+  async getCustomerAttribution(id: number): Promise<CustomerAttribution | undefined> {
+    const [attribution] = await db.select().from(customerAttributions).where(eq(customerAttributions.id, id));
+    return attribution;
+  }
+
+  async getCustomerAttributionByEmail(email: string): Promise<CustomerAttribution | undefined> {
+    const [attribution] = await db
+      .select()
+      .from(customerAttributions)
+      .where(
+        and(
+          eq(customerAttributions.customerEmail, email.toLowerCase()),
+          eq(customerAttributions.isActive, true)
+        )
+      )
+      .orderBy(desc(customerAttributions.createdAt))
+      .limit(1);
+    return attribution;
+  }
+
+  async getCustomerAttributionsByEmailAndSalesperson(email: string, salespersonId: number): Promise<CustomerAttribution | undefined> {
+    const [attribution] = await db
+      .select()
+      .from(customerAttributions)
+      .where(
+        and(
+          eq(customerAttributions.customerEmail, email.toLowerCase()),
+          eq(customerAttributions.salespersonId, salespersonId),
+          eq(customerAttributions.isActive, true)
+        )
+      )
+      .orderBy(desc(customerAttributions.createdAt))
+      .limit(1);
+    return attribution;
+  }
+
+  async upgradeCustomerAttributionToPermanent(email: string, salespersonId: number): Promise<CustomerAttribution | undefined> {
+    const normalizedEmail = email.toLowerCase();
+    
+    // First, find the specific attribution to upgrade
+    const existing = await this.getCustomerAttributionsByEmailAndSalesperson(normalizedEmail, salespersonId);
+    if (!existing) return undefined;
+    
+    // Use a transaction to ensure atomicity
+    return await db.transaction(async (tx) => {
+      // Deactivate any conflicting active attributions for this email
+      await tx
+        .update(customerAttributions)
+        .set({ isActive: false })
+        .where(
+          and(
+            eq(customerAttributions.customerEmail, normalizedEmail),
+            eq(customerAttributions.isActive, true),
+            ne(customerAttributions.id, existing.id)
+          )
+        );
+      
+      // Upgrade the specific attribution to permanent
+      const [attribution] = await tx
+        .update(customerAttributions)
+        .set({
+          attributionType: 'permanent',
+          permanentAttributionDate: new Date()
+        })
+        .where(eq(customerAttributions.id, existing.id))
+        .returning();
+      
+      return attribution;
+    });
+  }
+
+  async updateCustomerAttributionStats(email: string, salespersonId: number): Promise<CustomerAttribution | undefined> {
+    // Use atomic SQL increment to prevent race conditions
+    const [attribution] = await db
+      .update(customerAttributions)
+      .set({
+        totalBidRequests: sql`${customerAttributions.totalBidRequests} + 1`,
+        lastBidRequestDate: new Date()
+      })
+      .where(
+        and(
+          eq(customerAttributions.customerEmail, email.toLowerCase()),
+          eq(customerAttributions.salespersonId, salespersonId),
+          eq(customerAttributions.isActive, true)
+        )
+      )
+      .returning();
+    return attribution;
+  }
+
+  async getActiveCustomerAttributionByEmail(email: string): Promise<CustomerAttribution | undefined> {
+    const [attribution] = await db
+      .select()
+      .from(customerAttributions)
+      .where(
+        and(
+          eq(customerAttributions.customerEmail, email.toLowerCase()),
+          eq(customerAttributions.isActive, true)
+        )
+      )
+      .orderBy(
+        // Prefer permanent over session attribution
+        desc(sql`CASE WHEN ${customerAttributions.attributionType} = 'permanent' THEN 1 ELSE 0 END`),
+        desc(customerAttributions.permanentAttributionDate),
+        desc(customerAttributions.createdAt)
+      )
+      .limit(1);
+    return attribution;
   }
 
   // Document management methods

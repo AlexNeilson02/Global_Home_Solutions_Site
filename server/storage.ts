@@ -7,6 +7,7 @@ import {
   ServiceCategory, InsertServiceCategory,
   BidRequest, InsertBidRequest,
   PageVisit, InsertPageVisit,
+  CustomerAttribution, InsertCustomerAttribution,
   CommissionRecord, InsertCommissionRecord,
   CommissionAdjustment, InsertCommissionAdjustment,
   CommissionPayment, InsertCommissionPayment,
@@ -101,6 +102,15 @@ export interface IStorage {
   }>;
   // QR/NFC verification for commission eligibility
   getVerifiedQrNfcVisit(sessionTrackingId: string, salespersonId: number): Promise<PageVisit | undefined>;
+
+  // Customer Attribution methods
+  createCustomerAttribution(attribution: InsertCustomerAttribution): Promise<CustomerAttribution>;
+  getCustomerAttribution(id: number): Promise<CustomerAttribution | undefined>;
+  getCustomerAttributionByEmail(email: string): Promise<CustomerAttribution | undefined>;
+  getCustomerAttributionsByEmailAndSalesperson(email: string, salespersonId: number): Promise<CustomerAttribution | undefined>;
+  upgradeCustomerAttributionToPermanent(email: string, salespersonId: number): Promise<CustomerAttribution | undefined>;
+  updateCustomerAttributionStats(email: string, salespersonId: number): Promise<CustomerAttribution | undefined>;
+  getActiveCustomerAttributionByEmail(email: string): Promise<CustomerAttribution | undefined>;
 
   // Commission methods
   createCommissionRecord(commission: InsertCommissionRecord): Promise<CommissionRecord>;
@@ -660,6 +670,69 @@ export class MemStorage implements IStorage {
       rating: 5
     });
   }
+
+  // Customer Attribution stub methods (not implemented in MemStorage)
+  async createCustomerAttribution(): Promise<any> { throw new Error("Not implemented in MemStorage"); }
+  async getCustomerAttribution(): Promise<any> { throw new Error("Not implemented in MemStorage"); }
+  async getCustomerAttributionByEmail(): Promise<any> { throw new Error("Not implemented in MemStorage"); }
+  async getCustomerAttributionsByEmailAndSalesperson(): Promise<any> { throw new Error("Not implemented in MemStorage"); }
+  async upgradeCustomerAttributionToPermanent(): Promise<any> { throw new Error("Not implemented in MemStorage"); }
+  async updateCustomerAttributionStats(): Promise<any> { throw new Error("Not implemented in MemStorage"); }
+  async getActiveCustomerAttributionByEmail(): Promise<any> { throw new Error("Not implemented in MemStorage"); }
+
+  // Page Visit stub methods (not implemented in MemStorage)
+  async createPageVisit(): Promise<any> { throw new Error("Not implemented in MemStorage"); }
+  async getPageVisitsBySalespersonId(): Promise<any[]> { return []; }
+  async updatePageVisitConversion(): Promise<any> { throw new Error("Not implemented in MemStorage"); }
+  async getPageVisitStats(): Promise<any> { throw new Error("Not implemented in MemStorage"); }
+  async getVerifiedQrNfcVisit(): Promise<any> { throw new Error("Not implemented in MemStorage"); }
+
+  // Commission stub methods (not implemented in MemStorage)  
+  async createCommissionRecord(): Promise<any> { throw new Error("Not implemented in MemStorage"); }
+  async getCommissionRecord(): Promise<any> { throw new Error("Not implemented in MemStorage"); }
+  async getCommissionRecordsByBidRequest(): Promise<any[]> { return []; }
+  async getCommissionRecordsBySalesperson(): Promise<any[]> { return []; }
+  async getCommissionRecordsByDateRange(): Promise<any[]> { return []; }
+  async updateCommissionRecordStatus(): Promise<any> { throw new Error("Not implemented in MemStorage"); }
+  async updateCommissionRecordPayment(): Promise<any> { throw new Error("Not implemented in MemStorage"); }
+  async createCommissionAdjustment(): Promise<any> { throw new Error("Not implemented in MemStorage"); }
+  async getCommissionAdjustmentsByRecord(): Promise<any[]> { return []; }
+  async createCommissionPayment(): Promise<any> { throw new Error("Not implemented in MemStorage"); }
+  async getCommissionPaymentsByRecipient(): Promise<any[]> { return []; }
+  async updateCommissionPaymentStatus(): Promise<any> { throw new Error("Not implemented in MemStorage"); }
+  async getPendingCommissionsForContractor(): Promise<any[]> { return []; }
+  async getCommissionSummaryBySalesperson(): Promise<any> { throw new Error("Not implemented in MemStorage"); }
+  async getTopEarnersBySalesperson(): Promise<any[]> { return []; }
+  async getCommissionAnalytics(): Promise<any> { throw new Error("Not implemented in MemStorage"); }
+  async getContractorMonthlySpending(): Promise<number> { return 0; }
+  async createEmailCommunication(): Promise<any> { throw new Error("Not implemented in MemStorage"); }
+  async getEmailCommunicationsByContractorId(): Promise<any[]> { return []; }
+  async getEmailCommunicationsByBidRequestId(): Promise<any[]> { return []; }
+  async updateEmailCommunication(): Promise<any> { throw new Error("Not implemented in MemStorage"); }
+
+  // Missing user methods
+  async updateUserLastLogin(): Promise<any> { throw new Error("Not implemented in MemStorage"); }
+  async getUsersByRole(): Promise<any[]> { return []; }
+  async getUserByRole(): Promise<any> { throw new Error("Not implemented in MemStorage"); }
+  async updateStripeCustomerId(): Promise<any> { throw new Error("Not implemented in MemStorage"); }
+  async updateUserStripeInfo(): Promise<any> { throw new Error("Not implemented in MemStorage"); }
+
+  // Missing salesperson methods
+  async getSalespersonById(): Promise<any> { throw new Error("Not implemented in MemStorage"); }
+  async getSalespersonByStripeAccountId(): Promise<any> { throw new Error("Not implemented in MemStorage"); }
+  async incrementSalespersonStats(): Promise<any> { throw new Error("Not implemented in MemStorage"); }
+  async getSalespersonAnalytics(): Promise<any> { throw new Error("Not implemented in MemStorage"); }
+  async getTopSalespersons(): Promise<any[]> { return []; }
+
+  // Missing contractor methods
+  async getFeaturedContractors(): Promise<any[]> { return []; }
+  async updateContractorStripeInfo(): Promise<any> { throw new Error("Not implemented in MemStorage"); }
+  async getContractorByStripeSubscriptionId(): Promise<any> { throw new Error("Not implemented in MemStorage"); }
+
+  // Missing bid request methods
+  async getBidRequestsBySalespersonId(): Promise<any[]> { return []; }
+  async getRecentBidRequests(): Promise<any[]> { return []; }
+  async updateBidRequestNotes(): Promise<any> { throw new Error("Not implemented in MemStorage"); }
 
   // Refund request stub methods (not implemented in MemStorage)
   async createRefundRequest(): Promise<any> { throw new Error("Not implemented in MemStorage"); }

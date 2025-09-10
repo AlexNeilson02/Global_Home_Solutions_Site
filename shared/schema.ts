@@ -1,7 +1,7 @@
 import { pgTable, text, serial, integer, boolean, timestamp, real, json, varchar, index } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
-import { relations } from "drizzle-orm";
+import { relations, eq } from "drizzle-orm";
 
 // Session storage table for authentication
 export const sessions = pgTable(
@@ -207,7 +207,15 @@ export const customerAttributions = pgTable("customer_attributions", {
   // Optional customer identification data
   customerName: text("customer_name"),
   customerPhone: text("customer_phone"),
-});
+}, (table) => [
+  // Unique constraint: only one active attribution per customer email
+  index("unique_active_customer_email").on(table.customerEmail, table.isActive).where(eq(table.isActive, true)),
+  // Performance indexes
+  index("idx_customer_email").on(table.customerEmail),
+  index("idx_salesperson_id").on(table.salespersonId),
+  index("idx_attribution_type").on(table.attributionType),
+  index("idx_created_at").on(table.createdAt),
+]);
 
 // Documents/Files table for organized file management
 export const documents = pgTable("documents", {
