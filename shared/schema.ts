@@ -184,6 +184,31 @@ export const pageVisits = pgTable("page_visits", {
   sessionTrackingId: text("session_tracking_id"), // Unique ID to link visits to bid requests
 });
 
+// Customer Attribution table for permanent customer-to-salesperson relationships
+export const customerAttributions = pgTable("customer_attributions", {
+  id: serial("id").primaryKey(),
+  customerEmail: text("customer_email").notNull(),
+  salespersonId: integer("salesperson_id").notNull().references(() => salespersons.id),
+  
+  // Attribution tracking fields
+  attributionType: text("attribution_type").notNull(), // 'session', 'permanent'
+  attributionSource: text("attribution_source").notNull(), // 'qr_code', 'nfc_tag', 'web_link'
+  firstVisitDate: timestamp("first_visit_date").defaultNow(),
+  permanentAttributionDate: timestamp("permanent_attribution_date"), // When app was installed
+  
+  // Usage tracking
+  totalBidRequests: integer("total_bid_requests").default(0),
+  lastBidRequestDate: timestamp("last_bid_request_date"),
+  
+  // Metadata
+  createdAt: timestamp("created_at").defaultNow(),
+  isActive: boolean("is_active").default(true),
+  
+  // Optional customer identification data
+  customerName: text("customer_name"),
+  customerPhone: text("customer_phone"),
+});
+
 // Documents/Files table for organized file management
 export const documents = pgTable("documents", {
   id: serial("id").primaryKey(),
@@ -426,6 +451,14 @@ export const insertPageVisitSchema = createInsertSchema(pageVisits).omit({
   timestamp: true,
   convertedToBidRequest: true,
   bidRequestId: true,
+});
+
+export const insertCustomerAttributionSchema = createInsertSchema(customerAttributions).omit({
+  id: true,
+  firstVisitDate: true,
+  totalBidRequests: true,
+  lastBidRequestDate: true,
+  createdAt: true,
 });
 
 export const insertDocumentSchema = createInsertSchema(documents).omit({
@@ -684,6 +717,9 @@ export type InsertBidRequest = z.infer<typeof insertBidRequestSchema>;
 
 export type PageVisit = typeof pageVisits.$inferSelect;
 export type InsertPageVisit = z.infer<typeof insertPageVisitSchema>;
+
+export type CustomerAttribution = typeof customerAttributions.$inferSelect;
+export type InsertCustomerAttribution = z.infer<typeof insertCustomerAttributionSchema>;
 
 export type Document = typeof documents.$inferSelect;
 export type InsertDocument = z.infer<typeof insertDocumentSchema>;
