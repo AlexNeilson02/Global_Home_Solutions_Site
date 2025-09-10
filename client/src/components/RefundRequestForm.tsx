@@ -305,7 +305,6 @@ export function RefundRequestForm({ contractorId }: RefundRequestFormProps) {
                   <h5 className="text-sm font-medium text-yellow-800">Important Information</h5>
                   <ul className="text-sm text-yellow-700 mt-1 space-y-1">
                     <li>• Refund requests are reviewed by our admin team</li>
-                    <li>• Approved refunds will be deducted from future revenue</li>
                     <li>• Processing may take 3-5 business days</li>
                     <li>• You will be notified of the decision via email</li>
                   </ul>
