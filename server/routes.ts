@@ -544,12 +544,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Track page visit for QR code attribution - public endpoint
   apiRouter.post("/track-visit", async (req: Request, res: Response) => {
     try {
-      const { salespersonProfileUrl, userAgent, referrer } = req.body;
+      const { salespersonProfileUrl, userAgent, referrer, sessionTrackingId } = req.body;
       
       console.log('Track visit request received:', { 
         salespersonProfileUrl, 
         userAgent: userAgent?.substring(0, 50) + '...', 
         referrer,
+        sessionTrackingId,
         ip: req.ip 
       });
       
@@ -558,9 +559,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Salesperson profile URL is required" });
       }
 
-      // Generate unique session tracking ID for this visit
-      const sessionTrackingId = `qr_${salespersonProfileUrl}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-      console.log('Generated session tracking ID:', sessionTrackingId);
+      // Use frontend-provided sessionTrackingId or generate fallback
+      const finalSessionTrackingId = sessionTrackingId || `qr_${salespersonProfileUrl}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      console.log('Using session tracking ID:', finalSessionTrackingId, sessionTrackingId ? '(from frontend)' : '(fallback generated)');
 
       // Get salesperson by profile URL with improved error handling
       console.log('Looking up salesperson by profile URL:', salespersonProfileUrl);
@@ -609,7 +610,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
               id: salesperson.id,
               profileUrl: salesperson.profileUrl
             },
-            sessionTrackingId: recentVisits[0].sessionTrackingId || sessionTrackingId,
+            sessionTrackingId: recentVisits[0].sessionTrackingId || finalSessionTrackingId,
             isVerified: true,
             isDuplicate: true,
             message: 'Visit already tracked recently for this session'
@@ -630,14 +631,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Mark as verified QR/NFC visit for commission eligibility
         isVerifiedQrNfcVisit: true,
         qrNfcSource: 'qr_code', // or 'nfc_tag' if coming from NFC
-        sessionTrackingId: sessionTrackingId
+        sessionTrackingId: finalSessionTrackingId
       });
 
       console.log('Created page visit record:', pageVisit.id);
-
-      // Increment salesperson's total visits
-      await storage.incrementSalespersonStats(salesperson.id, 'totalVisits');
-      
       console.log('Successfully tracked visit for salesperson:', salesperson.id);
 
       res.json({ 
@@ -646,7 +643,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           id: salesperson.id,
           profileUrl: salesperson.profileUrl
         },
-        sessionTrackingId: sessionTrackingId,
+        sessionTrackingId: finalSessionTrackingId,
         isVerified: true
       });
     } catch (error) {

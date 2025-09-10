@@ -55,6 +55,16 @@ export default function HomePage() {
       setTrackingComplete(true);
       return;
     }
+
+    // Generate or get existing session tracking ID
+    let sessionTrackingId = sessionStorage.getItem('sessionTrackingId');
+    if (!sessionTrackingId) {
+      sessionTrackingId = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      sessionStorage.setItem('sessionTrackingId', sessionTrackingId);
+      console.log('📱 Generated new session tracking ID:', sessionTrackingId);
+    } else {
+      console.log('📱 Using existing session tracking ID:', sessionTrackingId);
+    }
     
     // Only track if we haven't tracked yet in this component and session
     if (!trackingComplete && !trackingLoading) {
@@ -65,20 +75,20 @@ export default function HomePage() {
         try {
           console.log(`📡 Attempt ${retryCount + 1}: Making track-visit API call...`);
           
+          // apiRequest throws on non-2xx responses, so if we get past this call it was successful
           const response = await apiRequest('POST', '/api/track-visit', {
             salespersonProfileUrl: refParam,
             userAgent: navigator.userAgent,
-            referrer: document.referrer
+            referrer: document.referrer,
+            sessionTrackingId: sessionTrackingId
           });
           
-          if (response.ok) {
-            console.log('✅ Page visit tracked successfully for ref:', refParam);
-            // Mark as tracked in this session to prevent duplicates
-            sessionStorage.setItem(sessionKey, 'true');
-            setTrackingComplete(true);
-          } else {
-            throw new Error(`Track visit failed with status: ${response.status}`);
-          }
+          // If we reach here, the call was successful (apiRequest would have thrown otherwise)
+          console.log('✅ Page visit tracked successfully for ref:', refParam);
+          // Mark as tracked in this session to prevent duplicates
+          sessionStorage.setItem(sessionKey, 'true');
+          setTrackingComplete(true);
+          setTrackingLoading(false);
         } catch (error) {
           console.error(`❌ Track visit attempt ${retryCount + 1} failed:`, error);
           
@@ -91,10 +101,6 @@ export default function HomePage() {
             console.error('❌ All tracking attempts failed for ref:', refParam);
             setTrackingComplete(true); // Allow page to work without tracking
             setTrackingLoading(false); // Clear loading state when all attempts fail
-          }
-        } finally {
-          if (retryCount === 0) {
-            setTrackingLoading(false);
           }
         }
       };
