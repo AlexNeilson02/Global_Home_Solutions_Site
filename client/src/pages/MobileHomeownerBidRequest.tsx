@@ -55,6 +55,7 @@ interface Contractor {
   id: number;
   companyName: string;
   specialties: string[];
+  serviceCategoryIds: number[];
   logoUrl?: string;
 }
 
@@ -107,14 +108,11 @@ export default function MobileHomeownerBidRequest() {
   // Submit bid request mutation
   const submitBidRequest = useMutation({
     mutationFn: async (data: BidRequestForm & { contractorId: number }) => {
-      return apiRequest('/api/bid-requests', {
-        method: 'POST',
-        body: JSON.stringify({
-          fullName: user?.fullName || "",
-          email: user?.email || "",
-          phone: user?.phone || "",
-          ...data
-        }),
+      return apiRequest('POST', '/api/bid-requests', {
+        fullName: user?.fullName || "",
+        email: user?.email || "",
+        phone: user?.phone || "",
+        ...data
       });
     },
     onSuccess: () => {
@@ -146,14 +144,34 @@ export default function MobileHomeownerBidRequest() {
   const getFilteredContractors = () => {
     if (!contractors?.contractors || selectedServices.length === 0) return [];
     
-    return contractors.contractors.filter(contractor => 
-      contractor.specialties && contractor.specialties.some(specialty => 
-        selectedServices.some(service => 
-          specialty.toLowerCase().includes(service.toLowerCase()) ||
-          service.toLowerCase().includes(specialty.toLowerCase())
-        )
-      )
-    );
+    // Get the IDs of selected services
+    const selectedServiceIds = serviceCategories?.services
+      ?.filter(service => selectedServices.includes(service.name))
+      ?.map(service => service.id) || [];
+    
+    return contractors.contractors.filter(contractor => {
+      // Primary matching: Check if contractor has serviceCategoryIds that match selected services
+      if (contractor.serviceCategoryIds && Array.isArray(contractor.serviceCategoryIds) && selectedServiceIds.length > 0) {
+        const hasMatchingServiceId = contractor.serviceCategoryIds.some(id => selectedServiceIds.includes(id));
+        if (hasMatchingServiceId) {
+          return true;
+        }
+      }
+      
+      // Fallback matching: Check specialties text (for contractors who only have text-based specialties)
+      if (contractor.specialties && Array.isArray(contractor.specialties)) {
+        return contractor.specialties.some(specialty => 
+          selectedServices.some(service => {
+            const normalizedSpecialty = specialty.toLowerCase().trim();
+            const normalizedService = service.toLowerCase().trim();
+            return normalizedSpecialty.includes(normalizedService) ||
+                   normalizedService.includes(normalizedSpecialty);
+          })
+        );
+      }
+      
+      return false;
+    });
   };
 
   const onSubmit = async (data: BidRequestForm) => {
