@@ -21,14 +21,16 @@ export function RefundHistory({ type, contractorId }: RefundHistoryProps) {
   // Fetch refund requests based on type
   const { data: refundData, isLoading, refetch } = useQuery({
     queryKey: ['refund-history', type, contractorId, statusFilter],
-    queryFn: () => {
+    queryFn: async () => {
       if (type === 'contractor' && contractorId) {
-        return apiRequest('GET', `/api/refunds/contractor/${contractorId}`);
+        const response = await apiRequest('GET', `/api/refunds/contractor/${contractorId}`);
+        return response.json();
       } else if (type === 'admin') {
         const params = statusFilter !== 'all' ? `?status=${statusFilter}` : '';
-        return apiRequest('GET', `/api/refunds/all${params}`);
+        const response = await apiRequest('GET', `/api/refunds/all${params}`);
+        return response.json();
       }
-      return Promise.resolve({ refundRequests: [] });
+      return { refundRequests: [] };
     },
     enabled: type === 'admin' || (type === 'contractor' && !!contractorId),
   });
