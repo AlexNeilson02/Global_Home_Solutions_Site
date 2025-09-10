@@ -34,15 +34,32 @@ export default function HomePage() {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  // Page visit tracking for ?ref=username
+  // Page visit tracking for ?ref=username with session-based deduplication
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const refParam = urlParams.get('ref');
     
-    // Only track if we have ref parameter and haven't tracked yet
-    if (refParam && !trackingComplete && !trackingLoading) {
+    if (!refParam) {
+      // No ref parameter, mark tracking as complete
+      console.log('ℹ️ No ref parameter found - no visit tracking needed');
+      setTrackingComplete(true);
+      return;
+    }
+
+    // Check if this visit has already been tracked in this session
+    const sessionKey = `visit_tracked_${refParam}`;
+    const alreadyTracked = sessionStorage.getItem(sessionKey);
+    
+    if (alreadyTracked) {
+      console.log('✅ Visit already tracked for this session for ref:', refParam);
+      setTrackingComplete(true);
+      return;
+    }
+    
+    // Only track if we haven't tracked yet in this component and session
+    if (!trackingComplete && !trackingLoading) {
       setTrackingLoading(true);
-      console.log('🔄 Starting page visit tracking for ref:', refParam);
+      console.log('🔄 Starting page visit tracking for ref:', refParam, '(new session)');
       
       const trackVisit = async (retryCount = 0) => {
         try {
@@ -56,6 +73,8 @@ export default function HomePage() {
           
           if (response.ok) {
             console.log('✅ Page visit tracked successfully for ref:', refParam);
+            // Mark as tracked in this session to prevent duplicates
+            sessionStorage.setItem(sessionKey, 'true');
             setTrackingComplete(true);
           } else {
             throw new Error(`Track visit failed with status: ${response.status}`);
@@ -81,10 +100,6 @@ export default function HomePage() {
       };
       
       trackVisit();
-    } else if (!refParam) {
-      // No ref parameter, mark tracking as complete
-      console.log('ℹ️ No ref parameter found - no visit tracking needed');
-      setTrackingComplete(true);
     }
   }, [trackingComplete, trackingLoading]);
 

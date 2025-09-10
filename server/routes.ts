@@ -584,6 +584,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       console.log('Found salesperson:', { id: salesperson.id, profileUrl: salesperson.profileUrl });
 
+      // Check for recent duplicate visits from same IP to prevent double counting
+      // This provides backend protection in addition to frontend sessionStorage checks
+      const recentTimeThreshold = new Date(Date.now() - 5 * 60 * 1000); // 5 minutes ago
+      
+      try {
+        const recentVisits = await storage.getRecentPageVisits(
+          salesperson.id, 
+          req.ip || 'unknown', 
+          recentTimeThreshold
+        );
+        
+        if (recentVisits && recentVisits.length > 0) {
+          console.log('⚠️ Recent visit detected from same IP within 5 minutes - skipping duplicate');
+          console.log('Recent visits:', recentVisits.map(v => ({ 
+            id: v.id, 
+            timestamp: v.timestamp, 
+            ip: v.visitorIp 
+          })));
+          
+          return res.json({ 
+            success: true, 
+            salesperson: {
+              id: salesperson.id,
+              profileUrl: salesperson.profileUrl
+            },
+            sessionTrackingId: recentVisits[0].sessionTrackingId || sessionTrackingId,
+            isVerified: true,
+            isDuplicate: true,
+            message: 'Visit already tracked recently for this session'
+          });
+        }
+      } catch (duplicateCheckError) {
+        // If duplicate check fails, log and continue with normal tracking
+        console.warn('⚠️ Duplicate check failed, proceeding with tracking:', duplicateCheckError);
+      }
+
       // Create page visit record for tracking with QR/NFC verification
       const pageVisit = await storage.createPageVisit({
         salespersonId: salesperson.id,

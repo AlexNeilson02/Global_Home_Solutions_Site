@@ -100,6 +100,8 @@ export interface IStorage {
     uniqueVisitors: number, 
     conversionRate: number 
   }>;
+  // Get recent page visits for deduplication
+  getRecentPageVisits(salespersonId: number, visitorIp: string, sinceTime: Date): Promise<PageVisit[]>;
   // QR/NFC verification for commission eligibility
   getVerifiedQrNfcVisit(sessionTrackingId: string, salespersonId: number): Promise<PageVisit | undefined>;
 
@@ -685,6 +687,7 @@ export class MemStorage implements IStorage {
   async getPageVisitsBySalespersonId(): Promise<any[]> { return []; }
   async updatePageVisitConversion(): Promise<any> { throw new Error("Not implemented in MemStorage"); }
   async getPageVisitStats(): Promise<any> { throw new Error("Not implemented in MemStorage"); }
+  async getRecentPageVisits(): Promise<any> { throw new Error("Not implemented in MemStorage"); }
   async getVerifiedQrNfcVisit(): Promise<any> { throw new Error("Not implemented in MemStorage"); }
 
   // Commission stub methods (not implemented in MemStorage)  

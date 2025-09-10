@@ -670,6 +670,16 @@ export class DatabaseStorage implements IStorage {
     return db.select().from(pageVisits).where(eq(pageVisits.salespersonId, salespersonId));
   }
   
+  async getRecentPageVisits(salespersonId: number, visitorIp: string, sinceTime: Date): Promise<PageVisit[]> {
+    return db.select().from(pageVisits)
+      .where(and(
+        eq(pageVisits.salespersonId, salespersonId),
+        eq(pageVisits.visitorIp, visitorIp),
+        gt(pageVisits.timestamp, sinceTime)
+      ))
+      .orderBy(desc(pageVisits.timestamp));
+  }
+  
   async updatePageVisitConversion(id: number, bidRequestId: number): Promise<PageVisit | undefined> {
     const [visit] = await db
       .update(pageVisits)
