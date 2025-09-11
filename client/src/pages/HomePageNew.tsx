@@ -138,16 +138,7 @@ export default function HomePage() {
         About Us
       </Link>
 
-      {/* Mobile Login Button - Top Right */}
-      {isMobile && !user && (
-        <TouchOptimizedButton
-          onClick={() => navigateWithSalesperson('/login')}
-          size="sm"
-          className="mobile-nav-show fixed top-5 right-5 z-20 bg-white/20 backdrop-blur-sm text-white border border-white/30 hover:bg-white/30 touch-target"
-        >
-          Login
-        </TouchOptimizedButton>
-      )}
+      
 
       {/* Mobile User Menu - Top Right */}
       {isMobile && user && (
