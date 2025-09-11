@@ -64,10 +64,12 @@ const ServiceSelection = () => {
 
   const { data: serviceCategories } = useQuery<ServiceCategoriesResponse>({
     queryKey: ["/api/service-categories"],
+    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
   });
 
   const { data: contractors } = useQuery<ContractorsResponse>({
-    queryKey: ["/api/contractors"],
+    queryKey: ["/api/contractors/featured"],
+    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
   });
 
   // Get specific contractors for featured cards
